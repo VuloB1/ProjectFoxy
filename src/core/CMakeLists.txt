@@ -1,0 +1,54 @@
+add_library(imageviewer_core STATIC
+    ImageDocument.h
+    ImageDocument.cpp
+    ImageLoader.h
+    ImageLoader.cpp
+    DecoderRegistry.h
+    DecoderRegistry.cpp
+    decoders/IImageDecoder.h
+    decoders/VipsGuard.h
+    decoders/VipsGuard.cpp
+    decoders/VipsDecoder.h
+    decoders/VipsDecoder.cpp
+    decoders/RawDecoder.h
+    decoders/RawDecoder.cpp
+    decoders/HeifDecoder.h
+    decoders/HeifDecoder.cpp
+    decoders/QtImageDecoder.h
+    decoders/QtImageDecoder.cpp
+    decoders/AnimatedDecoder.h
+    decoders/AnimatedDecoder.cpp
+    ThumbnailCache.h
+    ThumbnailCache.cpp
+    ColorManagement.h
+    ColorManagement.cpp
+    ImageWriter.h
+    ImageWriter.cpp
+    MetadataReader.h
+    MetadataReader.cpp
+    Histogram.h
+    Histogram.cpp
+    edit/EditStack.h
+    edit/EditStack.cpp
+    edit/AdjustMath.h
+    edit/AdjustMath.cpp
+    edit/Looks.h
+    edit/Looks.cpp
+    edit/Effects.h
+    edit/Effects.cpp
+    edit/Resample.h
+    edit/Resample.cpp
+    edit/ParallelRows.h
+    edit/Operations.h
+)
+
+target_include_directories(imageviewer_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(imageviewer_core PUBLIC
+    Qt6::Core
+    Qt6::Gui
+    PkgConfig::VIPS
+    PkgConfig::LIBRAW
+    PkgConfig::LIBHEIF
+    PkgConfig::EXIV2
+)

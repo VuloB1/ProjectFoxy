@@ -1,0 +1,28 @@
+{
+  "name": "image-viewer",
+  "version": "0.1.0",
+  "$comment": "Licensing-sensitive choices are annotated on the dependency they affect. See docs/LICENCIAS.md before changing any of them.",
+  "builtin-baseline": "10541e317a660f4165ba4ac2851ab54a8d4577b1",
+  "dependencies": [
+    {
+      "name": "libvips",
+      "features": ["cplusplus", "jpeg", "png", "tiff", "webp"]
+    },
+    "libraw",
+    {
+      "name": "libheif",
+      "$comment": "DO NOT remove default-features:false. libheif's default feature 'hevc' pulls in x265, which is GPL-2.0-or-later and would put a GPL encoder in the shipped folder. Without it HEIC is still DECODED (libde265, LGPL-3.0) and AVIF works through aom (BSD-2-Clause). The program does not write HEIC, so no encoder is needed.",
+      "default-features": false,
+      "features": ["aom"]
+    },
+    {
+      "name": "exiv2",
+      "features": ["png", "xmp"],
+      "$comment": "GPL-2.0-or-later: the one dependency that blocks closed-source distribution. Used only by src/core/MetadataReader.cpp and src/core/ImageWriter.cpp. Decision pending, see docs/LICENCIAS.md. 'png' (zlib) and 'xmp' (expat) are OFF in the port by default: without them exiv2 does not recognise a PNG at all and cannot read or write XMP, so the metadata a save is supposed to keep was silently dropped (tests/test_image_writer.cpp checks both). 'bmff' (HEIC/AVIF/CR3 metadata, needs brotli) is deliberately left off."
+    },
+    {
+      "name": "pkgconf",
+      "host": true
+    }
+  ]
+}

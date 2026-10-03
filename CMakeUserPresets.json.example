@@ -1,0 +1,29 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "local-release",
+      "inherits": "windows-release",
+      "binaryDir": "C:/build/imageviewer/release",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.7.3/msvc2022_64"
+      }
+    },
+    {
+      "name": "local-debug",
+      "inherits": "windows-debug",
+      "binaryDir": "C:/build/imageviewer/debug",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.7.3/msvc2022_64"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "local-release", "configurePreset": "local-release" },
+    { "name": "local-debug", "configurePreset": "local-debug" }
+  ],
+  "testPresets": [
+    { "name": "local-release", "inherits": "windows-release", "configurePreset": "local-release" },
+    { "name": "local-debug", "inherits": "windows-debug", "configurePreset": "local-debug" }
+  ]
+}

@@ -1,0 +1,11 @@
+build/
+out/
+*.user
+.vs/
+.vscode/
+CMakeUserPresets.json
+vcpkg_installed/
+datos/
+*.zip
+*.log
+.claude/
