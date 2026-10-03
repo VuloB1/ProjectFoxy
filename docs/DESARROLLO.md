@@ -102,7 +102,7 @@ Tamaño del código (líneas no vacías, aproximado): núcleo C++ ≈ 4 200 · c
   `.example`).
 - **Shaders**: `qt_add_shaders` compila `Grade.frag` y `Detail.frag` a `.qsb`
   (objetivos GLSL `150,300es` porque el ruido usa enteros sin signo).
-- **Pruebas**: QtTest, 11 ejecutables, **290 casos** (incluida la **paridad CPU↔GPU con
+- **Pruebas**: QtTest, 11 ejecutables, **291 casos** (incluida la **paridad CPU↔GPU con
   Direct3D 11** y el `AppController` real), más una **prueba de humo** del programa real
   (`smoke_startup`): 12 entradas en `ctest`, todas pasan.
 - **Plataforma**: solo Windows (usa `Shell32`/`User32`, fondo de escritorio por
@@ -627,7 +627,7 @@ llamando a una librería sin iniciar).
 
 ## 7. Calidad y verificación
 
-**Pruebas automáticas** (QtTest, 290 casos contando `initTestCase`/`cleanupTestCase`, + humo;
+**Pruebas automáticas** (QtTest, 291 casos contando `initTestCase`/`cleanupTestCase`, + humo;
 `ctest` ejecuta 12 programas):
 - `test_color_management` (16): P3 y AdobeRGB frente a matemática de referencia independiente,
   sRGB sin tocar (incluido el perfil de Windows), perfiles inválidos o CMYK rechazados, alfa
@@ -681,7 +681,7 @@ llamando a una librería sin iniciar).
   hay dispositivo Direct3D 11. Estado anterior a la corrección de alfa, medido con esta
   misma prueba: 14 de 15 ajustes se desviaban hasta 247 niveles con transparencia.
 - `test_animated_decoder` (9): GIF/APNG con fixtures.
-- `test_app_settings` (10): el interruptor del Modo pixel y sus cinco extras —todo apagado por defecto,
+- `test_app_settings` (11): el interruptor del Modo pixel y sus cinco extras —todo apagado por defecto,
   cada uno se recuerda por separado, una señal por cambio real— y la migración desde el interruptor
   único antiguo (corre contra la carpeta de configuración de prueba de Qt, nunca contra el `.ini` real), más el modo portable.
 - **`smoke_startup`**: arranca el programa real sobre una foto, sin ventana visible
@@ -1077,3 +1077,5 @@ reinstale lo afectado en el siguiente `cmake --build`.
   recto, de vecindad sobre premultiplicado; y llevar una fila en `test_gpu_parity`.
 
 **Versión portable.** `src/app/AppPaths.h`: si junto a `ImageViewer.exe` existe `portable.txt`, la configuración (`settings.ini`) y la caché de miniaturas van a `datos\` en vez del perfil de Windows. El zip se arma con `cmake --install` (carpeta autocontenida, ver `tools/Test-Install.ps1`) + `portable.txt` + `LEEME.txt` + `licenses\` (avisos y `LICENCIAS.md`); sin firmar (SmartScreen avisa). Probado extrayendo el zip en una carpeta limpia y arrancando con PATH reducido: sin salida de errores, `datos\` creado, el `.ini` real intacto.
+
+**Barra de miniaturas configurable.** `ThumbnailStrip.qml` pasó de `ListView` a `GridView`: `appSettings.stripColumns` (1–4) × `stripThumbSize` (48–200 px, tope: la mitad de la ventana). Arrastrando el borde derecho con el mouse cambia el tamaño en vivo (`liveCell`, sin animación) y al soltar se guarda en `stripThumbSize`. `appSettings.stripMode`: `manual` (la pestaña abre/cierra), `open` y `closed` (sin pestaña) y `auto` (cerrada al editar, durante la presentación —`FloatingToolbar.slideshowRunning`— y con la ventana de menos de 900 px; la pestaña puede invertir la decisión hasta que cambie la situación). Las miniaturas se piden a 160 px, o a 256 si el tamaño pasa de 110. Se configura en Configuración > Apariencia > «Barra de miniaturas». +1 prueba en `test_app_settings`.

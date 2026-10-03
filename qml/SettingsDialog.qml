@@ -218,7 +218,7 @@ AppDialog {
                 Item {
                     id: pageColumn
                     width: scroller.width - 12
-                    implicitHeight: Math.max(appearance.implicitHeight + pixelCard.implicitHeight + 16, slideshow.implicitHeight,
+                    implicitHeight: Math.max(appearance.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + 32, slideshow.implicitHeight,
                                              saving.implicitHeight, batch.implicitHeight)
 
                     // -- Apariencia: one preview card per theme --------------------
@@ -405,6 +405,47 @@ AppDialog {
                                     checked: appSettings.pixelSharpEdit
                                     onToggled: appSettings.pixelSharpEdit = checked
                                 }
+                            }
+                        }
+                    }
+
+                    // -- Apariencia, 3rd card: the thumbnail bar on the left -------------------
+                    Card {
+                        id: stripCard
+                        width: parent.width
+                        visible: root.page === 0
+                        y: appearance.height + pixelCard.height + 32
+                        heading: qsTr("Barra de miniaturas")
+                        SettingRow {
+                            label: qsTr("Cuándo se muestra")
+                            hint: qsTr("«Con pestaña» la abres y cierras tú. «Automática» se cierra al editar, en la presentación y en ventanas estrechas.")
+                            AppComboBox {
+                                id: stripModeCombo
+                                width: 170
+                                readonly property var modes: ["manual", "open", "closed", "auto"]
+                                model: [qsTr("Con pestaña"), qsTr("Siempre abierta"), qsTr("Siempre cerrada"), qsTr("Automática")]
+                                currentIndex: Math.max(0, modes.indexOf(appSettings.stripMode))
+                                onActivated: function (i) { appSettings.stripMode = modes[i]; }
+                            }
+                        }
+                        Divider {}
+                        SettingRow {
+                            label: qsTr("Tamaño de las miniaturas")
+                            hint: qsTr("También puedes arrastrar el borde de la barra con el mouse.")
+                            ScrubNumberField {
+                                from: 48; to: 200; decimals: 0; dragStep: 1; suffix: qsTr(" px")
+                                value: appSettings.stripThumbSize
+                                onValueEdited: appSettings.stripThumbSize = Math.round(newValue)
+                            }
+                        }
+                        Divider {}
+                        SettingRow {
+                            label: qsTr("Columnas")
+                            hint: qsTr("Útil con muchas imágenes en la carpeta.")
+                            ScrubNumberField {
+                                from: 1; to: 4; decimals: 0; dragStep: 1
+                                value: appSettings.stripColumns
+                                onValueEdited: appSettings.stripColumns = Math.round(newValue)
                             }
                         }
                     }

@@ -92,6 +92,7 @@ ApplicationWindow {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         visible: folderModel.count > 1
+        busy: root.editMode || floatingToolbar.slideshowRunning
         enabled: !root.toolLocked
         opacity: enabled ? 1.0 : 0.45
     }

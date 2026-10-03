@@ -24,6 +24,9 @@ AppSettings::AppSettings(QObject *parent)
     m_batchExportQuality = m_store.value(QStringLiteral("batch/exportQuality"), kDefaultQuality).toInt();
     m_batchRenamePadding = m_store.value(QStringLiteral("batch/renamePadding"), kDefaultPadding).toInt();
     m_confirmOverwrite = m_store.value(QStringLiteral("save/confirmOverwrite"), true).toBool();
+    m_stripThumbSize = std::clamp(m_store.value(QStringLiteral("strip/thumbSize"), 88).toInt(), 48, 200);
+    m_stripColumns = std::clamp(m_store.value(QStringLiteral("strip/columns"), 1).toInt(), 1, 4);
+    setStripMode(m_store.value(QStringLiteral("strip/mode"), QStringLiteral("manual")).toString());
 
     // The mode started life as one all-in-one switch ("view/pixelArt"). Whoever had that on keeps
     // every extra on; for everybody else the extras start off.
@@ -34,6 +37,38 @@ AppSettings::AppSettings(QObject *parent)
     m_pixelGrid = m_store.value(QStringLiteral("view/pixelGrid"), wasAllInOne).toBool();
     m_pixelReadout = m_store.value(QStringLiteral("view/pixelReadout"), wasAllInOne).toBool();
     m_pixelSharpEdit = m_store.value(QStringLiteral("view/pixelSharpEdit"), wasAllInOne).toBool();
+}
+
+void AppSettings::setStripThumbSize(int value)
+{
+    value = std::clamp(value, 48, 200);
+    if (m_stripThumbSize == value)
+        return;
+    m_stripThumbSize = value;
+    m_store.setValue(QStringLiteral("strip/thumbSize"), value);
+    emit stripThumbSizeChanged();
+}
+
+void AppSettings::setStripColumns(int value)
+{
+    value = std::clamp(value, 1, 4);
+    if (m_stripColumns == value)
+        return;
+    m_stripColumns = value;
+    m_store.setValue(QStringLiteral("strip/columns"), value);
+    emit stripColumnsChanged();
+}
+
+void AppSettings::setStripMode(const QString &value)
+{
+    static const QStringList known = {QStringLiteral("manual"), QStringLiteral("open"),
+                                      QStringLiteral("closed"), QStringLiteral("auto")};
+    const QString mode = known.contains(value) ? value : QStringLiteral("manual");
+    if (m_stripMode == mode)
+        return;
+    m_stripMode = mode;
+    m_store.setValue(QStringLiteral("strip/mode"), mode);
+    emit stripModeChanged();
 }
 
 bool AppSettings::storeFlag(bool &member, const QString &key, bool value)

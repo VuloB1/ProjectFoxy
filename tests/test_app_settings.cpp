@@ -37,6 +37,33 @@ private slots:
         QVERIFY(!AppPaths::portable());
     }
 
+    void theThumbnailBarKeepsItsValuesWithinRange()
+    {
+        {
+            AppSettings s;
+            QCOMPARE(s.stripThumbSize(), 88);
+            QCOMPARE(s.stripColumns(), 1);
+            QCOMPARE(s.stripMode(), QStringLiteral("manual"));
+            s.setStripThumbSize(5000);
+            QCOMPARE(s.stripThumbSize(), 200);
+            s.setStripThumbSize(3);
+            QCOMPARE(s.stripThumbSize(), 48);
+            s.setStripColumns(9);
+            QCOMPARE(s.stripColumns(), 4);
+            s.setStripColumns(0);
+            QCOMPARE(s.stripColumns(), 1);
+            s.setStripMode(QStringLiteral("nonsense"));
+            QCOMPARE(s.stripMode(), QStringLiteral("manual"));
+            s.setStripThumbSize(120);
+            s.setStripColumns(3);
+            s.setStripMode(QStringLiteral("auto"));
+        }
+        AppSettings again;
+        QCOMPARE(again.stripThumbSize(), 120);
+        QCOMPARE(again.stripColumns(), 3);
+        QCOMPARE(again.stripMode(), QStringLiteral("auto"));
+    }
+
     void everythingStartsOff()
     {
         AppSettings s;

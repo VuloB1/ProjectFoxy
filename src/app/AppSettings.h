@@ -21,6 +21,13 @@ class AppSettings : public QObject {
     // Digit count for the numbered suffix batch rename produces (e.g. 3 ->
     // "imagen_001").
     Q_PROPERTY(int batchRenamePadding READ batchRenamePadding WRITE setBatchRenamePadding NOTIFY batchRenamePaddingChanged)
+    // The thumbnail bar on the left. Size of one thumbnail in pixels (also changed by dragging the
+    // bar's edge), how many columns it has, and when it is shown: "manual" (the tab opens and
+    // closes it), "open" (always), "closed" (never) or "auto" (closes while editing, during the
+    // slideshow and in narrow windows).
+    Q_PROPERTY(int stripThumbSize READ stripThumbSize WRITE setStripThumbSize NOTIFY stripThumbSizeChanged)
+    Q_PROPERTY(int stripColumns READ stripColumns WRITE setStripColumns NOTIFY stripColumnsChanged)
+    Q_PROPERTY(QString stripMode READ stripMode WRITE setStripMode NOTIFY stripModeChanged)
     // "Modo pixel" (Configuración > Apariencia). `pixelMode` is the switch itself: pictures stay
     // sharp (no smoothing) once zoomed in, up to 64x. The rest are extras of that mode, each one
     // on its own switch, and only count while the mode is on.
@@ -48,6 +55,13 @@ public:
 
     int batchRenamePadding() const { return m_batchRenamePadding; }
     void setBatchRenamePadding(int value);
+
+    int stripThumbSize() const { return m_stripThumbSize; }
+    void setStripThumbSize(int value);
+    int stripColumns() const { return m_stripColumns; }
+    void setStripColumns(int value);
+    QString stripMode() const { return m_stripMode; }
+    void setStripMode(const QString &value);
 
     bool pixelMode() const { return m_pixelMode; }
     void setPixelMode(bool value);
@@ -77,6 +91,9 @@ signals:
     void batchExportQualityChanged();
     void batchRenamePaddingChanged();
     void confirmOverwriteChanged();
+    void stripThumbSizeChanged();
+    void stripColumnsChanged();
+    void stripModeChanged();
     void pixelModeChanged();
     void pixelIntegerZoomChanged();
     void pixelCheckerboardChanged();
@@ -96,6 +113,9 @@ private:
     int m_batchExportQuality;
     int m_batchRenamePadding;
     bool m_confirmOverwrite;
+    int m_stripThumbSize = 88;
+    int m_stripColumns = 1;
+    QString m_stripMode = QStringLiteral("manual");
     bool m_pixelMode = false;
     bool m_pixelIntegerZoom = false;
     bool m_pixelCheckerboard = false;

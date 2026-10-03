@@ -20,6 +20,8 @@ Item {
     // A tool is open in the edit panel: only the actions that belong to editing the picture
     // (Comparar, Deshacer, Rehacer) stay; leaving, saving and resetting wait for Aplicar / Cancelar.
     property bool locked: false
+    // True while the slideshow is playing (the thumbnail bar closes itself in "auto" mode).
+    readonly property bool slideshowRunning: slideshowButton.checked
     signal saveAsRequested()
     signal closeEditRequested()
 

@@ -74,7 +74,7 @@ arrastre completo de un slider es un solo paso).
 ├── qml/        ventana, lienzo, panel de edición, controles tematizados
 │   ├── controls/  envoltorios App*.qml de cada control + iconos vectoriales
 │   └── shaders/   Grade.frag y Detail.frag (vista previa en GPU)
-├── tests/      QtTest (290 casos): núcleo, el AppController real y la paridad CPU/GPU
+├── tests/      QtTest (291 casos): núcleo, el AppController real y la paridad CPU/GPU
 │               con Direct3D 11 + prueba de humo del programa real
 │               + fixtures (un archivo de ejemplo de cada formato, EXIF/XMP/IPTC, CMYK…)
 ├── tools/      archivos .reg del menú contextual y generador de avisos de terceros
