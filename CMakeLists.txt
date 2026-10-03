@@ -333,6 +333,7 @@ set(IV_VCPKG_BIN \"${_iv_vcpkg_bin}\")")
     endif()
 
     install(FILES docs/THIRD_PARTY_NOTICES.txt DESTINATION licenses)
+    install(FILES LICENSE DESTINATION licenses RENAME LICENSE-ImageViewer.txt)
 endif()
 
 # ---------------------------------------------------------------------------

@@ -111,7 +111,8 @@ como herramienta del host y `CMakeLists.txt` lo localiza solo.
 ## Estado
 - Visor, formatos, animaciones, temas, configuración, lote, Ajustes, Filtros,
   Efectos, guardado seguro y deshacer completo: **terminados**.
-- Antes de distribuirlo hay que resolver las licencias (exiv2 es GPL) y elegir la del
-  proyecto: ver `docs/LICENCIAS.md`.
+- Licencia del proyecto: **GPL-3.0-or-later**, copyright 2026 Vulito (ver `LICENSE`). Es la
+  coherente con exiv2 (GPL); las licencias de las demás dependencias están en
+  `docs/LICENCIAS.md`.
 - Pendientes: control de versiones y CI, marcos y bordes, capas de texto y formas,
   pinceles y máscaras, recetas por lote. Ver `docs/DESARROLLO.md`, sección 9.
