@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
-    Installs ImageViewer into a scratch folder and proves that folder is self-contained.
+    Installs Project Foxy into a scratch folder and proves that folder is self-contained.
 
 .DESCRIPTION
     `cmake --install` is what produces the folder that gets shipped. This script checks it:
 
       1. installs the already-built project into -Prefix (wiped first, so it must be a scratch path);
       2. adds Qt's "offscreen" platform plugin to the copy (only so it can run without a window);
-      3. starts the INSTALLED ImageViewer.exe with a PATH reduced to the Windows folders, so a
+      3. starts the INSTALLED ProjectFoxy.exe with a PATH reduced to the Windows folders, so a
          DLL that was forgotten in the install (and merely found on this machine's PATH, in the
          vcpkg tree or in the Qt SDK) makes the program fail to start;
       4. fails if it dies or writes anything to its error output (same rule as the smoke_startup
@@ -39,8 +39,8 @@ Write-Host "== cmake --install -> $Prefix"
 & $cmake --install $Build --prefix $Prefix | Out-Null
 if ($LASTEXITCODE -ne 0) { throw "cmake --install failed ($LASTEXITCODE)" }
 
-$exe = Join-Path $Prefix 'ImageViewer.exe'
-if (-not (Test-Path -LiteralPath $exe)) { throw "ImageViewer.exe is not in $Prefix" }
+$exe = Join-Path $Prefix 'ProjectFoxy.exe'
+if (-not (Test-Path -LiteralPath $exe)) { throw "ProjectFoxy.exe is not in $Prefix" }
 
 Write-Host '== content checks'
 if (Test-Path -LiteralPath (Join-Path $Prefix 'libx265.dll')) { throw 'libx265.dll (GPL) is in the installed folder' }

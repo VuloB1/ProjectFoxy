@@ -1,4 +1,4 @@
-# ImageViewer — Documento de desarrollo
+# Project Foxy — Documento de desarrollo
 
 > Documento pensado para pasárselo a un revisor externo (por ejemplo ChatGPT) y
 > pedirle opinión sobre el desarrollo: qué mejorar, qué riesgos hay y qué falta
@@ -817,7 +817,7 @@ suya, contrastada:
 | ¿Enlace estático o dinámico? (importa para la LGPL) | **Respuesta**: el triplet es `x64-windows` (DLL). `imageviewer_core` es una biblioteca estática **propia**; libvips, LibRaw, libheif y exiv2 son DLL junto al `.exe` | Triplet fijado en los presets y documentado en `CMakeLists.txt` y `LICENCIAS.md` |
 
 **Entrega reproducible (`cmake --install`).** Produce la carpeta completa de 93,8 MB:
-`ImageViewer.exe`, Qt (por `windeployqt` a través del script de despliegue de Qt, que
+`ProjectFoxy.exe`, Qt (por `windeployqt` a través del script de despliegue de Qt, que
 encuentra QtQuick.Effects escaneando el QML; sin la DLL de OpenGL por software de 20 MB),
 las **27 DLL de vcpkg que el programa necesita de verdad** (se resuelven con
 `file(GET_RUNTIME_DEPENDENCIES)` sobre el ejecutable: no se copia toda la carpeta `bin`
@@ -1076,8 +1076,10 @@ reinstale lo afectado en el siguiente `cmake --build`.
 - Todo shader nuevo debe respetar el **contrato de alfa** (4.2): por píxel sobre color
   recto, de vecindad sobre premultiplicado; y llevar una fila en `test_gpu_parity`.
 
-**Versión portable.** `src/app/AppPaths.h`: si junto a `ImageViewer.exe` existe `portable.txt`, la configuración (`settings.ini`) y la caché de miniaturas van a `datos\` en vez del perfil de Windows. El zip se arma con `cmake --install` (carpeta autocontenida, ver `tools/Test-Install.ps1`) + `portable.txt` + `LEEME.txt` + `licenses\` (avisos y `LICENCIAS.md`); sin firmar (SmartScreen avisa). Probado extrayendo el zip en una carpeta limpia y arrancando con PATH reducido: sin salida de errores, `datos\` creado, el `.ini` real intacto.
+**Versión portable.** `src/app/AppPaths.h`: si junto a `ProjectFoxy.exe` existe `portable.txt`, la configuración (`settings.ini`) y la caché de miniaturas van a `datos\` en vez del perfil de Windows. El zip se arma con `cmake --install` (carpeta autocontenida, ver `tools/Test-Install.ps1`) + `portable.txt` + `LEEME.txt` + `licenses\` (avisos y `LICENCIAS.md`); sin firmar (SmartScreen avisa). Probado extrayendo el zip en una carpeta limpia y arrancando con PATH reducido: sin salida de errores, `datos\` creado, el `.ini` real intacto.
 
 **Barra de miniaturas configurable.** `ThumbnailStrip.qml` pasó de `ListView` a `GridView`: `appSettings.stripColumns` (1–4) × `stripThumbSize` (48–200 px, tope: la mitad de la ventana). Arrastrando el borde derecho con el mouse cambia el tamaño en vivo (`liveCell`, sin animación) y al soltar se guarda en `stripThumbSize`. `appSettings.stripMode`: `manual` (la pestaña abre/cierra), `open` y `closed` (sin pestaña) y `auto` (cerrada al editar, durante la presentación —`FloatingToolbar.slideshowRunning`— y con la ventana de menos de 900 px; la pestaña puede invertir la decisión hasta que cambie la situación). Las miniaturas se piden a 160 px, o a 256 si el tamaño pasa de 110. Se configura en Configuración > Apariencia > «Barra de miniaturas». +1 prueba en `test_app_settings`.
 
 **Nombre e icono: «Project Foxy».** Título de la ventana en `Main.qml`; icono en `resources/icons/icon.png` (ventana, `main.cpp`) y `icon.ico` (el `.exe`, vía `resources/app.rc`). `applicationName`/`organizationName` siguen siendo `ImageViewer` a propósito: de ellos cuelgan las carpetas de configuración y caché, y cambiarlos perdería los ajustes de quien ya lo usa. El ejecutable, el target de CMake y el proyecto aún se llaman `ImageViewer`.
+
+**Cambio de nombre.** El programa se llamaba «ImageViewer» y ahora es **Project Foxy**: ejecutable `ProjectFoxy.exe`, ventana, documentos, licencias y carpeta de configuración (`%LOCALAPPDATA%\ProjectFoxy`; la primera vez se copia el `settings.ini` de la carpeta antigua `ImageViewer`, la caché de miniaturas se regenera). El target de CMake, el módulo QML (`ImageViewerApp`) y las rutas de compilación conservan el nombre antiguo a propósito. (Donde este documento dice «ImageViewer» entre comillas de código es ese nombre interno.)

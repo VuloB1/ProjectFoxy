@@ -64,6 +64,27 @@ private slots:
         QCOMPARE(again.stripMode(), QStringLiteral("auto"));
     }
 
+    // The settings of the program's old name are taken over once, never over newer ones.
+    void settingsFromTheOldNameAreCopiedOnce()
+    {
+        const QString dir = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + QStringLiteral("/foxy_migrate");
+        QDir(dir).removeRecursively();
+        QDir().mkpath(dir + QStringLiteral("/old"));
+        const QString oldFile = dir + QStringLiteral("/old/settings.ini");
+        const QString newFile = dir + QStringLiteral("/new/Foxy/settings.ini");
+        { QSettings s(oldFile, QSettings::IniFormat); s.setValue(QStringLiteral("view/pixelMode"), true); }
+
+        QVERIFY(AppPaths::migrateSettings(newFile, oldFile));
+        QVERIFY(QFileInfo::exists(newFile));
+        QVERIFY(QSettings(newFile, QSettings::IniFormat).value(QStringLiteral("view/pixelMode")).toBool());
+
+        { QSettings s(newFile, QSettings::IniFormat); s.setValue(QStringLiteral("view/pixelMode"), false); }
+        QVERIFY(!AppPaths::migrateSettings(newFile, oldFile)); // already there: untouched
+        QVERIFY(!QSettings(newFile, QSettings::IniFormat).value(QStringLiteral("view/pixelMode")).toBool());
+        QVERIFY(!AppPaths::migrateSettings(dir + QStringLiteral("/x.ini"), dir + QStringLiteral("/missing.ini")));
+        QDir(dir).removeRecursively();
+    }
+
     void everythingStartsOff()
     {
         AppSettings s;

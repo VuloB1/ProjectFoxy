@@ -1,4 +1,4 @@
-# ImageViewer
+# Project Foxy
 
 Visor de imágenes moderno, ligero y rápido **para Windows**, con un editor de
 fotos integrado. Interfaz en español y tres temas: *Moderno Claro*, *Moderno

@@ -23,7 +23,7 @@ bool ensureVipsInitialized()
 {
     static std::once_flag flag;
     std::call_once(flag, []() {
-        if (VIPS_INIT("ImageViewer")) {
+        if (VIPS_INIT("ProjectFoxy")) {
             g_vipsError = vips_error_buffer();
             qWarning("libvips initialization failed: %s", g_vipsError.c_str());
             return;

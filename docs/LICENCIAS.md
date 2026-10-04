@@ -1,4 +1,4 @@
-# ImageViewer — licencias de las dependencias
+# Project Foxy — licencias de las dependencias
 
 > Estado a **2 de octubre de 2026**. Esto es un análisis técnico hecho a partir de lo
 > que vcpkg declara para cada paquete y de lo que realmente se instala y se distribuye
@@ -13,7 +13,7 @@
 | Tema | Estado |
 |---|---|
 | Licencia del propio proyecto | **No elegida todavía.** No hay archivo `LICENSE`. |
-| **exiv2** (GPL‑2.0‑or‑later) | **Bloquea distribuir ImageViewer como software cerrado** mientras se use. Opciones en la sección 3. |
+| **exiv2** (GPL‑2.0‑or‑later) | **Bloquea distribuir Project Foxy como software cerrado** mientras se use. Opciones en la sección 3. |
 | **x265** (GPL‑2.0‑or‑later) | **Resuelto el 2‑oct‑2026**: se distribuía `libx265.dll` sin que hiciera falta (ver sección 4). |
 | Qt, libvips, libheif, libde265, LibRaw y el resto | LGPL / MIT / BSD y similares: compatibles con una aplicación cerrada **si se cumplen sus condiciones** (enlace dinámico, avisos, texto de la licencia, derecho a reemplazar la biblioteca). Todas se enlazan como DLL. |
 | Patentes HEVC/H.265 | Fuera del alcance de GPL/LGPL; ver sección 5. |
@@ -21,7 +21,7 @@
 ## 2. Componentes que viajan con el programa
 
 Versiones y licencias tal como las declara cada *port* de vcpkg (identificadores SPDX).
-Todos se distribuyen como DLL junto a `ImageViewer.exe`.
+Todos se distribuyen como DLL junto a `ProjectFoxy.exe`.
 
 | Componente | Versión | Licencia declarada | Para qué se usa |
 |---|---|---|---|
@@ -46,12 +46,12 @@ meson y los scripts `vcpkg‑cmake*`.
 
 ## 3. El problema principal: exiv2 (GPL)
 
-exiv2 se enlaza dentro de ImageViewer (`MetadataReader.cpp` lo usa para la ventana de
+exiv2 se enlaza dentro de Project Foxy (`MetadataReader.cpp` lo usa para la ventana de
 información y `ImageWriter.cpp` para conservar EXIF/IPTC/XMP/ICC al guardar). Una
 aplicación que enlaza una biblioteca GPL‑2.0‑or‑later debe distribuirse bajo licencia
 compatible con la GPL, con su código fuente. Opciones:
 
-1. **Publicar ImageViewer bajo una licencia compatible con la GPL** (por ejemplo GPL‑3.0),
+1. **Publicar Project Foxy bajo una licencia compatible con la GPL** (por ejemplo GPL‑3.0),
    con el código fuente disponible. Es lo más simple si el objetivo no es venderlo cerrado.
 2. **Sustituir exiv2** por algo con licencia permisiva o LGPL. El uso está aislado en dos
    archivos y detrás de funciones pequeñas (`MetadataReader::read`, `withMetadata` en
@@ -74,7 +74,7 @@ compatible con la GPL, con su código fuente. Opciones:
 3. Una licencia comercial de exiv2: **hoy el proyecto no la ofrece** (según su propio
    repositorio; no lo he verificado de nuevo).
 
-Si ImageViewer se queda como uso personal, no se distribuye, nada de esto aplica.
+Si Project Foxy se queda como uso personal, no se distribuye, nada de esto aplica.
 
 ## 4. x265 — corregido
 
@@ -82,7 +82,7 @@ Hasta el 2‑oct‑2026 el `vcpkg.json` pedía `libheif` con `features: ["aom"]`
 desactivar las características por defecto**, y el *port* de libheif trae `hevc` por
 defecto, que añade **x265** (codificador HEVC, **GPL‑2.0‑or‑later**). Comprobado en el
 árbol instalado: `x265` estaba instalado y `libx265.dll` (5 MB) se copiaba junto al `.exe`,
-aunque ImageViewer solo **decodifica** HEIC y nunca lo necesitó.
+aunque Project Foxy solo **decodifica** HEIC y nunca lo necesitó.
 
 Corrección: `"default-features": false` en `libheif`. Tras recompilar: x265 desaparece del
 árbol instalado y de la carpeta del programa, `libde265` (LGPL‑3.0) sigue haciendo la

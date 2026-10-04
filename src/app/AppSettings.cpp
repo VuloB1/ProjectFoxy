@@ -15,7 +15,7 @@ constexpr int kDefaultPadding = 3;
 
 AppSettings::AppSettings(QObject *parent)
     : QObject(parent)
-    , m_store(AppPaths::configDir() + QStringLiteral("/settings.ini"),
+    , m_store(AppPaths::settingsFile(),
                QSettings::IniFormat)
 {
     m_slideshowIntervalMs = m_store.value(QStringLiteral("slideshow/intervalMs"), kDefaultIntervalMs).toInt();

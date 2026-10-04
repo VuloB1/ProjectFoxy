@@ -62,7 +62,7 @@ pkg_check_modules(LIBRAW REQUIRED IMPORTED_TARGET libraw_r)
 pkg_check_modules(LIBHEIF REQUIRED IMPORTED_TARGET libheif)
 pkg_check_modules(EXIV2 REQUIRED IMPORTED_TARGET exiv2)
 
-# The shipped folder is flat on Windows (ImageViewer.exe next to its DLLs), so
+# The shipped folder is flat on Windows (ProjectFoxy.exe next to its DLLs), so
 # `cmake --install` puts the executable at the prefix root instead of in bin/.
 # Must be set before qt_standard_project_setup() pulls in GNUInstallDirs.
 set(CMAKE_INSTALL_BINDIR ".")
@@ -221,7 +221,7 @@ qt_add_shaders(ImageViewer "imageviewer_shaders"
 # files next to the exe, under qml/QtQuick/Effects/, which is already one of
 # QQmlEngine's default import search paths relative to the app.
 #
-# This copy only serves the build tree (running ImageViewer.exe straight from
+# This copy only serves the build tree (running ProjectFoxy.exe straight from
 # the build folder). The shipped folder is produced by `cmake --install`, where
 # windeployqt finds the plugin by scanning the QML imports (see "Installation"
 # below). The SDK paths come from the QT6_INSTALL_* variables Qt itself defines
@@ -247,7 +247,7 @@ add_custom_command(TARGET ImageViewer POST_BUILD
 
 set_target_properties(ImageViewer PROPERTIES
     WIN32_EXECUTABLE TRUE
-    OUTPUT_NAME "ImageViewer"
+    OUTPUT_NAME "ProjectFoxy"
 )
 if(WIN32)
     target_sources(ImageViewer PRIVATE resources/app.rc)
@@ -259,7 +259,7 @@ endif()
 #   cmake --install <build dir> --prefix <folder>
 #
 # produces the complete folder to ship (and the one an installer should pack):
-#   ImageViewer.exe, the Qt runtime + plugins + QML modules (windeployqt, driven
+#   ProjectFoxy.exe, the Qt runtime + plugins + QML modules (windeployqt, driven
 #   by Qt's deploy script, which also finds QtQuick.Effects by scanning the QML),
 #   the vcpkg DLLs the program really needs (libvips, LibRaw, libheif, exiv2 and
 #   their dependencies - resolved from the executable's import tables, not by
@@ -339,7 +339,7 @@ set(IV_VCPKG_BIN \"${_iv_vcpkg_bin}\")")
     endif()
 
     install(FILES docs/THIRD_PARTY_NOTICES.txt DESTINATION licenses)
-    install(FILES LICENSE DESTINATION licenses RENAME LICENSE-ImageViewer.txt)
+    install(FILES LICENSE DESTINATION licenses RENAME LICENSE-ProjectFoxy.txt)
 endif()
 
 # ---------------------------------------------------------------------------

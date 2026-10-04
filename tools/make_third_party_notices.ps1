@@ -1,5 +1,5 @@
 # Builds docs\THIRD_PARTY_NOTICES.txt from the licence files vcpkg keeps for every installed port,
-# for the libraries whose DLLs ship next to ImageViewer.exe. Run it after a build:
+# for the libraries whose DLLs ship next to ProjectFoxy.exe. Run it after a build:
 #   tools\make_third_party_notices.ps1 -Installed C:\build\imageviewer\release\vcpkg_installed\x64-windows
 param(
     [string]$Installed = 'C:\build\imageviewer\release\vcpkg_installed\x64-windows',
@@ -38,10 +38,10 @@ $ports = [ordered]@{
     'zlib'          = 'zlib - compression'
 }
 $sb = New-Object System.Text.StringBuilder
-[void]$sb.AppendLine('ImageViewer - third-party software notices')
+[void]$sb.AppendLine('Project Foxy - third-party software notices')
 [void]$sb.AppendLine('==========================================')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('ImageViewer uses the open-source components listed below. Each keeps its own licence;')
+[void]$sb.AppendLine('Project Foxy uses the open-source components listed below. Each keeps its own licence;')
 [void]$sb.AppendLine('the licence/copyright text of every one follows, exactly as vcpkg installed it.')
 [void]$sb.AppendLine('The Qt framework (LGPLv3) is used as dynamic libraries; its licence texts and source')
 [void]$sb.AppendLine('offer are available from https://www.qt.io/licensing/ and must accompany any distribution.')

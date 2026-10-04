@@ -1,7 +1,7 @@
-ImageViewer - third-party software notices
+Project Foxy - third-party software notices
 ==========================================
 
-ImageViewer uses the open-source components listed below. Each keeps its own licence;
+Project Foxy uses the open-source components listed below. Each keeps its own licence;
 the licence/copyright text of every one follows, exactly as vcpkg installed it.
 The Qt framework (LGPLv3) is used as dynamic libraries; its licence texts and source
 offer are available from https://www.qt.io/licensing/ and must accompany any distribution.

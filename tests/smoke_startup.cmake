@@ -6,7 +6,7 @@
 # fails to load, a binding loop, a bad resource path, a property assigned to the
 # wrong type. Before this test existed, three such warnings sat in the log for weeks.
 #
-# Usage:  cmake -DEXE=<ImageViewer.exe> -DIMAGE=<picture> -DQT_PLUGINS=<qt plugins dir>
+# Usage:  cmake -DEXE=<ProjectFoxy.exe> -DIMAGE=<picture> -DQT_PLUGINS=<qt plugins dir>
 #               -P smoke_startup.cmake
 
 foreach(var EXE IMAGE QT_PLUGINS)
