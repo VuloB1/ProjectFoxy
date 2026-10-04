@@ -203,6 +203,27 @@ inline void bilinear(const Plane &p, double sx, double sy, float out[4])
     }
 }
 
+// Adds the bilinear sample at (sx, sy) to acc[0..3]; the blurs call it up to ~100 times per pixel,
+// so it works in float, with one clamp per axis and no per-call row arithmetic beyond two offsets.
+inline void accumulate(const Plane &p, double px, double py, float acc[4])
+{
+    const float sx = static_cast<float>(clampd(px, 0.0, p.w - 1));
+    const float sy = static_cast<float>(clampd(py, 0.0, p.h - 1));
+    const int x0 = static_cast<int>(sx);
+    const int y0 = static_cast<int>(sy);
+    const int x1 = x0 + (x0 < p.w - 1);
+    const int y1 = y0 + (y0 < p.h - 1);
+    const float fx = sx - x0, fy = sy - y0;
+    const size_t stride = size_t(p.w) * 4;
+    const uint8_t *r0 = p.d.data() + size_t(y0) * stride;
+    const uint8_t *r1 = p.d.data() + size_t(y1) * stride;
+    const uint8_t *a = r0 + size_t(x0) * 4, *b = r0 + size_t(x1) * 4;
+    const uint8_t *c = r1 + size_t(x0) * 4, *e = r1 + size_t(x1) * 4;
+    const float w00 = (1.f - fx) * (1.f - fy), w10 = fx * (1.f - fy), w01 = (1.f - fx) * fy, w11 = fx * fy;
+    for (int k = 0; k < 4; ++k)
+        acc[k] += a[k] * w00 + b[k] * w10 + c[k] * w01 + e[k] * w11;
+}
+
 struct FloatPlane {
     int w = 0, h = 0;
     std::vector<float> d;
@@ -273,18 +294,19 @@ Plane fxMotion(const Job &job, const Plane &src, const EffectValues &v, double l
     const double angle = v[1] * kPi / 180.0;
     const double ca = std::cos(angle), sa = std::sin(angle);
     const int taps = clampi(static_cast<int>(dist) + 1, 3, 96);
+    std::vector<double> offX(taps), offY(taps); // the same line of offsets for every pixel
+    for (int k = 0; k < taps; ++k) {
+        const double t = (double(k) / (taps - 1) - 0.5) * dist;
+        offX[k] = t * ca;
+        offY[k] = t * sa;
+    }
     Plane out(src.w, src.h, 4);
     rows(job, src.h, [&](int y) {
         uint8_t *d = out.row(y);
         for (int x = 0; x < src.w; ++x) {
             float acc[4] = {0, 0, 0, 0};
-            for (int k = 0; k < taps; ++k) {
-                const double t = (double(k) / (taps - 1) - 0.5) * dist;
-                float c[4];
-                bilinear(src, x + t * ca, y + t * sa, c);
-                for (int j = 0; j < 4; ++j)
-                    acc[j] += c[j];
-            }
+            for (int k = 0; k < taps; ++k)
+                accumulate(src, x + offX[k], y + offY[k], acc);
             for (int j = 0; j < 4; ++j)
                 d[x * 4 + j] = toByte(acc[j] / taps);
         }
@@ -303,34 +325,41 @@ Plane fxRadialBlur(const Job &job, const Plane &src, const EffectValues &v, bool
     const double amount = v[0] / 100.0;
     const double zoomSpan = amount * 0.4;                 // the scale sweeps +-20% at most
     const double spinSpan = amount * 30.0 * kPi / 180.0;  // and the angle +-15 degrees
+    // Spin: the step between two samples depends only on how many there are, so its sine and cosine
+    // come from a table and each sample is the previous one turned by that step.
+    constexpr int kMaxTaps = 64;
+    double stepCos[kMaxTaps + 1] = {}, stepSin[kMaxTaps + 1] = {};
+    for (int n = 2; n <= kMaxTaps; ++n) {
+        stepCos[n] = std::cos(spinSpan / (n - 1));
+        stepSin[n] = std::sin(spinSpan / (n - 1));
+    }
+    const double startCos = std::cos(-0.5 * spinSpan), startSin = std::sin(-0.5 * spinSpan);
     Plane out(src.w, src.h, 4);
     rows(job, src.h, [&](int y) {
         uint8_t *d = out.row(y);
         for (int x = 0; x < src.w; ++x) {
             const double dx = x - cx, dy = y - cy;
             const double r = std::sqrt(dx * dx + dy * dy);
-            // One sample every ~2 px along the smear, so far-from-center pixels
+            // One sample every ~3 px along the smear, so far-from-center pixels
             // (which travel the longest) do not show stepping.
             const double reach = spin ? r * spinSpan : r * zoomSpan;
-            const int taps = clampi(static_cast<int>(reach * 0.5) + 1, 6, 96);
+            const int taps = clampi(static_cast<int>(reach * (1.0 / 3.0)) + 1, 6, kMaxTaps);
             float acc[4] = {0, 0, 0, 0};
-            for (int k = 0; k < taps; ++k) {
-                const double t = double(k) / (taps - 1) - 0.5;
-                double sx, sy;
-                if (spin) {
-                    const double a = t * spinSpan;
-                    const double ca = std::cos(a), sa = std::sin(a);
-                    sx = cx + dx * ca - dy * sa;
-                    sy = cy + dx * sa + dy * ca;
-                } else {
-                    const double s = 1.0 + t * zoomSpan;
-                    sx = cx + dx * s;
-                    sy = cy + dy * s;
+            if (spin) {
+                const double cs = stepCos[taps], sn = stepSin[taps];
+                double vx = dx * startCos - dy * startSin;
+                double vy = dx * startSin + dy * startCos;
+                for (int k = 0; k < taps; ++k) {
+                    accumulate(src, cx + vx, cy + vy, acc);
+                    const double nx = vx * cs - vy * sn;
+                    vy = vx * sn + vy * cs;
+                    vx = nx;
                 }
-                float c[4];
-                bilinear(src, sx, sy, c);
-                for (int j = 0; j < 4; ++j)
-                    acc[j] += c[j];
+            } else {
+                const double step = zoomSpan / (taps - 1);
+                double scale = 1.0 - 0.5 * zoomSpan;
+                for (int k = 0; k < taps; ++k, scale += step)
+                    accumulate(src, cx + dx * scale, cy + dy * scale, acc);
             }
             for (int j = 0; j < 4; ++j)
                 d[x * 4 + j] = toByte(acc[j] / taps);
@@ -347,6 +376,36 @@ Plane fxMedian(const Job &job, const Plane &src, const EffectValues &v)
     const int side = 2 * r + 1;
     const int count = side * side;
     Plane out(src.w, src.h, 4);
+    if (r == 1) {
+        // 3x3: the median of nine values with a fixed network of 19 compare-exchanges, much
+        // faster than a general selection for the setting most people use.
+        auto sortPair = [](uint8_t &a, uint8_t &b) {
+            if (a > b)
+                std::swap(a, b);
+        };
+        rows(job, src.h, [&](int y) {
+            uint8_t *d = out.row(y);
+            const uint8_t *above = src.row(clampi(y - 1, 0, src.h - 1));
+            const uint8_t *mid = src.row(y);
+            const uint8_t *below = src.row(clampi(y + 1, 0, src.h - 1));
+            for (int x = 0; x < src.w; ++x) {
+                const size_t xl = size_t(std::max(x - 1, 0)) * 4, xc = size_t(x) * 4, xr = size_t(std::min(x + 1, src.w - 1)) * 4;
+                for (int c = 0; c < 4; ++c) {
+                    uint8_t p[9] = {above[xl + c], above[xc + c], above[xr + c], mid[xl + c], mid[xc + c],
+                                    mid[xr + c],   below[xl + c], below[xc + c], below[xr + c]};
+                    sortPair(p[1], p[2]); sortPair(p[4], p[5]); sortPair(p[7], p[8]);
+                    sortPair(p[0], p[1]); sortPair(p[3], p[4]); sortPair(p[6], p[7]);
+                    sortPair(p[1], p[2]); sortPair(p[4], p[5]); sortPair(p[7], p[8]);
+                    sortPair(p[0], p[3]); sortPair(p[5], p[8]); sortPair(p[4], p[7]);
+                    sortPair(p[3], p[6]); sortPair(p[1], p[4]); sortPair(p[2], p[5]);
+                    sortPair(p[4], p[7]); sortPair(p[4], p[2]); sortPair(p[6], p[4]);
+                    sortPair(p[4], p[2]);
+                    d[xc + c] = p[4];
+                }
+            }
+        });
+        return out;
+    }
     rows(job, src.h, [&](int y) {
         uint8_t *d = out.row(y);
         uint8_t window[25];
@@ -504,6 +563,40 @@ QImage fxHalftone(const Job &job, const QImage &src, const EffectValues &v, doub
     const bool colored = v[2] >= 0.5;
     const Plane blurred = gaussianBlur(job, planeFrom(src), cell * 0.35);
 
+    // The dots live on a grid in the rotated frame: find the cells the picture touches and work out
+    // each one's dot (size and colour) once, instead of nine times per pixel.
+    const double corners[4][2] = {{0, 0}, {src.width() - 1.0, 0}, {0, src.height() - 1.0}, {src.width() - 1.0, src.height() - 1.0}};
+    double umin = 1e300, umax = -1e300, wmin = 1e300, wmax = -1e300;
+    for (const auto &c : corners) {
+        const double u = c[0] * ca + c[1] * sa, w = -c[0] * sa + c[1] * ca;
+        umin = std::min(umin, u);
+        umax = std::max(umax, u);
+        wmin = std::min(wmin, w);
+        wmax = std::max(wmax, w);
+    }
+    const int ci0 = static_cast<int>(std::floor(umin / cell)) - 1, ci1 = static_cast<int>(std::floor(umax / cell)) + 1;
+    const int cj0 = static_cast<int>(std::floor(wmin / cell)) - 1, cj1 = static_cast<int>(std::floor(wmax / cell)) + 1;
+    const int gw = ci1 - ci0 + 1, gh = cj1 - cj0 + 1;
+    struct Dot {
+        double radius;
+        uint8_t color[3];
+    };
+    std::vector<Dot> dots(size_t(gw) * size_t(gh));
+    rows(job, gh, [&](int j) {
+        for (int i = 0; i < gw; ++i) {
+            const double cu = (ci0 + i + 0.5) * cell;
+            const double cv = (cj0 + j + 0.5) * cell;
+            const int px = clampi(static_cast<int>(std::lround(cu * ca - cv * sa)), 0, src.width() - 1);
+            const int py = clampi(static_cast<int>(std::lround(cu * sa + cv * ca)), 0, src.height() - 1);
+            const uint8_t *p = blurred.row(py) + size_t(px) * 4;
+            const double lum = 0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2];
+            Dot &dot = dots[size_t(j) * gw + i];
+            dot.radius = cell * 0.72 * std::sqrt(1.0 - lum / 255.0);
+            for (int c = 0; c < 3; ++c)
+                dot.color[c] = colored ? p[c] : 0;
+        }
+    });
+
     QImage out(src.size(), QImage::Format_RGBA8888);
     out.bits();
     rows(job, src.height(), [&](int y) {
@@ -515,29 +608,24 @@ QImage fxHalftone(const Job &job, const QImage &src, const EffectValues &v, doub
             const int ci = static_cast<int>(std::floor(u / cell));
             const int cj = static_cast<int>(std::floor(w / cell));
             double cover = 0.0;
-            double col[3] = {0, 0, 0};
+            const uint8_t *col = nullptr;
             for (int dj = -1; dj <= 1; ++dj)
                 for (int di = -1; di <= 1; ++di) {
-                    const double cu = (ci + di + 0.5) * cell;
-                    const double cv = (cj + dj + 0.5) * cell;
-                    const int px = clampi(static_cast<int>(std::lround(cu * ca - cv * sa)), 0, src.width() - 1);
-                    const int py = clampi(static_cast<int>(std::lround(cu * sa + cv * ca)), 0, src.height() - 1);
-                    const uint8_t *p = blurred.row(py) + size_t(px) * 4;
-                    const double lum = 0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2];
-                    const double radius = cell * 0.72 * std::sqrt(1.0 - lum / 255.0);
-                    const double dist = std::hypot(u - cu, w - cv);
-                    const double c = clampd(radius - dist + 0.5, 0.0, 1.0);
+                    const Dot &dot = dots[size_t(cj + dj - cj0) * gw + size_t(ci + di - ci0)];
+                    const double du = u - (ci + di + 0.5) * cell;
+                    const double dv = w - (cj + dj + 0.5) * cell;
+                    const double reach = dot.radius + 0.5;
+                    const double dist2 = du * du + dv * dv;
+                    if (dist2 >= reach * reach)
+                        continue; // outside this dot, the usual case
+                    const double c = clampd(reach - std::sqrt(dist2), 0.0, 1.0);
                     if (c > cover) {
                         cover = c;
-                        if (colored) {
-                            col[0] = p[0];
-                            col[1] = p[1];
-                            col[2] = p[2];
-                        }
+                        col = dot.color;
                     }
                 }
             for (int c = 0; c < 3; ++c)
-                d[x * 4 + c] = toByte(255.0 * (1.0 - cover) + col[c] * cover);
+                d[x * 4 + c] = toByte(255.0 * (1.0 - cover) + (col ? col[c] : 0) * cover);
             d[x * 4 + 3] = s[x * 4 + 3];
         }
     });

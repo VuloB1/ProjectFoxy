@@ -63,3 +63,8 @@ add_test(NAME smoke_startup
         -DIMAGE=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/exif_orient_6.jpg
         -DQT_PLUGINS=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/smoke_startup.cmake)
+
+# Developer tool, not a test: wall and CPU time of every effect (bench_effects [longSide] [id...]).
+add_executable(bench_effects bench_effects.cpp)
+target_link_libraries(bench_effects PRIVATE imageviewer_core Qt6::Core)
+target_include_directories(bench_effects PRIVATE ${CMAKE_SOURCE_DIR}/src/core)

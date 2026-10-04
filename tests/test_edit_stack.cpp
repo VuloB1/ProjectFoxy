@@ -557,6 +557,38 @@ private slots:
         }
     }
 
+    // "Quitar ruido" radius 1 uses a fixed sorting network; it must give the median of the 3x3
+    // neighbourhood (edges clamped). Opaque pixels: every colour channel; translucent ones: the
+    // alpha channel (colour is worked on premultiplied, so only alpha compares exactly).
+    void medianRadiusOneIsTheTrueMedian()
+    {
+        for (const bool opaque : {true, false}) {
+            QImage src(23, 17, QImage::Format_RGBA8888);
+            quint32 seed = 12345;
+            for (int y = 0; y < src.height(); ++y)
+                for (int x = 0; x < src.width(); ++x) {
+                    seed = seed * 1664525u + 1013904223u;
+                    src.setPixelColor(x, y, QColor((seed >> 8) & 255, (seed >> 16) & 255, (seed >> 24) & 255,
+                                                   opaque ? 255 : 255 - int((seed >> 4) & 63)));
+                }
+            const QImage out = applyEffect(src, QStringLiteral("median"), {1});
+            for (int y = 0; y < src.height(); ++y)
+                for (int x = 0; x < src.width(); ++x)
+                    for (int c = opaque ? 0 : 3; c < (opaque ? 3 : 4); ++c) {
+                        std::vector<int> v;
+                        for (int j = -1; j <= 1; ++j)
+                            for (int i = -1; i <= 1; ++i) {
+                                const QColor p = src.pixelColor(qBound(0, x + i, src.width() - 1), qBound(0, y + j, src.height() - 1));
+                                v.push_back(c == 0 ? p.red() : c == 1 ? p.green() : c == 2 ? p.blue() : p.alpha());
+                            }
+                        std::sort(v.begin(), v.end());
+                        const QColor o = out.pixelColor(x, y);
+                        const int got = c == 0 ? o.red() : c == 1 ? o.green() : c == 2 ? o.blue() : o.alpha();
+                        QVERIFY2(got == v[4], qPrintable(QStringLiteral("channel %1 at %2,%3").arg(c).arg(x).arg(y)));
+                    }
+        }
+    }
+
     void negativeInvertsTheColoursAndKeepsTheAlpha()
     {
         QImage src(4, 4, QImage::Format_RGBA8888);

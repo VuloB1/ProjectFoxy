@@ -16,15 +16,37 @@ namespace core::edit {
 // competing for the same limited slots - with enough concurrent bands
 // requested, every slot can end up occupied by tasks blocked on each other,
 // none of them ever running, and the wait below never returns.
+//
+// The pool is also deliberately NOT the whole machine: it leaves a couple of cores free and its
+// threads run below normal priority (see rowWorkerThreads / yieldToOtherPrograms). A heavy effect
+// on a 24 MP photo is minutes of CPU time in total; at normal priority on every core it starved
+// everything else on the computer (a YouTube video froze while a slider was being dragged).
+inline int rowWorkerThreads()
+{
+    const int ideal = std::max(1, QThread::idealThreadCount());
+    return ideal >= 8 ? ideal - 2 : std::max(1, ideal - 1);
+}
+
 inline QThreadPool &rowWorkerPool()
 {
     static QThreadPool pool;
     static const bool init = [] {
-        pool.setMaxThreadCount(std::max(1, QThread::idealThreadCount()));
+        pool.setMaxThreadCount(rowWorkerThreads());
         return true;
     }();
     Q_UNUSED(init);
     return pool;
+}
+
+// Called at the start of every band: lowers the priority of the pool thread running it (a no-op
+// after the first time on that thread, and the pool keeps its threads alive between jobs).
+inline void yieldToOtherPrograms()
+{
+    thread_local bool done = false;
+    if (!done) {
+        QThread::currentThread()->setPriority(QThread::LowestPriority);
+        done = true;
+    }
 }
 
 // Splits [0, height) into per-core row bands and runs `rowFunc(y)` for every
@@ -40,7 +62,7 @@ void forEachRowParallel(int height, RowFunc &&rowFunc)
 {
     if (height <= 0)
         return;
-    const int threads = std::max(1, QThread::idealThreadCount());
+    const int threads = rowWorkerThreads();
     const int minRowsPerThread = 32; // not worth splitting a small image further
     if (threads <= 1 || height < threads * minRowsPerThread) {
         for (int y = 0; y < height; ++y)
@@ -55,6 +77,7 @@ void forEachRowParallel(int height, RowFunc &&rowFunc)
         const int y1 = std::min(height, y0 + band);
         ++bands;
         rowWorkerPool().start(QRunnable::create([y0, y1, &rowFunc, &done]() {
+            yieldToOtherPrograms();
             for (int y = y0; y < y1; ++y)
                 rowFunc(y);
             done.release();
@@ -79,6 +102,7 @@ void forEachBandParallel(int height, int bandRows, BandFunc &&bandFunc)
         const int y1 = std::min(height, y0 + bandRows);
         ++bands;
         rowWorkerPool().start(QRunnable::create([y0, y1, &bandFunc, &done]() {
+            yieldToOtherPrograms();
             bandFunc(y0, y1);
             done.release();
         }));
