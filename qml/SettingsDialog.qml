@@ -16,6 +16,8 @@ AppDialog {
     height: Math.min(460, (Overlay.overlay ? Overlay.overlay.height : 460) - 40)
 
     property int page: 0
+    // Each page starts at its top: the previous page may have been scrolled further than this one is tall.
+    onPageChanged: scroller.contentY = 0
     readonly property var pages: [
         { icon: "theme", name: qsTr("Apariencia"), hint: qsTr("Cómo se ve el programa.") },
         { icon: "slideshow", name: qsTr("Presentación"), hint: qsTr("Cómo avanza la presentación de diapositivas.") },
@@ -218,8 +220,9 @@ AppDialog {
                 Item {
                     id: pageColumn
                     width: scroller.width - 12
-                    implicitHeight: Math.max(appearance.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + 32, slideshow.implicitHeight,
-                                             saving.implicitHeight, batch.implicitHeight)
+                    implicitHeight: root.page === 0 ? appearance.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + 32
+                                       : root.page === 1 ? slideshow.implicitHeight
+                                       : root.page === 2 ? saving.implicitHeight : batch.implicitHeight
 
                     // -- Apariencia: one preview card per theme --------------------
                     Card {
