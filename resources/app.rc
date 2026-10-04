@@ -1,2 +1,31 @@
-// The executable's own icon (Explorer, taskbar, Alt+Tab).
+// The executable's own icon (Explorer, taskbar, Alt+Tab) and the version information Windows
+// shows as the program's name (taskbar jump list, Task Manager, file properties).
+#include <winver.h>
+
 IDI_ICON1 ICON "icons/icon.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     0,1,0,0
+PRODUCTVERSION  0,1,0,0
+FILEOS          VOS_NT_WINDOWS32
+FILETYPE        VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      "Vulito\0"
+            VALUE "FileDescription",  "Project Foxy\0"
+            VALUE "FileVersion",      "0.1.0\0"
+            VALUE "InternalName",     "ProjectFoxy\0"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 Vulito. GPL-3.0-or-later.\0"
+            VALUE "OriginalFilename", "ProjectFoxy.exe\0"
+            VALUE "ProductName",      "Project Foxy\0"
+            VALUE "ProductVersion",   "0.1.0\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 0x04B0
+    END
+END
