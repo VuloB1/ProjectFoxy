@@ -557,6 +557,81 @@ private slots:
         }
     }
 
+    // A clean test picture (smooth colour gradient with a hard-edged bright square) and the same with
+    // Gaussian noise of the given deviation added to each channel.
+    static QImage cleanPicture(int w, int h)
+    {
+        QImage img(w, h, QImage::Format_RGBA8888);
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x) {
+                const bool square = x > w / 3 && x < 2 * w / 3 && y > h / 3 && y < 2 * h / 3;
+                img.setPixelColor(x, y, square ? QColor(230, 210, 60) : QColor(40 + x * 100 / w, 80 + y * 90 / h, 140));
+            }
+        return img;
+    }
+    static QImage addNoise(const QImage &clean, double sigma)
+    {
+        QImage img = clean;
+        quint32 seed = 987654321u;
+        auto uniform = [&seed] {
+            seed = seed * 1664525u + 1013904223u;
+            return (seed >> 8) / 16777216.0;
+        };
+        for (int y = 0; y < img.height(); ++y)
+            for (int x = 0; x < img.width(); ++x) {
+                QColor c = img.pixelColor(x, y);
+                auto gauss = [&] { return (uniform() + uniform() + uniform() + uniform() - 2.0) * sigma * std::sqrt(3.0); };
+                c.setRgb(qBound(0, int(c.red() + gauss() + 0.5), 255), qBound(0, int(c.green() + gauss() + 0.5), 255),
+                         qBound(0, int(c.blue() + gauss() + 0.5), 255), c.alpha());
+                img.setPixelColor(x, y, c);
+            }
+        return img;
+    }
+    static double meanError(const QImage &a, const QImage &b)
+    {
+        double sum = 0;
+        for (int y = 0; y < a.height(); ++y)
+            for (int x = 0; x < a.width(); ++x) {
+                const QColor p = a.pixelColor(x, y), q = b.pixelColor(x, y);
+                sum += qAbs(p.red() - q.red()) + qAbs(p.green() - q.green()) + qAbs(p.blue() - q.blue());
+            }
+        return sum / (3.0 * a.width() * a.height());
+    }
+
+    // "Quitar ruido" (non-local means): on a noisy picture it gets much closer to the clean one than
+    // both the noisy picture and the old median do, and it does not soften the hard edge.
+    void denoiseBeatsTheMedianAndKeepsEdges()
+    {
+        const QImage clean = cleanPicture(96, 96);
+        const QImage noisy = addNoise(clean, 14.0);
+        const QImage out = applyEffect(noisy, QStringLiteral("denoise"), {50, 60});
+        const QImage median = applyEffect(noisy, QStringLiteral("median"), {1});
+        const double noisyErr = meanError(noisy, clean), denoisedErr = meanError(out, clean), medianErr = meanError(median, clean);
+        qInfo() << "mean error: noisy" << noisyErr << "median" << medianErr << "denoise" << denoisedErr;
+        QVERIFY(denoisedErr < noisyErr * 0.5);
+        QVERIFY(denoisedErr < medianErr * 0.85);
+        // across the square's left edge (x = 32|33) the step is still there
+        const int step = out.pixelColor(36, 48).blue() - out.pixelColor(28, 48).blue(); // clean: 60 - 140 = -80
+        QVERIFY2(step < -55, qPrintable(QStringLiteral("edge step %1").arg(step)));
+    }
+
+    // Nothing to remove: both sliders at 0 gives the picture back; alpha is never touched.
+    void denoiseWithZeroStrengthIsANoOpAndKeepsAlpha()
+    {
+        QImage src = addNoise(cleanPicture(40, 30), 10.0);
+        QCOMPARE(applyEffect(src, QStringLiteral("denoise"), {0, 0}), src);
+        for (int y = 0; y < src.height(); ++y)
+            for (int x = 0; x < src.width(); ++x) {
+                QColor c = src.pixelColor(x, y);
+                c.setAlpha(100 + (x * 3 + y) % 100);
+                src.setPixelColor(x, y, c);
+            }
+        const QImage out = applyEffect(src, QStringLiteral("denoise"), {70, 70});
+        for (int y = 0; y < src.height(); ++y)
+            for (int x = 0; x < src.width(); ++x)
+                QCOMPARE(out.pixelColor(x, y).alpha(), src.pixelColor(x, y).alpha());
+    }
+
     // "Quitar ruido" radius 1 uses a fixed sorting network; it must give the median of the 3x3
     // neighbourhood (edges clamped). Opaque pixels: every colour channel; translucent ones: the
     // alpha channel (colour is worked on premultiplied, so only alpha compares exactly).

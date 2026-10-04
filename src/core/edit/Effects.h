@@ -36,6 +36,9 @@ struct EffectSpec {
     QString name;
     QString group;
     std::vector<EffectParam> params; // 0..kMaxEffectParams entries
+    // The result depends on the real pixels (noise reduction), so a quick preview computed on a
+    // shrunken copy would not show what the full-size picture gets: it is always calculated at full size.
+    bool fullSize = false;
 };
 
 struct EffectGroup {

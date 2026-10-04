@@ -1,11 +1,13 @@
 #include "Effects.h"
 #include "AdjustMath.h"
+#include "Denoise.h"
 #include "ParallelRows.h"
 
 #include <algorithm>
 #include <atomic>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <vector>
 
 namespace core::edit {
@@ -923,6 +925,7 @@ std::vector<EffectSpec> buildCatalogue()
 {
     auto spec = [](const char *id, const char *name, const char *group, std::vector<EffectParam> params) {
         EffectSpec s;
+        s.fullSize = std::strcmp(id, "denoise") == 0; // noise is a property of the real pixels
         s.id = QString::fromUtf8(id);
         s.name = QString::fromUtf8(name);
         s.group = QString::fromUtf8(group);
@@ -937,7 +940,8 @@ std::vector<EffectSpec> buildCatalogue()
              {slider("Cantidad", 0, 100, 60), slider("Centro X", -100, 100, 0), slider("Centro Y", -100, 100, 0)}),
         spec("spin", "Giratorio", "blur",
              {slider("Cantidad", 0, 100, 60), slider("Centro X", -100, 100, 0), slider("Centro Y", -100, 100, 0)}),
-        spec("median", "Quitar ruido", "blur", {slider("Radio", 1, 2, 1, "", true)}),
+        spec("denoise", "Quitar ruido", "blur", {slider("Luminancia", 0, 100, 50), slider("Color", 0, 100, 60)}),
+        spec("median", "Mediana", "blur", {slider("Radio", 1, 2, 1, "", true)}),
 
         spec("posterize", "Posterizar", "style", {slider("Niveles", 2, 16, 4, "", true)}),
         spec("threshold", "Umbral", "style", {slider("Nivel", 0, 255, 128, "", true)}),
@@ -1072,6 +1076,7 @@ QImage applyEffect(const QImage &source, const QString &id, const EffectValues &
         else if (id == QLatin1String("edges")) result = fxEdges(job, straight, v);
         else if (id == QLatin1String("sketch")) result = fxSketch(job, straight, v, longSide);
         else if (id == QLatin1String("negative")) result = fxNegative(job, straight);
+        else if (id == QLatin1String("denoise")) result = denoiseColor(straight, v[0], v[1], cancel);
         else if (id == QLatin1String("vignette")) result = fxVignette(job, straight, v);
         else if (id == QLatin1String("grain")) result = fxGrain(job, straight, v, longSide);
         else result = fxHalftone(job, straight, v, longSide);

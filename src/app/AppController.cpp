@@ -1262,7 +1262,12 @@ void AppController::scheduleEffectPreview()
     m_effectFullValid = false;
 
     const QImage base = structuralBaked();
-    if (std::max(base.width(), base.height()) > kEffectProxyThreshold) {
+    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
+    if (spec && spec->fullSize) {
+        // Noise reduction only means something on the real pixels (a shrunken copy has already
+        // lost most of its noise): no quick approximation, just the exact result once the sliders rest.
+        m_effectDebounce.start(kEffectSettleMs);
+    } else if (std::max(base.width(), base.height()) > kEffectProxyThreshold) {
         startEffectJob(1); // approximate, immediately...
         m_effectDebounce.start(kEffectSettleMs); // ...exact once the sliders rest
     } else {

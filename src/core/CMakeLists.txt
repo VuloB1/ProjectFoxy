@@ -36,6 +36,8 @@ add_library(imageviewer_core STATIC
     edit/Looks.cpp
     edit/Effects.h
     edit/Effects.cpp
+    edit/Denoise.h
+    edit/Denoise.cpp
     edit/Resample.h
     edit/Resample.cpp
     edit/ParallelRows.h
