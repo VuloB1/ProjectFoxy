@@ -1,0 +1,2 @@
+// The executable's own icon (Explorer, taskbar, Alt+Tab).
+IDI_ICON1 ICON "icons/icon.ico"

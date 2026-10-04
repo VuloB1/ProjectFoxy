@@ -9,7 +9,7 @@ ApplicationWindow {
     minimumWidth: 480
     minimumHeight: 320
     visible: true
-    title: "ImageViewer"
+    title: "Project Foxy"
     color: themeManager.background
     font.family: themeManager.fontFamily
 

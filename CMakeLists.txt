@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.21)
 project(ImageViewer VERSION 0.1.0 LANGUAGES CXX)
+if(WIN32)
+    enable_language(RC)   # the executable carries its icon as a resource (resources/app.rc)
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -166,7 +169,7 @@ qt_add_qml_module(ImageViewer
         qml/controls/AppScrollBar.qml
         qml/controls/AppWheelScroll.qml
     RESOURCES
-        resources/icons/icon.svg
+        resources/icons/icon.png
 )
 
 target_link_libraries(ImageViewer PRIVATE
@@ -246,6 +249,9 @@ set_target_properties(ImageViewer PROPERTIES
     WIN32_EXECUTABLE TRUE
     OUTPUT_NAME "ImageViewer"
 )
+if(WIN32)
+    target_sources(ImageViewer PRIVATE resources/app.rc)
+endif()
 
 # ---------------------------------------------------------------------------
 # Installation

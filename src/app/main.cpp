@@ -25,9 +25,11 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     app.setApplicationName("ImageViewer");
     app.setOrganizationName("ImageViewer");
+    // These two names decide where the settings and the cache live, so they stay "ImageViewer"
+    // even though the program is called Project Foxy (the window title is set in Main.qml).
     // qt_add_qml_module puts RESOURCES under the module's own prefix
     // (/qt/qml/<URI>/), the same place the .qml files live.
-    app.setWindowIcon(QIcon(":/qt/qml/ImageViewerApp/resources/icons/icon.svg"));
+    app.setWindowIcon(QIcon(":/qt/qml/ImageViewerApp/resources/icons/icon.png"));
 
     QQuickStyle::setStyle("Basic"); // fully themable base for the custom Fluent-ish look
 
