@@ -269,6 +269,10 @@ bool renderGeometry(const Job &job, const QString &id, const QImage &src, const 
 // The lens correction (EffectsLens.cpp): the render pass and its (hidden) catalogue entry.
 QImage fxLens(const Job &job, const QImage &src, const EffectValues &v);
 EffectSpec lensSpec();
+// The picture frame of the Recortar tool (EffectsFrame.cpp): the hidden "frame" effect.
+EffectSpec frameSpec();
+QImage fxFrameRender(const Job &job, const QImage &src, const EffectValues &v);
+QSize frameOutputSize(const EffectValues &v, QSize input);
 // The size a geometry effect gives a picture of `input` size (see effectOutputSize()).
 QSize geometryOutputSize(const QString &id, const EffectValues &v, QSize input);
 

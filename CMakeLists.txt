@@ -142,6 +142,8 @@ qt_add_qml_module(ImageViewer
         qml/EffectCaption.qml
         qml/EffectHandles.qml
         qml/LensTool.qml
+        qml/FramePanel.qml
+        qml/FrameCornerPicker.qml
         qml/UnsavedChangesDialog.qml
         qml/OverwriteDialog.qml
         qml/SettingsDialog.qml

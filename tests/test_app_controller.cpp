@@ -471,6 +471,41 @@ private slots:
         QCOMPARE(m_ctl->currentImageSize(), preview);
     }
 
+    // The Marco page of Recortar is the hidden "frame" effect: the outline, margin and shadow make the picture
+    // bigger (and "Mantener el tamaño" brings it back), it is one undo step, and it is not offered in the
+    // effects grid.
+    void theFrameGrowsThePictureAndUndoesCleanly()
+    {
+        const QString a = file("a.png", busyImage(400, 300));
+        open(a);
+        bool listedAsHidden = false;
+        for (const QVariant &fx : m_ctl->effectList())
+            if (fx.toMap().value(QStringLiteral("id")).toString() == QLatin1String("frame"))
+                listedAsHidden = fx.toMap().value(QStringLiteral("hidden")).toBool();
+        QVERIFY(listedAsHidden);
+
+        m_ctl->selectEffect(QStringLiteral("frame")); // 3 % outline and a soft shadow around rounded corners
+        QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 10000);
+        const QSize grown = m_ctl->currentImageSize();
+        QVERIFY2(grown.width() > 400 && grown.height() > 300, qPrintable(QStringLiteral("%1x%2").arg(grown.width()).arg(grown.height())));
+
+        m_ctl->setEffectValue(9, 1); // Mantener el tamaño
+        QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 10000);
+        QCOMPARE(m_ctl->currentImageSize(), QSize(400, 300));
+        m_ctl->setEffectValue(9, 0);
+        QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 10000);
+        QCOMPARE(m_ctl->currentImageSize(), grown);
+
+        m_ctl->commitEffect();
+        QCOMPARE(m_ctl->currentImageSize(), grown);
+        QVERIFY(m_ctl->isDirty());
+        m_ctl->undoEdit();
+        QCOMPARE(m_ctl->currentImageSize(), QSize(400, 300));
+        QVERIFY(!m_ctl->isDirty());
+        m_ctl->redoEdit();
+        QCOMPARE(m_ctl->currentImageSize(), grown);
+    }
+
     // ---- saving does not hold the interface -------------------------------------
 
     // Starts the save, then keeps the event loop running with a 10 ms ticker: the longest

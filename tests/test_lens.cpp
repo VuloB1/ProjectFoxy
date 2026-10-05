@@ -34,6 +34,14 @@ const char *kSample = R"(<?xml version="1.0"?>
   </lens>
 </lensdatabase>)";
 
+// The lens values are 16 numbers; the effect takes room for more.
+EffectValues asValues(const std::array<double, 16> &lens)
+{
+    EffectValues v{};
+    std::copy(lens.begin(), lens.end(), v.begin());
+    return v;
+}
+
 QImage grey(int w, int h, int v)
 {
     QImage img(w, h, QImage::Format_RGBA8888);
@@ -258,7 +266,7 @@ private slots:
         QCOMPARE(manualValues(-100, 0, 0, false)[14], 0.0); // unless the option is off
         // and the crop really leaves a full picture for both signs
         for (double d : {-100.0, 100.0}) {
-            const QImage out = applyEffect(grey(400, 300, 200), QStringLiteral("lens"), manualValues(d, 0, 0, true));
+            const QImage out = applyEffect(grey(400, 300, 200), QStringLiteral("lens"), asValues(manualValues(d, 0, 0, true)));
             for (int y : {0, 1, 150, 298, 299})
                 for (int x : {0, 1, 200, 398, 399})
                     QVERIFY2(qAlpha(out.pixel(x, y)) > 250, qPrintable(QString("d=%1 at %2,%3").arg(d).arg(x).arg(y)));
@@ -270,7 +278,7 @@ private slots:
         QVERIFY(manualValues(0, 0, 100, false)[10] < 0);
         QVERIFY(manualValues(0, 0, -100, false)[10] > 0);
         // a full-strength manual correction leaves the middle of a picture alone and fixes the corners of a flat grey
-        const QImage out = applyEffect(grey(400, 300, 120), QStringLiteral("lens"), manualValues(0, 0, 100, false));
+        const QImage out = applyEffect(grey(400, 300, 120), QStringLiteral("lens"), asValues(manualValues(0, 0, 100, false)));
         QVERIFY(qAbs(qRed(out.pixel(200, 150)) - 120) <= 1);
         QVERIFY(qRed(out.pixel(1, 1)) > 140);
     }

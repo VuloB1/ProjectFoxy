@@ -2,19 +2,25 @@ import QtQuick
 import QtQuick.Controls
 import ImageViewerApp
 
-// Recortar: the crop frame, the quarter turns / mirrors and the fine "Enderezar" slider.
-// Everything here only takes effect through the panel's Aplicar (a pending straighten,
-// else the drawn crop frame; turns and mirrors are applied the moment they are
-// pressed, but count as part of the session, so Cancelar undoes them too).
+// Recortar: the crop frame, the quarter turns / mirrors and the fine "Enderezar" slider - and, on its
+// second page, Marco: cutting the picture to a shape and putting an outline, shadow and background around it.
+// Everything here only takes effect through the panel's Aplicar (a pending straighten, else the drawn crop
+// frame, else the frame being previewed; turns and mirrors are applied the moment they are pressed, but
+// count as part of the session, so Cancelar undoes them too).
 Item {
     id: root
 
     property var canvas: null
 
-    readonly property bool canApply: appController.toolSessionDirty || straightenSlider.value !== 0
-                                     || (canvas !== null && canvas.cropHasSelection)
+    // "crop" or "frame"
+    property string mode: "crop"
 
-    function apply() {
+    readonly property bool canApply: mode === "frame"
+        ? (appController.effectId === "frame" && !appController.effectBusy)
+        : (appController.toolSessionDirty || straightenSlider.value !== 0 || (canvas !== null && canvas.cropHasSelection))
+
+    // Takes in whatever the crop page has pending: a tilt that was dialled in, else the frame that was drawn.
+    function settleCrop() {
         if (!canvas)
             return;
         if (straightenSlider.value !== 0) {
@@ -28,21 +34,71 @@ Item {
             canvas.cancelCrop();
     }
 
+    function apply() {
+        if (!canvas)
+            return;
+        if (mode === "frame") {
+            appController.commitEffect();
+            return;
+        }
+        settleCrop();
+    }
+
     function cancel() {
         if (!canvas)
             return;
+        appController.cancelEffect();
         canvas.cancelStraighten();
         canvas.straightenActive = false;
         straightenSlider.value = 0;
         canvas.cancelCrop();
     }
 
+    // Marco works on the picture as it is: what was drawn or dialled in on the first page is applied
+    // first (Cancelar of the tool still takes all of it back).
+    function setMode(next) {
+        if (next === mode || !canvas)
+            return;
+        if (next === "frame") {
+            settleCrop();
+            mode = "frame";
+            appController.selectEffect("frame");
+        } else {
+            appController.cancelEffect();
+            mode = "crop";
+            canvas.startCrop(0, 0);
+        }
+    }
+
     Component.onCompleted: if (canvas) canvas.startCrop(0, 0) // freeform by default
+
+    Row {
+        id: modeRow
+        spacing: 4
+        AppToolButton { text: qsTr("Recorte"); checked: root.mode === "crop"; onClicked: root.setMode("crop") }
+        AppToolButton { text: qsTr("Marco"); checked: root.mode === "frame"; onClicked: root.setMode("frame") }
+    }
+
+    Component { id: frameComponent; FramePanel {} }
+    Loader {
+        id: framePage
+        anchors.top: modeRow.bottom
+        anchors.topMargin: 10
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        active: root.mode === "frame"
+        sourceComponent: frameComponent
+    }
 
     // --- Recortar: aspect-ratio presets + rotate/flip -----------------
     Column {
+        id: cropPage
+        anchors.top: modeRow.bottom
+        anchors.topMargin: 10
         width: root.width
         spacing: 10
+        visible: root.mode === "crop"
 
         Label { text: qsTr("Recorte - arrastrá el rectángulo o sus bordes/esquinas sobre la imagen"); color: themeManager.textSecondary; wrapMode: Text.WordWrap; width: parent.width }
         // Icon-only (the text becomes the hover tooltip): each frame

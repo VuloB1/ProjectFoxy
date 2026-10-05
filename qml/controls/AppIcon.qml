@@ -380,6 +380,67 @@ Canvas {
             ctx.beginPath(); ctx.arc(12, 12, 1.7, 0, 2 * Math.PI); ctx.fill();
             ctx.beginPath(); ctx.arc(12, 12, 7.2, 3.75, 4.5); ctx.stroke();
             break;
+        case "frame":
+            // A picture with a rounded frame around it.
+            ctx.beginPath(); ctx.roundedRect(3, 3, 18, 18, 5, 5); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(7.5, 7.5, 9, 9, 2, 2); ctx.stroke();
+            break;
+        // The shapes a picture can be cut to (Recortar > Marco), each outlined on the same grid.
+        case "frame-rect":
+            ctx.beginPath(); ctx.roundedRect(3.5, 5, 17, 14, 4, 4); ctx.stroke();
+            break;
+        case "frame-ellipse": {
+            const pts = [];
+            for (let i = 0; i < 48; ++i)
+                pts.push(12 + 9 * Math.cos(i * Math.PI / 24), 12 + 7 * Math.sin(i * Math.PI / 24));
+            closedShape(pts);
+            break;
+        }
+        case "frame-hexagon":
+            closedShape([3, 12, 7.5, 4.5, 16.5, 4.5, 21, 12, 16.5, 19.5, 7.5, 19.5]);
+            break;
+        case "frame-octagon":
+            closedShape([8.7, 4, 15.3, 4, 20, 8.7, 20, 15.3, 15.3, 20, 8.7, 20, 4, 15.3, 4, 8.7]);
+            break;
+        case "frame-diamond":
+            closedShape([12, 3, 21, 12, 12, 21, 3, 12]);
+            break;
+        case "frame-triangle":
+            closedShape([12, 4, 20.5, 19.5, 3.5, 19.5]);
+            break;
+        case "frame-star": {
+            const pts = [];
+            for (let i = 0; i < 10; ++i) {
+                const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 === 0 ? 9.5 : 3.9;
+                pts.push(12 + r * Math.cos(a), 12.8 + r * Math.sin(a));
+            }
+            closedShape(pts);
+            break;
+        }
+        case "frame-heart": {
+            const pts = [];
+            for (let i = 0; i < 60; ++i) {
+                const t = i * 2 * Math.PI / 60;
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+                pts.push(12 + x * 0.58, 11.4 - y * 0.58 + 0.6);
+            }
+            closedShape(pts);
+            break;
+        }
+        // One corner of a shape with each way of cutting it.
+        case "corner-round":
+            ctx.beginPath(); ctx.moveTo(4, 20); ctx.lineTo(4, 13); ctx.arcTo(4, 4, 13, 4, 9); ctx.lineTo(20, 4); ctx.stroke();
+            break;
+        case "corner-soft":
+            ctx.beginPath(); ctx.moveTo(4, 20); ctx.lineTo(4, 16); ctx.bezierCurveTo(4, 7, 7, 4, 16, 4); ctx.lineTo(20, 4); ctx.stroke();
+            break;
+        case "corner-cut":
+            ctx.beginPath(); ctx.moveTo(4, 20); ctx.lineTo(4, 12); ctx.lineTo(12, 4); ctx.lineTo(20, 4); ctx.stroke();
+            break;
+        case "corner-hollow":
+            ctx.beginPath(); ctx.moveTo(4, 20); ctx.lineTo(4, 12); ctx.arc(4, 4, 8, Math.PI / 2, 0, true); ctx.lineTo(20, 4); ctx.stroke();
+            break;
         case "filters":
             // Three overlapping discs, the usual "photo filters" sign.
             for (const c of [[12, 8.6], [8.3, 15.2], [15.7, 15.2]]) {

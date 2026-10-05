@@ -12,6 +12,7 @@ target_compile_definitions(test_decoder_registry PRIVATE
     FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 add_core_test(test_edit_stack)
 add_core_test(test_effect_families)
+add_core_test(test_frame)
 add_core_test(test_lens)
 target_compile_definitions(test_lens PRIVATE
     LENSFUN_DIR="${CMAKE_SOURCE_DIR}/resources/lensfun")

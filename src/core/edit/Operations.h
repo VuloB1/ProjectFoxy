@@ -12,7 +12,7 @@ namespace core::edit {
 
 // The slider values of an Efectos effect, in the order its catalogue entry lists them
 // (unused slots are 0). The most any effect has is kMaxEffectParams.
-inline constexpr size_t kMaxEffectParams = 16;
+inline constexpr size_t kMaxEffectParams = 24;
 using EffectValues = std::array<double, kMaxEffectParams>;
 
 // Each operation is a plain data record (no behavior) so the stack can be
