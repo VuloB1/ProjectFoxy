@@ -404,6 +404,16 @@ private slots:
         again.setTemplatesFile(file);
         QCOMPARE(again.templates().size(), 0); // the deletion was written
     }
+
+    void picturesChosenInTheFileDialogAreAdded()
+    {
+        PaneImageStore store;
+        CollageStudio s(&store);
+        const QString a = png("dlg a.png", Qt::red), b = png("dlg b.png", Qt::blue);
+        QCOMPARE(s.addUrls({QUrl::fromLocalFile(a).toString(), QUrl::fromLocalFile(b).toString()}), 2);
+        QCOMPARE(cell(s, 0).value("path").toString(), a);
+        QCOMPARE(s.addUrls({QVariant::fromValue(QUrl::fromLocalFile(b))}), 1);
+    }
 };
 
 QTEST_MAIN(TestCollageStudio)

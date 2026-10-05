@@ -478,7 +478,7 @@ int CollageStudio::addUrls(const QVariantList &urls)
 {
     QStringList paths;
     for (const QVariant &u : urls)
-        paths << pathFrom(u.toUrl().isLocalFile() ? u.toUrl().toLocalFile() : u.toString());
+        paths << pathFrom(u.toString()); // from the page these arrive as text ("file:///C:/..."); pathFrom turns them into paths
     return addPaths(paths);
 }
 

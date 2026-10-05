@@ -282,8 +282,9 @@ int AnimStudio::addUrls(const QVariantList &urls)
 {
     QStringList paths;
     for (const QVariant &u : urls) {
-        const QUrl url = u.toUrl();
-        paths << (url.isLocalFile() ? url.toLocalFile() : u.toString());
+        // from the page these arrive as text ("file:///C:/..."); a QUrl converts to the same text
+        const QString text = u.toString();
+        paths << (text.startsWith(QLatin1String("file:")) ? QUrl(text).toLocalFile() : text);
     }
     return addPaths(paths);
 }

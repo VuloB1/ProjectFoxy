@@ -861,7 +861,7 @@ Item {
         title: qsTr("Elegí las fotos del collage")
         fileMode: FileDialog.OpenFiles
         nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
-        onAccepted: collageStudio.addUrls(selectedFiles)
+        onAccepted: collageStudio.addUrls(Array.from(selectedFiles, u => u.toString()))
     }
     FileDialog {
         id: pickDialog

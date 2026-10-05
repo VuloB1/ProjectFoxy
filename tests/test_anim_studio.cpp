@@ -349,6 +349,71 @@ private slots:
         QVERIFY(written.load(out));
         QVERIFY(written.pixelColor(written.width() / 8, written.height() / 2) != QColor(200, 40, 40)); // the effect is in the file
     }
+
+    void transparentPicturesExportWithTheBackgroundAndNoGreenFringe()
+    {
+        for (const QSize size : {QSize(300, 200), QSize(2400, 1600)}) { // small, and big enough to be scaled down
+            QImage src(size, QImage::Format_RGBA8888);
+            src.fill(QColor(200, 40, 40, 255));
+            const double k = size.width() / 300.0;
+            for (int y = 0; y < src.height(); ++y)
+                for (int x = 0; x < src.width(); ++x) {
+                    const double dx = x / k - 150, dy = y / k - 100, d2 = dx * dx + dy * dy;
+                    if (d2 < 60 * 60)
+                        src.setPixelColor(x, y, QColor(0, 255, 0, 0)); // transparent, hiding green
+                    else if (d2 < 75 * 75)
+                        src.setPixelColor(x, y, QColor(0, 255, 0, 90)); // a translucent green rim would be legitimate...
+                }
+            // ...so make the rim the picture's own colour instead: only the hidden colour of the hole is green
+            for (int y = 0; y < src.height(); ++y)
+                for (int x = 0; x < src.width(); ++x) {
+                    const double dx = x / k - 150, dy = y / k - 100, d2 = dx * dx + dy * dy;
+                    if (d2 >= 60 * 60 && d2 < 75 * 75)
+                        src.setPixelColor(x, y, QColor(200, 40, 40, 90));
+                }
+            const QString path = m_dir.filePath(QString("alpha%1.png").arg(size.width()));
+            QVERIFY(src.save(path));
+
+            PaneImageStore store;
+            AnimStudio s(&store);
+            s.addPaths({path, path}); // two frames, so that the WebP is an animation the viewer's decoder reads
+            for (int format = 0; format < 2; ++format) { // GIF and APNG (the WebP is made from the same frames)
+                s.setOption("format", format);
+                const QString out = m_dir.filePath(QString("alpha%1_%2.out").arg(size.width()).arg(format));
+                const QString file = out + (format == 0 ? ".gif" : format == 1 ? ".png" : ".webp");
+                QSignalSpy done(&s, &AnimStudio::exportFinished);
+                QVERIFY(s.exportTo(QUrl::fromLocalFile(file)));
+                QVERIFY(done.wait(30000));
+                QVERIFY(done.first().at(0).toBool());
+                const QImage back = QImageReader(file).read();
+                QVERIFY2(!back.isNull(), qPrintable(file));
+                const int w = back.width(), h = back.height();
+                // the middle of the hole and a ring of pixels around it: black background and the picture's red, never green
+                int greenish = 0;
+                for (int y = 0; y < h; ++y)
+                    for (int x = 0; x < w; ++x) {
+                        const QColor c = back.pixelColor(x, y);
+                        if (c.alpha() > 0 && c.green() > c.red() + 25 && c.green() > 60)
+                            ++greenish;
+                    }
+                QVERIFY2(greenish == 0, qPrintable(QString("%1: %2 greenish pixels").arg(file).arg(greenish)));
+            }
+        }
+    }
+
+    void picturesChosenInTheFileDialogAreAdded()
+    {
+        // the file dialog hands over its choice as text ("file:///C:/...") or as QUrl, depending on the page
+        PaneImageStore store;
+        AnimStudio s(&store);
+        const QString a = makePng("dlg a.png", Qt::red), b = makePng("dlg b.png", Qt::blue);
+        QCOMPARE(s.addUrls({QUrl::fromLocalFile(a).toString(), QUrl::fromLocalFile(b).toString()}), 2);
+        QCOMPARE(s.count(), 2);
+        QCOMPARE(s.addUrls({QVariant::fromValue(QUrl::fromLocalFile(a))}), 1);
+        QCOMPARE(s.count(), 3);
+        QCOMPARE(s.addUrls({a}), 1); // a plain path too
+        QCOMPARE(s.count(), 4);
+    }
 };
 
 QTEST_MAIN(TestAnimStudio)

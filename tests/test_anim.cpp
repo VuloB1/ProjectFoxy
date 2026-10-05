@@ -595,6 +595,81 @@ private slots:
         b.text.size = 12.0;
         QVERIFY(a.signature() != b.signature());
     }
+
+    void transparentPicturesShowTheBackgroundAndNotTheirHiddenColour()
+    {
+        // fully transparent pixels that hide pure green, and a half transparent ring around them
+        QImage src(200, 150, QImage::Format_RGBA8888);
+        src.fill(QColor(200, 40, 40, 255));
+        for (int y = 0; y < src.height(); ++y)
+            for (int x = 0; x < src.width(); ++x) {
+                const int d2 = (x - 100) * (x - 100) + (y - 75) * (y - 75);
+                if (d2 < 45 * 45)
+                    src.setPixelColor(x, y, QColor(0, 255, 0, 0));
+                else if (d2 < 55 * 55)
+                    src.setPixelColor(x, y, QColor(200, 40, 40, 100));
+            }
+        Settings st;
+        st.size = QSize(400, 300);
+        st.background = QColor(10, 20, 30);
+        const QImage fitted = fitToCanvas(src, st);
+        const QColor hole = fitted.pixelColor(200, 150);
+        QVERIFY2(qAbs(hole.red() - 10) <= 2 && qAbs(hole.green() - 20) <= 2 && qAbs(hole.blue() - 30) <= 2 && hole.alpha() == 255,
+                 qPrintable(QString("hole is %1,%2,%3,%4").arg(hole.red()).arg(hole.green()).arg(hole.blue()).arg(hole.alpha())));
+        // the ring is the picture's colour mixed with the background, never greener than either
+        for (int x = 200 + 95; x < 200 + 115; ++x) {
+            const QColor c = fitted.pixelColor(x, 150);
+            QVERIFY2(c.green() <= 45, qPrintable(QString("x=%1 green %2").arg(x).arg(c.green())));
+        }
+        // and through the GIF writer
+        VectorSource frames({fitted}, {100});
+        QBuffer out;
+        out.open(QIODevice::WriteOnly);
+        QVERIFY(writeGif(frames, GifOptions{}, out));
+        QImage back;
+        QVERIFY(back.loadFromData(out.data(), "GIF"));
+        const QColor gifHole = back.pixelColor(200, 150);
+        QVERIFY2(gifHole.green() < 60 && gifHole.alpha() == 255, qPrintable(QString("gif hole is %1,%2,%3,%4").arg(gifHole.red()).arg(gifHole.green()).arg(gifHole.blue()).arg(gifHole.alpha())));
+    }
+
+    void aNeutralDarkGradientStaysNeutralInTheGif()
+    {
+        // a soft grey shadow over black (what a transparent picture's soft edge looks like once it is flattened),
+        // in a GIF whose palette is shared with a colourful picture
+        QImage shade(320, 240, QImage::Format_RGBA8888);
+        for (int y = 0; y < shade.height(); ++y)
+            for (int x = 0; x < shade.width(); ++x) {
+                const double d = std::hypot(x - 160.0, y - 120.0) / 120.0;
+                const int v = int(std::clamp(1.0 - d, 0.0, 1.0) * 90.0);
+                shade.setPixelColor(x, y, QColor(v, v, v));
+            }
+        QImage colourful(320, 240, QImage::Format_RGBA8888);
+        for (int y = 0; y < colourful.height(); ++y)
+            for (int x = 0; x < colourful.width(); ++x)
+                colourful.setPixelColor(x, y, QColor::fromHsv((x * 360 / 320 + y) % 360, 200, 120 + (y % 120)));
+        for (bool dither : {true, false}) {
+            VectorSource frames({shade, colourful}, {100, 100});
+            GifOptions o;
+            o.dither = dither;
+            QBuffer out;
+            out.open(QIODevice::WriteOnly);
+            QVERIFY(writeGif(frames, o, out));
+            QImage back;
+            QVERIFY(back.loadFromData(out.data(), "GIF"));
+            int worst = 0;
+            double meanErr = 0.0;
+            for (int y = 0; y < back.height(); ++y)
+                for (int x = 0; x < back.width(); ++x) {
+                    const QColor c = back.pixelColor(x, y), w = shade.pixelColor(x, y);
+                    worst = std::max(worst, std::max({qAbs(c.red() - c.green()), qAbs(c.green() - c.blue()), qAbs(c.red() - c.blue())}));
+                    meanErr += qAbs(c.red() - w.red()) + qAbs(c.green() - w.green()) + qAbs(c.blue() - w.blue());
+                }
+            meanErr /= back.width() * back.height() * 3.0;
+            qInfo() << "dither" << dither << "worst chroma" << worst << "mean error" << meanErr;
+            QVERIFY2(worst <= 8, qPrintable(QString("dither=%1: worst chroma %2").arg(dither).arg(worst)));
+            QVERIFY2(meanErr < 3.0, qPrintable(QString("dither=%1: mean error %2").arg(dither).arg(meanErr)));
+        }
+    }
 };
 
 QTEST_MAIN(TestAnim)

@@ -124,13 +124,59 @@ std::vector<unsigned> medianCut(const Histogram &h, int maxColors)
     return palette;
 }
 
-// For every 5-bit colour, the palette entry that is nearest to it.
+// Median cut leaves boxes whose averages are only roughly where the colours cluster; a few rounds of
+// k-means (every colour to its nearest entry, every entry to the mean of its colours) pull the palette
+// towards what is really in the pictures, which is what keeps smooth gradients and flat backgrounds clean.
+void refinePalette(const Histogram &h, std::vector<unsigned> &palette, int rounds)
+{
+    if (palette.size() < 2)
+        return;
+    struct Pt { float r, g, b; uint32_t n; };
+    std::vector<Pt> pts;
+    for (int bin = 0; bin < kBins; ++bin) {
+        const uint32_t n = h.n[size_t(bin)];
+        if (n)
+            pts.push_back({float(h.sr[size_t(bin)]) / n, float(h.sg[size_t(bin)]) / n, float(h.sb[size_t(bin)]) / n, n});
+    }
+    const size_t K = palette.size();
+    std::vector<float> pr(K), pg(K), pb(K);
+    for (size_t k = 0; k < K; ++k) {
+        pr[k] = float((palette[k] >> 16) & 255); pg[k] = float((palette[k] >> 8) & 255); pb[k] = float(palette[k] & 255);
+    }
+    std::vector<double> sr(K), sg(K), sb(K), sn(K);
+    for (int round = 0; round < rounds; ++round) {
+        std::fill(sr.begin(), sr.end(), 0.0); std::fill(sg.begin(), sg.end(), 0.0);
+        std::fill(sb.begin(), sb.end(), 0.0); std::fill(sn.begin(), sn.end(), 0.0);
+        for (const Pt &p : pts) {
+            size_t best = 0;
+            float bestD = 1e30f;
+            for (size_t k = 0; k < K; ++k) {
+                const float dr = p.r - pr[k], dg = p.g - pg[k], db = p.b - pb[k];
+                const float d = 2 * dr * dr + 4 * dg * dg + 3 * db * db;
+                if (d < bestD) { bestD = d; best = k; }
+            }
+            sr[best] += double(p.r) * p.n; sg[best] += double(p.g) * p.n; sb[best] += double(p.b) * p.n; sn[best] += p.n;
+        }
+        for (size_t k = 0; k < K; ++k)
+            if (sn[k] > 0) { pr[k] = float(sr[k] / sn[k]); pg[k] = float(sg[k] / sn[k]); pb[k] = float(sb[k] / sn[k]); }
+    }
+    for (size_t k = 0; k < K; ++k)
+        palette[k] = (unsigned(std::clamp(int(pr[k] + 0.5f), 0, 255)) << 16) | (unsigned(std::clamp(int(pg[k] + 0.5f), 0, 255)) << 8)
+                     | unsigned(std::clamp(int(pb[k] + 0.5f), 0, 255));
+}
+
+// For every 5-bit colour, the palette entry that is nearest to it (to the colours really seen in that bin when
+// there are any, so a bin that holds nothing but black is matched as black and not as "a little above it").
 struct Nearest {
     std::vector<uint8_t> lut = std::vector<uint8_t>(kBins, 0);
-    void build(const std::vector<unsigned> &palette, int firstIndex)
+    void build(const std::vector<unsigned> &palette, int firstIndex, const Histogram *seen = nullptr)
     {
         for (int bin = 0; bin < kBins; ++bin) {
-            const int r = ((bin >> 10) & 31) * 8 + 4, g = ((bin >> 5) & 31) * 8 + 4, b = (bin & 31) * 8 + 4;
+            int r = ((bin >> 10) & 31) * 8 + 4, g = ((bin >> 5) & 31) * 8 + 4, b = (bin & 31) * 8 + 4;
+            if (seen && seen->n[size_t(bin)]) {
+                const uint64_t n = seen->n[size_t(bin)];
+                r = int((seen->sr[size_t(bin)] + n / 2) / n); g = int((seen->sg[size_t(bin)] + n / 2) / n); b = int((seen->sb[size_t(bin)] + n / 2) / n);
+            }
             int best = 0, bestD = 1 << 30;
             for (size_t i = 0; i < palette.size(); ++i) {
                 const int d = colorDistance(r, g, b, int((palette[i] >> 16) & 255), int((palette[i] >> 8) & 255), int(palette[i] & 255));
@@ -281,7 +327,9 @@ std::vector<unsigned> quantizePalette(const std::vector<QImage> &images, int col
                     h.add(p[0], p[1], p[2]);
         }
     }
-    return medianCut(h, std::clamp(colors, 2, 256));
+    std::vector<unsigned> palette = medianCut(h, std::clamp(colors, 2, 256));
+    refinePalette(h, palette, 4);
+    return palette;
 }
 
 bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, const ProgressFn &progress, QString *error)
@@ -333,7 +381,8 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
         }
         if (!options.localPalettes) {
             globalPalette = medianCut(h, usable);
-            globalNearest.build(globalPalette, 1);
+            refinePalette(h, globalPalette, 4);
+            globalNearest.build(globalPalette, 1, &h);
         }
     }
 
@@ -416,7 +465,8 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
                 }
             }
             palette = medianCut(hist, usable);
-            localNearest.build(palette, 1);
+            refinePalette(hist, palette, 2);
+            localNearest.build(palette, 1, &hist);
             nearest = &localNearest;
         } else {
             palette = globalPalette;
@@ -451,7 +501,12 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
                 outIdx = idx;
                 if (options.dither && size_t(idx) - 1 < palette.size()) {
                     const unsigned pc = palette[size_t(idx) - 1];
-                    const float er = r - float((pc >> 16) & 255), eg = g - float((pc >> 8) & 255), eb = b - float(pc & 255);
+                    // the error is capped: where the palette has nothing near a colour it would otherwise grow from pixel
+                    // to pixel and the picture fills with speckles of unrelated colours
+                    constexpr float kMaxError = 24.f;
+                    const float er = std::clamp(r - float((pc >> 16) & 255), -kMaxError, kMaxError);
+                    const float eg = std::clamp(g - float((pc >> 8) & 255), -kMaxError, kMaxError);
+                    const float eb = std::clamp(b - float(pc & 255), -kMaxError, kMaxError);
                     const int dir = leftToRight ? 1 : -1;
                     auto spread = [&](std::vector<float> &buf, int xx, float f) {
                         if (xx < 0 || xx >= w)

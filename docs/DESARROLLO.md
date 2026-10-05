@@ -579,6 +579,14 @@ ahora también **reproduce WebP animado**. Pruebas: `test_anim` (20: el GIF se v
 con el decodificador de Qt, el APNG con `AnimatedDecoder`, el WebP con libwebpdemux) y
 `test_anim_studio` (12).
 
+**Calidad del GIF.** La paleta sale de cortes por la mediana y se afina con unas vueltas de
+k‑means sobre el histograma (los fondos planos quedan exactos y los degradados oscuros no se
+rompen); la tabla de búsqueda usa los colores realmente vistos en cada casilla y el error del
+tramado Floyd‑Steinberg se limita a ±24 por canal, porque con una paleta que no tenía nada cerca
+de un color el error crecía de píxel en píxel y llenaba la imagen de puntos de colores ajenos
+(verdes, en sombras suaves de imágenes con transparencia). Pruebas: `test_anim`
+(`aNeutralDarkGradientStaysNeutralInTheGif`, `transparentPicturesShowTheBackground...`).
+
 **Efecto y texto por fotograma.** Cada imagen de la tira puede llevar un `FrameStyle`
 (`core/anim/Decorate.cpp`): un efecto del catálogo de Efectos (uno de sus *presets* o los valores
 de fábrica, con «Cantidad») y un texto (varias líneas, tipo de letra, tamaño en % del lado corto,

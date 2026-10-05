@@ -545,7 +545,7 @@ Item {
                         width: parent.width
                         implicitHeight: 40
                         visible: root.currentIndex >= 0
-                        readonly property int hold: root.count > 0 ? animStudio.holdAt(root.currentIndex) : 1000
+                        readonly property int hold: { animStudio.revision; return root.count > 0 ? animStudio.holdAt(root.currentIndex) : 1000; }
                         Label { text: qsTr("Este fotograma"); color: themeManager.textSecondary }
                         Label { anchors.right: parent.right; text: parent.hold + " ms"; color: themeManager.textPrimary; font.bold: true }
                         AppSlider {
@@ -569,7 +569,7 @@ Item {
                         Item {
                             width: (parent.width - 6) / 2
                             height: 56
-                            Label { text: qsTr("Los que agregues"); color: themeManager.textSecondary; font.pixelSize: 11 }
+                            Label { text: qsTr("Duración de las nuevas"); color: themeManager.textSecondary; font.pixelSize: 11 }
                             AppSpinBox {
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
@@ -579,6 +579,7 @@ Item {
                                 editable: true
                                 value: root.opts.defaultHold
                                 onValueModified: animStudio.setOption("defaultHold", value)
+                                AppToolTip { visible: parent.hovered; text: qsTr("Cuántos milisegundos dura cada imagen que agregues de ahora en adelante. No cambia las que ya están en la tira.") }
                             }
                         }
                     }
@@ -914,7 +915,7 @@ Item {
         title: qsTr("Elegí las imágenes de la animación")
         fileMode: FileDialog.OpenFiles
         nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
-        onAccepted: animStudio.addUrls(selectedFiles)
+        onAccepted: animStudio.addUrls(Array.from(selectedFiles, u => u.toString()))
     }
     FileDialog {
         id: saveDialog
