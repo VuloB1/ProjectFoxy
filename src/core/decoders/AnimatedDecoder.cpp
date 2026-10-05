@@ -4,6 +4,8 @@
 #include <QImageReader>
 #include <QPainter>
 #include <QtEndian>
+#include <webp/decode.h>
+#include <webp/demux.h>
 #include <array>
 #include <cstring>
 
@@ -292,6 +294,64 @@ bool decodeGifFrames(const QString &filePath, bool wantAllFrames,
     return true;
 }
 
+// Animated WebP: libwebp's animation decoder composes every frame (blend and dispose included) onto a
+// full-canvas picture, so each one comes out ready to show.
+bool webpHasAnimation(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+    const QByteArray head = file.read(64);
+    WebPBitstreamFeatures features;
+    if (WebPGetFeatures(reinterpret_cast<const uint8_t *>(head.constData()), size_t(head.size()), &features) != VP8_STATUS_OK)
+        return false;
+    return features.has_animation != 0;
+}
+
+bool decodeWebpFrames(const QString &filePath, bool wantAllFrames,
+                      QVector<QImage> &frames, QVector<int> &delays, QString &error)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        error = file.errorString();
+        return false;
+    }
+    const QByteArray bytes = file.readAll();
+    WebPData data{reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size())};
+    WebPAnimDecoderOptions options;
+    if (!WebPAnimDecoderOptionsInit(&options)) {
+        error = QStringLiteral("No se pudo iniciar el decodificador de WebP.");
+        return false;
+    }
+    options.color_mode = MODE_RGBA;
+    options.use_threads = 1;
+    WebPAnimDecoder *decoder = WebPAnimDecoderNew(&data, &options);
+    if (!decoder) {
+        error = QStringLiteral("No se pudo leer el WebP animado.");
+        return false;
+    }
+    WebPAnimInfo info;
+    WebPAnimDecoderGetInfo(decoder, &info);
+    int previous = 0;
+    while (WebPAnimDecoderHasMoreFrames(decoder)) {
+        uint8_t *rgba = nullptr;
+        int timestamp = 0;
+        if (!WebPAnimDecoderGetNext(decoder, &rgba, &timestamp))
+            break;
+        frames.push_back(QImage(rgba, int(info.canvas_width), int(info.canvas_height), int(info.canvas_width) * 4,
+                                QImage::Format_RGBA8888).copy()); // the decoder reuses its buffer
+        const int delay = timestamp - previous;
+        delays.push_back(delay > 0 ? delay : 100);
+        previous = timestamp;
+        if (!wantAllFrames)
+            break;
+    }
+    WebPAnimDecoderDelete(decoder);
+    if (frames.isEmpty())
+        error = QStringLiteral("El WebP animado no tiene fotogramas.");
+    return !frames.isEmpty();
+}
+
 } // namespace
 
 bool AnimatedDecoder::canDecode(const QString &filePath) const
@@ -303,6 +363,8 @@ bool AnimatedDecoder::canDecode(const QString &filePath) const
     }
     if (ext == QLatin1String("png"))
         return pngHasAnimation(filePath);
+    if (ext == QLatin1String("webp"))
+        return webpHasAnimation(filePath);
     return false;
 }
 
@@ -317,7 +379,9 @@ DecodeResult AnimatedDecoder::decode(const QString &filePath, QSize maxSize)
     QString error;
     const bool decoded = (ext == QLatin1String("gif"))
         ? decodeGifFrames(filePath, wantAllFrames, frames, delays, error)
-        : decodeApngFrames(filePath, wantAllFrames, frames, delays, error);
+        : (ext == QLatin1String("webp"))
+            ? decodeWebpFrames(filePath, wantAllFrames, frames, delays, error)
+            : decodeApngFrames(filePath, wantAllFrames, frames, delays, error);
 
     if (!decoded || frames.isEmpty()) {
         result.error = error.isEmpty() ? QStringLiteral("No se pudo decodificar %1").arg(filePath) : error;
@@ -336,7 +400,7 @@ DecodeResult AnimatedDecoder::decode(const QString &filePath, QSize maxSize)
 
 QStringList AnimatedDecoder::supportedExtensions() const
 {
-    return { "gif", "png" };
+    return { "gif", "png", "webp" };
 }
 
 } // namespace core

@@ -103,6 +103,8 @@ add_library(imageviewer_app STATIC
     src/app/PaneImageProvider.cpp
     src/app/AnimStudio.h
     src/app/AnimStudio.cpp
+    src/app/CollageStudio.h
+    src/app/CollageStudio.cpp
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)
@@ -152,6 +154,7 @@ qt_add_qml_module(ImageViewer
         qml/PaneView.qml
         qml/MultiView.qml
         qml/GifStudio.qml
+        qml/CollageMaker.qml
         qml/FrameCornerPicker.qml
         qml/UnsavedChangesDialog.qml
         qml/OverwriteDialog.qml

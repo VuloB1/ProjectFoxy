@@ -156,17 +156,17 @@ ApplicationWindow {
     }
 
     // The animation studio; like the multi view it only exists while it is open, and takes the whole window.
+    Component { id: gifStudioComponent; GifStudio { onCloseRequested: root.setStudio("") } }
+    Component { id: collageComponent; CollageMaker { onCloseRequested: root.setStudio("") } }
     Loader {
         id: studioLoader
-        active: root.studio === "gif"
+        active: root.studio !== ""
         anchors.top: toolbar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         z: 6
-        sourceComponent: GifStudio {
-            onCloseRequested: root.setStudio("")
-        }
+        sourceComponent: root.studio === "gif" ? gifStudioComponent : collageComponent
     }
 
     Loader {

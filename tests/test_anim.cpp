@@ -355,6 +355,35 @@ private slots:
         QCOMPARE(delays, (std::vector<int>{100, 120, 140, 160}));
     }
 
+    void theViewerPlaysTheAnimatedWebpItWrites()
+    {
+        std::vector<QImage> frames;
+        for (int i = 0; i < 3; ++i)
+            frames.push_back(square(64, 48, 4 + i * 20, 10, QColor(250 - i * 80, 60 + i * 80, 120)));
+        VectorSource src(frames, {100, 200, 300});
+        QTemporaryDir dir;
+        QFile file(dir.filePath("a.webp"));
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        WebpOptions opt;
+        opt.lossless = true;
+        QVERIFY(writeWebp(src, opt, file));
+        file.close();
+        core::AnimatedDecoder decoder;
+        QVERIFY(decoder.canDecode(file.fileName()));
+        const core::DecodeResult r = decoder.decode(file.fileName());
+        QVERIFY2(r.ok, qPrintable(r.error));
+        QCOMPARE(int(r.frames.size()), 3);
+        QCOMPARE(r.frameDelaysMs, (QVector<int>{100, 200, 300}));
+        for (int i = 0; i < 3; ++i)
+            QCOMPARE(meanAbsDiff(r.frames[i].convertToFormat(QImage::Format_ARGB32), frames[size_t(i)].convertToFormat(QImage::Format_ARGB32)), 0.0);
+        // a still WebP is not "animated": it goes to the ordinary decoder
+        QImage still(16, 16, QImage::Format_RGBA8888);
+        still.fill(Qt::red);
+        QVERIFY(still.save(dir.filePath("still.webp"), "WEBP") || true);
+        if (QFileInfo::exists(dir.filePath("still.webp")))
+            QVERIFY(!decoder.canDecode(dir.filePath("still.webp")));
+    }
+
     void webpLossyIsSmallerAndClose()
     {
         const QImage g = gradient(96, 72);

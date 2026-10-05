@@ -13,6 +13,7 @@ target_compile_definitions(test_decoder_registry PRIVATE
 add_core_test(test_edit_stack)
 add_core_test(test_effect_families)
 add_core_test(test_frame)
+add_core_test(test_collage)
 add_core_test(test_anim)
 target_link_libraries(test_anim PRIVATE WebP::webpdemux)
 add_core_test(test_lens)
@@ -43,6 +44,11 @@ add_test(NAME test_pane_images COMMAND test_pane_images)
 add_executable(test_anim_studio test_anim_studio.cpp)
 target_link_libraries(test_anim_studio PRIVATE imageviewer_app imageviewer_core Qt6::Test)
 add_test(NAME test_anim_studio COMMAND test_anim_studio)
+
+# The collage maker's controller (Crear > Collage).
+add_executable(test_collage_studio test_collage_studio.cpp)
+target_link_libraries(test_collage_studio PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_collage_studio COMMAND test_collage_studio)
 
 # The settings file: Modo pixel's switch and extras, and the migration from the old single switch.
 add_executable(test_app_settings test_app_settings.cpp)

@@ -9,6 +9,7 @@
 #include "LensController.h"
 #include "PaneImageProvider.h"
 #include "AnimStudio.h"
+#include "CollageStudio.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -61,6 +62,11 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("animStudio", animStudio);
     engine.addImageProvider(QLatin1String("animprev"), new AnimPreviewProvider(animStudio));
     engine.addImageProvider(QLatin1String("animsrc"), new AnimThumbnailProvider(animStudio));
+
+    // The collage maker (Crear > Collage).
+    auto *collageStudio = new CollageStudio(paneStore, &engine);
+    engine.rootContext()->setContextProperty("collageStudio", collageStudio);
+    engine.addImageProvider(QLatin1String("collageprev"), new CollagePreviewProvider(collageStudio));
 
     auto *controller = new AppController(imageProvider, folderModel, &engine);
     engine.rootContext()->setContextProperty("appController", controller);

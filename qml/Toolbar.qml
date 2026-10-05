@@ -78,6 +78,11 @@ AppPanelBackground {
                     text: qsTr("GIF animado…")
                     onTriggered: root.studioRequested("gif")
                 }
+                AppMenuItem {
+                    iconName: "collage"
+                    text: qsTr("Collage…")
+                    onTriggered: root.studioRequested("collage")
+                }
             }
         }
         AppToolButton {

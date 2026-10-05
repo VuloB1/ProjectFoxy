@@ -60,6 +60,9 @@ add_library(imageviewer_core STATIC
     anim/GifEncoder.cpp
     anim/ApngEncoder.cpp
     anim/WebpEncoder.cpp
+    collage/Collage.h
+    collage/Collage.cpp
+    collage/Layouts.cpp
 )
 
 target_include_directories(imageviewer_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -73,4 +76,5 @@ target_link_libraries(imageviewer_core PUBLIC
     PkgConfig::EXIV2
     WebP::webp
     WebP::libwebpmux
+    WebP::webpdemux
 )

@@ -380,6 +380,13 @@ Canvas {
             ctx.beginPath(); ctx.arc(12, 12, 1.7, 0, 2 * Math.PI); ctx.fill();
             ctx.beginPath(); ctx.arc(12, 12, 7.2, 3.75, 4.5); ctx.stroke();
             break;
+        case "collage":
+            // Pictures of different sizes fitted into one frame.
+            ctx.beginPath(); ctx.roundedRect(3, 3, 8, 11, 1.5, 1.5); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(13, 3, 8, 6, 1.5, 1.5); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(13, 11, 8, 10, 1.5, 1.5); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(3, 16, 8, 5, 1.5, 1.5); ctx.stroke();
+            break;
         case "film":
             // A strip of film: the frame and its two rows of sprocket holes.
             ctx.beginPath(); ctx.roundedRect(4, 3, 16, 18, 2, 2); ctx.stroke();
