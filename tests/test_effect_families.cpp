@@ -527,6 +527,106 @@ private slots:
         QVERIFY(qRed(at(round, 100, 70)) == 0);
     }
 
+    // --- Luz ----------------------------------------------------------------------------------------
+
+    static QImage dimScene(int w, int h)
+    {
+        QImage img(w, h, QImage::Format_RGBA8888);
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x)
+                img.setPixelColor(x, y, QColor(30 + x * 40 / w, 40 + y * 40 / h, 70));
+        for (int y = h / 2; y < h / 2 + h / 8; ++y) // a bright patch, for the effects that work from the highlights
+            for (int x = w / 2; x < w / 2 + w / 8; ++x)
+                img.setPixelColor(x, y, QColor(250, 245, 230));
+        return img;
+    }
+
+    void lightEffectsOnlyAddLightAndAreReproducible()
+    {
+        const QImage src = dimScene(320, 220);
+        for (const char *name : {"bokeh", "flare", "leak", "beams", "dust", "sparkles", "glow"}) {
+            const QString id = QString::fromLatin1(name);
+            const EffectSpec *fx = findEffect(id);
+            QVERIFY2(fx, name);
+            QCOMPARE(fx->group, QStringLiteral("light"));
+            EffectValues v = defaultEffectValues(*fx);
+            const QImage out = applyEffect(src, id, v);
+            QCOMPARE(out, applyEffect(src, id, v)); // the same picture every time
+            int brighter = 0;
+            for (int y = 0; y < src.height(); ++y)
+                for (int x = 0; x < src.width(); ++x)
+                    for (int c = 0; c < 3; ++c) {
+                        const int d = int(out.constScanLine(y)[x * 4 + c]) - int(src.constScanLine(y)[x * 4 + c]);
+                        QVERIFY2(d >= -1, name); // Trama never darkens
+                        brighter += d > 8;
+                    }
+            QVERIFY2(brighter > 50, name);
+            // a seed makes another arrangement
+            for (size_t i = 0; i < fx->params.size(); ++i)
+                if (fx->params[i].seed) {
+                    EffectValues other = v;
+                    other[i] = v[i] + 17;
+                    QVERIFY2(applyEffect(src, id, other) != out, name);
+                }
+        }
+    }
+
+    void bokehShapesAllDrawSomething()
+    {
+        const QImage src = dimScene(300, 200);
+        const EffectSpec *fx = findEffect(QStringLiteral("bokeh"));
+        EffectValues v = defaultEffectValues(*fx);
+        const EffectParam &shapes = fx->params[3];
+        QImage first;
+        for (int k = 0; k < shapes.options.size(); ++k) {
+            v[3] = k;
+            const QImage out = applyEffect(src, QStringLiteral("bokeh"), v);
+            QVERIFY2(out != src, qPrintable(shapes.options.at(k)));
+            if (k == 0)
+                first = out;
+            else
+                QVERIFY2(out != first, qPrintable(shapes.options.at(k)));
+        }
+    }
+
+    void theSpotlightDarkensTheOutsideAndLightsTheInside()
+    {
+        const QImage src = solid(120, 120, 120, 200, 140);
+        const EffectSpec *fx = findEffect(QStringLiteral("spotlight"));
+        EffectValues v = defaultEffectValues(*fx);
+        v[0] = 50; v[1] = 50; v[2] = 25; v[3] = 20; v[4] = 60; v[5] = 70;
+        const QImage out = applyEffect(src, QStringLiteral("spotlight"), v);
+        QVERIFY(qRed(at(out, 100, 70)) > 150);   // the middle is lit
+        QVERIFY(qRed(at(out, 2, 2)) < 60);        // the corner is in shade
+        v[5] = 0; v[4] = 0;
+        QCOMPARE(applyEffect(src, QStringLiteral("spotlight"), v), src);
+    }
+
+    void sparklesGoWhereTheLightIs()
+    {
+        QImage src(900, 600, QImage::Format_RGBA8888);
+        src.fill(QColor(15, 15, 25));
+        for (int y = 288; y < 312; ++y)
+            for (int x = 588; x < 612; ++x)
+                src.setPixelColor(x, y, QColor(255, 255, 255));
+        const EffectSpec *fx = findEffect(QStringLiteral("sparkles"));
+        EffectValues v = defaultEffectValues(*fx);
+        v[0] = 1;  // a single sparkle
+        v[5] = 1;  // on the lights
+        v[1] = 60;
+        const QImage out = applyEffect(src, QStringLiteral("sparkles"), v);
+        // the arms of the star reach past the bright square it sits on
+        int lit = 0;
+        for (int y = 258; y < 342; ++y)
+            for (int x = 558; x < 642; ++x)
+                if ((std::abs(x - 600) > 16 || std::abs(y - 300) > 16) && qRed(at(out, x, y)) > 15 + 30)
+                    ++lit;
+        QVERIFY2(lit > 20, qPrintable(QString::number(lit)));
+        // while the far corners did not change
+        QCOMPARE(at(out, 5, 5), at(src, 5, 5));
+        QCOMPARE(at(out, 894, 594), at(src, 894, 594));
+    }
+
     // --- every effect, tiny and odd sizes, cancellation -----------------------------------------
 
     void everyEffectSurvivesTinyPictures()

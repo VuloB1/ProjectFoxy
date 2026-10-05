@@ -212,6 +212,25 @@ inline Rgb unpackColor(double v)
 }
 inline double packColor(int r, int g, int b) { return double((uint32_t(r) << 16) | (uint32_t(g) << 8) | uint32_t(b)); }
 
+// Hue in degrees (0..360), saturation and value 0..1 -> RGB 0..255.
+inline Rgb hsvToRgb(double h, double s, double v)
+{
+    h = std::fmod(h, 360.0);
+    if (h < 0)
+        h += 360.0;
+    const double c = v * s, hp = h / 60.0;
+    const double x = c * (1.0 - std::abs(std::fmod(hp, 2.0) - 1.0));
+    double r = 0, g = 0, b = 0;
+    if (hp < 1) { r = c; g = x; }
+    else if (hp < 2) { r = x; g = c; }
+    else if (hp < 3) { g = c; b = x; }
+    else if (hp < 4) { g = x; b = c; }
+    else if (hp < 5) { r = x; b = c; }
+    else { r = c; b = x; }
+    const double m = v - c;
+    return {(r + m) * 255.0, (g + m) * 255.0, (b + m) * 255.0};
+}
+
 // Luma, Rec. 601 (the weights the rest of the effects use).
 inline double lumaOf(double r, double g, double b) { return 0.299 * r + 0.587 * g + 0.114 * b; }
 
