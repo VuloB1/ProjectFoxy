@@ -31,6 +31,12 @@ add_executable(test_folder_model test_folder_model.cpp)
 target_link_libraries(test_folder_model PRIVATE imageviewer_app imageviewer_core Qt6::Test)
 add_test(NAME test_folder_model COMMAND test_folder_model)
 
+# The pictures of the "Varias imágenes" view.
+add_executable(test_pane_images test_pane_images.cpp)
+target_link_libraries(test_pane_images PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+target_compile_definitions(test_pane_images PRIVATE FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
+add_test(NAME test_pane_images COMMAND test_pane_images)
+
 # The settings file: Modo pixel's switch and extras, and the migration from the old single switch.
 add_executable(test_app_settings test_app_settings.cpp)
 target_link_libraries(test_app_settings PRIVATE imageviewer_app imageviewer_core Qt6::Test)

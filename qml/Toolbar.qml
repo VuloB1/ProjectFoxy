@@ -18,7 +18,10 @@ AppPanelBackground {
     property bool editMode: false
     // A tool is open in the edit panel: edit mode (and the file) cannot be left meanwhile.
     property bool locked: false
+    // "Varias imágenes" is on (owned by Main.qml too).
+    property bool multiMode: false
     signal editModeRequested(bool on)
+    signal multiModeRequested(bool on)
 
     function requestOpen() { openDialog.open() }
     function requestDelete() { deleteConfirmDialog.open() }
@@ -53,9 +56,18 @@ AppPanelBackground {
             checkable: true
             // Structural edits/filters bake a single static frame, which
             // doesn't fit a playing animation - see AppController::isAnimated.
-            enabled: !appController.isAnimated && !root.locked
+            enabled: !appController.isAnimated && !root.locked && !root.multiMode
             checked: root.editMode
             onToggled: root.editModeRequested(checked)
+        }
+        AppToolButton {
+            text: qsTr("Varias imágenes (con zoom vinculado)")
+            iconName: "multi"
+            iconOnly: true
+            checkable: true
+            enabled: folderModel.count > 0 && !root.locked
+            checked: root.multiMode
+            onToggled: root.multiModeRequested(checked)
         }
         AppToolButton {
             text: qsTr("Exportar por lote")

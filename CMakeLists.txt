@@ -97,6 +97,8 @@ add_library(imageviewer_app STATIC
     src/app/BatchExporter.cpp
     src/app/LensController.h
     src/app/LensController.cpp
+    src/app/PaneImageProvider.h
+    src/app/PaneImageProvider.cpp
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)
@@ -143,6 +145,8 @@ qt_add_qml_module(ImageViewer
         qml/EffectHandles.qml
         qml/LensTool.qml
         qml/FramePanel.qml
+        qml/PaneView.qml
+        qml/MultiView.qml
         qml/FrameCornerPicker.qml
         qml/UnsavedChangesDialog.qml
         qml/OverwriteDialog.qml

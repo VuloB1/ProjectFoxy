@@ -380,6 +380,40 @@ Canvas {
             ctx.beginPath(); ctx.arc(12, 12, 1.7, 0, 2 * Math.PI); ctx.fill();
             ctx.beginPath(); ctx.arc(12, 12, 7.2, 3.75, 4.5); ctx.stroke();
             break;
+        case "multi":
+            // Two pictures side by side (the "Varias imágenes" view).
+            ctx.beginPath(); ctx.roundedRect(3, 5, 8, 14, 1.8, 1.8); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(13, 5, 8, 14, 1.8, 1.8); ctx.stroke();
+            break;
+        case "link":
+        case "link-off": {
+            // Two chain links; apart, and crossed by a slash, when the link is off.
+            const gap = root.name === "link-off" ? 2.6 : 0;
+            ctx.save();
+            ctx.translate(12, 12);
+            ctx.rotate(-Math.PI / 4);
+            ctx.beginPath(); ctx.roundedRect(-10 - gap, -3.4, 10.4, 6.8, 3.4, 3.4); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(-0.4 + gap, -3.4, 10.4, 6.8, 3.4, 3.4); ctx.stroke();
+            ctx.restore();
+            if (root.name === "link-off") {
+                ctx.beginPath(); ctx.moveTo(4, 20); ctx.lineTo(20, 4); ctx.stroke();
+            }
+            break;
+        }
+        case "split-h":
+            ctx.beginPath(); ctx.roundedRect(3.5, 5, 17, 14, 2, 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(12, 5); ctx.lineTo(12, 19); ctx.stroke();
+            break;
+        case "split-v":
+            ctx.beginPath(); ctx.roundedRect(3.5, 5, 17, 14, 2, 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(3.5, 12); ctx.lineTo(20.5, 12); ctx.stroke();
+            break;
+        case "plus":
+            ctx.beginPath(); ctx.moveTo(12, 5); ctx.lineTo(12, 19); ctx.moveTo(5, 12); ctx.lineTo(19, 12); ctx.stroke();
+            break;
+        case "minus":
+            ctx.beginPath(); ctx.moveTo(5, 12); ctx.lineTo(19, 12); ctx.stroke();
+            break;
         case "frame":
             // A picture with a rounded frame around it.
             ctx.beginPath(); ctx.roundedRect(3, 3, 18, 18, 5, 5); ctx.stroke();

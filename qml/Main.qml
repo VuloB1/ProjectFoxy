@@ -70,6 +70,20 @@ ApplicationWindow {
             editLoader.item.requestSaveAs();
     }
 
+    // "Varias imágenes": several pictures side by side with linked zoom (MultiView.qml). It takes the
+    // canvas's place; editing and browsing wait until it is closed.
+    property bool multiMode: false
+    function setMultiMode(on) {
+        if (on === root.multiMode)
+            return;
+        if (on) {
+            if (root.toolLocked || appController.isLoading)
+                return;
+            root.setEditMode(false);
+        }
+        root.multiMode = on;
+    }
+
     // Frameless + custom-drawn titlebar comes later (Fase 3 polish); using
     // the native frame for now keeps window management (snap, move, resize)
     // free and correct while the core viewer is being built.
@@ -83,7 +97,9 @@ ApplicationWindow {
         canvas: canvas
         editMode: root.editMode
         locked: root.toolLocked
+        multiMode: root.multiMode
         onEditModeRequested: function (on) { root.setEditMode(on) }
+        onMultiModeRequested: function (on) { root.setMultiMode(on) }
     }
 
     ThumbnailStrip {
@@ -93,7 +109,7 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         visible: folderModel.count > 1
         busy: root.editMode || floatingToolbar.slideshowRunning
-        enabled: !root.toolLocked
+        enabled: !root.toolLocked && !root.multiMode
         opacity: enabled ? 1.0 : 0.45
     }
 
@@ -106,7 +122,22 @@ ApplicationWindow {
         toolbar: toolbar
         editMode: root.editMode
         locked: root.toolLocked
+        visible: !root.multiMode
         onEditModeRequested: function (on) { root.setEditMode(on) }
+    }
+
+    // Several pictures at once; it only exists while it is shown.
+    Loader {
+        id: multiLoader
+        active: root.multiMode
+        anchors.top: canvas.top
+        anchors.bottom: canvas.bottom
+        anchors.left: canvas.left
+        anchors.right: canvas.right
+        sourceComponent: MultiView {
+            onCloseRequested: root.setMultiMode(false)
+        }
+        onLoaded: item.begin()
     }
 
     Loader {
@@ -133,6 +164,7 @@ ApplicationWindow {
         locked: root.toolLocked
         onSaveAsRequested: root.requestSaveAs()
         onCloseEditRequested: root.setEditMode(false)
+        visible: !root.multiMode
         anchors.bottom: canvas.bottom
         anchors.bottomMargin: 16
         anchors.horizontalCenter: canvas.horizontalCenter
@@ -185,16 +217,16 @@ ApplicationWindow {
     // Drag & drop onto the window opens the file / navigates its folder.
     DropArea {
         anchors.fill: parent
-        enabled: !root.toolLocked
+        enabled: !root.toolLocked && !root.multiMode
         onDropped: function (drop) {
             if (drop.hasUrls && drop.urls.length > 0)
                 appController.openFile(drop.urls[0]);
         }
     }
 
-    Shortcut { sequence: StandardKey.MoveToPreviousChar; enabled: !root.toolLocked; onActivated: folderModel.previous() }
-    Shortcut { sequence: StandardKey.MoveToNextChar; enabled: !root.toolLocked; onActivated: folderModel.next() }
-    Shortcut { sequence: StandardKey.Open; enabled: !root.toolLocked; onActivated: toolbar.requestOpen() }
+    Shortcut { sequence: StandardKey.MoveToPreviousChar; enabled: !root.toolLocked && !root.multiMode; onActivated: folderModel.previous() }
+    Shortcut { sequence: StandardKey.MoveToNextChar; enabled: !root.toolLocked && !root.multiMode; onActivated: folderModel.next() }
+    Shortcut { sequence: StandardKey.Open; enabled: !root.toolLocked && !root.multiMode; onActivated: toolbar.requestOpen() }
     // Disabled while editing (so it doesn't replace the image mid-edit) and
     // while a text field has focus (so Ctrl+V pastes text there as normal,
     // e.g. the batch rename/export dialogs) - "cursorPosition" is a cheap

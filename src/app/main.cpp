@@ -7,6 +7,7 @@
 #include "ThumbnailImageProvider.h"
 #include "BatchExporter.h"
 #include "LensController.h"
+#include "PaneImageProvider.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -48,6 +49,11 @@ int main(int argc, char *argv[])
 
     auto *thumbnailProvider = new ThumbnailImageProvider(folderModel->thumbnailCache());
     engine.addImageProvider(QLatin1String("thumb"), thumbnailProvider);
+
+    // The pictures of the "Varias imágenes" view: one per pane, each at the resolution it needs.
+    auto *paneStore = new PaneImageStore(&engine);
+    engine.addImageProvider(QLatin1String("pane"), new PaneImageProvider(paneStore));
+    engine.rootContext()->setContextProperty("paneImages", paneStore);
 
     auto *controller = new AppController(imageProvider, folderModel, &engine);
     engine.rootContext()->setContextProperty("appController", controller);
