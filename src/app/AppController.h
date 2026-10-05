@@ -42,6 +42,9 @@ class AppController : public QObject {
     // Display-ready EXIF rows for the Info popup - {"Cámara": "Canon EOS R5",
     // "ISO": "400", ...}. Empty when the file has no readable metadata.
     Q_PROPERTY(QVariantMap metadata READ metadata NOTIFY metadataChanged)
+    // What the lens correction needs to know about the picture's camera, from its EXIF: {make, model,
+    // lens, focal (mm), aperture (f-number), distance (m)}; empty values when the file does not say.
+    Q_PROPERTY(QVariantMap lensHints READ lensHints NOTIFY metadataChanged)
     Q_PROPERTY(bool isLoading READ isLoading NOTIFY isLoadingChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
     Q_PROPERTY(QStringList supportedExtensions READ supportedExtensions CONSTANT)
@@ -171,6 +174,7 @@ public:
     QSize currentImageSize() const { return m_currentImageSize; }
     QUrl suggestedSaveUrl() const;
     QVariantMap metadata() const { return m_metadata; }
+    QVariantMap lensHints() const { return m_lensHints; }
     bool isLoading() const { return m_isLoading; }
     QString errorString() const { return m_errorString; }
     QStringList supportedExtensions() const;
@@ -299,6 +303,8 @@ public slots:
     void setEffectValue(int index, qreal value);
     void setEffectMix(qreal mix);
     void resetEffectValues();
+    // Sets every slider of the picked effect at once (one preview instead of one per slider).
+    void setEffectValues(const QVariantList &values);
     void applyEffectPreset(int index);
     void commitEffect();
     void cancelEffect();
@@ -499,6 +505,7 @@ private:
     QString m_currentFilePath;
     QSize m_currentImageSize;
     QVariantMap m_metadata;
+    QVariantMap m_lensHints;
     bool m_isLoading = false;
     QString m_errorString;
     int m_revision = 0;

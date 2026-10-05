@@ -6,6 +6,7 @@
 #include "FolderModel.h"
 #include "ThumbnailImageProvider.h"
 #include "BatchExporter.h"
+#include "LensController.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -59,6 +60,9 @@ int main(int argc, char *argv[])
 
     auto *batchExporter = new BatchExporter(&engine);
     engine.rootContext()->setContextProperty("batchExporter", batchExporter);
+
+    auto *lensController = new LensController(&engine);
+    engine.rootContext()->setContextProperty("lensController", lensController);
 
     // Filmstrip navigation (arrow keys, click, Toolbar prev/next) reports a
     // new current file here; AppController decodes and displays it.

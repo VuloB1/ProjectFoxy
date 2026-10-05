@@ -95,6 +95,8 @@ add_library(imageviewer_app STATIC
     src/app/ThumbnailImageProvider.cpp
     src/app/BatchExporter.h
     src/app/BatchExporter.cpp
+    src/app/LensController.h
+    src/app/LensController.cpp
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)
@@ -139,6 +141,7 @@ qt_add_qml_module(ImageViewer
         qml/EffectParamRow.qml
         qml/EffectCaption.qml
         qml/EffectHandles.qml
+        qml/LensTool.qml
         qml/UnsavedChangesDialog.qml
         qml/OverwriteDialog.qml
         qml/SettingsDialog.qml
@@ -173,6 +176,16 @@ qt_add_qml_module(ImageViewer
         qml/controls/AppWheelScroll.qml
     RESOURCES
         resources/icons/icon.png
+)
+
+# The Lensfun lens database (resources/lensfun, CC BY-SA 3.0 - see docs/LICENCIAS.md), compiled into the
+# program as Qt resources under :/lensfun so the lens correction works wherever the .exe is copied.
+file(GLOB _iv_lensfun_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/lensfun/*.xml"
+                                              "${CMAKE_SOURCE_DIR}/resources/lensfun/timestamp.txt")
+qt_add_resources(ImageViewer "lensfun_db"
+    PREFIX "/lensfun"
+    BASE "${CMAKE_SOURCE_DIR}/resources/lensfun"
+    FILES ${_iv_lensfun_files}
 )
 
 target_link_libraries(ImageViewer PRIVATE

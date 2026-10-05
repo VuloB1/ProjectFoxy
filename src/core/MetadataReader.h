@@ -12,6 +12,8 @@ struct ImageMetadata {
     QDateTime dateTaken;
     double focalLengthMm = 0.0;
     double apertureF = 0.0;
+    QString lensModel;             // the lens, when the file says (what the lens correction looks up)
+    double subjectDistanceM = 0.0; // distance to the subject in metres, when the file says
     double exposureSeconds = 0.0;
     int isoSpeed = 0;
     double gpsLatitude = 0.0;

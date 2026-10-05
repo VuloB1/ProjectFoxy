@@ -204,6 +204,12 @@ void AppController::applyNewDocument(const core::ImageDocument &doc)
     m_provider->setOriginalImage(doc.pixels);
     m_currentImageSize = doc.sourceSize;
     m_metadata = buildMetadataDisplay(doc.metadata);
+    m_lensHints = QVariantMap{{QStringLiteral("make"), doc.metadata.cameraMake},
+                              {QStringLiteral("model"), doc.metadata.cameraModel},
+                              {QStringLiteral("lens"), doc.metadata.lensModel},
+                              {QStringLiteral("focal"), doc.metadata.focalLengthMm},
+                              {QStringLiteral("aperture"), doc.metadata.apertureF},
+                              {QStringLiteral("distance"), doc.metadata.subjectDistanceM}};
     m_isLoading = false;
     m_errorString.clear();
 
@@ -1302,6 +1308,28 @@ void AppController::applyEffectPreset(int index)
     if (!spec || index < 0 || size_t(index) >= spec->presets.size())
         return;
     m_effectValues = core::edit::applyEffectPreset(*spec, spec->presets[size_t(index)], m_effectValues);
+    emit effectValuesChanged();
+    scheduleEffectPreview();
+}
+
+void AppController::setEffectValues(const QVariantList &values)
+{
+    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
+    if (!spec)
+        return;
+    bool changed = false;
+    for (int i = 0; i < values.size() && size_t(i) < spec->params.size(); ++i) {
+        const core::edit::EffectParam &p = spec->params[size_t(i)];
+        double v = std::clamp(values[i].toDouble(), p.min, p.max);
+        if (p.integer)
+            v = std::round(v);
+        if (v != m_effectValues[size_t(i)]) {
+            m_effectValues[size_t(i)] = v;
+            changed = true;
+        }
+    }
+    if (!changed)
+        return;
     emit effectValuesChanged();
     scheduleEffectPreview();
 }

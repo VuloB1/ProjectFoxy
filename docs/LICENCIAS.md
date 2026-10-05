@@ -37,6 +37,7 @@ Todos se distribuyen como DLL junto a `ProjectFoxy.exe`.
 | Little CMS | 2.19.1 | MIT | gestión de color |
 | libjpeg‑turbo | 3.2.0 | BSD‑3‑Clause AND IJG | JPEG |
 | libpng · libwebp · libtiff · zlib · liblzma | — | libpng‑2.0 · BSD‑3 · libtiff · Zlib · 0BSD | formatos y compresión |
+| Base de datos Lensfun (solo los datos) | marca de tiempo 1577948414 | **CC BY‑SA 3.0** | perfiles de cámaras y objetivos de la herramienta *Lente* (sección 7b) |
 | **Qt 6.7.3** | 6.7.3 | LGPL‑3.0 / GPL‑3.0 / comercial | interfaz (Core, Gui, Qml, Quick, QuickControls2, QuickDialogs2, Svg, QuickEffects) |
 
 Solo de **compilación** (no se distribuyen): gettext (herramientas, GPL‑3.0‑only),
@@ -111,6 +112,28 @@ Open Media), pero también debe revisarse.
 
 Ofrece elegir entre LGPL‑2.1 y CDDL‑1.0. Para este proyecto lo natural es **elegir
 explícitamente LGPL‑2.1** (y dejarlo anotado en los avisos), además de la parte BSD‑3.
+
+## 7b. Base de datos de lentes (Lensfun)
+
+La herramienta *Lente* trae embebida la base de perfiles del proyecto **Lensfun**
+(`resources/lensfun/*.xml`, unos 5 MB, 56 archivos). **Solo los datos**: la biblioteca
+Lensfun (LGPL) no se usa; el programa lee los XML con código propio
+(`src/core/lens/LensDatabase.cpp`) y aplica las fórmulas publicadas de distorsión,
+aberración cromática y viñeteo.
+
+- Licencia de los datos: **Creative Commons Atribución‑CompartirIgual 3.0** (CC BY‑SA 3.0).
+  Hay que dar crédito al proyecto Lensfun y a sus colaboradores, indicar la licencia y
+  enlazarla. Los archivos van **sin modificar**; si alguien los redistribuye cambiados,
+  los cambios quedan también bajo CC BY‑SA 3.0.
+- El «compartir igual» alcanza a los archivos de datos (y a las obras derivadas *de esos
+  datos*), no al resto del programa: el código de Project Foxy los lee como un recurso,
+  no los incorpora a sí mismo. Esto es una lectura técnica mía, **no asesoría legal**; si
+  se publica el proyecto como GPL‑3.0‑or‑later, conviene dejar los XML en su carpeta con
+  su aviso y confirmarlo en la revisión jurídica de la sección 8.
+- El aviso ya está en `THIRD_PARTY_NOTICES.txt` (y en `tools/make_third_party_notices.ps1`,
+  para que sobreviva a las regeneraciones).
+- Para actualizar la base: copiar de nuevo los XML de `data/db` del repositorio de Lensfun
+  y el `timestamp.txt`, y volver a compilar.
 
 ## 8. Qué hacer antes de distribuir
 

@@ -239,6 +239,7 @@ void addGeometrySpecs(std::vector<EffectSpec> &out)
         s.changesSize = true;
         out.push_back(std::move(s));
     }
+    out.push_back(lensSpec());
 }
 
 bool renderGeometry(const Job &job, const QString &id, const QImage &src, const EffectValues &v, double,
@@ -248,6 +249,8 @@ bool renderGeometry(const Job &job, const QString &id, const QImage &src, const 
         result = fxStretch(job, src, v);
     else if (id == QLatin1String("perspective"))
         result = fxPerspective(job, src, v);
+    else if (id == QLatin1String("lens"))
+        result = fxLens(job, src, v);
     else
         return false;
     return true;

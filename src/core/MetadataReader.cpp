@@ -60,6 +60,10 @@ ImageMetadata MetadataReader::read(const QString &filePath)
             meta.focalLengthMm = it->toFloat();
         if (auto it = Exiv2::fNumber(exif); it != exif.end())
             meta.apertureF = it->toFloat();
+        if (auto it = Exiv2::lensName(exif); it != exif.end())
+            meta.lensModel = QString::fromStdString(it->toString()).trimmed();
+        if (const auto it = exif.findKey(Exiv2::ExifKey("Exif.Photo.SubjectDistance")); it != exif.end())
+            meta.subjectDistanceM = it->toFloat();
         if (auto it = Exiv2::exposureTime(exif); it != exif.end())
             meta.exposureSeconds = it->toFloat();
         if (auto it = Exiv2::isoSpeed(exif); it != exif.end())
@@ -80,6 +84,19 @@ ImageMetadata MetadataReader::read(const QString &filePath)
         // Full tag dump for a future "all metadata" view - key -> display string.
         for (const auto &datum : exif)
             meta.raw.insert(QString::fromStdString(datum.key()), QString::fromStdString(datum.toString()));
+        // Maker notes name the lens under their own keys when the standard tag is absent.
+        if (meta.lensModel.isEmpty()) {
+            for (auto it = meta.raw.cbegin(); it != meta.raw.cend(); ++it) {
+                if (it.key().endsWith(QLatin1String(".LensModel")) || it.key().endsWith(QLatin1String(".LensType"))
+                    || it.key().endsWith(QLatin1String(".Lens"))) {
+                    const QString v = it.value().toString().trimmed();
+                    if (!v.isEmpty() && v != QLatin1String("0") && !v.startsWith(QLatin1String("Unknown"), Qt::CaseInsensitive)) {
+                        meta.lensModel = v;
+                        break;
+                    }
+                }
+            }
+        }
     } catch (const Exiv2::Error &) {
         // Not a supported format, or corrupt/absent metadata - return
         // whatever was gathered so far (likely the default-constructed

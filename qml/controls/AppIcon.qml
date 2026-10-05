@@ -373,6 +373,13 @@ Canvas {
             ctx.stroke();
             ctx.beginPath(); ctx.moveTo(8, 14); ctx.lineTo(16, 14); ctx.stroke();
             break;
+        case "lens":
+            // A camera lens seen from the front: barrel, glass rings and a glint.
+            ctx.beginPath(); ctx.arc(12, 12, 9, 0, 2 * Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(12, 12, 5.4, 0, 2 * Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(12, 12, 1.7, 0, 2 * Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.arc(12, 12, 7.2, 3.75, 4.5); ctx.stroke();
+            break;
         case "filters":
             // Three overlapping discs, the usual "photo filters" sign.
             for (const c of [[12, 8.6], [8.3, 15.2], [15.7, 15.2]]) {

@@ -30,7 +30,8 @@ AppPanelBackground {
         { id: "resize", icon: "resize", name: qsTr("Tamaño"), hint: qsTr("Ancho, alto y escala") },
         { id: "adjust", icon: "sliders", name: qsTr("Ajustes"), hint: qsTr("Luz, color, detalle, niveles y curvas") },
         { id: "filters", icon: "filters", name: qsTr("Filtros"), hint: qsTr("Estilos listos para aplicar") },
-        { id: "effects", icon: "effects", name: qsTr("Efectos"), hint: qsTr("Desenfoque, pixelado, viñetas y más") }
+        { id: "effects", icon: "effects", name: qsTr("Efectos"), hint: qsTr("Desenfoque, color, luz, dibujos, distorsión y más") },
+        { id: "lens", icon: "lens", name: qsTr("Lente"), hint: qsTr("Distorsión, franjas de color y esquinas oscuras") }
     ]
 
     function toolInfo(id) {
@@ -48,6 +49,7 @@ AppPanelBackground {
             : id === "resize" ? resizeComponent
             : id === "adjust" ? adjustComponent
             : id === "filters" ? filterComponent
+            : id === "lens" ? lensComponent
             : effectsComponent;
         shownTool = id;
         tool = id;
@@ -275,6 +277,7 @@ AppPanelBackground {
     Component { id: adjustComponent; AdjustTool { canvas: root.canvas } }
     Component { id: filterComponent; FilterTool { canvas: root.canvas } }
     Component { id: effectsComponent; EffectsTool { canvas: root.canvas } }
+    Component { id: lensComponent; LensTool { canvas: root.canvas } }
 
     // Exposed so FloatingToolbar's edit-mode button row can trigger the same
     // save-as flow without duplicating the dialog.

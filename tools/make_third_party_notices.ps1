@@ -60,6 +60,20 @@ foreach ($p in $ports.Keys) {
     }
     [void]$sb.AppendLine('')
 }
+$lensfun = @'
+==============================================================================
+Lensfun lens-correction database (data only, not the library)
+resources/lensfun/*.xml, embedded in the program as Qt resources
+==============================================================================
+The camera and lens profiles used by the "Lente" tool come from the Lensfun project
+(https://lensfun.github.io/), (c) the Lensfun contributors, and are distributed
+unmodified under the Creative Commons Attribution-ShareAlike 3.0 licence
+(https://creativecommons.org/licenses/by-sa/3.0/legalcode). The Lensfun library itself
+is NOT used: Project Foxy reads the XML files with its own code. Redistributing or
+changing the profile files keeps them under CC BY-SA 3.0; that licence covers the data
+files, not the rest of the program.
+'@
+[void]$sb.AppendLine($lensfun.Replace("`r`n", "`n"))
 $out = [IO.Path]::GetFullPath($Out)
 [IO.File]::WriteAllText($out, $sb.ToString(), (New-Object System.Text.UTF8Encoding($false)))
 "{0}: {1:N0} KB, {2} components" -f $out, ((Get-Item $out).Length / 1KB), $ports.Count
