@@ -519,6 +519,82 @@ private slots:
         QVERIFY(qAlpha(half.pixel(5, 5)) > 100 && qAlpha(half.pixel(5, 5)) < 155);
         QVERIFY(near(half.pixel(5, 5), QColor(200, 0, 0), 3)); // the colour is the picture's, not darkened by the empty one
     }
+
+    void aFrameStyleChangesTheEffectAndWritesTheText()
+    {
+        QImage base(200, 120, QImage::Format_RGBA8888);
+        base.fill(QColor(200, 40, 40));
+
+        FrameStyle plain;
+        QVERIFY(plain.isPlain());
+        QVERIFY(plain.signature().isEmpty());
+        QCOMPARE(decorate(base, plain), base); // nothing to do: the same picture
+
+        // an effect
+        FrameStyle fx;
+        fx.effectId = "negative";
+        QVERIFY(effectUsableOnFrames("negative"));
+        QVERIFY(!effectUsableOnFrames("nothing-like-this"));
+        QVERIFY(!effectUsableOnFrames("lens"));     // driven by its own tool
+        QVERIFY(!effectUsableOnFrames("stretch"));  // changes the size
+        const QImage inverted = decorate(base, fx);
+        QCOMPARE(inverted.size(), base.size());
+        QVERIFY(near(inverted.pixel(100, 60), QColor(55, 215, 215), 3));
+        fx.effectMix = 0.5; // half way between the two
+        QVERIFY(near(decorate(base, fx).pixel(100, 60), QColor(127, 127, 127), 4));
+        fx.effectMix = 0.0;
+        QCOMPARE(decorate(base, fx), base);
+
+        // text: pixels of its colour appear near the spot asked for, and nowhere far from it
+        FrameStyle tx;
+        tx.text.text = "Hola";
+        tx.text.x = 0.5;
+        tx.text.y = 0.5;
+        tx.text.size = 30.0;
+        tx.text.color = QColor(0, 255, 0);
+        tx.text.outline = false;
+        const QImage lettered = decorate(base, tx);
+        int green = 0, farGreen = 0;
+        for (int y = 0; y < lettered.height(); ++y)
+            for (int x = 0; x < lettered.width(); ++x) {
+                const QColor c = lettered.pixelColor(x, y);
+                if (c.green() > 200 && c.red() < 60) {
+                    ++green;
+                    if (qAbs(y - 60) > 40)
+                        ++farGreen;
+                }
+            }
+        QVERIFY(green > 100);
+        QCOMPARE(farGreen, 0);
+        QVERIFY(lettered.pixelColor(2, 2) == base.pixelColor(2, 2)); // the rest is untouched
+
+        // moved to the top it is no longer in the middle
+        tx.text.y = 0.1;
+        const QImage top = decorate(base, tx);
+        int topGreen = 0, midGreen = 0;
+        for (int y = 0; y < top.height(); ++y)
+            for (int x = 0; x < top.width(); ++x)
+                if (top.pixelColor(x, y).green() > 200 && top.pixelColor(x, y).red() < 60)
+                    (y < 40 ? topGreen : midGreen)++;
+        QVERIFY(topGreen > 100);
+        QCOMPARE(midGreen, 0);
+
+        // a text too wide for the picture is shrunk to fit, never cut
+        tx.text.text = "Un texto muy muy largo para una imagen tan chica";
+        tx.text.y = 0.5;
+        tx.text.size = 40.0;
+        const QImage fitted = decorate(base, tx);
+        for (int y = 0; y < fitted.height(); ++y) {
+            QVERIFY(fitted.pixelColor(0, y).green() < 200 || fitted.pixelColor(0, y).red() > 60);
+            QVERIFY(fitted.pixelColor(fitted.width() - 1, y).green() < 200 || fitted.pixelColor(fitted.width() - 1, y).red() > 60);
+        }
+
+        // equal styles share a signature, different ones do not
+        FrameStyle a = tx, b = tx;
+        QCOMPARE(a.signature(), b.signature());
+        b.text.size = 12.0;
+        QVERIFY(a.signature() != b.signature());
+    }
 };
 
 QTEST_MAIN(TestAnim)

@@ -100,6 +100,38 @@ struct PlanStep {
     bool isStill() const { return a == b || t <= 0.0; }
 };
 
+// What is done to one picture once it is fitted to the canvas: an effect from the Efectos catalogue (one of its
+// presets, mixed in by some amount) and a line of text over it. Both are in proportions of the canvas, so the same
+// style looks the same in the small preview and in the finished file.
+struct TextOverlay {
+    QString text;                  // may have several lines
+    QString family;                // "" = the application's font
+    double x = 0.5, y = 0.88;      // where the middle of the text is, 0..1 of the canvas
+    double size = 9.0;             // height of a line, % of the canvas' short side
+    bool bold = true;
+    QColor color = QColor(255, 255, 255);
+    bool outline = true;
+    QColor outlineColor = QColor(0, 0, 0);
+    bool operator==(const TextOverlay &) const = default;
+};
+
+struct FrameStyle {
+    QString effectId;              // "" = none
+    int effectPreset = -1;         // -1 = the effect's own defaults
+    double effectMix = 1.0;        // 0..1
+    TextOverlay text;
+    bool isPlain() const { return (effectId.isEmpty() || effectMix <= 0.0) && text.text.trimmed().isEmpty(); }
+    // Equal styles give equal strings: for caches.
+    QString signature() const;
+    bool operator==(const FrameStyle &) const = default;
+};
+
+// Whether `effectId` can be used on a frame: it keeps the picture's size and does not take long.
+bool effectUsableOnFrames(const QString &effectId);
+
+// `fitted` with the style applied (it is returned as it is when there is nothing to do).
+QImage decorate(const QImage &fitted, const FrameStyle &style);
+
 // The frames the animation is made of, in order, from how long each picture stays.
 std::vector<PlanStep> buildPlan(const std::vector<int> &holdMs, const Settings &settings);
 

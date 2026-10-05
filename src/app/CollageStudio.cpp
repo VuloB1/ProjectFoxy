@@ -1,13 +1,19 @@
 #include "CollageStudio.h"
 #include "PaneImageProvider.h"
 
+#include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QImageWriter>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMetaObject>
 #include <QMutexLocker>
 #include <QPainter>
 #include <QRunnable>
 #include <QSaveFile>
+#include <QStandardPaths>
 #include <QThreadPool>
 #include <algorithm>
 #include <cmath>
@@ -70,6 +76,9 @@ CollageStudio::CollageStudio(PaneImageStore *store, QObject *parent) : QObject(p
     for (size_t i = 0; i < 4; ++i)
         m_cells[i].rect = layouts.front().rects[i];
     rebuildSnapshot();
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (!dir.isEmpty())
+        setTemplatesFile(dir + QStringLiteral("/collage-templates.json"));
 }
 
 CollageStudio::~CollageStudio()
@@ -272,6 +281,161 @@ void CollageStudio::applyPreset(int index)
     m_presetIndex = index;
     applyRects(layouts[size_t(index)].rects);
     touch(true);
+}
+
+// ---- saved templates ---------------------------------------------------------------------------------------------------
+
+namespace {
+// What a template remembers of how the collage looks: everything but how the file is written.
+bool isLookOption(const QString &key) { return key != QLatin1String("format") && key != QLatin1String("quality"); }
+}
+
+QVariantList CollageStudio::templates() const
+{
+    QVariantList list;
+    for (const Template &t : m_templates) {
+        QVariantList rects;
+        for (const Cell &c : t.cells)
+            rects.append(QVariant(QVariantList{c.rect.x(), c.rect.y(), c.rect.width(), c.rect.height()}));
+        list.append(QVariantMap{{"name", t.name}, {"count", int(t.cells.size())}, {"free", t.options.value("free").toBool()}, {"rects", rects}});
+    }
+    return list;
+}
+
+bool CollageStudio::saveTemplate(const QString &rawName)
+{
+    const QString name = rawName.trimmed();
+    if (name.isEmpty())
+        return false;
+    Template t;
+    t.name = name;
+    for (auto it = m_options.constBegin(); it != m_options.constEnd(); ++it)
+        if (isLookOption(it.key()))
+            t.options.insert(it.key(), it.value());
+    for (const Cell &c : m_cells) {
+        Cell k;
+        k.rect = c.rect;
+        k.content.rotation = c.content.rotation;
+        k.content.flipH = c.content.flipH;
+        k.content.flipV = c.content.flipV;
+        k.content.overflow = c.content.overflow;
+        t.cells.push_back(k);
+    }
+    bool replaced = false;
+    for (Template &old : m_templates)
+        if (old.name.compare(name, Qt::CaseInsensitive) == 0) {
+            old = t;
+            replaced = true;
+        }
+    if (!replaced)
+        m_templates.push_back(std::move(t));
+    storeTemplates();
+    emit templatesChanged();
+    return true;
+}
+
+bool CollageStudio::applyTemplate(int index)
+{
+    if (index < 0 || index >= int(m_templates.size()))
+        return false;
+    const Template &t = m_templates[size_t(index)];
+    for (auto it = t.options.constBegin(); it != t.options.constEnd(); ++it)
+        if (m_options.contains(it.key()) && isLookOption(it.key())) {
+            QVariant v = it.value();
+            v.convert(m_options.value(it.key()).metaType()); // JSON has one kind of number
+            m_options.insert(it.key(), v);
+        }
+    m_drag.active = false;
+    std::vector<Content> contents;
+    for (const Cell &c : m_cells)
+        contents.push_back(c.content);
+    m_cells = t.cells;
+    for (size_t i = 0; i < m_cells.size(); ++i) {
+        const Content turn = m_cells[i].content; // the template's turn, mirror and overflow
+        m_cells[i].content = i < contents.size() ? contents[i] : Content{};
+        m_cells[i].content.rotation = turn.rotation;
+        m_cells[i].content.flipH = turn.flipH;
+        m_cells[i].content.flipV = turn.flipV;
+        m_cells[i].content.overflow = turn.overflow;
+    }
+    m_presetIndex = -1;
+    if (m_selected >= cellCount())
+        m_selected = cellCount() - 1;
+    emit selectedChanged();
+    emit optionsChanged();
+    touch(true);
+    return true;
+}
+
+void CollageStudio::deleteTemplate(int index)
+{
+    if (index < 0 || index >= int(m_templates.size()))
+        return;
+    m_templates.erase(m_templates.begin() + index);
+    storeTemplates();
+    emit templatesChanged();
+}
+
+void CollageStudio::setTemplatesFile(const QString &path)
+{
+    m_templatesFile = path;
+    loadTemplates();
+    emit templatesChanged();
+}
+
+void CollageStudio::loadTemplates()
+{
+    m_templates.clear();
+    QFile file(m_templatesFile);
+    if (m_templatesFile.isEmpty() || !file.open(QIODevice::ReadOnly))
+        return;
+    const QJsonArray list = QJsonDocument::fromJson(file.readAll()).object().value("templates").toArray();
+    for (const QJsonValue &tv : list) {
+        const QJsonObject o = tv.toObject();
+        Template t;
+        t.name = o.value("name").toString();
+        const QJsonObject look = o.value("options").toObject();
+        for (auto it = look.constBegin(); it != look.constEnd(); ++it)
+            t.options.insert(it.key(), it.value().toVariant());
+        for (const QJsonValue &cv : o.value("cells").toArray()) {
+            const QJsonObject c = cv.toObject();
+            Cell cell;
+            cell.rect = QRectF(c.value("x").toDouble(), c.value("y").toDouble(), c.value("w").toDouble(), c.value("h").toDouble());
+            cell.content.rotation = c.value("rotation").toDouble();
+            cell.content.flipH = c.value("flipH").toBool();
+            cell.content.flipV = c.value("flipV").toBool();
+            cell.content.overflow = c.value("overflow").toBool();
+            if (cell.rect.width() > 0.0 && cell.rect.height() > 0.0 && int(t.cells.size()) < kMaxCells)
+                t.cells.push_back(cell);
+        }
+        if (!t.name.isEmpty() && !t.cells.empty())
+            m_templates.push_back(std::move(t));
+    }
+}
+
+void CollageStudio::storeTemplates() const
+{
+    if (m_templatesFile.isEmpty())
+        return;
+    QDir().mkpath(QFileInfo(m_templatesFile).absolutePath());
+    QJsonArray list;
+    for (const Template &t : m_templates) {
+        QJsonObject o;
+        o.insert("name", t.name);
+        o.insert("options", QJsonObject::fromVariantMap(t.options));
+        QJsonArray cells;
+        for (const Cell &c : t.cells)
+            cells.append(QJsonObject{{"x", c.rect.x()}, {"y", c.rect.y()}, {"w", c.rect.width()}, {"h", c.rect.height()},
+                                     {"rotation", c.content.rotation}, {"flipH", c.content.flipH}, {"flipV", c.content.flipV},
+                                     {"overflow", c.content.overflow}});
+        o.insert("cells", cells);
+        list.append(o);
+    }
+    QSaveFile out(m_templatesFile);
+    if (out.open(QIODevice::WriteOnly)) {
+        out.write(QJsonDocument(QJsonObject{{"version", 1}, {"templates", list}}).toJson(QJsonDocument::Indented));
+        out.commit();
+    }
 }
 
 void CollageStudio::newMosaic()

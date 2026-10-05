@@ -347,6 +347,63 @@ private slots:
         QVERIFY(done.wait(60000));
         QVERIFY(!QFileInfo::exists(path)); // nothing half-written is left behind
     }
+
+    void templatesKeepTheLayoutAndTheLookButNotThePictures()
+    {
+        const QString file = m_dir.filePath("templates.json");
+        QFile::remove(file);
+        PaneImageStore store;
+        QVariantMap saved;
+        QRectF secondCell;
+        {
+            CollageStudio s(&store);
+            s.setTemplatesFile(file);
+            QCOMPARE(s.templates().size(), 0);
+            QVERIFY(!s.saveTemplate("   ")); // a name is needed
+            s.setCellCount(3);
+            s.applyPreset(1);
+            s.setOption("spacing", 7.0);
+            s.setOption("radius", 40.0);
+            s.setOption("color1", 0x336699);
+            s.setOption("format", 2);           // how the file is written is not part of the look
+            s.setCellProperty(1, "rotation", 12.0);
+            s.setCellProperty(1, "overflow", true);
+            s.addPaths({png("t0.png", Qt::red)});
+            secondCell = QRectF(cell(s, 1).value("x").toDouble(), cell(s, 1).value("y").toDouble(), cell(s, 1).value("w").toDouble(),
+                                cell(s, 1).value("h").toDouble());
+            QVERIFY(s.saveTemplate("Mi diseño"));
+            QVERIFY(s.saveTemplate("mi DISEÑO")); // same name: replaced, not repeated
+            QCOMPARE(s.templates().size(), 1);
+            QVariantMap t = s.templates().at(0).toMap();
+            QCOMPARE(t.value("count").toInt(), 3);
+            QCOMPARE(t.value("rects").toList().size(), 3);
+        }
+        // a new session reads them back
+        CollageStudio s(&store);
+        s.setTemplatesFile(file);
+        QCOMPARE(s.templates().size(), 1);
+        const QString picture = png("t1.png", Qt::blue);
+        s.addPaths({picture});
+        QCOMPARE(s.cellCount(), 4);
+        QVERIFY(s.applyTemplate(0));
+        QCOMPARE(s.cellCount(), 3);
+        QCOMPARE(s.options().value("spacing").toDouble(), 7.0);
+        QCOMPARE(s.options().value("radius").toDouble(), 40.0);
+        QCOMPARE(s.options().value("color1").toInt(), 0x336699);
+        QCOMPARE(s.options().value("format").toInt(), 0); // untouched
+        QCOMPARE(cell(s, 0).value("path").toString(), picture); // the picture stayed, in the template's first cell
+        QVERIFY(cell(s, 1).value("empty").toBool());
+        QCOMPARE(cell(s, 1).value("rotation").toDouble(), 12.0);
+        QVERIFY(cell(s, 1).value("overflow").toBool());
+        QVERIFY(qAbs(cell(s, 1).value("x").toDouble() - secondCell.x()) < 1e-6);
+        QVERIFY(qAbs(cell(s, 1).value("w").toDouble() - secondCell.width()) < 1e-6);
+        QVERIFY(!s.applyTemplate(5));
+        s.deleteTemplate(0);
+        QCOMPARE(s.templates().size(), 0);
+        CollageStudio again(&store);
+        again.setTemplatesFile(file);
+        QCOMPARE(again.templates().size(), 0); // the deletion was written
+    }
 };
 
 QTEST_MAIN(TestCollageStudio)

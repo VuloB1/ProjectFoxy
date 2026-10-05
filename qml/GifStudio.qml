@@ -309,6 +309,7 @@ Item {
                     required property int entryId
                     required property string name
                     required property int holdMs
+                    required property bool styled
                     width: 128
                     height: list.height
                     readonly property bool selected: root.currentIndex === index
@@ -342,6 +343,18 @@ Item {
                             radius: 9
                             color: Qt.rgba(0, 0, 0, 0.6)
                             Label { id: numberLabel; anchors.centerIn: parent; text: cell.index + 1; color: "#fff"; font.pixelSize: 11 }
+                        }
+                        Rectangle {
+                            visible: cell.styled
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 24
+                            anchors.rightMargin: 4
+                            width: 22
+                            height: 18
+                            radius: 9
+                            color: themeManager.accent
+                            Label { anchors.centerIn: parent; text: "Fx"; color: themeManager.accentText; font.pixelSize: 10; font.bold: true }
                         }
                         Rectangle {
                             anchors.left: parent.left
@@ -459,6 +472,36 @@ Item {
                 onMoved: animStudio.setOption(parent.key, value)
             }
         }
+        // a slider over the style of the picked frame
+        component StyleSlider: Item {
+            property string key: ""
+            property string label: ""
+            property real from: 0
+            property real to: 100
+            property real step: 1
+            property string suffix: ""
+            property int decimals: 0
+            property real shown: styleSection.st[key] ?? 0
+            width: parent ? parent.width : 0
+            implicitHeight: 40
+            Label { text: parent.label; color: themeManager.textSecondary }
+            Label {
+                anchors.right: parent.right
+                text: parent.shown.toFixed(parent.decimals) + parent.suffix
+                color: themeManager.textPrimary
+                font.bold: true
+            }
+            AppSlider {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                from: parent.from
+                to: parent.to
+                stepSize: parent.step
+                value: parent.shown
+                onMoved: animStudio.setStyleValue(root.currentIndex, parent.key, value)
+            }
+        }
         component OptCheck: AppCheckBox {
             property string key: ""
             width: parent ? parent.width : 0
@@ -536,6 +579,126 @@ Item {
                                 editable: true
                                 value: root.opts.defaultHold
                                 onValueModified: animStudio.setOption("defaultHold", value)
+                            }
+                        }
+                    }
+                }
+
+                // ---- effect and text of the picture picked
+                AdjustSection {
+                    id: styleSection
+                    width: parent.width
+                    title: qsTr("Efecto y texto del fotograma")
+                    // read again whenever anything changed
+                    readonly property var st: { animStudio.revision; return root.currentIndex >= 0 && root.currentIndex < root.count ? animStudio.styleOf(root.currentIndex) : ({}); }
+                    readonly property var effects: animStudio.frameEffects()
+                    readonly property int effectIndex: { for (let i = 0; i < effects.length; ++i) if (effects[i].id === st.effectId) return i; return -1; }
+                    readonly property var presetNames: effectIndex >= 0 ? effects[effectIndex].presets : []
+                    readonly property bool has: root.currentIndex >= 0 && root.currentIndex < root.count
+                    function rgbColor(v) { return Qt.rgba(((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255, 1); }
+                    function packed(c) { return (Math.round(c.r * 255) << 16) | (Math.round(c.g * 255) << 8) | Math.round(c.b * 255); }
+
+                    Label {
+                        width: parent.width
+                        visible: !styleSection.has
+                        text: qsTr("Elegí un fotograma de la tira para ponerle un efecto o un texto.")
+                        color: themeManager.textSecondary
+                        wrapMode: Text.WordWrap
+                        font.pixelSize: 11
+                    }
+                    Column {
+                        width: parent.width
+                        spacing: 6
+                        visible: styleSection.has
+                        Label { text: qsTr("Efecto"); color: themeManager.textSecondary }
+                        AppComboBox {
+                            width: parent.width
+                            model: [qsTr("Ninguno")].concat(styleSection.effects.map(e => e.name))
+                            currentIndex: styleSection.effectIndex + 1
+                            onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "effectId", i === 0 ? "" : styleSection.effects[i - 1].id); }
+                        }
+                        Column {
+                            width: parent.width
+                            spacing: 6
+                            visible: styleSection.effectIndex >= 0
+                            AppComboBox {
+                                width: parent.width
+                                visible: styleSection.presetNames.length > 0
+                                model: [qsTr("Valores de fábrica")].concat(styleSection.presetNames)
+                                currentIndex: (styleSection.st.effectPreset ?? -1) + 1
+                                onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "effectPreset", i - 1); }
+                            }
+                            StyleSlider { key: "effectMix"; label: qsTr("Cantidad"); from: 0; to: 100; step: 1; suffix: "%" }
+                        }
+
+                        Label { text: qsTr("Texto"); color: themeManager.textSecondary; topPadding: 4 }
+                        AppTextField {
+                            width: parent.width
+                            placeholderText: qsTr("Escribí el texto del fotograma")
+                            text: styleSection.st.text ?? ""
+                            onTextEdited: animStudio.setStyleValue(root.currentIndex, "text", text)
+                        }
+                        Column {
+                            width: parent.width
+                            spacing: 6
+                            visible: (styleSection.st.text ?? "").trim().length > 0
+                            AppComboBox {
+                                id: familyBox
+                                width: parent.width
+                                readonly property var families: animStudio.fontFamilies()
+                                model: [qsTr("Letra predeterminada")].concat(families)
+                                currentIndex: Math.max(0, families.indexOf(styleSection.st.family) + 1)
+                                onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "family", i === 0 ? "" : families[i - 1]); }
+                            }
+                            StyleSlider { key: "textSize"; label: qsTr("Tamaño"); from: 2; to: 40; step: 0.5; suffix: "%"; decimals: 1 }
+                            StyleSlider { key: "textX"; label: qsTr("Posición horizontal"); from: 0; to: 100; step: 1; suffix: "%" }
+                            StyleSlider { key: "textY"; label: qsTr("Posición vertical"); from: 0; to: 100; step: 1; suffix: "%" }
+                            Row {
+                                width: parent.width
+                                spacing: 10
+                                Label { anchors.verticalCenter: parent.verticalCenter; text: qsTr("Color"); color: themeManager.textSecondary }
+                                AppColorSwatch {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    value: styleSection.rgbColor(styleSection.st.color ?? 0xFFFFFF)
+                                    onPicked: function (c) { animStudio.setStyleValue(root.currentIndex, "color", styleSection.packed(c)); }
+                                }
+                                AppCheckBox {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: qsTr("Negrita")
+                                    checked: styleSection.st.bold === true
+                                    onToggled: animStudio.setStyleValue(root.currentIndex, "bold", checked)
+                                }
+                            }
+                            Row {
+                                width: parent.width
+                                spacing: 10
+                                AppCheckBox {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: qsTr("Contorno")
+                                    checked: styleSection.st.outline === true
+                                    onToggled: animStudio.setStyleValue(root.currentIndex, "outline", checked)
+                                }
+                                AppColorSwatch {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    enabled: styleSection.st.outline === true
+                                    opacity: enabled ? 1 : 0.4
+                                    value: styleSection.rgbColor(styleSection.st.outlineColor ?? 0)
+                                    onPicked: function (c) { animStudio.setStyleValue(root.currentIndex, "outlineColor", styleSection.packed(c)); }
+                                }
+                            }
+                        }
+                        Row {
+                            width: parent.width
+                            spacing: 6
+                            AppButton {
+                                width: (parent.width - 6) / 2
+                                text: qsTr("A todos los fotogramas")
+                                onClicked: animStudio.copyStyleToAll(root.currentIndex)
+                            }
+                            AppButton {
+                                width: (parent.width - 6) / 2
+                                text: qsTr("Quitar")
+                                onClicked: animStudio.clearStyle(root.currentIndex)
                             }
                         }
                     }

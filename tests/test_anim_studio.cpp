@@ -283,6 +283,72 @@ private slots:
         QCOMPARE(s.options().value("width").toInt(), 640); // 40 x 30 -> 640 x 480
         QCOMPARE(s.options().value("height").toInt(), 480);
     }
+
+    void eachPictureCanHaveItsOwnEffectAndText()
+    {
+        PaneImageStore store;
+        AnimStudio s(&store);
+        s.addPaths({makePng("e0.png", QColor(200, 40, 40)), makePng("e1.png", QColor(40, 200, 40))});
+        QCOMPARE(s.count(), 2);
+        QVERIFY(!s.index(0, 0).data(AnimStudio::StyledRole).toBool());
+
+        const QVariantList effects = s.frameEffects();
+        QVERIFY(effects.size() > 10);
+        for (const QVariant &e : effects) {
+            QVERIFY(e.toMap().value("id").toString() != "lens");
+            QVERIFY(e.toMap().value("id").toString() != "frame");
+        }
+        QVERIFY(!s.fontFamilies().isEmpty());
+
+        const QImage before0 = s.previewFrame(0), before1 = s.previewFrame(1);
+        const int rev = s.revision();
+        s.setStyleValue(0, "effectId", "negative");
+        QVERIFY(s.revision() > rev);
+        QVERIFY(s.index(0, 0).data(AnimStudio::StyledRole).toBool());
+        QVERIFY(!s.index(1, 0).data(AnimStudio::StyledRole).toBool()); // only that picture
+        QCOMPARE(s.styleOf(0).value("effectId").toString(), QString("negative"));
+        QCOMPARE(s.styleOf(0).value("effectMix").toDouble(), 100.0);
+        const QImage after0 = s.previewFrame(0);
+        QVERIFY(after0.pixel(after0.width() / 2, after0.height() / 2) != before0.pixel(before0.width() / 2, before0.height() / 2));
+        QCOMPARE(s.previewFrame(1), before1);
+
+        // an effect that cannot work on a frame is refused
+        s.setStyleValue(1, "effectId", "lens");
+        QVERIFY(s.styleOf(1).value("effectId").toString().isEmpty());
+        // limits
+        s.setStyleValue(0, "effectMix", 500);
+        QCOMPARE(s.styleOf(0).value("effectMix").toDouble(), 100.0);
+        s.setStyleValue(0, "textSize", 0.0);
+        QCOMPARE(s.styleOf(0).value("textSize").toDouble(), 1.0);
+
+        // text, then copied to all and cleared
+        s.setStyleValue(0, "text", "Hola");
+        s.setStyleValue(0, "color", 0x00FF00);
+        s.setStyleValue(0, "outline", false);
+        s.setStyleValue(0, "textY", 50);
+        s.copyStyleToAll(0);
+        QCOMPARE(s.styleOf(1).value("text").toString(), QString("Hola"));
+        QCOMPARE(s.styleOf(1).value("effectId").toString(), QString("negative"));
+        QVERIFY(s.index(1, 0).data(AnimStudio::StyledRole).toBool());
+        s.clearStyle(1);
+        QVERIFY(!s.index(1, 0).data(AnimStudio::StyledRole).toBool());
+        QVERIFY(s.styleOf(1).value("text").toString().isEmpty());
+
+        // a duplicate keeps the style
+        s.duplicateAt(0);
+        QCOMPARE(s.styleOf(1).value("text").toString(), QString("Hola"));
+
+        // the exported frames have it too: the written GIF's first frame is not the plain picture
+        const QString out = m_dir.filePath("styled.png");
+        s.setOption("format", 1);
+        QSignalSpy done(&s, &AnimStudio::exportFinished);
+        QVERIFY(s.exportTo(QUrl::fromLocalFile(out)));
+        QVERIFY(done.wait(30000));
+        QVERIFY(done.first().at(0).toBool());
+        QImage written;
+        QVERIFY(written.load(out));
+        QVERIFY(written.pixelColor(written.width() / 8, written.height() / 2) != QColor(200, 40, 40)); // the effect is in the file
+    }
 };
 
 QTEST_MAIN(TestAnimStudio)

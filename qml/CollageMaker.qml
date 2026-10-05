@@ -521,6 +521,76 @@ Item {
                             }
                         }
                     }
+                    Label {
+                        text: qsTr("Mis plantillas")
+                        color: themeManager.textSecondary
+                        font.pixelSize: 11
+                        topPadding: 4
+                    }
+                    Row {
+                        width: parent.width
+                        spacing: 6
+                        AppTextField {
+                            id: templateName
+                            width: parent.width - saveTemplateButton.width - 6
+                            placeholderText: qsTr("Nombre de la plantilla")
+                            maximumLength: 40
+                            onAccepted: saveTemplateButton.clicked()
+                        }
+                        AppToolButton {
+                            id: saveTemplateButton
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: qsTr("Guardar")
+                            enabled: templateName.text.trim().length > 0
+                            onClicked: {
+                                if (collageStudio.saveTemplate(templateName.text))
+                                    templateName.text = "";
+                            }
+                            AppToolTip { visible: parent.hovered; text: qsTr("Guarda este diseño y cómo se ve (separación, bordes, fondo...) para usarlo de nuevo, sin las fotos") }
+                        }
+                    }
+                    Label {
+                        width: parent.width
+                        visible: collageStudio.templates.length === 0
+                        text: qsTr("Todavía no guardaste ninguna.")
+                        color: themeManager.textSecondary
+                        font.pixelSize: 11
+                        wrapMode: Text.WordWrap
+                    }
+                    Flow {
+                        width: parent.width
+                        spacing: 6
+                        Repeater {
+                            model: collageStudio.templates
+                            delegate: Item {
+                                required property int index
+                                required property var modelData
+                                width: 62
+                                height: 62
+                                PresetThumb {
+                                    rects: modelData.rects
+                                    label: qsTr("%1 (%2 fotos)").arg(modelData.name).arg(modelData.count)
+                                    onClicked: collageStudio.applyTemplate(index)
+                                }
+                                Rectangle {
+                                    id: delBadge
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    anchors.margins: 2
+                                    width: 16
+                                    height: 16
+                                    radius: 8
+                                    visible: delHover.hovered || tplHover.hovered
+                                    color: delHover.hovered ? "#d9534f" : Qt.rgba(0, 0, 0, 0.55)
+                                    AppIcon { anchors.centerIn: parent; name: "close"; size: 9; color: "#fff" }
+                                    HoverHandler { id: delHover; cursorShape: Qt.PointingHandCursor }
+                                    TapHandler { onTapped: collageStudio.deleteTemplate(index) }
+                                    AppToolTip { visible: delHover.hovered; text: qsTr("Borrar esta plantilla") }
+                                }
+                                HoverHandler { id: tplHover }
+                            }
+                        }
+                    }
                 }
 
                 // ---- the picture picked

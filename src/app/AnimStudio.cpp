@@ -1,8 +1,10 @@
 #include "AnimStudio.h"
 #include "PaneImageProvider.h"
+#include "edit/Effects.h"
 #include "decoders/AnimatedDecoder.h"
 
 #include <QDir>
+#include <QFontDatabase>
 #include <QFileInfo>
 #include <QMetaObject>
 #include <QMutexLocker>
@@ -81,7 +83,7 @@ private:
         const Settings &s = m_snap->settings;
         const int side = std::max(s.size.width(), s.size.height()) * (s.fit == Fit::Cover ? 3 : 2);
         const QImage source = AnimStudio::loadEntry(m_store, m_snap->entries[size_t(index)], side);
-        QImage out = fitToCanvas(source, s);
+        QImage out = decorate(fitToCanvas(source, s), m_snap->entries[size_t(index)].style);
         m_cache.push_back({index, out});
         if (m_cache.size() > 3)
             m_cache.erase(m_cache.begin());
@@ -120,13 +122,14 @@ QVariant AnimStudio::data(const QModelIndex &index, int role) const
     case NameRole: return e.label;
     case HoldRole: return e.holdMs;
     case FromAnimationRole: return !e.memory.isNull();
+    case StyledRole: return !e.style.isPlain();
     default: return {};
     }
 }
 
 QHash<int, QByteArray> AnimStudio::roleNames() const
 {
-    return {{IdRole, "entryId"}, {PathRole, "path"}, {NameRole, "name"}, {HoldRole, "holdMs"}, {FromAnimationRole, "fromAnimation"}};
+    return {{IdRole, "entryId"}, {PathRole, "path"}, {NameRole, "name"}, {HoldRole, "holdMs"}, {FromAnimationRole, "fromAnimation"}, {StyledRole, "styled"}};
 }
 
 QVariantMap AnimStudio::options() const { return m_options; }
@@ -364,6 +367,100 @@ void AnimStudio::setAllHold(int ms)
     changed();
 }
 
+// ---- the look of one picture -----------------------------------------------------------------------------------------
+
+namespace {
+uint packRgb(const QColor &c) { return (uint(c.red()) << 16) | (uint(c.green()) << 8) | uint(c.blue()); }
+QColor unpackRgb(const QVariant &v) { const uint c = v.toUInt() & 0xFFFFFF; return QColor(int((c >> 16) & 255), int((c >> 8) & 255), int(c & 255)); }
+}
+
+QVariantMap AnimStudio::styleOf(int index) const
+{
+    const core::anim::FrameStyle st = index >= 0 && index < count() ? m_entries[size_t(index)].style : core::anim::FrameStyle{};
+    QVariantMap m;
+    m.insert("effectId", st.effectId);
+    m.insert("effectPreset", st.effectPreset);
+    m.insert("effectMix", st.effectMix * 100.0);
+    m.insert("text", st.text.text);
+    m.insert("family", st.text.family);
+    m.insert("textX", st.text.x * 100.0);
+    m.insert("textY", st.text.y * 100.0);
+    m.insert("textSize", st.text.size);
+    m.insert("bold", st.text.bold);
+    m.insert("color", packRgb(st.text.color));
+    m.insert("outline", st.text.outline);
+    m.insert("outlineColor", packRgb(st.text.outlineColor));
+    return m;
+}
+
+void AnimStudio::setStyleValue(int index, const QString &key, const QVariant &value)
+{
+    if (index < 0 || index >= count())
+        return;
+    core::anim::FrameStyle &st = m_entries[size_t(index)].style;
+    const core::anim::FrameStyle before = st;
+    if (key == QLatin1String("effectId")) {
+        const QString id = value.toString();
+        st.effectId = id.isEmpty() || effectUsableOnFrames(id) ? id : QString();
+        st.effectPreset = -1;
+    } else if (key == QLatin1String("effectPreset")) st.effectPreset = std::max(-1, value.toInt());
+    else if (key == QLatin1String("effectMix")) st.effectMix = std::clamp(value.toDouble() / 100.0, 0.0, 1.0);
+    else if (key == QLatin1String("text")) st.text.text = value.toString().left(500);
+    else if (key == QLatin1String("family")) st.text.family = value.toString();
+    else if (key == QLatin1String("textX")) st.text.x = std::clamp(value.toDouble() / 100.0, 0.0, 1.0);
+    else if (key == QLatin1String("textY")) st.text.y = std::clamp(value.toDouble() / 100.0, 0.0, 1.0);
+    else if (key == QLatin1String("textSize")) st.text.size = std::clamp(value.toDouble(), 1.0, 60.0);
+    else if (key == QLatin1String("bold")) st.text.bold = value.toBool();
+    else if (key == QLatin1String("color")) st.text.color = unpackRgb(value);
+    else if (key == QLatin1String("outline")) st.text.outline = value.toBool();
+    else if (key == QLatin1String("outlineColor")) st.text.outlineColor = unpackRgb(value);
+    else return;
+    if (st == before)
+        return;
+    emit dataChanged(this->index(index), this->index(index), {StyledRole});
+    changed();
+}
+
+void AnimStudio::copyStyleToAll(int index)
+{
+    if (index < 0 || index >= count())
+        return;
+    const core::anim::FrameStyle st = m_entries[size_t(index)].style;
+    for (Entry &e : m_entries)
+        e.style = st;
+    emit dataChanged(this->index(0), this->index(count() - 1), {StyledRole});
+    changed();
+}
+
+void AnimStudio::clearStyle(int index)
+{
+    if (index < 0 || index >= count() || m_entries[size_t(index)].style == core::anim::FrameStyle{})
+        return;
+    m_entries[size_t(index)].style = {};
+    emit dataChanged(this->index(index), this->index(index), {StyledRole});
+    changed();
+}
+
+QStringList AnimStudio::fontFamilies() const { return QFontDatabase::families(); }
+
+QVariantList AnimStudio::frameEffects() const
+{
+    QVariantList list;
+    for (const auto &spec : core::edit::allEffects()) {
+        if (!effectUsableOnFrames(spec.id))
+            continue;
+        QStringList presets;
+        for (const auto &p : spec.presets)
+            presets << p.name;
+        QString group;
+        for (const auto &g : core::edit::effectGroups())
+            if (g.id == spec.group)
+                group = g.name;
+        list.append(QVariantMap{{"id", spec.id}, {"name", spec.name}, {"group", group}, {"presets", presets}});
+    }
+    return list;
+}
+
 // ---- the options -----------------------------------------------------------------------------------------------------
 
 void AnimStudio::setOption(const QString &key, const QVariant &value)
@@ -443,8 +540,8 @@ QImage AnimStudio::previewFrame(int planIndex) const
 
     auto fitted = [&](int entryIndex) -> QImage {
         const Entry &e = snap->entries[size_t(entryIndex)];
-        const QString key = QStringLiteral("%1|%2x%3|%4|%5|%6").arg(e.id).arg(ps.size.width()).arg(ps.size.height()).arg(int(ps.fit))
-                                .arg(ps.background.rgba(), 0, 16).arg(ps.transparentBackground);
+        const QString key = QStringLiteral("%1|%2x%3|%4|%5|%6|%7").arg(e.id).arg(ps.size.width()).arg(ps.size.height()).arg(int(ps.fit))
+                                .arg(ps.background.rgba(), 0, 16).arg(ps.transparentBackground).arg(e.style.signature());
         {
             QMutexLocker lock(&m_previewMutex);
             const auto it = m_previewFitted.constFind(key);
@@ -452,7 +549,7 @@ QImage AnimStudio::previewFrame(int planIndex) const
                 return it.value();
         }
         const int side = std::max(ps.size.width(), ps.size.height()) * 2;
-        const QImage out = fitToCanvas(loadEntry(m_store, e, side), ps);
+        const QImage out = decorate(fitToCanvas(loadEntry(m_store, e, side), ps), e.style);
         QMutexLocker lock(&m_previewMutex);
         m_previewFitted.insert(key, out);
         m_previewOrder.append(key);

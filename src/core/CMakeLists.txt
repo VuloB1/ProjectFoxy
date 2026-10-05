@@ -57,6 +57,7 @@ add_library(imageviewer_core STATIC
     edit/Operations.h
     anim/Anim.h
     anim/Compose.cpp
+    anim/Decorate.cpp
     anim/GifEncoder.cpp
     anim/ApngEncoder.cpp
     anim/WebpEncoder.cpp

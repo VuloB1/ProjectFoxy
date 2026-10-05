@@ -36,7 +36,7 @@ class AnimStudio : public QAbstractListModel {
     Q_PROPERTY(qreal progress READ progress NOTIFY progressChanged)
 
 public:
-    enum Roles { IdRole = Qt::UserRole + 1, PathRole, NameRole, HoldRole, FromAnimationRole };
+    enum Roles { IdRole = Qt::UserRole + 1, PathRole, NameRole, HoldRole, FromAnimationRole, StyledRole };
 
     // What one picture of the list is: a file, or (for the frames of an animation that was taken apart) a picture
     // that lives in memory.
@@ -46,6 +46,7 @@ public:
         QImage memory;    // set when the picture is not a file of its own
         QString label;
         int holdMs = 1000;
+        core::anim::FrameStyle style; // effect and text of this picture
     };
 
     explicit AnimStudio(PaneImageStore *store, QObject *parent = nullptr);
@@ -74,6 +75,17 @@ public:
     Q_INVOKABLE void clear();
     Q_INVOKABLE void setHold(int index, int ms);
     Q_INVOKABLE void setAllHold(int ms);
+
+    // The look of one picture: an effect of the Efectos catalogue and a text over it. Keys: effectId, effectPreset
+    // (-1 = defaults), effectMix (0..100), text, family, textX, textY (0..100, % of the canvas), textSize (% of the short
+    // side), bold, color, outline, outlineColor (0xRRGGBB).
+    Q_INVOKABLE QVariantMap styleOf(int index) const;
+    Q_INVOKABLE void setStyleValue(int index, const QString &key, const QVariant &value);
+    Q_INVOKABLE void copyStyleToAll(int index);
+    Q_INVOKABLE void clearStyle(int index);
+    // The effects a picture can be given: [{id, name, group, presets: [name...]}].
+    Q_INVOKABLE QVariantList frameEffects() const;
+    Q_INVOKABLE QStringList fontFamilies() const;
 
     // One option: width, height, lockAspect, fit, background (0xRRGGBB), transparent, transition,
     // transitionMs, transitionSteps, transitionOnLoop, reverse, pingPong, speed, loops, format (0 GIF, 1 APNG,

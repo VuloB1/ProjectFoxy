@@ -34,6 +34,8 @@ class CollageStudio : public QObject {
     Q_PROPERTY(QVariantList cells READ cells NOTIFY layoutChanged)
     // [{vertical, pos, from, to}] - the lines that can be dragged (empty in the free layout).
     Q_PROPERTY(QVariantList dividers READ dividers NOTIFY layoutChanged)
+    // [{name, count, free, rects: [[x, y, w, h]...]}] - the layouts the user saved ("Plantillas").
+    Q_PROPERTY(QVariantList templates READ templates NOTIFY templatesChanged)
     Q_PROPERTY(int revision READ revision NOTIFY changed)
     Q_PROPERTY(bool exporting READ exporting NOTIFY exportingChanged)
 
@@ -46,6 +48,7 @@ public:
     int selected() const { return m_selected; }
     QVariantList presets() const;
     int presetIndex() const { return m_presetIndex; }
+    QVariantList templates() const;
     QVariantList cells() const;
     QVariantList dividers() const;
     int revision() const { return m_revision; }
@@ -62,6 +65,16 @@ public:
     Q_INVOKABLE void select(int index);
     // The cell under (x, y), fractions of the canvas; -1 where there is none.
     Q_INVOKABLE int cellAt(double x, double y) const;
+
+    // ---- saved templates: the cells' layout and how the collage looks (not the pictures)
+    // Saves the current layout under `name` (one with that name is replaced); false for an empty name.
+    Q_INVOKABLE bool saveTemplate(const QString &name);
+    // Puts template `index` in place: the pictures stay in their order, in the template's cells.
+    Q_INVOKABLE bool applyTemplate(int index);
+    Q_INVOKABLE void deleteTemplate(int index);
+    // Where the templates live (a JSON file); changing it loads that file. The default is in the app's data folder.
+    void setTemplatesFile(const QString &path);
+    QString templatesFile() const { return m_templatesFile; }
 
     // ---- the picture of one cell
     Q_INVOKABLE void setPicture(int cell, const QString &pathOrUrl);
@@ -91,6 +104,7 @@ public:
 signals:
     void optionsChanged();
     void layoutChanged();
+    void templatesChanged();
     void selectedChanged();
     void changed();
     void exportingChanged();
@@ -111,6 +125,8 @@ private:
     QPointF toLayoutDelta(double dx, double dy) const;
     void applyRects(const std::vector<QRectF> &rects);
     static QString pathFrom(const QString &pathOrUrl);
+    void loadTemplates();
+    void storeTemplates() const;
 
     PaneImageStore *m_store;
     std::vector<core::collage::Cell> m_cells;
@@ -119,6 +135,14 @@ private:
     int m_presetIndex = 0;
     unsigned m_seed = 1;
     int m_revision = 0;
+
+    struct Template {
+        QString name;
+        QVariantMap options;                 // how it looks (the options that are not about saving the file)
+        std::vector<core::collage::Cell> cells; // rect and the picture's turn/mirror/overflow; no pictures
+    };
+    std::vector<Template> m_templates;
+    QString m_templatesFile;
 
     // a divider being dragged: the cells around it, as they were
     struct Drag {

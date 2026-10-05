@@ -83,7 +83,7 @@ real de cada tipo** en las pruebas)
 | Filtros | 38 "looks" por receta con miniaturas de la propia foto, control "Cantidad", acabado (viñeta y grano) |
 | Efectos | **43 efectos** de un solo uso en 7 grupos (desenfoque, estilo, color, dibujo, luz, distorsión, acabado; 4.13), con vista previa en toda la imagen, sliders propios, preajustes, tiradores sobre la imagen y "Mezcla" |
 | Lente | Corrección de distorsión, franjas de color y esquinas oscuras con la base de perfiles de Lensfun (cámara y objetivo reconocidos por el EXIF) o a mano (4.14) |
-| Crear (menú de la barra superior) | **GIF animado** (4.17): tira de imágenes, transiciones, exportación a GIF/APNG/WebP · **Collage** (4.18): 1 a 12 fotos en celdas con líneas divisorias ajustables o diseño libre, fotos sin límites dentro de su celda |
+| Crear (menú de la barra superior) | **GIF animado** (4.17): tira de imágenes con efecto y texto por fotograma, transiciones, exportación a GIF/APNG/WebP · **Collage** (4.18): 1 a 12 fotos en celdas con líneas divisorias ajustables o diseño libre, fotos sin límites dentro de su celda, plantillas guardables |
 
 **Deshacer/Rehacer** cubre todo, en orden cronológico: recortes, tamaños, giros,
 efectos **y también los movimientos de Ajustes y Filtros** (un arrastre completo de un
@@ -575,9 +575,21 @@ lista + mapa de opciones + proveedores `animprev` y `animsrc`) y `qml/GifStudio.
 imágenes (mover, duplicar, quitar, duración por fotograma), vista previa con los mismos
 fotogramas que se guardarán, exportación en segundo plano con progreso y archivo atómico. Un
 GIF/APNG/WebP animado que se agregue se desarma en sus fotogramas con sus tiempos. El visor
-ahora también **reproduce WebP animado**. Pruebas: `test_anim` (19: el GIF se valida leyéndolo
+ahora también **reproduce WebP animado**. Pruebas: `test_anim` (20: el GIF se valida leyéndolo
 con el decodificador de Qt, el APNG con `AnimatedDecoder`, el WebP con libwebpdemux) y
-`test_anim_studio` (11).
+`test_anim_studio` (12).
+
+**Efecto y texto por fotograma.** Cada imagen de la tira puede llevar un `FrameStyle`
+(`core/anim/Decorate.cpp`): un efecto del catálogo de Efectos (uno de sus *presets* o los valores
+de fábrica, con «Cantidad») y un texto (varias líneas, tipo de letra, tamaño en % del lado corto,
+posición en % del lienzo, color, negrita y contorno). Se aplica **después de ajustar la imagen al
+lienzo**, así que el texto viaja con la imagen en las transiciones y todo es independiente de la
+resolución (las distancias de los efectos ya son relativas). Solo valen los efectos que no
+cambian el tamaño, no son ocultos y no necesitan tamaño completo (`effectUsableOnFrames`). El
+texto se achica si no cabe a lo ancho y nunca sale del cuadro. La vista previa guarda los
+fotogramas ya decorados (la firma del estilo entra en la clave de la caché). «A todos» copia el
+estilo y la tira marca con «Fx» los fotogramas que lo tienen. Prueba en `test_anim` (decorar) y
+`test_anim_studio` (modelo y exportación).
 
 ### 4.18 Collage
 `core/collage`: el collage son **celdas rectangulares** (`Cell`: rectángulo normalizado +
@@ -593,7 +605,15 @@ margen, esquinas redondeadas, borde, sombra, relleno de celda, fondo (color, deg
 desenfocada, o transparente); todo en % del lado corto. Cada foto se pide con la resolución que
 hace falta (copia de prueba de 512 px para conocer la proporción y una más nítida si el
 zoom la necesita). `CollageStudio` + `qml/CollageMaker.qml`; guarda PNG, JPG o WebP en segundo
-plano y cancelable. Pruebas: `test_collage` (16) y `test_collage_studio` (15).
+plano y cancelable. Pruebas: `test_collage` (16) y `test_collage_studio` (16).
+
+**Plantillas.** «Mis plantillas» (en Diseño) guarda el diseño actual con un nombre: los
+rectángulos de las celdas, el giro/espejo/«sale de su celda» de cada una y todo lo que define
+cómo se ve (separación, margen, esquinas, borde, sombra, fondo, tamaño, modo Libre), pero **no
+las fotos** ni el formato de guardado. Viven en `collage-templates.json` dentro de la carpeta de
+datos de la aplicación (`AppDataLocation`), se escriben de forma atómica y se pueden borrar con
+la cruz de la miniatura. Al aplicar una, las fotos que ya están se quedan en su orden dentro
+de las celdas de la plantilla (si hay menos celdas que fotos, las últimas se sueltan).
 
 ## 5. Concurrencia, rendimiento y memoria
 
