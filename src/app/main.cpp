@@ -8,6 +8,7 @@
 #include "BatchExporter.h"
 #include "LensController.h"
 #include "PaneImageProvider.h"
+#include "AnimStudio.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -54,6 +55,12 @@ int main(int argc, char *argv[])
     auto *paneStore = new PaneImageStore(&engine);
     engine.addImageProvider(QLatin1String("pane"), new PaneImageProvider(paneStore));
     engine.rootContext()->setContextProperty("paneImages", paneStore);
+
+    // The animation studio (Crear > GIF animado): the list of pictures and options, and the pictures it shows.
+    auto *animStudio = new AnimStudio(paneStore, &engine);
+    engine.rootContext()->setContextProperty("animStudio", animStudio);
+    engine.addImageProvider(QLatin1String("animprev"), new AnimPreviewProvider(animStudio));
+    engine.addImageProvider(QLatin1String("animsrc"), new AnimThumbnailProvider(animStudio));
 
     auto *controller = new AppController(imageProvider, folderModel, &engine);
     engine.rootContext()->setContextProperty("appController", controller);

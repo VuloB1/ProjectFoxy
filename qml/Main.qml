@@ -73,6 +73,19 @@ ApplicationWindow {
     // "Varias imágenes": several pictures side by side with linked zoom (MultiView.qml). It takes the
     // canvas's place; editing and browsing wait until it is closed.
     property bool multiMode: false
+    // A creation studio ("gif") covers the window below the toolbar.
+    property string studio: ""
+    function setStudio(name) {
+        if (name === root.studio)
+            return;
+        if (name !== "") {
+            if (root.toolLocked || appController.isLoading)
+                return;
+            root.setEditMode(false);
+            root.setMultiMode(false);
+        }
+        root.studio = name;
+    }
     function setMultiMode(on) {
         if (on === root.multiMode)
             return;
@@ -98,8 +111,10 @@ ApplicationWindow {
         editMode: root.editMode
         locked: root.toolLocked
         multiMode: root.multiMode
+        studio: root.studio
         onEditModeRequested: function (on) { root.setEditMode(on) }
         onMultiModeRequested: function (on) { root.setMultiMode(on) }
+        onStudioRequested: function (name) { root.setStudio(name) }
     }
 
     ThumbnailStrip {
@@ -109,7 +124,7 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         visible: folderModel.count > 1
         busy: root.editMode || floatingToolbar.slideshowRunning
-        enabled: !root.toolLocked && !root.multiMode
+        enabled: !root.toolLocked && !root.multiMode && root.studio === ""
         opacity: enabled ? 1.0 : 0.45
     }
 
@@ -122,7 +137,7 @@ ApplicationWindow {
         toolbar: toolbar
         editMode: root.editMode
         locked: root.toolLocked
-        visible: !root.multiMode
+        visible: !root.multiMode && root.studio === ""
         onEditModeRequested: function (on) { root.setEditMode(on) }
     }
 
@@ -138,6 +153,20 @@ ApplicationWindow {
             onCloseRequested: root.setMultiMode(false)
         }
         onLoaded: item.begin()
+    }
+
+    // The animation studio; like the multi view it only exists while it is open, and takes the whole window.
+    Loader {
+        id: studioLoader
+        active: root.studio === "gif"
+        anchors.top: toolbar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        z: 6
+        sourceComponent: GifStudio {
+            onCloseRequested: root.setStudio("")
+        }
     }
 
     Loader {
@@ -164,7 +193,7 @@ ApplicationWindow {
         locked: root.toolLocked
         onSaveAsRequested: root.requestSaveAs()
         onCloseEditRequested: root.setEditMode(false)
-        visible: !root.multiMode
+        visible: !root.multiMode && root.studio === ""
         anchors.bottom: canvas.bottom
         anchors.bottomMargin: 16
         anchors.horizontalCenter: canvas.horizontalCenter
@@ -217,16 +246,16 @@ ApplicationWindow {
     // Drag & drop onto the window opens the file / navigates its folder.
     DropArea {
         anchors.fill: parent
-        enabled: !root.toolLocked && !root.multiMode
+        enabled: !root.toolLocked && !root.multiMode && root.studio === ""
         onDropped: function (drop) {
             if (drop.hasUrls && drop.urls.length > 0)
                 appController.openFile(drop.urls[0]);
         }
     }
 
-    Shortcut { sequence: StandardKey.MoveToPreviousChar; enabled: !root.toolLocked && !root.multiMode; onActivated: folderModel.previous() }
-    Shortcut { sequence: StandardKey.MoveToNextChar; enabled: !root.toolLocked && !root.multiMode; onActivated: folderModel.next() }
-    Shortcut { sequence: StandardKey.Open; enabled: !root.toolLocked && !root.multiMode; onActivated: toolbar.requestOpen() }
+    Shortcut { sequence: StandardKey.MoveToPreviousChar; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: folderModel.previous() }
+    Shortcut { sequence: StandardKey.MoveToNextChar; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: folderModel.next() }
+    Shortcut { sequence: StandardKey.Open; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: toolbar.requestOpen() }
     // Disabled while editing (so it doesn't replace the image mid-edit) and
     // while a text field has focus (so Ctrl+V pastes text there as normal,
     // e.g. the batch rename/export dialogs) - "cursorPosition" is a cheap

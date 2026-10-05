@@ -20,8 +20,11 @@ AppPanelBackground {
     property bool locked: false
     // "Varias imágenes" is on (owned by Main.qml too).
     property bool multiMode: false
+    // A creation studio ("gif") is open: they take over the window, so nothing else is offered meanwhile.
+    property string studio: ""
     signal editModeRequested(bool on)
     signal multiModeRequested(bool on)
+    signal studioRequested(string name)
 
     function requestOpen() { openDialog.open() }
     function requestDelete() { deleteConfirmDialog.open() }
@@ -56,16 +59,33 @@ AppPanelBackground {
             checkable: true
             // Structural edits/filters bake a single static frame, which
             // doesn't fit a playing animation - see AppController::isAnimated.
-            enabled: !appController.isAnimated && !root.locked && !root.multiMode
+            enabled: !appController.isAnimated && !root.locked && !root.multiMode && root.studio === ""
             checked: root.editMode
             onToggled: root.editModeRequested(checked)
+        }
+        AppToolButton {
+            id: createButton
+            text: qsTr("Crear")
+            iconName: "film"
+            iconOnly: true
+            enabled: !root.locked
+            checked: root.studio !== ""
+            onClicked: createMenu.popup(createButton, 0, createButton.height + 4)
+            AppMenu {
+                id: createMenu
+                AppMenuItem {
+                    iconName: "film"
+                    text: qsTr("GIF animado…")
+                    onTriggered: root.studioRequested("gif")
+                }
+            }
         }
         AppToolButton {
             text: qsTr("Varias imágenes (con zoom vinculado)")
             iconName: "multi"
             iconOnly: true
             checkable: true
-            enabled: folderModel.count > 0 && !root.locked
+            enabled: folderModel.count > 0 && !root.locked && root.studio === ""
             checked: root.multiMode
             onToggled: root.multiModeRequested(checked)
         }

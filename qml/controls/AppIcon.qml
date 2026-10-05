@@ -380,6 +380,13 @@ Canvas {
             ctx.beginPath(); ctx.arc(12, 12, 1.7, 0, 2 * Math.PI); ctx.fill();
             ctx.beginPath(); ctx.arc(12, 12, 7.2, 3.75, 4.5); ctx.stroke();
             break;
+        case "film":
+            // A strip of film: the frame and its two rows of sprocket holes.
+            ctx.beginPath(); ctx.roundedRect(4, 3, 16, 18, 2, 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(8, 3); ctx.lineTo(8, 21); ctx.moveTo(16, 3); ctx.lineTo(16, 21); ctx.stroke();
+            for (const y of [6.5, 10.5, 14.5, 18])
+                ctx.fillRect(5.1, y - 0.9, 1.8, 1.8), ctx.fillRect(17.1, y - 0.9, 1.8, 1.8);
+            break;
         case "multi":
             // Two pictures side by side (the "Varias imágenes" view).
             ctx.beginPath(); ctx.roundedRect(3, 5, 8, 14, 1.8, 1.8); ctx.stroke();

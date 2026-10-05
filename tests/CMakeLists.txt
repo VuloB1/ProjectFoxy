@@ -39,6 +39,11 @@ target_link_libraries(test_pane_images PRIVATE imageviewer_app imageviewer_core 
 target_compile_definitions(test_pane_images PRIVATE FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 add_test(NAME test_pane_images COMMAND test_pane_images)
 
+# The animation studio (Crear > GIF animado).
+add_executable(test_anim_studio test_anim_studio.cpp)
+target_link_libraries(test_anim_studio PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_anim_studio COMMAND test_anim_studio)
+
 # The settings file: Modo pixel's switch and extras, and the migration from the old single switch.
 add_executable(test_app_settings test_app_settings.cpp)
 target_link_libraries(test_app_settings PRIVATE imageviewer_app imageviewer_core Qt6::Test)

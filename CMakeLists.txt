@@ -101,6 +101,8 @@ add_library(imageviewer_app STATIC
     src/app/LensController.cpp
     src/app/PaneImageProvider.h
     src/app/PaneImageProvider.cpp
+    src/app/AnimStudio.h
+    src/app/AnimStudio.cpp
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)
@@ -149,6 +151,7 @@ qt_add_qml_module(ImageViewer
         qml/FramePanel.qml
         qml/PaneView.qml
         qml/MultiView.qml
+        qml/GifStudio.qml
         qml/FrameCornerPicker.qml
         qml/UnsavedChangesDialog.qml
         qml/OverwriteDialog.qml
