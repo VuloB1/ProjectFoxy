@@ -54,6 +54,10 @@ struct EffectOverlay {
     int x = -1; // Point: X parameter; VLine: the parameter; HLine unused
     int y = -1; // Point: Y parameter; HLine: the parameter
     QString label;
+    // How the parameters map to a place on the picture as it is shown: empty = linearly over the
+    // parameter's range; "stretchX" / "stretchY" = the guides of the stretch effect, which sit on the
+    // original picture while the stretched one is on show (see qml/EffectHandles.qml).
+    QString mapping;
 };
 
 struct EffectSpec {

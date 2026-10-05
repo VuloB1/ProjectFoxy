@@ -485,6 +485,8 @@ void AppController::republishBaked(bool resetView)
 {
     const QImage baked = structuralBaked();
     m_provider->setImage(baked);
+    // A picture of another size (a stretch, a perspective correction) cannot keep the view of the old one.
+    resetView = resetView || baked.size() != m_currentImageSize;
     m_currentImageSize = baked.size();
     ++m_revision;
     m_currentSource = QStringLiteral("image://viewer/current?rev=%1").arg(m_revision);
@@ -1168,6 +1170,7 @@ QVariantList AppController::effectOverlays() const
         m.insert(QStringLiteral("x"), o.x);
         m.insert(QStringLiteral("y"), o.y);
         m.insert(QStringLiteral("label"), o.label);
+        m.insert(QStringLiteral("mapping"), o.mapping);
         double xlo = 0, xhi = 1, ylo = 0, yhi = 1;
         range(o.x, xlo, xhi);
         range(o.y, ylo, yhi);
@@ -1208,9 +1211,17 @@ void AppController::publishPicture(const QImage &image)
     m_provider->setImage(image);
     ++m_revision;
     m_currentSource = QStringLiteral("image://viewer/current?rev=%1").arg(m_revision);
-    // Deliberately NOT structuralImageChanged: the picture is the same size, so
-    // the canvas must keep the user's zoom and position.
+    // The picture is normally the same size, so the canvas must keep the user's zoom and position
+    // (no structuralImageChanged). An effect that changes the size (stretch, perspective) is the
+    // exception: the view is refitted to what is now on show.
+    const bool resized = image.size() != m_currentImageSize && !image.isNull();
+    if (resized)
+        m_currentImageSize = image.size();
     emit currentSourceChanged();
+    if (resized) {
+        emit structuralImageChanged();
+        emit currentImageSizeChanged();
+    }
 }
 
 void AppController::dropEffectPreview()
@@ -1348,7 +1359,8 @@ void AppController::startEffectJob(int stage)
     const double mix = m_effectMix;
     const int generation = m_effectGeneration;
     const std::shared_ptr<std::atomic<bool>> cancel = m_effectCancel;
-    const QSize fullSize = base.size();
+    // What the exact result measures: the same as the picture, unless the effect changes the size.
+    const QSize fullSize = core::edit::effectOutputSize(id, values, base.size());
 
     ++m_effectJobsRunning;
     emit effectBusyChanged();

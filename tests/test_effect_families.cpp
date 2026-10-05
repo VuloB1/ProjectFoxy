@@ -627,6 +627,122 @@ private slots:
         QCOMPARE(at(out, 894, 594), at(src, 894, 594));
     }
 
+    // --- Estirar, Perspectiva, Ojo de pez ---------------------------------------------------------------
+
+    static QImage rulerPicture(int w, int h)
+    {
+        QImage img(w, h, QImage::Format_RGBA8888);
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x)
+                img.setPixelColor(x, y, QColor(x * 255 / (w - 1), y * 255 / (h - 1), 90));
+        return img;
+    }
+
+    void stretchScalesOnlyTheBandBetweenTheGuides()
+    {
+        const QImage src = rulerPicture(400, 300);
+        const EffectSpec *fx = findEffect(QStringLiteral("stretch"));
+        QVERIFY(fx && fx->changesSize);
+        EffectValues v = defaultEffectValues(*fx);
+        v[0] = 25; v[1] = 75; v[4] = 200; v[5] = 100; v[6] = 0; v[7] = 0; // double the middle half, sideways
+        const QImage out = applyEffect(src, QStringLiteral("stretch"), v);
+        QCOMPARE(out.size(), QSize(400 + 200, 300));
+        QCOMPARE(effectOutputSize(QStringLiteral("stretch"), v, src.size()), out.size());
+        // the left part (before the guide at x = 100) is untouched
+        for (int x : {0, 40, 99})
+            QVERIFY(qAbs(qRed(at(out, x, 100)) - qRed(at(src, x, 100))) <= 1);
+        // the right part (after the band) is the same picture shifted by the growth
+        for (int x : {300, 340, 399})
+            QVERIFY(qAbs(qRed(at(out, x + 200, 100)) - qRed(at(src, x, 100))) <= 1);
+        // inside the band the horizontal ramp is stretched to twice as long
+        const int mid = qRed(at(out, 300, 100));                   // middle of the band: the source's middle
+        QVERIFY(qAbs(mid - qRed(at(src, 200, 100))) <= 2);
+        QVERIFY(qAbs(qRed(at(out, 200, 100)) - qRed(at(src, 150, 100))) <= 3); // a quarter of the way in
+        // keeping the size squeezes the outside instead (the band 1.5 times as wide leaves half the room to the rest)
+        v[7] = 1; v[4] = 150;
+        const QImage kept = applyEffect(src, QStringLiteral("stretch"), v);
+        QCOMPARE(kept.size(), src.size());
+        QCOMPARE(effectOutputSize(QStringLiteral("stretch"), v, src.size()), src.size());
+        // a smooth transition grows the picture by about as much, but not with an abrupt change of scale
+        v[7] = 0; v[6] = 60; v[4] = 200;
+        const QImage soft = applyEffect(src, QStringLiteral("stretch"), v);
+        QVERIFY(qAbs(soft.width() - 600) <= 4);
+        v[6] = 0;
+        QVERIFY(applyEffect(src, QStringLiteral("stretch"), v) != soft);
+        v[6] = 60;
+        QCOMPARE(soft.size(), effectOutputSize(QStringLiteral("stretch"), v, src.size()));
+        // 100% in both directions: nothing changes
+        v[4] = 100; v[5] = 100; v[6] = 0;
+        QCOMPARE(applyEffect(src, QStringLiteral("stretch"), v), src);
+    }
+
+    void perspectiveFollowsTheKeystoneModel()
+    {
+        const QImage src = solid(180, 90, 40, 1000, 800);
+        const EffectSpec *fx = findEffect(QStringLiteral("perspective"));
+        QVERIFY(fx && fx->changesSize);
+        EffectValues v = defaultEffectValues(*fx);
+        v[0] = 50; v[1] = 0; v[2] = 0; v[3] = 0; // PhotoScape's maximum: 1000x800 -> about 1000x565
+        const QImage out = applyEffect(src, QStringLiteral("perspective"), v);
+        QVERIFY2(qAbs(out.width() - 1000) <= 0 && qAbs(out.height() - 565) <= 3, qPrintable(QString("%1x%2").arg(out.width()).arg(out.height())));
+        QCOMPARE(effectOutputSize(QStringLiteral("perspective"), v, src.size()), out.size());
+        // the top row is as wide as the picture, the bottom row about 0.71 of it, and the rest is transparent
+        auto opaqueWidth = [&](int y) {
+            int n = 0;
+            for (int x = 0; x < out.width(); ++x)
+                n += qAlpha(at(out, x, y)) > 128;
+            return n;
+        };
+        QVERIFY(opaqueWidth(1) > 990);
+        const int bottom = opaqueWidth(out.height() - 2);
+        QVERIFY2(bottom > 690 && bottom < 730, qPrintable(QString::number(bottom)));
+        QCOMPARE(qAlpha(at(out, 2, out.height() - 2)), 0);
+        // the opposite sign narrows the top instead
+        v[0] = -50;
+        const QImage up = applyEffect(src, QStringLiteral("perspective"), v);
+        auto opaqueUp = [&](int y) {
+            int n = 0;
+            for (int x = 0; x < up.width(); ++x)
+                n += qAlpha(at(up, x, y)) > 128;
+            return n;
+        };
+        QVERIFY(opaqueUp(up.height() - 2) > 990);
+        QVERIFY(opaqueUp(1) < 730);
+        // cropped: a full rectangle with no transparent corners
+        v[0] = 50; v[2] = 1;
+        const QImage cropped = applyEffect(src, QStringLiteral("perspective"), v);
+        QVERIFY(cropped.width() < 720);
+        for (int y = 0; y < cropped.height(); y += 40)
+            for (int x : {1, cropped.width() - 2})
+                QVERIFY2(qAlpha(at(cropped, x, y)) > 200, qPrintable(QString("%1,%2").arg(x).arg(y)));
+        // a background colour fills the gaps
+        v[2] = 0; v[3] = 1; v[4] = packRgb(10, 200, 30);
+        const QImage filled = applyEffect(src, QStringLiteral("perspective"), v);
+        QCOMPARE(qGreen(at(filled, 2, filled.height() - 2)), 200);
+        QCOMPARE(qAlpha(at(filled, 2, filled.height() - 2)), 255);
+        // both axes together
+        v[0] = 30; v[1] = 30; v[3] = 0;
+        const QImage both = applyEffect(src, QStringLiteral("perspective"), v);
+        QCOMPARE(both.size(), effectOutputSize(QStringLiteral("perspective"), v, src.size()));
+        QVERIFY(both.width() < 1000 && both.height() < 800);
+    }
+
+    void fisheyeCentreMovesTheBulge()
+    {
+        const QImage src = rulerPicture(200, 150);
+        const EffectSpec *fx = findEffect(QStringLiteral("fisheye"));
+        QVERIFY(fx && fx->params.size() == 3);
+        EffectValues v = defaultEffectValues(*fx);
+        v[0] = 70;
+        const QImage middle = applyEffect(src, QStringLiteral("fisheye"), v);
+        v[1] = -60; // centre toward the left
+        const QImage left = applyEffect(src, QStringLiteral("fisheye"), v);
+        QVERIFY(middle != left);
+        // the pixel at the new centre stays put (a bulge does not move its own centre)
+        QVERIFY(qAbs(qRed(at(left, 40, 75)) - qRed(at(src, 40, 75))) <= 3);
+        QVERIFY(qAbs(qRed(at(middle, 40, 75)) - qRed(at(src, 40, 75))) > 3);
+    }
+
     // --- every effect, tiny and odd sizes, cancellation -----------------------------------------
 
     void everyEffectSurvivesTinyPictures()

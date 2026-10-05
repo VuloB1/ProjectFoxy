@@ -435,6 +435,42 @@ private slots:
         QVERIFY(m_ctl->isDirty());            // ...which the file no longer matches
     }
 
+    // ---- effects that change the size of the picture ---------------------------------
+
+    // A stretch (or a perspective correction) makes a picture of another size: the preview must put
+    // that size on screen and tell the canvas to refit, cancelling must bring the old one back, and the
+    // history must hold the result.
+    void anEffectThatChangesTheSizeResizesTheView()
+    {
+        const QString a = file("a.png", busyImage(400, 300));
+        open(a);
+        QCOMPARE(m_ctl->currentImageSize(), QSize(400, 300));
+
+        QSignalSpy structural(m_ctl, &AppController::structuralImageChanged);
+        m_ctl->selectEffect(QStringLiteral("stretch")); // the guides at 35% / 65%, the middle at 150%
+        QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 10000);
+        QVERIFY(m_ctl->currentImageSize().width() > 400);
+        QCOMPARE(m_ctl->currentImageSize().height(), 300);
+        QVERIFY(structural.count() >= 1);
+
+        m_ctl->cancelEffect();
+        QCOMPARE(m_ctl->currentImageSize(), QSize(400, 300));
+
+        m_ctl->selectEffect(QStringLiteral("perspective"));
+        QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 10000);
+        QVERIFY(m_ctl->currentImageSize().height() < 300);
+        const QSize preview = m_ctl->currentImageSize();
+        m_ctl->commitEffect();
+        QCOMPARE(m_ctl->currentImageSize(), preview);
+        QVERIFY(m_ctl->canUndoEdit());
+        QVERIFY(m_ctl->isDirty());
+
+        m_ctl->undoEdit();
+        QCOMPARE(m_ctl->currentImageSize(), QSize(400, 300));
+        m_ctl->redoEdit();
+        QCOMPARE(m_ctl->currentImageSize(), preview);
+    }
+
     // ---- saving does not hold the interface -------------------------------------
 
     // Starts the save, then keeps the event loop running with a 10 ms ticker: the longest

@@ -462,8 +462,10 @@ Plane fxFisheye(const Job &job, const Plane &src, const EffectValues &v)
     const double amount = v[0] / 100.0;
     if (std::abs(amount) < 1e-6)
         return src;
-    const double cx = (src.w - 1) * 0.5, cy = (src.h - 1) * 0.5;
-    const double radius = 0.5 * std::hypot(src.w, src.h);
+    // The centre of the bulge (Centro X / Y move it) and its reach: as far as the farthest corner.
+    const double cx = (src.w - 1) * 0.5 * (1.0 + v[1] / 100.0), cy = (src.h - 1) * 0.5 * (1.0 + v[2] / 100.0);
+    const double radius = std::max({std::hypot(cx, cy), std::hypot(src.w - 1 - cx, cy), std::hypot(cx, src.h - 1 - cy),
+                                    std::hypot(src.w - 1 - cx, src.h - 1 - cy), 1.0});
     // > 1 pulls the middle outward (bulge), < 1 pinches it; the very edge stays put.
     const double exponent = amount >= 0.0 ? 1.0 + 1.5 * amount : 1.0 / (1.0 + 1.5 * -amount);
     return remap(job, src, [&](int x, int y, double &sx, double &sy) {
@@ -647,7 +649,8 @@ std::vector<EffectSpec> buildCatalogue()
         spec("crystallize", "Cristalizar", "style", {slider("Tamaño", 0, 100, 40)}),
         spec("negative", "Negativo", "style", {}),
 
-        spec("fisheye", "Ojo de pez", "distort", {slider("Cantidad", -100, 100, 40)}),
+        spec("fisheye", "Ojo de pez", "distort",
+             {slider("Cantidad", -100, 100, 40), slider("Centro X", -100, 100, 0), slider("Centro Y", -100, 100, 0)}),
         spec("swirl", "Remolino", "distort",
              {slider("Ángulo", -720, 720, 180, "°", true), slider("Radio", 10, 100, 70)}),
         spec("wave", "Onda", "distort",
@@ -667,6 +670,8 @@ std::vector<EffectSpec> buildCatalogue()
             s.overlays = {{EffectOverlay::Point, 1, 2, QStringLiteral("Centro")}};
         else if (s.id == QLatin1String("vignette"))
             s.overlays = {{EffectOverlay::Point, 4, 5, QStringLiteral("Centro")}};
+        else if (s.id == QLatin1String("fisheye"))
+            s.overlays = {{EffectOverlay::Point, 1, 2, QStringLiteral("Centro")}};
     }
     addColorSpecs(catalogue);
     addPatternSpecs(catalogue);
