@@ -121,6 +121,11 @@ class AppController : public QObject {
     // Its sliders, [{label, min, max, def, suffix, integer, toggle}] - changes
     // only when another effect is picked.
     Q_PROPERTY(QVariantList effectParams READ effectParams NOTIFY effectChanged)
+    // The names of the picked effect's presets (starting points that set several sliders at once),
+    // and the handles it wants drawn over the picture: [{kind: "point"|"vline"|"hline", x, y, label,
+    // xmin, xmax, ymin, ymax}] where x / y are slider indices (see EffectOverlay).
+    Q_PROPERTY(QStringList effectPresets READ effectPresets NOTIFY effectChanged)
+    Q_PROPERTY(QVariantList effectOverlays READ effectOverlays NOTIFY effectChanged)
     // The slider values (as many as effectParams) and the Mezcla amount (0..1);
     // these change on every drag tick.
     Q_PROPERTY(QVariantList effectValues READ effectValues NOTIFY effectValuesChanged)
@@ -213,6 +218,8 @@ public:
     QVariantList effectGroups() const;
     QString effectId() const { return m_effectId; }
     QVariantList effectParams() const;
+    QStringList effectPresets() const;
+    QVariantList effectOverlays() const;
     QVariantList effectValues() const;
     qreal effectMix() const { return m_effectMix; }
     bool effectBusy() const { return m_effectJobsRunning > 0 || m_effectDebounce.isActive(); }
@@ -292,6 +299,7 @@ public slots:
     void setEffectValue(int index, qreal value);
     void setEffectMix(qreal mix);
     void resetEffectValues();
+    void applyEffectPreset(int index);
     void commitEffect();
     void cancelEffect();
 

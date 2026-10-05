@@ -11,6 +11,7 @@ add_core_test(test_decoder_registry)
 target_compile_definitions(test_decoder_registry PRIVATE
     FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 add_core_test(test_edit_stack)
+add_core_test(test_effect_families)
 add_core_test(test_color_management)
 add_core_test(test_image_loader)
 add_core_test(test_thumbnail_cache)

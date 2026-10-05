@@ -34,7 +34,7 @@ Item {
         // "" = every effect, otherwise a group id from appController.effectGroups
         property string group: ""
         readonly property var shownEffects: appController.effectList.filter(
-            function (fx) { return effectFlick.group === "" || fx.group === effectFlick.group; })
+            function (fx) { return !fx.hidden && (effectFlick.group === "" || fx.group === effectFlick.group); })
         readonly property var picked: appController.effectList.find(
             function (fx) { return fx.id === appController.effectId; })
 
@@ -162,6 +162,27 @@ Item {
                 }
             }
 
+            // Starting points that set several controls at once.
+            Column {
+                width: parent.width
+                spacing: 4
+                visible: appController.effectPresets.length > 0
+                Label { text: qsTr("Preajustes"); color: themeManager.textSecondary }
+                Flow {
+                    width: parent.width
+                    spacing: 4
+                    Repeater {
+                        model: appController.effectPresets
+                        delegate: AppToolButton {
+                            required property int index
+                            required property string modelData
+                            text: modelData
+                            onClicked: appController.applyEffectPreset(index)
+                        }
+                    }
+                }
+            }
+
             Repeater {
                 model: appController.effectParams
                 delegate: EffectParamRow {
@@ -173,10 +194,12 @@ Item {
                 }
             }
 
-            // How much of the effect is mixed into the original.
+            // How much of the effect is mixed into the original (there is nothing to mix a picture of
+            // another size with, so effects that change the size have no Mezcla).
             Item {
                 width: parent.width
-                height: 42
+                height: visible ? 42 : 0
+                visible: !(effectFlick.picked && effectFlick.picked.changesSize)
 
                 Label {
                     id: mixCaption

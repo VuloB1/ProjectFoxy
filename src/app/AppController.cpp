@@ -1094,6 +1094,8 @@ QVariantList AppController::effectList() const
         m.insert(QStringLiteral("id"), fx.id);
         m.insert(QStringLiteral("name"), fx.name);
         m.insert(QStringLiteral("group"), fx.group);
+        m.insert(QStringLiteral("hidden"), fx.hidden);
+        m.insert(QStringLiteral("changesSize"), fx.changesSize);
         list.append(m);
     }
     return list;
@@ -1127,6 +1129,52 @@ QVariantList AppController::effectParams() const
         m.insert(QStringLiteral("integer"), p.integer);
         m.insert(QStringLiteral("toggle"), p.toggle);
         m.insert(QStringLiteral("options"), p.options);
+        m.insert(QStringLiteral("color"), p.color);
+        m.insert(QStringLiteral("seed"), p.seed);
+        m.insert(QStringLiteral("dependsOn"), p.dependsOn);
+        m.insert(QStringLiteral("dependsMask"), p.dependsMask);
+        m.insert(QStringLiteral("hint"), p.hint);
+        list.append(m);
+    }
+    return list;
+}
+
+QStringList AppController::effectPresets() const
+{
+    QStringList names;
+    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
+    if (spec)
+        for (const core::edit::EffectPreset &p : spec->presets)
+            names << p.name;
+    return names;
+}
+
+QVariantList AppController::effectOverlays() const
+{
+    QVariantList list;
+    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
+    if (!spec)
+        return list;
+    auto range = [spec](int index, double &lo, double &hi) {
+        if (index >= 0 && size_t(index) < spec->params.size()) {
+            lo = spec->params[size_t(index)].min;
+            hi = spec->params[size_t(index)].max;
+        }
+    };
+    for (const core::edit::EffectOverlay &o : spec->overlays) {
+        QVariantMap m;
+        const char *kind = o.kind == core::edit::EffectOverlay::Point ? "point" : o.kind == core::edit::EffectOverlay::VLine ? "vline" : "hline";
+        m.insert(QStringLiteral("kind"), QString::fromLatin1(kind));
+        m.insert(QStringLiteral("x"), o.x);
+        m.insert(QStringLiteral("y"), o.y);
+        m.insert(QStringLiteral("label"), o.label);
+        double xlo = 0, xhi = 1, ylo = 0, yhi = 1;
+        range(o.x, xlo, xhi);
+        range(o.y, ylo, yhi);
+        m.insert(QStringLiteral("xmin"), xlo);
+        m.insert(QStringLiteral("xmax"), xhi);
+        m.insert(QStringLiteral("ymin"), ylo);
+        m.insert(QStringLiteral("ymax"), yhi);
         list.append(m);
     }
     return list;
@@ -1233,6 +1281,16 @@ void AppController::setEffectMix(qreal mix)
     if (v == m_effectMix)
         return;
     m_effectMix = v;
+    emit effectValuesChanged();
+    scheduleEffectPreview();
+}
+
+void AppController::applyEffectPreset(int index)
+{
+    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
+    if (!spec || index < 0 || size_t(index) >= spec->presets.size())
+        return;
+    m_effectValues = core::edit::applyEffectPreset(*spec, spec->presets[size_t(index)], m_effectValues);
     emit effectValuesChanged();
     scheduleEffectPreview();
 }

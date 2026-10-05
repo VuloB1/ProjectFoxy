@@ -1,6 +1,7 @@
 #include "Effects.h"
 #include "AdjustMath.h"
 #include "Denoise.h"
+#include "EffectsCommon.h"
 #include "ParallelRows.h"
 
 #include <algorithm>
@@ -14,270 +15,7 @@ namespace core::edit {
 
 namespace {
 
-constexpr double kPi = 3.14159265358979323846;
-
-inline int clampi(int v, int lo, int hi) { return v < lo ? lo : (v > hi ? hi : v); }
-inline double clampd(double v, double lo, double hi) { return v < lo ? lo : (v > hi ? hi : v); }
-inline uint8_t toByte(double v) { return v <= 0.0 ? 0 : (v >= 255.0 ? 255 : static_cast<uint8_t>(v + 0.5)); }
-
-// Deterministic per-position randomness (the same on every run, so a preview
-// and the applied result agree exactly).
-inline uint32_t hash2(int x, int y, uint32_t salt)
-{
-    uint32_t h = static_cast<uint32_t>(x) * 0x9E3779B1u + static_cast<uint32_t>(y) * 0x85EBCA77u + salt * 0xC2B2AE3Du;
-    h ^= h >> 16;
-    h *= 0x7FEB352Du;
-    h ^= h >> 15;
-    h *= 0x846CA68Bu;
-    h ^= h >> 16;
-    return h;
-}
-inline double hashUnit(uint32_t h) { return double(h >> 8) / 16777216.0; } // [0, 1)
-
-// --- Cancellation ------------------------------------------------------------
-
-// Every pass runs through rows()/bands(), which stop starting new rows as soon
-// as the caller raises its cancel flag: a slider drag abandons the stale,
-// full-size computation within a few rows instead of waiting for it to finish.
-// A cancelled result is half-written garbage and must be discarded.
-struct Job {
-    const std::atomic<bool> *cancel = nullptr;
-    bool cancelled() const { return cancel && cancel->load(std::memory_order_relaxed); }
-};
-
-template <class F>
-void rows(const Job &job, int height, F &&fn)
-{
-    forEachRowParallel(height, [&](int y) {
-        if (!job.cancelled())
-            fn(y);
-    });
-}
-
-template <class F>
-void bands(const Job &job, int count, int perBand, F &&fn)
-{
-    forEachBandParallel(count, perBand, [&](int a, int b) {
-        if (!job.cancelled())
-            fn(a, b);
-    });
-}
-
-// --- Pixel buffers -----------------------------------------------------------
-
-// A tightly packed 8-bit image with `ch` interleaved channels (4 = RGBA
-// premultiplied, 1 = a single gray plane).
-struct Plane {
-    int w = 0;
-    int h = 0;
-    int ch = 4;
-    std::vector<uint8_t> d;
-
-    Plane() = default;
-    Plane(int width, int height, int channels)
-        : w(width), h(height), ch(channels), d(size_t(width) * size_t(height) * size_t(channels)) {}
-    uint8_t *row(int y) { return d.data() + size_t(y) * w * ch; }
-    const uint8_t *row(int y) const { return d.data() + size_t(y) * w * ch; }
-};
-
-Plane planeFrom(const QImage &rgba)
-{
-    Plane p(rgba.width(), rgba.height(), 4);
-    for (int y = 0; y < p.h; ++y)
-        std::copy_n(rgba.constScanLine(y), size_t(p.w) * 4, p.row(y));
-    return p;
-}
-
-QImage imageFrom(const Plane &p, QImage::Format format)
-{
-    QImage img(p.w, p.h, format);
-    for (int y = 0; y < p.h; ++y)
-        std::copy_n(p.row(y), size_t(p.w) * 4, img.scanLine(y));
-    return img;
-}
-
-// --- Gaussian blur (three box blurs) ---------------------------------------
-
-void boxBlurH(const Job &job, const Plane &src, Plane &dst, int r)
-{
-    const int w = src.w, ch = src.ch, win = 2 * r + 1;
-    rows(job, src.h, [&](int y) {
-        const uint8_t *s = src.row(y);
-        uint8_t *d = dst.row(y);
-        int sum[4] = {0, 0, 0, 0};
-        for (int k = -r; k <= r; ++k) {
-            const uint8_t *p = s + size_t(clampi(k, 0, w - 1)) * ch;
-            for (int c = 0; c < ch; ++c)
-                sum[c] += p[c];
-        }
-        for (int x = 0; x < w; ++x) {
-            for (int c = 0; c < ch; ++c)
-                d[size_t(x) * ch + c] = static_cast<uint8_t>((sum[c] + win / 2) / win);
-            const uint8_t *add = s + size_t(std::min(x + r + 1, w - 1)) * ch;
-            const uint8_t *sub = s + size_t(std::max(x - r, 0)) * ch;
-            for (int c = 0; c < ch; ++c)
-                sum[c] += int(add[c]) - int(sub[c]);
-        }
-    });
-}
-
-// Column strips, each walked top to bottom with one running sum per column:
-// far friendlier to the cache than sliding down single columns.
-void boxBlurV(const Job &job, const Plane &src, Plane &dst, int r)
-{
-    const int w = src.w, h = src.h, ch = src.ch, win = 2 * r + 1;
-    constexpr int kStrip = 64;
-    const int strips = (w + kStrip - 1) / kStrip;
-    bands(job, strips, 1, [&](int s0, int s1) {
-        for (int si = s0; si < s1; ++si) {
-            const int x0 = si * kStrip;
-            const int x1 = std::min(w, x0 + kStrip);
-            const int n = (x1 - x0) * ch;
-            std::vector<int> sum(size_t(n), 0);
-            for (int k = -r; k <= r; ++k) {
-                const uint8_t *p = src.row(clampi(k, 0, h - 1)) + size_t(x0) * ch;
-                for (int j = 0; j < n; ++j)
-                    sum[j] += p[j];
-            }
-            for (int y = 0; y < h; ++y) {
-                uint8_t *d = dst.row(y) + size_t(x0) * ch;
-                for (int j = 0; j < n; ++j)
-                    d[j] = static_cast<uint8_t>((sum[j] + win / 2) / win);
-                const uint8_t *add = src.row(std::min(y + r + 1, h - 1)) + size_t(x0) * ch;
-                const uint8_t *sub = src.row(std::max(y - r, 0)) + size_t(x0) * ch;
-                for (int j = 0; j < n; ++j)
-                    sum[j] += int(add[j]) - int(sub[j]);
-            }
-        }
-    });
-}
-
-Plane gaussianBlur(const Job &job, const Plane &src, double sigma)
-{
-    if (sigma < 0.45 || src.w < 2 || src.h < 2)
-        return src;
-    // Three box widths whose combined variance matches a Gaussian of `sigma`.
-    constexpr int kPasses = 3;
-    const double ideal = std::sqrt(12.0 * sigma * sigma / kPasses + 1.0);
-    int lower = static_cast<int>(std::floor(ideal));
-    if (lower % 2 == 0)
-        --lower;
-    const int upper = lower + 2;
-    const double mIdeal = (12.0 * sigma * sigma - kPasses * lower * lower - 4.0 * kPasses * lower - 3.0 * kPasses)
-                          / (-4.0 * lower - 4.0);
-    const int m = static_cast<int>(std::lround(mIdeal));
-
-    Plane a = src;
-    Plane b(src.w, src.h, src.ch);
-    for (int i = 0; i < kPasses; ++i) {
-        const int size = i < m ? lower : upper;
-        const int r = (size - 1) / 2;
-        if (r <= 0)
-            continue;
-        boxBlurH(job, a, b, r);
-        boxBlurV(job, b, a, r);
-    }
-    return a;
-}
-
-// --- Sampling ---------------------------------------------------------------
-
-// Bilinear read of an RGBA plane; pixel (i, j) is centered on integer
-// coordinates and anything outside is clamped to the border.
-inline void bilinear(const Plane &p, double sx, double sy, float out[4])
-{
-    sx = clampd(sx, 0.0, p.w - 1);
-    sy = clampd(sy, 0.0, p.h - 1);
-    const int x0 = static_cast<int>(sx);
-    const int y0 = static_cast<int>(sy);
-    const int x1 = std::min(x0 + 1, p.w - 1);
-    const int y1 = std::min(y0 + 1, p.h - 1);
-    const float fx = static_cast<float>(sx - x0);
-    const float fy = static_cast<float>(sy - y0);
-    const uint8_t *a = p.row(y0) + size_t(x0) * 4;
-    const uint8_t *b = p.row(y0) + size_t(x1) * 4;
-    const uint8_t *c = p.row(y1) + size_t(x0) * 4;
-    const uint8_t *e = p.row(y1) + size_t(x1) * 4;
-    for (int k = 0; k < 4; ++k) {
-        const float top = a[k] + (b[k] - a[k]) * fx;
-        const float bottom = c[k] + (e[k] - c[k]) * fx;
-        out[k] = top + (bottom - top) * fy;
-    }
-}
-
-// Adds the bilinear sample at (sx, sy) to acc[0..3]; the blurs call it up to ~100 times per pixel,
-// so it works in float, with one clamp per axis and no per-call row arithmetic beyond two offsets.
-inline void accumulate(const Plane &p, double px, double py, float acc[4])
-{
-    const float sx = static_cast<float>(clampd(px, 0.0, p.w - 1));
-    const float sy = static_cast<float>(clampd(py, 0.0, p.h - 1));
-    const int x0 = static_cast<int>(sx);
-    const int y0 = static_cast<int>(sy);
-    const int x1 = x0 + (x0 < p.w - 1);
-    const int y1 = y0 + (y0 < p.h - 1);
-    const float fx = sx - x0, fy = sy - y0;
-    const size_t stride = size_t(p.w) * 4;
-    const uint8_t *r0 = p.d.data() + size_t(y0) * stride;
-    const uint8_t *r1 = p.d.data() + size_t(y1) * stride;
-    const uint8_t *a = r0 + size_t(x0) * 4, *b = r0 + size_t(x1) * 4;
-    const uint8_t *c = r1 + size_t(x0) * 4, *e = r1 + size_t(x1) * 4;
-    const float w00 = (1.f - fx) * (1.f - fy), w10 = fx * (1.f - fy), w01 = (1.f - fx) * fy, w11 = fx * fy;
-    for (int k = 0; k < 4; ++k)
-        acc[k] += a[k] * w00 + b[k] * w10 + c[k] * w01 + e[k] * w11;
-}
-
-struct FloatPlane {
-    int w = 0, h = 0;
-    std::vector<float> d;
-    float at(int x, int y) const { return d[size_t(clampi(y, 0, h - 1)) * w + clampi(x, 0, w - 1)]; }
-    float bilinear(double sx, double sy) const
-    {
-        sx = clampd(sx, 0.0, w - 1);
-        sy = clampd(sy, 0.0, h - 1);
-        const int x0 = static_cast<int>(sx);
-        const int y0 = static_cast<int>(sy);
-        const float fx = static_cast<float>(sx - x0);
-        const float fy = static_cast<float>(sy - y0);
-        const float top = at(x0, y0) + (at(x0 + 1, y0) - at(x0, y0)) * fx;
-        const float bottom = at(x0, y0 + 1) + (at(x0 + 1, y0 + 1) - at(x0, y0 + 1)) * fx;
-        return top + (bottom - top) * fy;
-    }
-};
-
-FloatPlane lumaPlane(const Job &job, const QImage &rgba)
-{
-    FloatPlane y;
-    y.w = rgba.width();
-    y.h = rgba.height();
-    y.d.resize(size_t(y.w) * y.h);
-    rows(job, y.h, [&](int row) {
-        const uint8_t *s = rgba.constScanLine(row);
-        float *d = &y.d[size_t(row) * y.w];
-        for (int x = 0; x < y.w; ++x)
-            d[x] = 0.299f * s[x * 4] + 0.587f * s[x * 4 + 1] + 0.114f * s[x * 4 + 2];
-    });
-    return y;
-}
-
-// Builds the output by asking, for every destination pixel, where in the
-// source it should come from.
-template <class Mapper>
-Plane remap(const Job &job, const Plane &src, Mapper &&mapper)
-{
-    Plane out(src.w, src.h, 4);
-    rows(job, src.h, [&](int y) {
-        uint8_t *d = out.row(y);
-        for (int x = 0; x < src.w; ++x) {
-            double sx = x, sy = y;
-            mapper(x, y, sx, sy);
-            float c[4];
-            bilinear(src, sx, sy, c);
-            for (int k = 0; k < 4; ++k)
-                d[x * 4 + k] = toByte(c[k]);
-        }
-    });
-    return out;
-}
+using namespace fxk;
 
 // --- Blurs ------------------------------------------------------------------
 
@@ -805,12 +543,6 @@ QImage fxNegative(const Job &job, const QImage &src)
     return out;
 }
 
-inline double smoothStep01(double t)
-{
-    t = clampd(t, 0.0, 1.0);
-    return t * t * (3.0 - 2.0 * t);
-}
-
 // Cantidad (- lightens / + darkens the edges), Tamaño (how far the clear middle reaches),
 // Suavidad (how gradually it fades), Redondez (- toward a rectangle, 0 follows the picture's
 // shape, + toward a circle) and the Centro X / Y it is drawn around.
@@ -885,54 +617,14 @@ QImage fxGrain(const Job &job, const QImage &src, const EffectValues &v, double 
 
 // --- Catalogue ----------------------------------------------------------------
 
-EffectParam slider(const char *label, double lo, double hi, double def, const char *suffix = "%", bool integer = false)
-{
-    EffectParam p;
-    p.label = QString::fromUtf8(label);
-    p.min = lo;
-    p.max = hi;
-    p.def = def;
-    p.suffix = QString::fromUtf8(suffix);
-    p.integer = integer;
-    return p;
-}
-
-EffectParam choice(const char *label, QStringList options, int def)
-{
-    EffectParam p;
-    p.label = QString::fromUtf8(label);
-    p.min = 0.0;
-    p.max = double(options.size() - 1);
-    p.def = def;
-    p.integer = true;
-    p.options = std::move(options);
-    return p;
-}
-
-EffectParam toggle(const char *label, bool def = false)
-{
-    EffectParam p;
-    p.label = QString::fromUtf8(label);
-    p.min = 0.0;
-    p.max = 1.0;
-    p.def = def ? 1.0 : 0.0;
-    p.integer = true;
-    p.toggle = true;
-    return p;
-}
-
 std::vector<EffectSpec> buildCatalogue()
 {
     auto spec = [](const char *id, const char *name, const char *group, std::vector<EffectParam> params) {
-        EffectSpec s;
+        EffectSpec s = makeSpec(id, name, group, std::move(params));
         s.fullSize = std::strcmp(id, "denoise") == 0; // noise is a property of the real pixels
-        s.id = QString::fromUtf8(id);
-        s.name = QString::fromUtf8(name);
-        s.group = QString::fromUtf8(group);
-        s.params = std::move(params);
         return s;
     };
-    return {
+    std::vector<EffectSpec> catalogue = {
         spec("blur", "Gaussiano", "blur", {slider("Radio", 0, 100, 60)}),
         spec("motion", "Movimiento", "blur",
              {slider("Distancia", 0, 100, 50), slider("Ángulo", -90, 90, 0, "°", true)}),
@@ -949,7 +641,7 @@ std::vector<EffectSpec> buildCatalogue()
              {slider("Profundidad", 0, 100, 50), slider("Ángulo", -180, 180, 135, "°", true), slider("Color", 0, 100, 0)}),
         spec("edges", "Bordes", "style", {slider("Intensidad", 0, 100, 50), toggle("Fondo claro")}),
         spec("sketch", "Lápiz", "style", {slider("Trazo", 0, 100, 30), slider("Color", 0, 100, 0)}),
-        spec("halftone", "Semitono", "style",
+        spec("halftone", "Punteado", "style",
              {slider("Tamaño", 0, 100, 35), slider("Ángulo", -90, 90, 45, "°", true), toggle("Color")}),
         spec("pixelate", "Mosaico", "style", {slider("Tamaño", 0, 100, 40)}),
         spec("crystallize", "Cristalizar", "style", {slider("Tamaño", 0, 100, 40)}),
@@ -969,6 +661,18 @@ std::vector<EffectSpec> buildCatalogue()
              {slider("Cantidad", 0, 100, 40), slider("Tamaño", 0, 100, 0),
               choice("Tipo", {"Uniforme", "Gaussiano", "Impulso", "Laplaciano"}, 1), toggle("Monocromático")}),
     };
+    // The handles the older effects offer on the canvas (their "Centro X / Y" sliders, dragged instead).
+    for (EffectSpec &s : catalogue) {
+        if (s.id == QLatin1String("zoom") || s.id == QLatin1String("spin"))
+            s.overlays = {{EffectOverlay::Point, 1, 2, QStringLiteral("Centro")}};
+        else if (s.id == QLatin1String("vignette"))
+            s.overlays = {{EffectOverlay::Point, 4, 5, QStringLiteral("Centro")}};
+    }
+    addColorSpecs(catalogue);
+    addPatternSpecs(catalogue);
+    addLightSpecs(catalogue);
+    addGeometrySpecs(catalogue);
+    return catalogue;
 }
 
 // Effects that mix neighbors (blurs, remaps, cells) work on premultiplied color
@@ -990,6 +694,9 @@ const std::vector<EffectGroup> &effectGroups()
     static const std::vector<EffectGroup> groups = {
         {QStringLiteral("blur"), QStringLiteral("Desenfoque")},
         {QStringLiteral("style"), QStringLiteral("Estilo")},
+        {QStringLiteral("color"), QStringLiteral("Color")},
+        {QStringLiteral("pattern"), QStringLiteral("Dibujo")},
+        {QStringLiteral("light"), QStringLiteral("Luz")},
         {QStringLiteral("distort"), QStringLiteral("Distorsión")},
         {QStringLiteral("finish"), QStringLiteral("Acabado")},
     };
@@ -1030,7 +737,32 @@ EffectValues sampleEffectValues(const EffectSpec &spec)
         v[0] = 2.0;
     else if (spec.id == QLatin1String("wave"))
         v[0] = 100.0;
+    for (const auto &[index, value] : spec.sample)
+        if (index >= 0 && size_t(index) < v.size())
+            v[size_t(index)] = value;
     return v;
+}
+
+EffectValues applyEffectPreset(const EffectSpec &spec, const EffectPreset &preset, EffectValues values)
+{
+    for (const auto &[index, value] : preset.sets) {
+        if (index < 0 || size_t(index) >= spec.params.size() || size_t(index) >= values.size())
+            continue;
+        const EffectParam &p = spec.params[size_t(index)];
+        values[size_t(index)] = clampd(value, p.min, p.max);
+    }
+    return values;
+}
+
+QSize effectOutputSize(const QString &id, const EffectValues &values, QSize input)
+{
+    const EffectSpec *spec = findEffect(id);
+    if (!spec || !spec->changesSize || input.width() < 2 || input.height() < 2)
+        return input;
+    EffectValues v = values;
+    for (size_t i = 0; i < spec->params.size() && i < v.size(); ++i)
+        v[i] = clampd(v[i], spec->params[i].min, spec->params[i].max);
+    return geometryOutputSize(id, v, input);
 }
 
 QImage applyEffect(const QImage &source, const QString &id, const EffectValues &values, double mix,
@@ -1054,7 +786,10 @@ QImage applyEffect(const QImage &source, const QString &id, const EffectValues &
     const double longSide = std::max(straight.width(), straight.height());
 
     QImage result;
-    if (usesPremultiplied(id)) {
+    if (renderColor(job, id, straight, v, longSide, result) || renderPattern(job, id, straight, v, longSide, result)
+        || renderLight(job, id, straight, v, longSide, result) || renderGeometry(job, id, straight, v, longSide, result)) {
+        // one of the newer families
+    } else if (usesPremultiplied(id)) {
         const Plane src = planeFrom(straight.convertToFormat(QImage::Format_RGBA8888_Premultiplied));
         Plane out;
         if (id == QLatin1String("blur")) out = fxGaussian(job, src, v, longSide);
@@ -1082,7 +817,7 @@ QImage applyEffect(const QImage &source, const QString &id, const EffectValues &
         else result = fxHalftone(job, straight, v, longSide);
     }
 
-    if (mix >= 1.0)
+    if (mix >= 1.0 || spec->changesSize || result.size() != straight.size())
         return result;
 
     // Blend toward the untouched picture.

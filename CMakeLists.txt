@@ -137,6 +137,8 @@ qt_add_qml_module(ImageViewer
         qml/CurvesEditor.qml
         qml/LookCell.qml
         qml/EffectParamRow.qml
+        qml/EffectCaption.qml
+        qml/EffectHandles.qml
         qml/UnsavedChangesDialog.qml
         qml/OverwriteDialog.qml
         qml/SettingsDialog.qml
@@ -158,6 +160,7 @@ qt_add_qml_module(ImageViewer
         qml/controls/AppMenuSeparator.qml
         qml/controls/AppDialog.qml
         qml/controls/AppComboBox.qml
+        qml/controls/AppColorSwatch.qml
         qml/controls/AppSpinBox.qml
         qml/controls/AppTextField.qml
         qml/controls/AppProgressBar.qml

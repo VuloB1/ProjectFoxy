@@ -1366,6 +1366,16 @@ Rectangle {
         }
     }
 
+    // The handles an effect asks for (the centre of a vignette, where to stretch...).
+    EffectHandles {
+        anchors.fill: parent
+        z: 9
+        imageItem: image
+        flickItem: flick
+        visible: root.editMode && appController.effectId !== "" && appController.effectOverlays.length > 0
+                 && !root.cropActive && !root.transforming
+    }
+
     // Rule-of-thirds reference grid, shown only while adjusting "Enderezar"
     // - purely visual, no interaction, so it's a flat overlay (not part of
     // the Flickable's content) that just sits over the whole viewport.
