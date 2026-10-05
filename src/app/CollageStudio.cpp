@@ -551,8 +551,9 @@ void CollageStudio::panCell(int cell, double dx, double dy)
     // never so far that the picture is out of sight
     c.panX = std::clamp(c.panX, -3.0, 3.0);
     c.panY = std::clamp(c.panY, -3.0, 3.0);
+    // only the picture changes: the page does not read the pan, so the cells and lines are not rebuilt
+    // (doing it on every mouse move is what made dragging a picture stutter)
     touch(false);
-    emit layoutChanged();
 }
 
 void CollageStudio::zoomCell(int cell, double factor, double atX, double atY)

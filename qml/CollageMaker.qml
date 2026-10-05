@@ -14,6 +14,8 @@ Item {
 
     readonly property var opts: collageStudio.options
     readonly property var cellData: collageStudio.cells
+    // read once per change (each read of the property rebuilds the list)
+    readonly property var dividerData: free ? [] : collageStudio.dividers
     readonly property int sel: collageStudio.selected
     readonly property var selCell: sel >= 0 && sel < cellData.length ? cellData[sel] : null
     readonly property bool free: opts.free === true
@@ -150,10 +152,11 @@ Item {
 
                 // empty cells say so
                 Repeater {
-                    model: root.cellData
+                    // only the number of cells is the model, so moving a cell does not rebuild the delegates
+                    model: root.cellData.length
                     delegate: Item {
-                        required property var modelData
                         required property int index
+                        readonly property var modelData: root.cellData[index] || ({x: 0, y: 0, w: 0, h: 0, empty: false})
                         x: modelData.x * box.width
                         y: modelData.y * box.height
                         width: modelData.w * box.width
@@ -198,9 +201,10 @@ Item {
                 }
                 // the dividing lines
                 Repeater {
-                    model: root.free ? [] : collageStudio.dividers
+                    model: root.dividerData.length
                     delegate: Item {
-                        required property var modelData
+                        required property int index
+                        readonly property var modelData: root.dividerData[index] || ({vertical: true, pos: 0, from: 0, to: 0})
                         readonly property bool v: modelData.vertical
                         x: v ? modelData.pos * box.width - 1.5 : modelData.from * box.width
                         y: v ? modelData.from * box.height : modelData.pos * box.height - 1.5
@@ -235,7 +239,7 @@ Item {
                             Qt.point(x1, y1), Qt.point(xm, y1), Qt.point(x0, y1), Qt.point(x0, ym)][i];
                 }
                 function dividerAt(mx, my) {
-                    const list = collageStudio.dividers;
+                    const list = root.dividerData;
                     for (let i = 0; i < list.length; ++i) {
                         const d = list[i];
                         if (d.vertical) {
@@ -267,7 +271,7 @@ Item {
                     property real lastY: 0
                     cursorShape: {
                         if (mode === "divider" || (mode === "" && box.hoverDivider >= 0)) {
-                            const list = collageStudio.dividers;
+                            const list = root.dividerData;
                             const i = mode === "divider" ? target : box.hoverDivider;
                             return list[i] && list[i].vertical ? Qt.SizeHorCursor : Qt.SizeVerCursor;
                         }
@@ -276,6 +280,8 @@ Item {
                         return Qt.OpenHandCursor;
                     }
                     onPressed: function (m) {
+                        pendingDx = 0;
+                        pendingDy = 0;
                         lastX = m.x;
                         lastY = m.y;
                         const nx = m.x / box.width, ny = m.y / box.height;
@@ -312,14 +318,32 @@ Item {
                         lastX = m.x;
                         lastY = m.y;
                         if (mode === "divider") {
-                            const list = collageStudio.dividers;
+                            const list = root.dividerData;
                             const v = list[target] ? list[target].vertical : true;
                             collageStudio.dragDivider(v ? nx : ny);
                         } else if (mode === "resize") collageStudio.resizeCell(root.sel, target, dx, dy);
                         else if (mode === "move") collageStudio.moveCell(target, dx, dy);
-                        else if (mode === "pan") collageStudio.panCell(target, dx, dy);
+                        else if (mode === "pan") {
+                            // a mouse reports far more often than the screen redraws: the moves are added up
+                            // and applied once per pass of the event loop
+                            pendingDx += dx;
+                            pendingDy += dy;
+                            Qt.callLater(flushPan);
+                        }
+                    }
+                    property real pendingDx: 0
+                    property real pendingDy: 0
+                    function flushPan() {
+                        if (pendingDx === 0 && pendingDy === 0)
+                            return;
+                        const dx = pendingDx, dy = pendingDy;
+                        pendingDx = 0;
+                        pendingDy = 0;
+                        if (mode === "pan")
+                            collageStudio.panCell(target, dx, dy);
                     }
                     onReleased: {
+                        flushPan();
                         if (mode === "divider")
                             collageStudio.endDividerDrag();
                         mode = "";
