@@ -19,13 +19,14 @@ Oscuro* y *Windows 98*.
   abrirlas, en lugar de verse apagadas; lo que se guarda va etiquetado como sRGB.
 - Respeta la **orientación EXIF** (fotos de móvil) y abre archivos y carpetas con
   cualquier nombre (acentos, japonés, cirílico, emoji).
-- GIF y APNG animados con reproducción real.
+- GIF, APNG y WebP animados con reproducción real.
+- **Varias imágenes** a la vez (2 a 6) con zoom y desplazamiento vinculados, que se pueden desvincular.
 - Exportación por lote (JPG/WebP, conserva los metadatos) y configuración persistida
   en un `.ini`.
 
 **Formatos que abre** (cada uno comprobado con un archivo real en las pruebas):
 JPEG (también CMYK), PNG, WebP y TIFF (libvips; los de 16 bits por canal se escalan a 8) ·
-BMP, GIF e ICO (Qt) · RAW de cámara (LibRaw) · HEIC/HEIF y AVIF (libheif). **Guarda** en PNG, JPG, BMP, TIFF y WebP.
+BMP, GIF e ICO (Qt) · RAW de cámara (LibRaw) · HEIC/HEIF y AVIF (libheif) · GIF, APNG y WebP animados. **Guarda** en PNG, JPG, BMP, TIFF y WebP, y **crea** GIF, APNG y WebP animados.
 
 **Guardado seguro**: escritura atómica (un fallo nunca deja el original a medias), JPEG
 de alta calidad (95, sin submuestreo de croma), conserva EXIF, IPTC y XMP del
@@ -39,11 +40,13 @@ tras Guardar y Deshacer).
 **Editor**
 | Pestaña | Contenido |
 |---|---|
-| Recortar | Selección con tiradores, proporciones, rotar, enderezar, voltear |
+| Recortar | Recorte con tiradores, proporciones, rotar, enderezar, voltear · **Marco**: forma (rectángulo, elipse, hexágono, estrella, corazón…), esquinas redondas, suaves, cortadas o cóncavas, contorno, margen, sombra y fondo |
 | Tamaño | Por píxeles o escala, remuestreo Lanczos‑3 con nitidez sin halos al ampliar |
 | Ajustes | 18 controles de tono/color/detalle, niveles y curvas por canal, auto, histograma en vivo, grano/ruido (4 tipos) |
 | Filtros | 38 "looks" con miniaturas de la propia foto, cantidad, viñeta y grano |
-| Efectos | 17 efectos (desenfoques, posterizar, umbral, relieve, bordes, lápiz, semitono, mosaico, cristalizar, ojo de pez, remolino, onda, vidrio) con vista previa en toda la imagen, sliders propios y mezcla; "Aplicar" los deja como un paso deshacible |
+| Efectos | 43 efectos en 7 grupos (desenfoque, estilo, color, dibujo, luz, distorsión y acabado: blanco y negro, borrar niebla, celofán, semitono de imprenta, líneas, destellos, bokeh, estirar, perspectiva…) con vista previa en toda la imagen, sliders propios, preajustes y mezcla; "Aplicar" los deja como un paso deshacible |
+| Lente | Corrige la distorsión, las franjas de color y las esquinas oscuras de tu objetivo con la base de perfiles de Lensfun (reconoce la cámara y el objetivo por el EXIF), o a mano |
+| Crear (barra superior) | **GIF animado** (imágenes con duración propia, transiciones, GIF/APNG/WebP) y **Collage** (1 a 12 fotos, líneas divisorias ajustables o diseño libre, fotos que se mueven y se acercan sin límites dentro de su celda) |
 
 La vista previa de Ajustes y Filtros se calcula en la GPU y el archivo guardado
 se genera en CPU con la misma matemática, **también con imágenes semitransparentes**; una
@@ -64,17 +67,21 @@ arrastre completo de un slider es un solo paso).
 ├── src/
 │   ├── app/    capa que depende de Qt Quick (biblioteca `imageviewer_app`): AppController (puerta principal
 │   │           hacia QML), ImageProvider, FolderModel, ThemeManager,
-│   │           AppSettings, BatchExporter, proveedor de miniaturas
+│   │           AppSettings, BatchExporter, LensController, AnimStudio, CollageStudio,
+│   │           proveedores de imágenes (miniaturas, paneles, vistas previas)
 │   └── core/   biblioteca estática sin QML
 │       ├── ImageLoader, DecoderRegistry, ThumbnailCache, MetadataReader,
 │       │   Histogram, ImageWriter
-│       ├── decoders/  Vips, QtImage (BMP/GIF/ICO), Raw, Heif y Animated (GIF/APNG)
-│       └── edit/      Operations, EditStack (deshacer/rehacer), AdjustMath,
-│                      Looks, Effects, Resample, ParallelRows
+│       ├── decoders/  Vips, QtImage (BMP/GIF/ICO), Raw, Heif y Animated (GIF/APNG/WebP)
+│       ├── edit/      Operations, EditStack (deshacer/rehacer), AdjustMath, Looks,
+│       │              Effects (por familias), Blend, Resample, ParallelRows
+│       ├── lens/      LensDatabase (perfiles de Lensfun)
+│       ├── anim/      codificadores de GIF, APNG y WebP animado, armado de fotogramas
+│       └── collage/   dibujo y diseños del collage
 ├── qml/        ventana, lienzo, panel de edición, controles tematizados
 │   ├── controls/  envoltorios App*.qml de cada control + iconos vectoriales
 │   └── shaders/   Grade.frag y Detail.frag (vista previa en GPU)
-├── tests/      QtTest (291 casos): núcleo, el AppController real y la paridad CPU/GPU
+├── tests/      QtTest (430 casos): núcleo, el AppController real y la paridad CPU/GPU
 │               con Direct3D 11 + prueba de humo del programa real
 │               + fixtures (un archivo de ejemplo de cada formato, EXIF/XMP/IPTC, CMYK…)
 ├── tools/      archivos .reg del menú contextual y generador de avisos de terceros
@@ -114,5 +121,7 @@ como herramienta del host y `CMakeLists.txt` lo localiza solo.
 - Licencia del proyecto: **GPL-3.0-or-later**, copyright 2026 Vulito (ver `LICENSE`). Es la
   coherente con exiv2 (GPL); las licencias de las demás dependencias están en
   `docs/LICENCIAS.md`.
-- Pendientes: control de versiones y CI, marcos y bordes, capas de texto y formas,
-  pinceles y máscaras, recetas por lote. Ver `docs/DESARROLLO.md`, sección 9.
+- Desde el 4‑5 de octubre también: más efectos, corrección de lente, marcos, varias imágenes,
+  creador de GIF/APNG/WebP y collage (ver `docs/DESARROLLO.md`, secciones 4.13 a 4.18).
+- Pendientes: GitHub privado y CI, atajos de teclado, capas de texto y formas, pinceles y máscaras,
+  recetas por lote. Ver `docs/DESARROLLO.md`, sección 9.

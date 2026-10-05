@@ -4,7 +4,9 @@
 > pedirle opinión sobre el desarrollo: qué mejorar, qué riesgos hay y qué falta
 > para que el programa sea lo más profesional posible.
 >
-> Estado descrito: **2 de octubre de 2026**. Es la **cuarta ronda** de revisión: la
+> Estado descrito: **5 de octubre de 2026**. Es la **cuarta ronda** de revisión (las secciones
+> 4.13 a 4.18 describen lo añadido después, el 4‑5 de octubre, y todavía no pasaron por
+> revisión externa): la
 > primera versión (1‑oct) y las siguientes ya pasaron por revisión externa, y la sección 8
 > recoge qué dijo cada una, qué se comprobó contra el código y qué se corrigió (la última,
 > la auditoría técnica final, está en 8.8). Todo lo que aparece
@@ -55,7 +57,8 @@ integrado de fotos. Interfaz en español. Tres temas visuales: *Moderno Claro*,
 - Presentación (diaporama), comparar antes/después, copiar/pegar del portapapeles,
   fondo de escritorio, papelera, panel de información con EXIF e histograma.
 - **Respeta la orientación EXIF** (fotos de móvil), en tamaño completo y en miniatura.
-- GIF y APNG animados con reproducción real.
+- GIF, APNG y WebP animados con reproducción real.
+- **Varias imágenes** (2 a 6 a la vez) con zoom y desplazamiento vinculados (4.16).
 - Exportación por lote (JPG/WebP con calidad configurable, renombrado con relleno de
   dígitos); conserva los metadatos del original. Configuración en un `.ini`.
 
@@ -65,8 +68,8 @@ real de cada tipo** en las pruebas)
 - Qt (`QtImageDecoder`): BMP, GIF estático, ICO.
 - LibRaw (`libraw_r`, reentrante): RAW de cámaras (CR2, NEF, ARW, DNG…).
 - libheif + libde265 + libaom: HEIC/HEIF (HEVC) y AVIF (AV1).
-- `AnimatedDecoder` propio para GIF/APNG realmente animados (APNG reconstruido a
-  mano, sin librería externa).
+- `AnimatedDecoder` propio para GIF/APNG/WebP realmente animados (APNG reconstruido a
+  mano, sin librería externa; el WebP animado con libwebpdemux).
 - **No** se abren PSD, TGA ni JXL (no hay ImageMagick/libjxl en este build): antes
   se anunciaban y fallaban.
 - Guardado en PNG, JPG, BMP, TIFF y WebP (sección 4.7).
@@ -74,19 +77,21 @@ real de cada tipo** en las pruebas)
 **Editor** (pestañas del panel derecho)
 | Pestaña | Contenido |
 |---|---|
-| Recortar | Selección con 8 tiradores, proporciones predefinidas, rotar 90°, enderezar (ángulo libre), voltear |
+| Recortar | Dos páginas: **Recorte** (selección con 8 tiradores, proporciones predefinidas, rotar 90°, enderezar, voltear) y **Marco** (forma, esquinas redondas/suaves/cortadas/cóncavas, contorno, margen, sombra, fondo; 4.15) |
 | Tamaño | Por píxeles o por escala (con tope en 100 %), Lanczos‑3 + nitidez sin halos al ampliar |
 | Ajustes | 18 controles de tono/color/detalle, niveles y curvas por canal, auto color/niveles/contraste, histograma en vivo, grano/ruido en 4 tipos |
 | Filtros | 38 "looks" por receta con miniaturas de la propia foto, control "Cantidad", acabado (viñeta y grano) |
-| Efectos | 17 efectos de un solo uso en 3 grupos (desenfoque: gaussiano, movimiento, zoom, giratorio, quitar ruido, mediana · estilo: posterizar, umbral, relieve, bordes, lápiz, semitono, mosaico, cristalizar · distorsión: ojo de pez, remolino, onda, vidrio), con vista previa en toda la imagen, sliders propios y "Mezcla" |
+| Efectos | **43 efectos** de un solo uso en 7 grupos (desenfoque, estilo, color, dibujo, luz, distorsión, acabado; 4.13), con vista previa en toda la imagen, sliders propios, preajustes, tiradores sobre la imagen y "Mezcla" |
+| Lente | Corrección de distorsión, franjas de color y esquinas oscuras con la base de perfiles de Lensfun (cámara y objetivo reconocidos por el EXIF) o a mano (4.14) |
+| Crear (menú de la barra superior) | **GIF animado** (4.17): tira de imágenes, transiciones, exportación a GIF/APNG/WebP · **Collage** (4.18): 1 a 12 fotos en celdas con líneas divisorias ajustables o diseño libre, fotos sin límites dentro de su celda |
 
 **Deshacer/Rehacer** cubre todo, en orden cronológico: recortes, tamaños, giros,
 efectos **y también los movimientos de Ajustes y Filtros** (un arrastre completo de un
 slider = un paso). **Avisos de seguridad**: confirmación antes de sobrescribir el
 original y pregunta antes de perder cambios al cerrar o abrir otra imagen.
 
-Tamaño del código (líneas no vacías, aproximado): núcleo C++ ≈ 4 200 · capa app C++
-≈ 2 600 · QML ≈ 5 600 · shaders GLSL ≈ 300 · pruebas ≈ 1 700.
+Tamaño del código (líneas no vacías, aproximado, 5‑oct‑2026): núcleo C++ ≈ 11 300 · capa app C++
+≈ 5 100 · QML ≈ 10 600 · shaders GLSL ≈ 350 · pruebas ≈ 6 800.
 
 ---
 
@@ -102,7 +107,7 @@ Tamaño del código (líneas no vacías, aproximado): núcleo C++ ≈ 4 200 · c
   `.example`).
 - **Shaders**: `qt_add_shaders` compila `Grade.frag` y `Detail.frag` a `.qsb`
   (objetivos GLSL `150,300es` porque el ruido usa enteros sin signo).
-- **Pruebas**: QtTest, 11 ejecutables, **291 casos** (incluida la **paridad CPU↔GPU con
+- **Pruebas**: QtTest, 19 ejecutables, **430 casos** (incluida la **paridad CPU↔GPU con
   Direct3D 11** y el `AppController` real), más una **prueba de humo** del programa real
   (`smoke_startup`): 12 entradas en `ctest`, todas pasan.
 - **Plataforma**: solo Windows (usa `Shell32`/`User32`, fondo de escritorio por
@@ -483,6 +488,113 @@ convierten (se conservan); BT.2020/HDR no se tratan; la conversión CMYK sigue s
 
 ---
 
+### 4.13 Efectos: de 17 a 43 (réplica y mejora de PhotoScape X Pro)
+El catálogo ya no vive todo en `Effects.cpp`: cada **familia** tiene su archivo con dos
+puntos de entrada (`addXSpecs` y `renderX`) y `applyEffect` los consulta antes que a los
+efectos antiguos.
+- `EffectsColor`: blanco y negro (mezclador de canales con presets, tinte neutro en
+  luminancia y limitado al gamut), borrar niebla (canal oscuro con filtro guiado rápido),
+  mejorar documento, aberración cromática (radial, d(r)=A·4u(1−u)) y celofán.
+- `EffectsPattern`: **Semitono** de imprenta (pantallas por canal a 45°/22,5°/0°; el semitono
+  anterior pasó a llamarse **Punteado**).
+- `EffectsDecor`: líneas, círculos concéntricos, velocidad radial, relleno de degradado, relleno
+  de motivo (22 motivos), línea de borde (8 estilos de trazo).
+- `EffectsLight`: bokeh, destello de lente, fuga de luz, rayos, polvo, destellos, resplandor
+  y foco, dibujados **proceduralmente** (sin imágenes con licencia) sobre una capa reducida
+  (≤1 000–2 000 px) que se superpone con la mezcla *Trama* (exacta para Screen).
+- `EffectsGeometry`: **Estirar** y **Perspectiva**, que **cambian el tamaño** de la imagen.
+- `Blend.{h,cpp}`: los 22 modos de fusión de PhotoScape para los efectos decorativos.
+Infraestructura nueva: parámetros de tipo opción/interruptor/color/semilla con visibilidad
+condicional (`dependsOn`), **preajustes**, **tiradores sobre el lienzo** (`EffectHandles.qml`:
+punto o línea arrastrable en vez de un slider), `changesSize` + `effectOutputSize()` (la vista
+previa se calcula sobre la copia de 1 600 px, se estira al tamaño final y el lienzo se
+reajusta), `hidden` (efectos que maneja otra herramienta: `lens` y `frame`) y
+`kMaxEffectParams = 24`. Las fórmulas de PhotoScape se **midieron** sobre imágenes
+calibradas y se reprodujeron: B/N exacto, perfil de la aberración, desplazamientos del
+celofán, retícula del semitono, ancho y tamaño de la perspectiva. Pruebas:
+`test_effect_families` (34).
+
+### 4.14 Lente (corrección con la base de Lensfun)
+`core/lens/LensDatabase` lee los XML de **Lensfun** (56 archivos, 5 MB, embebidos como recursos
+Qt; solo los datos, no la biblioteca) y calcula la corrección en unidades de Hugin (r = 1 a
+medio lado corto): distorsión `ptlens`/`poly3`/`poly5`, aberración cromática `poly3`, viñeteo
+`pa`; interpola entre distancias focales como Lensfun (spline sobre 1/f, IDW para el viñeteo) y
+elige el juego de calibración según el factor de recorte. `MetadataReader` ahora devuelve el
+objetivo (`Exiv2::lensName` y claves de notas del fabricante) y la distancia al sujeto: la
+herramienta reconoce cámara y objetivo sola y deja elegirlos a mano (con buscador). Detrás hay
+un efecto oculto `lens` (`EffectsLens.cpp`: remapeo con interpolación bilineal, aberración por
+canal, ganancia de viñeteo, y «quitar los bordes vacíos» que recorta lo justo para ambos signos
+de la distorsión). Modo «A mano» con tres deslizadores para objetivos fuera de la base. Los 16
+valores del efecto salen de `correctionValues()`/`manualValues()` (en el núcleo, con pruebas).
+Licencia de los datos: **CC BY‑SA 3.0** (aviso en `LICENCIAS.md` y en el generador de avisos).
+Pruebas: `test_lens` (11).
+
+### 4.15 Marco (Recortar > Marco)
+Segunda página de la herramienta Recortar sobre el efecto oculto `frame` (`EffectsFrame.cpp`):
+recorta la foto con una **forma** (rectángulo, elipse, hexágono, octágono, rombo, triángulo,
+estrella, corazón; todos polígonos con esquinas tratables), esquinas **redondas, suaves, cortadas
+o cóncavas** con redondez en %, cada esquina del rectángulo activable por separado, **contorno**
+afuera o adentro (color, opacidad), margen, **sombra** (color, distancia, desenfoque, ángulo) y
+fondo (color, degradado, transparente o la propia foto desenfocada). La imagen crece para que
+todo entre (o «Mantener el tamaño» achica la foto); el lienzo no pasa de 100 MP ni de 20 000 px.
+Todo en % del lado corto, así que la vista previa de 1 600 px y el resultado final coinciden.
+Se pinta con **una sola capa del tamaño del lienzo**: foto, borrado de lo que queda fuera de la
+forma (borde antialiasado por cobertura), contorno interior con `SourceAtop`, y después —por
+detrás, con `DestinationOver`— contorno exterior, sombra (capa pequeña desenfocada y ampliada) y
+fondo; pintar por detrás evita la línea clara que dejan dos bordes a medias. Pasar de la página
+Recorte a Marco aplica antes el recorte o el enderezado pendientes; Cancelar deshace todo.
+Pruebas: `test_frame` (20).
+
+### 4.16 Varias imágenes
+Botón nuevo en la barra superior: de 2 a 6 imágenes a la vez (`MultiView.qml`, `PaneView.qml`).
+Cada panel guarda su vista como **zoom relativo al ajuste** y **punto de la imagen (fracciones
+de ancho y alto) en el centro del panel**, valores que sirven para cualquier imagen: fotos de
+distinto tamaño o proporción miran el mismo lugar. Con el zoom **vinculado** (por defecto) lo
+que se hace en un panel lo siguen los demás; se desvincula con la cadena; **Shift** hace lo
+contrario del vínculo solo durante ese gesto; al volver a vincular los demás alcanzan al
+último panel usado. Ajustar todas, 100 % (cada una en sus píxeles reales), agregar/quitar
+paneles, apilados o lado a lado, soltar un archivo sobre un panel. Las imágenes llegan por
+`image://pane/` (`PaneImageStore`): los mismos decodificadores que el visor (RAW, HEIC, AVIF,
+giro EXIF, sRGB), caché de 384 MB y tamaño real de cada archivo; un panel pide una copia de
+2 048 px y, al acercar mucho, otra más nítida (hasta 16 384 px con dos paneles, 6 144 con más
+de cuatro). Pruebas: `test_pane_images` (7).
+
+### 4.17 Animaciones: crear GIF, APNG y WebP animado
+`core/anim`: **GIF propio** (cuantización por corte de mediana sobre un histograma de 5 bits,
+tramado Floyd‑Steinberg opcional, paleta global o por fotograma, solo el rectángulo que cambió
+—el resto transparente sobre el fotograma anterior—, LZW de 12 bits con reinicio de tabla,
+extensión de repeticiones; con transparencia cada fotograma se pinta solo sobre fondo
+limpio), **APNG propio** sobre el PNG de Qt (`acTL`/`fcTL`/`fdAT`, solo la parte cambiada) y
+**WebP animado** con `WebPAnimEncoder` de libwebp (`libwebpmux`, que ya viajaba con libvips; se
+verificó que `cmake --install` lo despliega y que la carpeta instalada arranca). Los
+codificadores piden los fotogramas de uno en uno a un `FrameSource`, así que 500 fotogramas no
+están a la vez en memoria; todos admiten cancelación. `Compose.cpp` arma los fotogramas: ajustar
+al lienzo (entera con fondo / llenar / estirar), transiciones (fundido, deslizar ×4, zoom con
+suavizado), invertir, ida y vuelta, velocidad y duración mínima de 20 ms. `AnimStudio` (modelo de
+lista + mapa de opciones + proveedores `animprev` y `animsrc`) y `qml/GifStudio.qml`: tira de
+imágenes (mover, duplicar, quitar, duración por fotograma), vista previa con los mismos
+fotogramas que se guardarán, exportación en segundo plano con progreso y archivo atómico. Un
+GIF/APNG/WebP animado que se agregue se desarma en sus fotogramas con sus tiempos. El visor
+ahora también **reproduce WebP animado**. Pruebas: `test_anim` (19: el GIF se valida leyéndolo
+con el decodificador de Qt, el APNG con `AnimatedDecoder`, el WebP con libwebpdemux) y
+`test_anim_studio` (11).
+
+### 4.18 Collage
+`core/collage`: el collage son **celdas rectangulares** (`Cell`: rectángulo normalizado +
+`Content`) y un `Style`. Cada foto se mueve, se acerca **sin límites** (también por debajo de la
+celda: se ve el fondo), se gira, se espeja y, si se pide, **sale de su celda** y pasa por
+encima de las vecinas (se dibuja al final). Hay hasta 17 diseños de fábrica por cantidad de
+fotos (filas, columnas, «grande a un lado», principal y filas) más mosaicos por cortes al azar con
+semilla. Las **líneas divisorias** se *detectan* en cualquier conjunto de rectángulos
+(`findDividers`: bordes que coinciden, unidos donde se tocan) y arrastrar una mueve el borde
+compartido de todas las celdas que toca (`moveDivider`, con tamaño mínimo); el modo **Libre**
+deja mover y redimensionar cada celda por su cuenta, con superposición. Estilo: separación,
+margen, esquinas redondeadas, borde, sombra, relleno de celda, fondo (color, degradado o la foto
+desenfocada, o transparente); todo en % del lado corto. Cada foto se pide con la resolución que
+hace falta (copia de prueba de 512 px para conocer la proporción y una más nítida si el
+zoom la necesita). `CollageStudio` + `qml/CollageMaker.qml`; guarda PNG, JPG o WebP en segundo
+plano y cancelable. Pruebas: `test_collage` (16) y `test_collage_studio` (15).
+
 ## 5. Concurrencia, rendimiento y memoria
 
 - `ImageLoader`: carga asíncrona con pool propio; precarga vecinas. La cancelación es
@@ -627,8 +739,12 @@ llamando a una librería sin iniciar).
 
 ## 7. Calidad y verificación
 
-**Pruebas automáticas** (QtTest, 291 casos contando `initTestCase`/`cleanupTestCase`, + humo;
-`ctest` ejecuta 12 programas):
+**Pruebas automáticas** (QtTest, 430 casos contando `initTestCase`/`cleanupTestCase`, + humo;
+`ctest` ejecuta 20 programas; los de lo añadido el 4‑5 de octubre están al principio de esta lista):
+- Lo añadido el 4‑5 de octubre: `test_effect_families` (34), `test_lens` (11), `test_frame` (20),
+  `test_pane_images` (7), `test_anim` (19), `test_anim_studio` (11), `test_collage` (16),
+  `test_collage_studio` (15); y en `test_app_controller` (35) el flujo de un efecto que cambia el
+  tamaño y el del marco (vista previa, cancelar, aplicar, deshacer).
 - `test_color_management` (16): P3 y AdobeRGB frente a matemática de referencia independiente,
   sRGB sin tocar (incluido el perfil de Windows), perfiles inválidos o CMYK rechazados, alfa
   intacto, una imagen compartida no se modifica, coste.
@@ -650,8 +766,8 @@ llamando a una librería sin iniciar).
   de metadatos ilegible; **color**: los archivos guardados llevan perfil sRGB y nunca el del
   original (JPEG/PNG/WebP/TIFF), el trozo `iCCP` del PNG es válido, el perfil pendiente se
   adjunta, y P3 → guardar → reabrir no vuelve a convertir.
-- `test_edit_stack` (56): identidad, tabla de tonos, ajustes, looks, ruido (σ y curtosis),
-  remuestreo, los **17 efectos** (forma, fuerza cero, bordes, transparencia, determinismo,
+- `test_edit_stack` (63): identidad, tabla de tonos, ajustes, looks, ruido (σ y curtosis),
+  remuestreo, los **efectos** (forma, fuerza cero, bordes, transparencia, determinismo,
   mezcla, independencia de resolución, cancelación), **historial con `LiveOp`**
   (instantáneas, fusión de un gesto en un paso), **puntos de control** y su presupuesto;
   que la reproducción sin caché del trabajador de guardado da **exactamente** lo que hornea
@@ -1007,6 +1123,9 @@ textos de licencia (sección 12).
 - Qt, libvips, libheif, libde265, LibRaw (a elegir LGPL), GLib y el resto son LGPL/MIT/BSD:
   compatibles con una aplicación cerrada si se cumplen sus condiciones (todas se enlazan
   como DLL). Patentes HEVC: aparte.
+- **Datos de Lensfun** (perfiles de cámaras y objetivos de la herramienta Lente): **CC BY‑SA 3.0**;
+  van sin modificar, como recurso, y su aviso está en `LICENCIAS.md` (sección 7b) y en el generador
+  de avisos. Solo se usan los datos: la biblioteca Lensfun (LGPL) no se enlaza.
 - `docs/THIRD_PARTY_NOTICES.txt` (388 KB, 19 componentes) se genera con
   `tools/make_third_party_notices.ps1` a partir de los archivos de licencia de vcpkg.
 
@@ -1019,14 +1138,20 @@ textos de licencia (sección 12).
 CMakeLists.txt · CMakePresets.json · vcpkg.json · README.md
 docs/    DESARROLLO.md · LICENCIAS.md · THIRD_PARTY_NOTICES.txt
 src/app   AppController · ImageProvider · FolderModel · ThumbnailImageProvider
-          ThemeManager · AppSettings · BatchExporter   (biblioteca `imageviewer_app`,
-          para poder probar el controlador real) · main.cpp (solo el ejecutable)
+          ThemeManager · AppSettings · BatchExporter · LensController · PaneImageProvider
+          AnimStudio · CollageStudio   (biblioteca `imageviewer_app`, para poder probar
+          el controlador real) · main.cpp (solo el ejecutable)
 src/core  ImageLoader · ImageDocument · DecoderRegistry · ThumbnailCache
           MetadataReader · Histogram · ImageWriter · ColorManagement
           decoders/ Vips · Raw · Heif · Animated · QtImage · VipsGuard · IImageDecoder
           edit/     Operations · EditStack · AdjustMath · Looks · Resample
-                    ParallelRows · Effects
-qml/      Main · ImageCanvas (1 100 líneas) · EditPanel (810) · Toolbar
+                    ParallelRows · Effects (+ Common, Color, Pattern, Decor, Light, Geometry,
+                    Lens, Frame) · Blend · Denoise
+          lens/     LensDatabase (lector de Lensfun y matemática de la corrección)
+          anim/     Anim.h · Compose · GifEncoder · ApngEncoder · WebpEncoder
+          collage/  Collage (dibujo) · Layouts (diseños y líneas divisorias)
+qml/      Main · ImageCanvas (1 100 líneas) · EditPanel (810) · Toolbar · CropTool · FramePanel
+          LensTool · MultiView · PaneView · GifStudio · CollageMaker
           FloatingToolbar · ThumbnailStrip · LookCell · EffectParamRow
           UnsavedChangesDialog · OverwriteDialog · AdjustRow/Section
           LevelsEditor · CurvesEditor · HistogramView · SettingsDialog …
@@ -1037,6 +1162,8 @@ qml/shaders/   Grade.frag · Detail.frag
 tests/    test_edit_stack · test_decoder_registry · test_image_writer
           test_animated_decoder · test_image_loader · test_app_controller
           test_color_management · test_gpu_parity (+ gpu_parity/ParityScene.qml) · smoke_startup.cmake
+          test_effect_families · test_lens · test_frame · test_pane_images · test_anim
+          test_anim_studio · test_collage · test_collage_studio
           (+ fixtures: fotos de ejemplo de cada formato, las 8 orientaciones EXIF, una foto
           con EXIF/GPS/ICC, `meta_rich.jpg/png` con XMP e IPTC, `cmyk_sample.jpg`,
           `p3_icc.heic/avif` en Display P3; `color_reference.h`: matemática de color de referencia)
