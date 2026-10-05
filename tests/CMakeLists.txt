@@ -13,6 +13,8 @@ target_compile_definitions(test_decoder_registry PRIVATE
 add_core_test(test_edit_stack)
 add_core_test(test_effect_families)
 add_core_test(test_frame)
+add_core_test(test_anim)
+target_link_libraries(test_anim PRIVATE WebP::webpdemux)
 add_core_test(test_lens)
 target_compile_definitions(test_lens PRIVATE
     LENSFUN_DIR="${CMAKE_SOURCE_DIR}/resources/lensfun")

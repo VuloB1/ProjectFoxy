@@ -61,6 +61,8 @@ pkg_check_modules(VIPS REQUIRED IMPORTED_TARGET vips-cpp)
 pkg_check_modules(LIBRAW REQUIRED IMPORTED_TARGET libraw_r)
 pkg_check_modules(LIBHEIF REQUIRED IMPORTED_TARGET libheif)
 pkg_check_modules(EXIV2 REQUIRED IMPORTED_TARGET exiv2)
+# The animated WebP writer (libwebp's animation encoder lives in libwebpmux); both DLLs already ship with libvips.
+find_package(WebP CONFIG REQUIRED)
 
 # The shipped folder is flat on Windows (ProjectFoxy.exe next to its DLLs), so
 # `cmake --install` puts the executable at the prefix root instead of in bin/.

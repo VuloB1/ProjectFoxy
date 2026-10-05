@@ -55,6 +55,11 @@ add_library(imageviewer_core STATIC
     edit/Resample.cpp
     edit/ParallelRows.h
     edit/Operations.h
+    anim/Anim.h
+    anim/Compose.cpp
+    anim/GifEncoder.cpp
+    anim/ApngEncoder.cpp
+    anim/WebpEncoder.cpp
 )
 
 target_include_directories(imageviewer_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -66,4 +71,6 @@ target_link_libraries(imageviewer_core PUBLIC
     PkgConfig::LIBRAW
     PkgConfig::LIBHEIF
     PkgConfig::EXIV2
+    WebP::webp
+    WebP::libwebpmux
 )

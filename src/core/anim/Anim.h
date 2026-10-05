@@ -1,0 +1,116 @@
+#pragma once
+
+// Animated pictures: building the frames (fitting every picture to one size, the transitions between
+// them, the order they play in) and writing them as an animated GIF, APNG or WebP.
+//
+// Everything works on a FrameSource, which hands out one finished canvas-sized RGBA picture at a time, so
+// an animation of hundreds of frames never has to be in memory at once.
+
+#include <QColor>
+#include <QImage>
+#include <QIODevice>
+#include <QSize>
+#include <QString>
+#include <functional>
+#include <vector>
+
+namespace core::anim {
+
+// ---- frames in, files out --------------------------------------------------------------------------------------
+
+class FrameSource {
+public:
+    virtual ~FrameSource() = default;
+    virtual int count() const = 0;
+    virtual QSize size() const = 0;
+    // Frame `i` (0-based) as Format_RGBA8888 of size(), and how long it stays on screen in milliseconds.
+    // Called once per frame, in order, by the encoders.
+    virtual QImage frame(int i, int *delayMs) = 0;
+};
+
+// Called after each frame; returning false cancels the export.
+using ProgressFn = std::function<bool(int done, int total)>;
+
+struct GifOptions {
+    int colors = 256;            // 2..256 (one of them is kept for "transparent")
+    bool dither = true;          // Floyd-Steinberg: smoother gradients, noisier flat areas, larger files
+    bool localPalettes = false;  // one palette per frame instead of one for all: better colours, larger file
+    bool optimize = true;        // write only the part of each frame that changed
+    int loops = 0;               // 0 = forever
+};
+
+struct ApngOptions {
+    bool optimize = true;        // write only the part of each frame that changed
+    int loops = 0;               // 0 = forever
+};
+
+struct WebpOptions {
+    bool lossless = false;
+    int quality = 80;            // 0..100 (lossy), or how hard to compress (lossless)
+    int loops = 0;               // 0 = forever
+};
+
+// Each returns false (with `error` set, unless it was cancelled) when it could not finish.
+bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, const ProgressFn &progress = nullptr,
+              QString *error = nullptr);
+bool writeApng(FrameSource &frames, const ApngOptions &options, QIODevice &out, const ProgressFn &progress = nullptr,
+               QString *error = nullptr);
+bool writeWebp(FrameSource &frames, const WebpOptions &options, QIODevice &out, const ProgressFn &progress = nullptr,
+               QString *error = nullptr);
+
+// ---- building the frames ---------------------------------------------------------------------------------------
+
+enum class Fit {
+    Contain, // the whole picture, with the background showing where it does not reach
+    Cover,   // fills the frame, cutting what sticks out
+    Stretch, // fills the frame, changing the proportions
+};
+
+enum class Transition {
+    None,
+    Fade,
+    SlideLeft,  // the next picture comes in from the right, pushing the old one out to the left
+    SlideRight,
+    SlideUp,
+    SlideDown,
+    Zoom,       // the old one grows and fades while the new one settles in
+};
+
+struct Settings {
+    QSize size = QSize(640, 480);
+    Fit fit = Fit::Contain;
+    QColor background = QColor(0, 0, 0);
+    bool transparentBackground = false;
+    Transition transition = Transition::None;
+    int transitionMs = 400;      // how long each transition takes
+    int transitionSteps = 6;     // how many frames it is made of
+    bool transitionOnLoop = true; // also from the last picture back to the first
+    bool reverse = false;
+    bool pingPong = false;       // forward, then back (without repeating the ends)
+    double speed = 1.0;          // 2 = twice as fast
+};
+
+// One frame of the finished animation: a picture held still, or a point (t, 0..1) of a transition from
+// picture `a` to picture `b`. Indices are positions in the list of pictures.
+struct PlanStep {
+    int a = 0;
+    int b = 0;
+    double t = 0.0;
+    int delayMs = 100;
+    bool isStill() const { return a == b || t <= 0.0; }
+};
+
+// The frames the animation is made of, in order, from how long each picture stays.
+std::vector<PlanStep> buildPlan(const std::vector<int> &holdMs, const Settings &settings);
+
+// `source` fitted into a canvas of settings.size.
+QImage fitToCanvas(const QImage &source, const Settings &settings);
+
+// The canvas for one step, from the two (already fitted) pictures it involves.
+QImage renderStep(const QImage &fittedA, const QImage &fittedB, const PlanStep &step, const Settings &settings);
+
+// The 5/5/5-bit colour quantiser the GIF writer uses, exposed for tests: a palette of at most `colors`
+// entries (as 0xRRGGBB) that stands for the opaque pixels of `images`.
+std::vector<unsigned> quantizePalette(const std::vector<QImage> &images, int colors);
+
+} // namespace core::anim

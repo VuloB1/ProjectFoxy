@@ -1,0 +1,496 @@
+#include <QtTest>
+#include <QBuffer>
+#include <QImageReader>
+#include "anim/Anim.h"
+#include "decoders/AnimatedDecoder.h"
+
+#include <webp/demux.h>
+
+#include <cmath>
+#include <random>
+
+using namespace core::anim;
+
+namespace {
+
+class VectorSource : public FrameSource {
+public:
+    VectorSource(std::vector<QImage> images, std::vector<int> delays) : m_images(std::move(images)), m_delays(std::move(delays)) {}
+    int count() const override { return int(m_images.size()); }
+    QSize size() const override { return m_images.front().size(); }
+    QImage frame(int i, int *delayMs) override
+    {
+        if (delayMs)
+            *delayMs = m_delays[size_t(i)];
+        return m_images[size_t(i)];
+    }
+
+private:
+    std::vector<QImage> m_images;
+    std::vector<int> m_delays;
+};
+
+QImage solid(int w, int h, QColor c)
+{
+    QImage img(w, h, QImage::Format_RGBA8888);
+    img.fill(c);
+    return img;
+}
+
+// A square of colour `c` on a dark background at (x, y).
+QImage square(int w, int h, int x, int y, QColor c)
+{
+    QImage img = solid(w, h, QColor(20, 20, 40));
+    for (int j = y; j < y + 10; ++j)
+        for (int i = x; i < x + 10; ++i)
+            img.setPixelColor(i, j, c);
+    return img;
+}
+
+QImage gradient(int w, int h)
+{
+    QImage img(w, h, QImage::Format_RGBA8888);
+    for (int y = 0; y < h; ++y)
+        for (int x = 0; x < w; ++x)
+            img.setPixelColor(x, y, QColor(x * 255 / (w - 1), y * 255 / (h - 1), (x + y) * 255 / (w + h - 2)));
+    return img;
+}
+
+bool near(QRgb c, QColor want, int tol)
+{
+    return std::abs(qRed(c) - want.red()) <= tol && std::abs(qGreen(c) - want.green()) <= tol && std::abs(qBlue(c) - want.blue()) <= tol;
+}
+
+double meanAbsDiff(const QImage &a, const QImage &b)
+{
+    double sum = 0;
+    for (int y = 0; y < a.height(); ++y)
+        for (int x = 0; x < a.width(); ++x) {
+            const QRgb p = a.pixel(x, y), q = b.pixel(x, y);
+            sum += std::abs(qRed(p) - qRed(q)) + std::abs(qGreen(p) - qGreen(q)) + std::abs(qBlue(p) - qBlue(q));
+        }
+    return sum / (3.0 * a.width() * a.height());
+}
+
+QByteArray gifBytes(FrameSource &src, const GifOptions &o)
+{
+    QByteArray bytes;
+    QBuffer buf(&bytes);
+    buf.open(QIODevice::WriteOnly);
+    QString error;
+    if (!writeGif(src, o, buf, nullptr, &error))
+        qWarning("writeGif: %s", qPrintable(error));
+    return bytes;
+}
+
+// Every frame of a GIF as Qt's own reader composes them, with their delays.
+struct Decoded {
+    std::vector<QImage> frames;
+    std::vector<int> delays;
+};
+Decoded readGif(const QByteArray &bytes)
+{
+    Decoded d;
+    QBuffer buf;
+    buf.setData(bytes);
+    buf.open(QIODevice::ReadOnly);
+    QImageReader reader(&buf, "gif");
+    while (reader.canRead()) {
+        const QImage img = reader.read();
+        if (img.isNull())
+            break;
+        d.frames.push_back(img.convertToFormat(QImage::Format_ARGB32));
+        d.delays.push_back(reader.nextImageDelay());
+    }
+    return d;
+}
+
+} // namespace
+
+class TestAnim : public QObject {
+    Q_OBJECT
+
+private slots:
+    // ---- GIF -------------------------------------------------------------------------------------------------
+
+    void gifKeepsFlatColoursAndDelays()
+    {
+        VectorSource src({solid(40, 30, Qt::red), solid(40, 30, Qt::green), solid(40, 30, Qt::blue)}, {100, 200, 300});
+        const QByteArray bytes = gifBytes(src, GifOptions{});
+        QVERIFY(bytes.startsWith("GIF89a"));
+        QVERIFY(bytes.endsWith(char(0x3B)));
+        const Decoded d = readGif(bytes);
+        QCOMPARE(int(d.frames.size()), 3);
+        QCOMPARE(d.delays, (std::vector<int>{100, 200, 300}));
+        QVERIFY(near(d.frames[0].pixel(5, 5), Qt::red, 2));
+        QVERIFY(near(d.frames[1].pixel(20, 15), Qt::green, 2));
+        QVERIFY(near(d.frames[2].pixel(39, 29), Qt::blue, 2));
+        QCOMPARE(d.frames[0].size(), QSize(40, 30));
+    }
+
+    void gifWithOnlyTheChangedPartIsSmallerAndLooksTheSame()
+    {
+        std::vector<QImage> frames;
+        for (int i = 0; i < 6; ++i)
+            frames.push_back(square(120, 90, 10 + i * 15, 40, QColor(240, 200, 30)));
+        VectorSource a(frames, std::vector<int>(6, 80)), b(frames, std::vector<int>(6, 80));
+        GifOptions opt;
+        opt.dither = false;
+        opt.optimize = true;
+        const QByteArray small = gifBytes(a, opt);
+        opt.optimize = false;
+        const QByteArray big = gifBytes(b, opt);
+        QVERIFY2(small.size() < big.size(), qPrintable(QString("%1 vs %2").arg(small.size()).arg(big.size())));
+        const Decoded d = readGif(small);
+        QCOMPARE(int(d.frames.size()), 6);
+        for (int i = 0; i < 6; ++i) {
+            QVERIFY2(meanAbsDiff(d.frames[size_t(i)], frames[size_t(i)].convertToFormat(QImage::Format_ARGB32)) < 0.5, qPrintable(QString::number(i)));
+            QVERIFY(near(d.frames[size_t(i)].pixel(12 + i * 15, 44), QColor(240, 200, 30), 2));
+        }
+    }
+
+    void aGradientKeepsItsShapeWithAndWithoutDithering()
+    {
+        const QImage g = gradient(128, 96);
+        for (bool dither : {false, true}) {
+            VectorSource src({g, g}, {100, 100});
+            GifOptions opt;
+            opt.dither = dither;
+            const Decoded d = readGif(gifBytes(src, opt));
+            QCOMPARE(int(d.frames.size()), 2);
+            const double err = meanAbsDiff(d.frames[0], g.convertToFormat(QImage::Format_ARGB32));
+            QVERIFY2(err < 14.0, qPrintable(QString("dither %1: %2").arg(dither).arg(err)));
+        }
+    }
+
+    void theLzwSurvivesWhiteNoiseAndTableResets()
+    {
+        // 200 distinct colours in random order: the palette can hold them exactly, and the noise fills the
+        // LZW table over and over (12-bit codes, several resets) - what comes out must be what went in.
+        std::mt19937 rng(7);
+        std::vector<QColor> colours;
+        for (int i = 0; i < 200; ++i)
+            colours.push_back(QColor((i * 37) % 256, (i * 91 + 13) % 256, (i * 151 + 77) % 256));
+        QImage noise(300, 300, QImage::Format_RGBA8888);
+        for (int y = 0; y < 300; ++y)
+            for (int x = 0; x < 300; ++x)
+                noise.setPixelColor(x, y, colours[rng() % colours.size()]);
+        VectorSource src({noise}, {100});
+        GifOptions opt;
+        opt.dither = false;
+        opt.colors = 256;
+        const Decoded d = readGif(gifBytes(src, opt));
+        QCOMPARE(int(d.frames.size()), 1);
+        int wrong = 0;
+        for (int y = 0; y < 300; ++y)
+            for (int x = 0; x < 300; ++x)
+                wrong += !near(d.frames[0].pixel(x, y), noise.pixelColor(x, y), 8); // the 5-bit grid may merge colours <= 8 apart
+        QVERIFY2(wrong < 300 * 300 / 50, qPrintable(QString::number(wrong)));
+        // and a picture of only two flat colours must be exact (tiny alphabets and long runs)
+        QImage two = solid(500, 400, Qt::white);
+        for (int y = 100; y < 300; ++y)
+            for (int x = 100; x < 400; ++x)
+                two.setPixelColor(x, y, Qt::black);
+        VectorSource s2({two}, {100});
+        const Decoded d2 = readGif(gifBytes(s2, opt));
+        QCOMPARE(int(d2.frames.size()), 1);
+        QCOMPARE(meanAbsDiff(d2.frames[0], two.convertToFormat(QImage::Format_ARGB32)), 0.0);
+    }
+
+    void gifKeepsTransparency()
+    {
+        QImage f(60, 40, QImage::Format_RGBA8888);
+        f.fill(QColor(0, 0, 0, 0));
+        for (int y = 10; y < 30; ++y)
+            for (int x = 10; x < 50; ++x)
+                f.setPixelColor(x, y, QColor(200, 30, 30));
+        VectorSource src({f, f}, {100, 100});
+        const Decoded d = readGif(gifBytes(src, GifOptions{}));
+        QCOMPARE(int(d.frames.size()), 2);
+        for (const QImage &frame : d.frames) {
+            QCOMPARE(qAlpha(frame.pixel(2, 2)), 0);
+            QCOMPARE(qAlpha(frame.pixel(30, 20)), 255);
+            QVERIFY(near(frame.pixel(30, 20), QColor(200, 30, 30), 3));
+        }
+    }
+
+    void localPalettesGiveEachFrameItsOwnColours()
+    {
+        // two frames with completely different colours: with one shared palette 255 colours are split
+        // between them; per frame, each gets all of them
+        QImage a(100, 100, QImage::Format_RGBA8888), b(100, 100, QImage::Format_RGBA8888);
+        for (int y = 0; y < 100; ++y)
+            for (int x = 0; x < 100; ++x) {
+                a.setPixelColor(x, y, QColor(x * 2, y * 2, 0));
+                b.setPixelColor(x, y, QColor(0, 255 - x * 2, 255 - y * 2));
+            }
+        GifOptions shared, local;
+        shared.dither = local.dither = false;
+        local.localPalettes = true;
+        VectorSource s1({a, b}, {100, 100}), s2({a, b}, {100, 100});
+        const Decoded ds = readGif(gifBytes(s1, shared)), dl = readGif(gifBytes(s2, local));
+        QCOMPARE(int(dl.frames.size()), 2);
+        const double errShared = meanAbsDiff(ds.frames[0], a.convertToFormat(QImage::Format_ARGB32)) + meanAbsDiff(ds.frames[1], b.convertToFormat(QImage::Format_ARGB32));
+        const double errLocal = meanAbsDiff(dl.frames[0], a.convertToFormat(QImage::Format_ARGB32)) + meanAbsDiff(dl.frames[1], b.convertToFormat(QImage::Format_ARGB32));
+        QVERIFY2(errLocal < errShared, qPrintable(QString("%1 vs %2").arg(errLocal).arg(errShared)));
+    }
+
+    void gifLoopsAndFewColours()
+    {
+        VectorSource a({solid(8, 8, Qt::red), solid(8, 8, Qt::blue)}, {50, 50});
+        GifOptions endless;
+        QVERIFY(gifBytes(a, endless).contains("NETSCAPE2.0"));
+        VectorSource b({solid(8, 8, Qt::red), solid(8, 8, Qt::blue)}, {50, 50});
+        GifOptions once;
+        once.loops = 1;
+        QVERIFY(!gifBytes(b, once).contains("NETSCAPE2.0")); // plays once: no loop extension
+        // 4 colours still make a valid, readable file
+        VectorSource c({gradient(32, 32), gradient(32, 32)}, {50, 50});
+        GifOptions few;
+        few.colors = 4;
+        QCOMPARE(int(readGif(gifBytes(c, few)).frames.size()), 2);
+    }
+
+    void thePaletteStandsForTheColoursThatAreThere()
+    {
+        const auto two = quantizePalette({solid(10, 10, Qt::red), solid(10, 10, Qt::blue)}, 8);
+        QCOMPARE(int(two.size()), 2);
+        const auto many = quantizePalette({gradient(100, 100)}, 64);
+        QVERIFY(many.size() <= 64 && many.size() > 16);
+        const auto transparentOnly = quantizePalette({solid(10, 10, QColor(5, 5, 5, 0))}, 16);
+        QCOMPARE(int(transparentOnly.size()), 1); // nothing opaque: a placeholder
+    }
+
+    // ---- APNG ------------------------------------------------------------------------------------------------
+
+    void apngRoundTripsExactly()
+    {
+        std::vector<QImage> frames;
+        for (int i = 0; i < 5; ++i)
+            frames.push_back(square(90, 60, 5 + i * 12, 20 + i * 3, QColor(250 - i * 30, 40 + i * 40, 90)));
+        QTemporaryDir dir;
+        for (bool optimize : {true, false}) {
+            VectorSource src(frames, {100, 150, 200, 250, 300});
+            QFile file(dir.filePath(optimize ? "a.png" : "b.png"));
+            QVERIFY(file.open(QIODevice::WriteOnly));
+            ApngOptions opt;
+            opt.optimize = optimize;
+            QString error;
+            QVERIFY2(writeApng(src, opt, file, nullptr, &error), qPrintable(error));
+            file.close();
+
+            core::AnimatedDecoder decoder;
+            QVERIFY(decoder.canDecode(file.fileName()));
+            const core::DecodeResult r = decoder.decode(file.fileName());
+            QVERIFY2(r.ok, qPrintable(r.error));
+            QCOMPARE(int(r.frames.size()), 5);
+            QCOMPARE(r.frameDelaysMs, (QVector<int>{100, 150, 200, 250, 300}));
+            for (int i = 0; i < 5; ++i)
+                QCOMPARE(meanAbsDiff(r.frames[i].convertToFormat(QImage::Format_ARGB32), frames[size_t(i)].convertToFormat(QImage::Format_ARGB32)), 0.0);
+        }
+        QVERIFY(QFileInfo(dir.filePath("a.png")).size() < QFileInfo(dir.filePath("b.png")).size());
+    }
+
+    void apngKeepsTransparency()
+    {
+        QImage f(30, 20, QImage::Format_RGBA8888);
+        f.fill(QColor(0, 0, 0, 0));
+        f.setPixelColor(5, 5, QColor(255, 0, 0, 128));
+        QImage g = f;
+        g.setPixelColor(6, 5, QColor(0, 255, 0, 255));
+        QTemporaryDir dir;
+        QFile file(dir.filePath("t.png"));
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        VectorSource src({f, g}, {100, 100});
+        QVERIFY(writeApng(src, ApngOptions{}, file));
+        file.close();
+        core::AnimatedDecoder decoder;
+        const core::DecodeResult r = decoder.decode(file.fileName());
+        QVERIFY(r.ok && r.frames.size() == 2);
+        QCOMPARE(qAlpha(r.frames[1].convertToFormat(QImage::Format_ARGB32).pixel(5, 5)), 128);
+        QCOMPARE(qAlpha(r.frames[1].convertToFormat(QImage::Format_ARGB32).pixel(6, 5)), 255);
+        QCOMPARE(qAlpha(r.frames[1].convertToFormat(QImage::Format_ARGB32).pixel(0, 0)), 0);
+    }
+
+    // ---- WebP ------------------------------------------------------------------------------------------------
+
+    void webpLosslessRoundTrips()
+    {
+        std::vector<QImage> frames;
+        for (int i = 0; i < 4; ++i)
+            frames.push_back(square(64, 48, 4 + i * 10, 10 + i * 4, QColor(250 - i * 50, 60 + i * 50, 120)));
+        VectorSource src(frames, {100, 120, 140, 160});
+        QByteArray bytes;
+        QBuffer buf(&bytes);
+        buf.open(QIODevice::WriteOnly);
+        WebpOptions opt;
+        opt.lossless = true;
+        QString error;
+        QVERIFY2(writeWebp(src, opt, buf, nullptr, &error), qPrintable(error));
+        QVERIFY(bytes.startsWith("RIFF") && bytes.mid(8, 4) == "WEBP");
+
+        WebPData data{reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size())};
+        WebPAnimDecoderOptions dopt;
+        WebPAnimDecoderOptionsInit(&dopt);
+        dopt.color_mode = MODE_RGBA;
+        WebPAnimDecoder *dec = WebPAnimDecoderNew(&data, &dopt);
+        QVERIFY(dec);
+        WebPAnimInfo info;
+        WebPAnimDecoderGetInfo(dec, &info);
+        QCOMPARE(int(info.frame_count), 4);
+        QCOMPARE(int(info.canvas_width), 64);
+        int previousTs = 0, i = 0;
+        std::vector<int> delays;
+        while (WebPAnimDecoderHasMoreFrames(dec)) {
+            uint8_t *rgba = nullptr;
+            int ts = 0;
+            QVERIFY(WebPAnimDecoderGetNext(dec, &rgba, &ts));
+            delays.push_back(ts - previousTs);
+            previousTs = ts;
+            const QImage got(rgba, 64, 48, 64 * 4, QImage::Format_RGBA8888);
+            QCOMPARE(meanAbsDiff(got.convertToFormat(QImage::Format_ARGB32), frames[size_t(i)].convertToFormat(QImage::Format_ARGB32)), 0.0);
+            ++i;
+        }
+        WebPAnimDecoderDelete(dec);
+        QCOMPARE(delays, (std::vector<int>{100, 120, 140, 160}));
+    }
+
+    void webpLossyIsSmallerAndClose()
+    {
+        const QImage g = gradient(96, 72);
+        std::vector<QImage> frames{g, g.mirrored(true, false)};
+        QByteArray lossy, lossless;
+        for (bool l : {false, true}) {
+            VectorSource src(frames, {100, 100});
+            QBuffer buf(l ? &lossless : &lossy);
+            buf.open(QIODevice::WriteOnly);
+            WebpOptions opt;
+            opt.lossless = l;
+            opt.quality = 60;
+            QVERIFY(writeWebp(src, opt, buf));
+        }
+        QVERIFY2(lossy.size() < lossless.size(), qPrintable(QString("%1 vs %2").arg(lossy.size()).arg(lossless.size())));
+    }
+
+    void exportsCanBeCancelled()
+    {
+        std::vector<QImage> frames(10, gradient(64, 48));
+        for (int kind = 0; kind < 3; ++kind) {
+            VectorSource src(frames, std::vector<int>(10, 100));
+            QByteArray bytes;
+            QBuffer buf(&bytes);
+            buf.open(QIODevice::WriteOnly);
+            int calls = 0;
+            auto stopSoon = [&](int, int) { return ++calls < 3; };
+            bool ok = true;
+            if (kind == 0) ok = writeGif(src, GifOptions{}, buf, stopSoon);
+            else if (kind == 1) ok = writeApng(src, ApngOptions{}, buf, stopSoon);
+            else ok = writeWebp(src, WebpOptions{}, buf, stopSoon);
+            QVERIFY2(!ok, qPrintable(QString::number(kind)));
+            QVERIFY(calls < 12);
+        }
+    }
+
+    // ---- building the frames -----------------------------------------------------------------------------------
+
+    void picturesAreFittedToTheCanvas()
+    {
+        Settings s;
+        s.size = QSize(100, 100);
+        s.background = QColor(255, 0, 0);
+        const QImage wide = solid(200, 100, QColor(0, 0, 255));
+        const QImage contain = fitToCanvas(wide, s);
+        QCOMPARE(contain.size(), QSize(100, 100));
+        QVERIFY(near(contain.pixel(50, 5), QColor(255, 0, 0), 2));   // the background above...
+        QVERIFY(near(contain.pixel(50, 50), QColor(0, 0, 255), 2));  // ...the picture in the middle...
+        QVERIFY(near(contain.pixel(50, 95), QColor(255, 0, 0), 2));  // ...the background below
+        s.fit = Fit::Cover;
+        const QImage cover = fitToCanvas(wide, s);
+        QVERIFY(near(cover.pixel(2, 2), QColor(0, 0, 255), 2) && near(cover.pixel(97, 97), QColor(0, 0, 255), 2));
+        s.fit = Fit::Stretch;
+        QVERIFY(near(fitToCanvas(wide, s).pixel(2, 97), QColor(0, 0, 255), 2));
+        s.fit = Fit::Contain;
+        s.transparentBackground = true;
+        QCOMPARE(qAlpha(fitToCanvas(wide, s).pixel(50, 5)), 0);
+    }
+
+    void thePlanFollowsTheSettings()
+    {
+        Settings s;
+        const std::vector<int> hold{500, 1000, 250};
+        auto plan = buildPlan(hold, s);
+        QCOMPARE(int(plan.size()), 3);
+        QCOMPARE(plan[1].delayMs, 1000);
+        QVERIFY(plan[0].isStill());
+
+        s.transition = Transition::Fade;
+        s.transitionMs = 400;
+        s.transitionSteps = 4;
+        plan = buildPlan(hold, s);
+        QCOMPARE(int(plan.size()), 3 + 3 * 4); // each picture, and a transition after each (the last wraps round)
+        QCOMPARE(plan[1].a, 0);
+        QCOMPARE(plan[1].b, 1);
+        QCOMPARE(plan[1].delayMs, 100);
+        QVERIFY(plan[1].t > 0 && plan[1].t < plan[2].t);
+        QCOMPARE(plan.back().b, 0);
+        s.transitionOnLoop = false;
+        QCOMPARE(int(buildPlan(hold, s).size()), 3 + 2 * 4);
+
+        s.transition = Transition::None;
+        s.reverse = true;
+        plan = buildPlan(hold, s);
+        QCOMPARE(plan[0].a, 2);
+        QCOMPARE(plan[2].a, 0);
+        s.reverse = false;
+        s.pingPong = true;
+        plan = buildPlan({100, 100, 100, 100}, s);
+        QCOMPARE(int(plan.size()), 6); // 0 1 2 3 2 1
+        QCOMPARE(plan[4].a, 2);
+        QCOMPARE(plan[5].a, 1);
+        s.pingPong = false;
+        s.speed = 2.0;
+        QCOMPARE(buildPlan({400}, s)[0].delayMs, 200);
+        s.speed = 10.0;
+        QCOMPARE(buildPlan({100}, s)[0].delayMs, 20); // never shorter than a browser will play
+        QVERIFY(buildPlan({}, s).empty());
+    }
+
+    void transitionsMixThePictures()
+    {
+        Settings s;
+        s.size = QSize(100, 60);
+        const QImage a = solid(100, 60, QColor(200, 0, 0)), b = solid(100, 60, QColor(0, 0, 200));
+        PlanStep mid{0, 1, 0.5, 50};
+        s.transition = Transition::Fade;
+        const QImage fade = renderStep(a, b, mid, s);
+        QVERIFY(near(fade.pixel(50, 30), QColor(100, 0, 100), 3));
+        PlanStep still{0, 0, 0.0, 50};
+        QVERIFY(near(renderStep(a, b, still, s).pixel(50, 30), QColor(200, 0, 0), 0));
+
+        s.transition = Transition::SlideLeft; // at the half-way point: the old on the left half, the new on the right
+        const QImage slide = renderStep(a, b, mid, s);
+        QVERIFY(near(slide.pixel(10, 30), QColor(200, 0, 0), 2));
+        QVERIFY(near(slide.pixel(90, 30), QColor(0, 0, 200), 2));
+        s.transition = Transition::SlideRight;
+        const QImage right = renderStep(a, b, mid, s);
+        QVERIFY(near(right.pixel(10, 30), QColor(0, 0, 200), 2));
+        QVERIFY(near(right.pixel(90, 30), QColor(200, 0, 0), 2));
+        s.transition = Transition::SlideUp;
+        const QImage up = renderStep(a, b, mid, s);
+        QVERIFY(near(up.pixel(50, 5), QColor(200, 0, 0), 2));
+        QVERIFY(near(up.pixel(50, 55), QColor(0, 0, 200), 2));
+        s.transition = Transition::Zoom;
+        const QImage zoom = renderStep(a, b, mid, s);
+        QVERIFY(qRed(zoom.pixel(50, 30)) > 20 && qBlue(zoom.pixel(50, 30)) > 20);
+        // transparency survives a fade
+        s.transition = Transition::Fade;
+        const QImage clear = solid(100, 60, QColor(0, 0, 0, 0));
+        QCOMPARE(qAlpha(renderStep(clear, clear, mid, s).pixel(5, 5)), 0);
+        const QImage half = renderStep(a, clear, mid, s);
+        QVERIFY(qAlpha(half.pixel(5, 5)) > 100 && qAlpha(half.pixel(5, 5)) < 155);
+        QVERIFY(near(half.pixel(5, 5), QColor(200, 0, 0), 3)); // the colour is the picture's, not darkened by the empty one
+    }
+};
+
+QTEST_MAIN(TestAnim)
+#include "test_anim.moc"
