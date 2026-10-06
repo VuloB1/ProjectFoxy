@@ -1130,7 +1130,7 @@ Rectangle {
         anchors.margins: 12
         z: 25
         height: 30
-        width: readout.implicitWidth + 50
+        width: readout.implicitWidth + 50 + (root.pickerOn ? 26 : 0)
         radius: themeManager.radiusMedium === 0 ? 0 : 8
         color: themeManager.surfaceElevated
         border.color: themeManager.border
@@ -1149,9 +1149,20 @@ Rectangle {
                    ? Qt.rgba(root.pixelInfo.r / 255, root.pixelInfo.g / 255, root.pixelInfo.b / 255, root.pixelInfo.a / 255)
                    : "transparent"
         }
+        // with Alt held the eyedropper shows next to the colour: a click copies it
+        AppIcon {
+            id: pickerIcon
+            visible: root.pickerOn
+            anchors.left: swatch.right
+            anchors.leftMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+            name: "eyedropper"
+            size: 20
+            color: themeManager.accent
+        }
         Label {
             id: readout
-            anchors.left: swatch.right
+            anchors.left: root.pickerOn ? pickerIcon.right : swatch.right
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             color: themeManager.textPrimary

@@ -334,6 +334,24 @@ Canvas {
             ctx.beginPath(); ctx.moveTo(12, 11); ctx.lineTo(12, 16.5); ctx.stroke();
             ctx.beginPath(); ctx.arc(12, 7.6, 1.1, 0, 2 * Math.PI); ctx.fill();
             break;
+        case "eyedropper": {
+            // A pipette: a hollow tube narrowing to the tip (bottom left), a collar and a solid bulb.
+            ctx.save();
+            ctx.translate(3.6, 20.4);
+            ctx.rotate(Math.PI / 4);
+            ctx.beginPath();
+            ctx.moveTo(0, 0); ctx.lineTo(-1.5, -6); ctx.lineTo(-2.7, -13.2); ctx.lineTo(2.7, -13.2); ctx.lineTo(1.5, -6);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.roundedRect(-4.2, -16.2, 8.4, 2.6, 1, 1);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.roundedRect(-3.1, -23.2, 6.2, 7.6, 2.6, 2.6);
+            ctx.fill();
+            ctx.restore();
+            break;
+        }
         case "more":
             for (const x of [5.5, 12, 18.5]) {
                 ctx.beginPath(); ctx.arc(x, 12, 1.7, 0, 2 * Math.PI); ctx.fill();

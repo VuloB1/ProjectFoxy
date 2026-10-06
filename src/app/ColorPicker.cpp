@@ -9,40 +9,70 @@
 
 namespace {
 
-// A pipette drawn pointing down-left, drawn on a 32 x 32 grid and enlarged (kScale) so that it is easy to see on
-// a big or high-resolution screen; the tip is the hot spot.
+// The pipette is drawn on a 32 x 32 grid and enlarged so that it is easy to see on a big or high-resolution screen.
 constexpr double kScale = 1.9;
-QCursor eyedropperCursor()
+
+// The shapes of the pipette in its own coordinates: the tip is the origin and the pipette lies along -y (the
+// caller turns it). A hollow glass tube that narrows to the tip, a collar, and a solid bulb on top.
+QPainterPath tubePath()
+{
+    QPainterPath p;
+    p.moveTo(0, 0);
+    p.lineTo(-1.5, -6.5);
+    p.lineTo(-2.5, -17.0);
+    p.lineTo(2.5, -17.0);
+    p.lineTo(1.5, -6.5);
+    p.closeSubpath();
+    return p;
+}
+QPainterPath collarPath()
+{
+    QPainterPath p;
+    p.addRoundedRect(QRectF(-4.2, -19.6, 8.4, 3.0), 1.2, 1.2);
+    return p;
+}
+QPainterPath bulbPath()
+{
+    QPainterPath p;
+    p.addRoundedRect(QRectF(-3.0, -28.6, 6.0, 9.4), 3.0, 3.0);
+    return p;
+}
+
+} // namespace
+
+QPixmap ColorPicker::eyedropperPixmap()
 {
     QPixmap pm(int(32 * kScale), int(32 * kScale));
     pm.fill(Qt::transparent);
     QPainter p(&pm);
     p.setRenderHint(QPainter::Antialiasing, true);
     p.scale(kScale, kScale);
-    auto body = [&](const QColor &fill, qreal grow) {
-        p.save();
-        p.translate(3, 28);
-        p.rotate(-45);                         // the pipette lies along the up-right diagonal
-        QPainterPath path;
-        path.moveTo(0, 0);                     // tip
-        path.lineTo(-1.6 - grow, -4 - grow);
-        path.lineTo(-2.4 - grow, -14 - grow);
-        path.lineTo(2.4 + grow, -14 - grow);
-        path.lineTo(1.6 + grow, -4 - grow);
-        path.closeSubpath();
-        path.addRoundedRect(QRectF(-4.2 - grow, -18 - grow, 8.4 + 2 * grow, 5 + 2 * grow), 1.5, 1.5);  // the bulb
-        p.setPen(Qt::NoPen);
-        p.setBrush(fill);
-        p.drawPath(path);
-        p.restore();
-    };
-    body(QColor(0, 0, 0, 230), 1.1);           // a dark outline, so it shows on any picture
-    body(QColor(245, 245, 245), 0.0);
-    p.end();
-    return QCursor(pm, int(3 * kScale), int(28 * kScale));
-}
+    p.translate(3.0, 29.0);                // the tip
+    p.rotate(45.0);                        // turns the pipette to point up and to the right
+    const QColor dark(0, 0, 0, 235), light(250, 250, 250);
 
-} // namespace
+    // a dark halo first, so that it can be seen over any picture
+    QPen halo(dark, 3.4);
+    halo.setJoinStyle(Qt::RoundJoin);
+    p.setPen(halo);
+    p.setBrush(dark);
+    p.drawPath(tubePath());
+    p.drawPath(collarPath());
+    p.drawPath(bulbPath());
+
+    // then the pipette itself: a hollow tube, the collar and the bulb solid
+    QPen line(light, 1.5);
+    line.setJoinStyle(Qt::RoundJoin);
+    p.setPen(line);
+    p.setBrush(Qt::NoBrush);
+    p.drawPath(tubePath());
+    p.setPen(Qt::NoPen);
+    p.setBrush(light);
+    p.drawPath(collarPath());
+    p.drawPath(bulbPath());
+    p.end();
+    return pm;
+}
 
 ColorPicker::~ColorPicker()
 {
@@ -60,7 +90,7 @@ void ColorPicker::setCursor(bool eyedropper)
         return;
     m_cursorOn = eyedropper;
     if (eyedropper)
-        QGuiApplication::setOverrideCursor(eyedropperCursor());
+        QGuiApplication::setOverrideCursor(QCursor(eyedropperPixmap(), int(3 * kScale), int(29 * kScale)));
     else
         QGuiApplication::restoreOverrideCursor();
 }

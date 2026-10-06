@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QPixmap>
 #include <QString>
 
 // The eyedropper of the colour readout: whether Alt is held, the eyedropper mouse cursor, a colour as text
@@ -16,6 +17,8 @@ public:
     Q_INVOKABLE bool altDown() const;
     // Swaps the mouse cursor for an eyedropper (the tip is the hot spot) and back.
     Q_INVOKABLE void setCursor(bool eyedropper);
+    // The pipette drawn for the cursor (public so that a test can look at it).
+    static QPixmap eyedropperPixmap();
     // "#RRGGBB", or "#RRGGBBAA" when it is not opaque.
     Q_INVOKABLE QString hex(int r, int g, int b, int a = 255) const;
     // Puts `text` on the clipboard.
