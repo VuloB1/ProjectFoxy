@@ -132,6 +132,9 @@ class AppController : public QObject {
     // The slider values (as many as effectParams) and the Mezcla amount (0..1);
     // these change on every drag tick.
     Q_PROPERTY(QVariantList effectValues READ effectValues NOTIFY effectValuesChanged)
+    // The picked effect carries a text (the meme caption) and what it says.
+    Q_PROPERTY(bool effectUsesText READ effectUsesText NOTIFY effectChanged)
+    Q_PROPERTY(QString effectText READ effectText NOTIFY effectValuesChanged)
     Q_PROPERTY(qreal effectMix READ effectMix NOTIFY effectValuesChanged)
     // True while a preview is still being calculated.
     Q_PROPERTY(bool effectBusy READ effectBusy NOTIFY effectBusyChanged)
@@ -226,6 +229,8 @@ public:
     QVariantList effectOverlays() const;
     QVariantList effectValues() const;
     qreal effectMix() const { return m_effectMix; }
+    bool effectUsesText() const;
+    QString effectText() const { return m_effectText; }
     bool effectBusy() const { return m_effectJobsRunning > 0 || m_effectDebounce.isActive(); }
 
     bool isAnimated() const { return m_animationFrames.size() > 1; }
@@ -302,6 +307,7 @@ public slots:
     void selectEffect(const QString &id);
     void setEffectValue(int index, qreal value);
     void setEffectMix(qreal mix);
+    void setEffectText(const QString &text);
     void resetEffectValues();
     // Sets every slider of the picked effect at once (one preview instead of one per slider).
     void setEffectValues(const QVariantList &values);
@@ -570,6 +576,7 @@ private:
     size_t m_toolSessionStart = 0;
     core::edit::EffectValues m_effectValues{};
     double m_effectMix = 1.0;
+    QString m_effectText;
     int m_effectGeneration = 0;
     int m_effectJobsRunning = 0;
     std::shared_ptr<std::atomic<bool>> m_effectCancel;

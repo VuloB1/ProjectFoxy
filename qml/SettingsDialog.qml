@@ -220,7 +220,7 @@ AppDialog {
                 Item {
                     id: pageColumn
                     width: scroller.width - 12
-                    implicitHeight: root.page === 0 ? appearance.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + 32
+                    implicitHeight: root.page === 0 ? appearance.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + 48
                                        : root.page === 1 ? slideshow.implicitHeight
                                        : root.page === 2 ? saving.implicitHeight : batch.implicitHeight
 
@@ -335,10 +335,28 @@ AppDialog {
                     // The switch itself keeps pictures sharp when zoomed in; the extras below it
                     // are separate switches that only count while the mode is on.
                     Card {
-                        id: pixelCard
+                        id: zoomCard
                         width: parent.width
                         visible: root.page === 0
                         y: appearance.height + 16
+                        heading: qsTr("Zoom")
+                        SettingRow {
+                            label: qsTr("Tipo de zoom con la rueda")
+                            hint: qsTr("«Escalonado» salta de a un paso por vez. «Suavizado» se desliza hacia el nuevo tamaño, con una sensación más fluida.")
+                            AppComboBox {
+                                width: 170
+                                model: [qsTr("Escalonado"), qsTr("Suavizado")]
+                                currentIndex: appSettings.smoothZoom ? 1 : 0
+                                onActivated: function (i) { appSettings.smoothZoom = (i === 1); }
+                            }
+                        }
+                    }
+
+                    Card {
+                        id: pixelCard
+                        width: parent.width
+                        visible: root.page === 0
+                        y: appearance.height + zoomCard.height + 32
                         heading: qsTr("Modo pixel")
                         SettingRow {
                             label: qsTr("Modo pixel")
@@ -417,7 +435,7 @@ AppDialog {
                         id: stripCard
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + pixelCard.height + 32
+                        y: appearance.height + zoomCard.height + pixelCard.height + 48
                         heading: qsTr("Barra de miniaturas")
                         SettingRow {
                             label: qsTr("Cuándo se muestra")

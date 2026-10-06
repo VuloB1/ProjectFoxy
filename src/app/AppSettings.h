@@ -31,6 +31,8 @@ class AppSettings : public QObject {
     // "Modo pixel" (Configuración > Apariencia). `pixelMode` is the switch itself: pictures stay
     // sharp (no smoothing) once zoomed in, up to 64x. The rest are extras of that mode, each one
     // on its own switch, and only count while the mode is on.
+    // Wheel zoom: in fixed steps (false) or glided smoothly towards the new size (true).
+    Q_PROPERTY(bool smoothZoom READ smoothZoom WRITE setSmoothZoom NOTIFY smoothZoomChanged)
     Q_PROPERTY(bool pixelMode READ pixelMode WRITE setPixelMode NOTIFY pixelModeChanged)
     Q_PROPERTY(bool pixelIntegerZoom READ pixelIntegerZoom WRITE setPixelIntegerZoom NOTIFY pixelIntegerZoomChanged)
     Q_PROPERTY(bool pixelCheckerboard READ pixelCheckerboard WRITE setPixelCheckerboard NOTIFY pixelCheckerboardChanged)
@@ -63,6 +65,9 @@ public:
     QString stripMode() const { return m_stripMode; }
     void setStripMode(const QString &value);
 
+    bool smoothZoom() const { return m_smoothZoom; }
+    void setSmoothZoom(bool value);
+
     bool pixelMode() const { return m_pixelMode; }
     void setPixelMode(bool value);
     // Zoom in whole-number steps; a small picture opens enlarged to a whole number.
@@ -94,6 +99,7 @@ signals:
     void stripThumbSizeChanged();
     void stripColumnsChanged();
     void stripModeChanged();
+    void smoothZoomChanged();
     void pixelModeChanged();
     void pixelIntegerZoomChanged();
     void pixelCheckerboardChanged();
@@ -116,6 +122,7 @@ private:
     int m_stripThumbSize = 88;
     int m_stripColumns = 1;
     QString m_stripMode = QStringLiteral("manual");
+    bool m_smoothZoom = false;
     bool m_pixelMode = false;
     bool m_pixelIntegerZoom = false;
     bool m_pixelCheckerboard = false;

@@ -10,6 +10,7 @@
 #include "PaneImageProvider.h"
 #include "AnimStudio.h"
 #include "CollageStudio.h"
+#include "ColorPicker.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -79,6 +80,9 @@ int main(int argc, char *argv[])
 
     auto *batchExporter = new BatchExporter(&engine);
     engine.rootContext()->setContextProperty("batchExporter", batchExporter);
+
+    auto *colorPicker = new ColorPicker(&engine);
+    engine.rootContext()->setContextProperty("colorPicker", colorPicker);
 
     auto *lensController = new LensController(&engine);
     engine.rootContext()->setContextProperty("lensController", lensController);

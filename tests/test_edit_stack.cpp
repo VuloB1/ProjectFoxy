@@ -550,9 +550,10 @@ private slots:
     {
         const QImage src = busyPicture(96, 64);
         for (const EffectSpec &fx : allEffects()) {
-            const QImage out = applyEffect(src, fx.id, defaultEffectValues(fx));
+            const QString text = fx.usesText ? QStringLiteral("Texto") : QString(); // the effects that carry a text need one
+            const QImage out = applyEffect(src, fx.id, defaultEffectValues(fx), 1.0, nullptr, text);
             // the same size - unless the effect says it changes it, and then exactly the size it announces
-            const QSize expected = effectOutputSize(fx.id, defaultEffectValues(fx), src.size());
+            const QSize expected = effectOutputSize(fx.id, defaultEffectValues(fx), src.size(), text);
             QVERIFY2(fx.changesSize || expected == src.size(), qPrintable(fx.id));
             QVERIFY2(out.size() == expected, qPrintable(fx.id));
             QVERIFY2(out.format() == QImage::Format_RGBA8888, qPrintable(fx.id));

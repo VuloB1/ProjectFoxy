@@ -183,6 +183,35 @@ Item {
                 }
             }
 
+            // The effects that carry a text (the meme caption): what it says.
+            Column {
+                width: parent.width
+                spacing: 4
+                visible: appController.effectUsesText
+                Label { text: qsTr("Texto"); color: themeManager.textSecondary }
+                Rectangle {
+                    width: parent.width
+                    height: Math.min(150, Math.max(64, captionText.contentHeight + 16))
+                    radius: themeManager.radiusSmall
+                    color: themeManager.surfaceElevated
+                    border.width: 1
+                    border.color: captionText.activeFocus ? themeManager.accent : themeManager.border
+                    TextArea {
+                        id: captionText
+                        anchors.fill: parent
+                        wrapMode: TextEdit.Wrap
+                        color: themeManager.textPrimary
+                        placeholderText: qsTr("Escribí el texto de la leyenda")
+                        placeholderTextColor: themeManager.textSecondary
+                        selectionColor: themeManager.accent
+                        selectedTextColor: themeManager.accentText
+                        background: null
+                        text: appController.effectText
+                        onTextChanged: if (activeFocus && text !== appController.effectText) appController.setEffectText(text)
+                    }
+                }
+            }
+
             Repeater {
                 model: appController.effectParams
                 delegate: EffectParamRow {

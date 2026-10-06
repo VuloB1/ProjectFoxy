@@ -42,7 +42,7 @@ QImage ImageProvider::requestImage(const QString &id, QSize *size, const QSize &
         image = core::edit::applyLook(image, thumbId, 1.0);
     } else if (thumb == Thumb::Effect) {
         if (const core::edit::EffectSpec *spec = core::edit::findEffect(thumbId))
-            image = core::edit::applyEffect(image, thumbId, core::edit::sampleEffectValues(*spec), 1.0);
+            image = core::edit::applyEffect(image, thumbId, core::edit::sampleEffectValues(*spec), 1.0, nullptr, spec->usesText ? QStringLiteral("Texto") : QString());
     }
 
     if (size)

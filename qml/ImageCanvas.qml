@@ -597,10 +597,47 @@ Rectangle {
     // it only got worse the more you kept zooming in.
     function zoomAt(factor, cx, cy) {
         const oldScale = image.scale;
+        if (appSettings.smoothZoom && !integerZoom && factor !== 1) {
+            // smooth zoom: the wheel only moves the target; smoothTick() glides towards it, keeping the point
+            // under the cursor (kept as a viewport position, because the content moves while it glides)
+            const base = smoothActive ? smoothTarget : oldScale;
+            smoothTarget = Math.min(topScale, Math.max(minScale, base * factor));
+            smoothVx = cx - flick.contentX;
+            smoothVy = cy - flick.contentY;
+            smoothActive = true;
+            return;
+        }
+        smoothActive = false;
         const wanted = integerZoom ? (factor > 1 ? stepScale(oldScale, 1) : factor < 1 ? stepScale(oldScale, -1) : oldScale)
                                  : oldScale * factor;
-        const newScale = Math.min(topScale, Math.max(minScale, wanted));
-        if (Math.abs(newScale - oldScale) < 0.0001)
+        applyZoomAt(Math.min(topScale, Math.max(minScale, wanted)), cx, cy);
+    }
+
+    property bool smoothActive: false
+    property real smoothTarget: 1
+    property real smoothVx: 0
+    property real smoothVy: 0
+    // Any other change of the view (fit, 100%, a new picture) ends the glide.
+    onFitModeChanged: if (fitMode) smoothActive = false
+    FrameAnimation {
+        running: root.smoothActive
+        onTriggered: {
+            const cur = image.scale, target = root.smoothTarget;
+            // closes ~a third of the remaining distance (in the ratio of the sizes) every 16 ms: quick to start
+            // and settling softly
+            const k = 1 - Math.exp(-frameTime / 0.06);
+            let next = cur * Math.pow(target / cur, k);
+            if (Math.abs(next - target) / target < 0.003) {
+                next = target;
+                root.smoothActive = false;
+            }
+            root.applyZoomAt(next, flick.contentX + root.smoothVx, flick.contentY + root.smoothVy);
+        }
+    }
+
+    function applyZoomAt(newScale, cx, cy) {
+        const oldScale = image.scale;
+        if (Math.abs(newScale - oldScale) < 0.00001)
             return;
 
         const oldImgX = contentImageX(oldScale);
@@ -962,7 +999,14 @@ Rectangle {
 
         TapHandler {
             acceptedButtons: Qt.LeftButton
+            enabled: !root.pickerOn
             onDoubleTapped: root.toggleActualSize()
+        }
+        // with Alt held a click picks the colour under the cursor
+        TapHandler {
+            acceptedButtons: Qt.LeftButton
+            enabled: root.pickerOn
+            onTapped: root.pickColor()
         }
 
         // A plain MouseArea (not a WheelHandler on a parent item) is what
@@ -1034,19 +1078,51 @@ Rectangle {
         }
     }
 
-    // Modo pixel: which pixel the cursor is over and its colour.
+    // The colour readout (Modo pixel > "mostrar posición y color") and the eyedropper: holding Alt shows the
+    // readout whatever the setting says, turns the cursor into an eyedropper, and a click copies the colour
+    // as #RRGGBB.
     readonly property bool readoutOn: pixelMode && appSettings.pixelReadout
-    HoverHandler { id: pixelHover; enabled: root.readoutOn }
+    property bool altDown: false
+    readonly property bool pickerOn: altDown && !cropActive && !editMode
+    readonly property bool readoutVisible: readoutOn || pickerOn
+    property string copiedHex: ""
+    HoverHandler { id: pixelHover }
+    // Alt is polled (pressing it alone sends no mouse event), only while the mouse is over the picture
+    Timer {
+        interval: 50
+        repeat: true
+        running: pixelHover.hovered
+        onTriggered: root.altDown = colorPicker.altDown()
+    }
+    Connections {
+        target: pixelHover
+        function onHoveredChanged() { if (!pixelHover.hovered) root.altDown = false; }
+    }
+    onPickerOnChanged: colorPicker.setCursor(pickerOn && pixelHover.hovered)
+    Connections {
+        target: pixelHover
+        function onHoveredChanged() { colorPicker.setCursor(root.pickerOn && pixelHover.hovered); }
+    }
+    Timer { id: copiedTimer; interval: 1600; onTriggered: root.copiedHex = "" }
+    function pickColor() {
+        const info = appController.pixelAt(pixelCell.x, pixelCell.y);
+        if (info.valid !== true)
+            return;
+        const text = colorPicker.hex(info.r, info.g, info.b, info.a);
+        colorPicker.copyText(text);
+        copiedHex = text;
+        copiedTimer.restart();
+    }
     readonly property point pixelCell: {
         void (image.scale + flick.contentX + flick.contentY + image.rotation); // follow zoom / pan too
         const p = image.mapFromItem(root, pixelHover.point.position.x, pixelHover.point.position.y);
         return Qt.point(Math.floor(p.x), Math.floor(p.y));
     }
-    readonly property var pixelInfo: root.readoutOn && pixelHover.hovered
+    readonly property var pixelInfo: root.readoutVisible && pixelHover.hovered
         ? appController.pixelAt(pixelCell.x, pixelCell.y) : ({ valid: false })
 
     Rectangle {
-        visible: root.readoutOn && root.pixelInfo.valid === true
+        visible: root.readoutVisible && root.pixelInfo.valid === true
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.margins: 12
@@ -1079,8 +1155,10 @@ Rectangle {
             color: themeManager.textPrimary
             font.pixelSize: 12
             text: root.pixelInfo.valid === true
-                  ? qsTr("X %1  Y %2   RGBA %3 %4 %5 %6").arg(root.pixelCell.x).arg(root.pixelCell.y)
-                        .arg(root.pixelInfo.r).arg(root.pixelInfo.g).arg(root.pixelInfo.b).arg(root.pixelInfo.a)
+                  ? (root.copiedHex !== ""
+                     ? qsTr("X %1  Y %2   %3   ·   Copiado").arg(root.pixelCell.x).arg(root.pixelCell.y).arg(root.copiedHex)
+                     : qsTr("X %1  Y %2   %3").arg(root.pixelCell.x).arg(root.pixelCell.y)
+                           .arg(colorPicker.hex(root.pixelInfo.r, root.pixelInfo.g, root.pixelInfo.b, root.pixelInfo.a)))
                   : ""
         }
     }

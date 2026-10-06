@@ -58,7 +58,7 @@ integrado de fotos. Interfaz en español. Tres temas visuales: *Moderno Claro*,
   fondo de escritorio, papelera, panel de información con EXIF e histograma.
 - **Respeta la orientación EXIF** (fotos de móvil), en tamaño completo y en miniatura.
 - GIF, APNG y WebP animados con reproducción real.
-- **Varias imágenes** (2 a 6 a la vez) con zoom y desplazamiento vinculados (4.16).
+- **Comparador** (antes «Varias imágenes»: 2 a 10 a la vez, disposición automática / fila / columna) con zoom y desplazamiento vinculados (4.16, 4.19).
 - Exportación por lote (JPG/WebP con calidad configurable, renombrado con relleno de
   dígitos); conserva los metadatos del original. Configuración en un `.ini`.
 
@@ -598,6 +598,29 @@ texto se achica si no cabe a lo ancho y nunca sale del cuadro. La vista previa g
 fotogramas ya decorados (la firma del estilo entra en la clave de la caché). «A todos» copia el
 estilo y la tira marca con «Fx» los fotogramas que lo tienen. Prueba en `test_anim` (decorar) y
 `test_anim_studio` (modelo y exportación).
+
+### 4.19 Cambios del 6 de octubre
+- **Barra superior**: «GIF animado» y «Collage» son botones sueltos; «Exportar por lote» y «Renombrar por lote»
+  pasaron al menú «⋯» (`Toolbar.qml`).
+- **Comparador** (`MultiView.qml`): hasta 10 paneles y tres disposiciones. La automática prueba todas las
+  repartos en filas (1…n filas, cada fila con las imágenes que le tocan) y se queda con el que cubre más
+  superficie al encajar cada imagen en su celda según su proporción (`plan()`/`relayout()`); se recalcula al
+  cambiar la cantidad, el tamaño de la ventana o cuando se conoce la forma de una imagen.
+- **Leyenda (meme)** (`EffectsCaption.cpp`, efecto «caption» del grupo Acabado): primer efecto con **texto**.
+  `EffectOp` lleva un `QString text`, `applyEffect`/`effectOutputSize` lo reciben y `AppController` lo expone
+  (`effectUsesText`, `effectText`, `setEffectText`). Todo se mide en % del ANCHO de la imagen (la vista previa
+  de 1600 px y el original dan lo mismo); el texto se ajusta al ancho con `QTextLayout` y la franja crece lo
+  que haga falta, por eso cambia el tamaño. Modos: franja arriba/abajo o texto sobre la imagen (contorno por
+  desplazamientos en círculo). Cuatro preajustes (meme de franja blanca, franja negra, estilo Impact, subtítulo).
+- **Cuentagotas** (`ColorPicker`): `altDown()` se consulta cada 50 ms mientras el mouse está sobre la imagen
+  (apretar Alt no manda ningún evento de mouse), el cursor se cambia con `QGuiApplication::setOverrideCursor` y el
+  clic copia `#RRGGBB` (`#RRGGBBAA` si no es opaco). La lectura de píxel muestra HEX en lugar de RGBA y aparece
+  también con Alt aunque el modo pixel esté apagado.
+- **Zoom suavizado** (`AppSettings.smoothZoom`, por defecto apagado): la rueda solo mueve un objetivo y una
+  `FrameAnimation` se acerca a él geométricamente (constante de tiempo ~60 ms) manteniendo bajo el cursor el
+  punto elegido (guardado como posición en la ventana, porque el contenido se mueve mientras tanto).
+- **Arrastrar y soltar** en el estudio de GIF vale en toda la ventana y las rutas llegan como texto; el diálogo de
+  archivos y los *drops* de GIF y Collage convierten las URL antes de pasarlas a C++.
 
 ### 4.18 Collage
 `core/collage`: el collage son **celdas rectangulares** (`Cell`: rectángulo normalizado +

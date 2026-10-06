@@ -471,6 +471,52 @@ private slots:
         QCOMPARE(m_ctl->currentImageSize(), preview);
     }
 
+    // The meme caption carries a text beside its sliders: the preview grows the picture by the band, the text is
+    // part of the undo step, and a text of nothing leaves the picture alone.
+    void theCaptionKeepsItsTextThroughUndoAndRedo()
+    {
+        const QString a = file("cap.png", busyImage(400, 300));
+        open(a);
+        m_ctl->selectEffect(QStringLiteral("caption"));
+        QVERIFY(m_ctl->effectUsesText());
+        QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 10000);
+        QCOMPARE(m_ctl->currentImageSize(), QSize(400, 300)); // no text yet
+        m_ctl->setEffectText(QStringLiteral("Hola mundo"));
+        QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 10000);
+        QVERIFY(m_ctl->currentImageSize().height() > 300);
+        const QSize with = m_ctl->currentImageSize();
+        m_ctl->commitEffect();
+        QCOMPARE(m_ctl->currentImageSize(), with);
+        m_ctl->undoEdit();
+        QCOMPARE(m_ctl->currentImageSize(), QSize(400, 300));
+        m_ctl->redoEdit();
+        QCOMPARE(m_ctl->currentImageSize(), with);
+        QVERIFY(!m_ctl->effectUsesText()); // nothing is being previewed any more
+    }
+
+    // The same, stretching lengthways (the Vertical slider and the guides above and below).
+    void stretchingVerticallyResizesTheViewToo()
+    {
+        for (const QSize size : {QSize(400, 300), QSize(2400, 3200)}) { // the big one is calculated on a smaller copy first
+            const QString a = file(QString("v%1.png").arg(size.width()), busyImage(size.width(), size.height()));
+            open(a);
+            QCOMPARE(m_ctl->currentImageSize(), size);
+            m_ctl->selectEffect(QStringLiteral("stretch"));
+            QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 30000);
+            m_ctl->setEffectValue(4, 100); // Horizontal: none
+            m_ctl->setEffectValue(5, 200); // Vertical: the middle band twice as tall
+            QTRY_VERIFY_WITH_TIMEOUT(!m_ctl->effectBusy(), 30000);
+            QCOMPARE(m_ctl->currentImageSize().width(), size.width());
+            QVERIFY2(m_ctl->currentImageSize().height() > size.height() * 1.25,
+                     qPrintable(QString::number(m_ctl->currentImageSize().height())));
+            const QSize preview = m_ctl->currentImageSize();
+            m_ctl->commitEffect();
+            QCOMPARE(m_ctl->currentImageSize(), preview);
+            m_ctl->undoEdit();
+            QCOMPARE(m_ctl->currentImageSize(), size);
+        }
+    }
+
     // The Marco page of Recortar is the hidden "frame" effect: the outline, margin and shadow make the picture
     // bigger (and "Mantener el tamaño" brings it back), it is one undo step, and it is not offered in the
     // effects grid.

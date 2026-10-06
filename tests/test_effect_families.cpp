@@ -638,6 +638,78 @@ private slots:
         return img;
     }
 
+    void theCaptionAddsABandWithTheText()
+    {
+        QImage src(400, 300, QImage::Format_RGBA8888);
+        src.fill(QColor(30, 90, 200));
+        const EffectSpec *fx = findEffect(QStringLiteral("caption"));
+        QVERIFY(fx && fx->changesSize && fx->usesText && !fx->hidden);
+        EffectValues v = defaultEffectValues(*fx); // a white band on top, black bold text
+        const QString text = QStringLiteral("Can you gift me a game on Steam?");
+
+        // nothing to say, nothing to do
+        QCOMPARE(applyEffect(src, QStringLiteral("caption"), v, 1.0, nullptr, QString()), src);
+        QCOMPARE(effectOutputSize(QStringLiteral("caption"), v, src.size(), QStringLiteral("  ")), src.size());
+
+        const QImage out = applyEffect(src, QStringLiteral("caption"), v, 1.0, nullptr, text);
+        QCOMPARE(out.width(), 400);
+        QVERIFY(out.height() > 300 + 20);
+        QCOMPARE(effectOutputSize(QStringLiteral("caption"), v, src.size(), text), out.size());
+        const int band = out.height() - 300;
+        QCOMPARE(out.pixelColor(2, 2), QColor(255, 255, 255));      // the band is white...
+        QCOMPARE(out.pixelColor(200, band + 150), QColor(30, 90, 200)); // ...and the picture is under it, untouched
+        int dark = 0;
+        for (int y = 0; y < band; ++y)
+            for (int x = 0; x < 400; ++x)
+                if (out.pixelColor(x, y).red() < 100)
+                    ++dark;
+        QVERIFY(dark > 200); // the text is there
+
+        // longer text wraps and makes the band taller; bigger letters too
+        const QImage longer = applyEffect(src, QStringLiteral("caption"), v, 1.0, nullptr, text + text + text);
+        QVERIFY(longer.height() > out.height());
+        EffectValues big = v;
+        big[1] = 14;
+        QVERIFY(effectOutputSize(QStringLiteral("caption"), big, src.size(), text).height() > out.height());
+
+        // below instead of above
+        v[0] = 1;
+        const QImage below = applyEffect(src, QStringLiteral("caption"), v, 1.0, nullptr, text);
+        QCOMPARE(below.size(), out.size());
+        QCOMPARE(below.pixelColor(200, 5), QColor(30, 90, 200));
+        QCOMPARE(below.pixelColor(2, below.height() - 2), QColor(255, 255, 255));
+
+        // over the picture: the same size, the text in white with an outline
+        v[0] = 2; v[6] = 16777215; v[8] = 1;
+        const QImage over = applyEffect(src, QStringLiteral("caption"), v, 1.0, nullptr, text);
+        QCOMPARE(over.size(), src.size());
+        int white = 0, black = 0;
+        for (int y = 0; y < 100; ++y)
+            for (int x = 0; x < 400; ++x) {
+                const QColor c = over.pixelColor(x, y);
+                white += c.red() > 240 && c.green() > 240;
+                black += c.red() < 20 && c.green() < 20 && c.blue() < 20;
+            }
+        QVERIFY(white > 100 && black > 100);
+        QCOMPARE(over.pixelColor(200, 250), QColor(30, 90, 200)); // far from the text, untouched
+    }
+
+    void stretchWorksVerticallyToo()
+    {
+        const QImage src = rulerPicture(400, 300);
+        const EffectSpec *fx = findEffect(QStringLiteral("stretch"));
+        EffectValues v = defaultEffectValues(*fx);
+        v[2] = 25; v[3] = 75; v[4] = 100; v[5] = 200; v[6] = 0; v[7] = 0; // double the middle half, lengthways
+        const QImage out = applyEffect(src, QStringLiteral("stretch"), v);
+        QCOMPARE(out.size(), QSize(400, 300 + 150));
+        QCOMPARE(effectOutputSize(QStringLiteral("stretch"), v, src.size()), out.size());
+        for (int y : {0, 40, 74})
+            QVERIFY(qAbs(qGreen(at(out, 100, y)) - qGreen(at(src, 100, y))) <= 1);
+        for (int y : {225, 260, 299})
+            QVERIFY(qAbs(qGreen(at(out, 100, y + 150)) - qGreen(at(src, 100, y))) <= 1);
+        QVERIFY(qAbs(qGreen(at(out, 100, 225)) - qGreen(at(src, 100, 150))) <= 2);
+    }
+
     void stretchScalesOnlyTheBandBetweenTheGuides()
     {
         const QImage src = rulerPicture(400, 300);

@@ -64,7 +64,7 @@ QImage applyOperation(const QImage &source, const Operation &op)
         else if constexpr (std::is_same_v<T, FlipOp>) return applyFlip(source, concreteOp);
         else if constexpr (std::is_same_v<T, AdjustOp>) return applyAdjustOp(source, concreteOp);
         else if constexpr (std::is_same_v<T, FilterPresetOp>) return applyLook(source, concreteOp.presetId, concreteOp.intensity);
-        else if constexpr (std::is_same_v<T, EffectOp>) return applyEffect(source, concreteOp.effectId, concreteOp.values, concreteOp.mix);
+        else if constexpr (std::is_same_v<T, EffectOp>) return applyEffect(source, concreteOp.effectId, concreteOp.values, concreteOp.mix, nullptr, concreteOp.text);
         else if constexpr (std::is_same_v<T, LiveOp>) return source; // a live-overlay snapshot: no pixels change
         else return source;
     }, op);

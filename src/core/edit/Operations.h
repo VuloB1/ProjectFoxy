@@ -155,6 +155,7 @@ struct EffectOp {
     QString effectId;
     EffectValues values{};
     double mix = 1.0;
+    QString text; // for the effects that carry a text (the meme caption); "" for the rest
     bool operator==(const EffectOp &) const = default;
 };
 

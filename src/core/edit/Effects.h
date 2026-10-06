@@ -78,6 +78,8 @@ struct EffectSpec {
     bool changesSize = false;
     // Left out of the effects grid: it exists to be driven by a dedicated tool (the lens correction).
     bool hidden = false;
+    // The effect carries a text beside its sliders (the meme caption): see applyEffect's `text`.
+    bool usesText = false;
 };
 
 struct EffectGroup {
@@ -109,11 +111,11 @@ EffectValues sampleEffectValues(const EffectSpec &spec);
 // `cancel` (optional) is polled while working: once another thread sets it the
 // call returns quickly with an UNFINISHED image that the caller must discard.
 QImage applyEffect(const QImage &source, const QString &id, const EffectValues &values, double mix = 1.0,
-                   const std::atomic<bool> *cancel = nullptr);
+                   const std::atomic<bool> *cancel = nullptr, const QString &text = QString());
 
 // The size applyEffect() will return for a picture of `input` size (always `input` unless the effect
 // is flagged changesSize). It is what lets a preview computed on a shrunken copy be put at the
 // right size.
-QSize effectOutputSize(const QString &id, const EffectValues &values, QSize input);
+QSize effectOutputSize(const QString &id, const EffectValues &values, QSize input, const QString &text = QString());
 
 } // namespace core::edit

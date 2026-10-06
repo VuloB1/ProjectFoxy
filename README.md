@@ -20,7 +20,10 @@ Oscuro* y *Windows 98*.
 - Respeta la **orientación EXIF** (fotos de móvil) y abre archivos y carpetas con
   cualquier nombre (acentos, japonés, cirílico, emoji).
 - GIF, APNG y WebP animados con reproducción real.
-- **Varias imágenes** a la vez (2 a 6) con zoom y desplazamiento vinculados, que se pueden desvincular.
+- **Comparador**: de 2 a 10 imágenes a la vez, acomodadas solas según su forma, en una fila o en una columna, con zoom y desplazamiento vinculados que se pueden desvincular.
+- **Leyenda (meme)**: franja de color con texto arriba o abajo de la imagen, o el texto sobre ella con contorno.
+- **Cuentagotas**: con Alt apretado el cursor pasa a cuentagotas y un clic copia el color en `#RRGGBB`.
+- **Zoom suavizado** (opcional, en Configuración) además del escalonado de siempre.
 - Exportación por lote (JPG/WebP, conserva los metadatos) y configuración persistida
   en un `.ini`.
 

@@ -20,7 +20,7 @@ AppPanelBackground {
     property bool locked: false
     // "Varias imágenes" is on (owned by Main.qml too).
     property bool multiMode: false
-    // A creation studio ("gif") is open: they take over the window, so nothing else is offered meanwhile.
+    // A creation studio ("gif" or "collage") is open: they take over the window, so nothing else is offered meanwhile.
     property string studio: ""
     signal editModeRequested(bool on)
     signal multiModeRequested(bool on)
@@ -64,29 +64,23 @@ AppPanelBackground {
             onToggled: root.editModeRequested(checked)
         }
         AppToolButton {
-            id: createButton
-            text: qsTr("Crear")
+            text: qsTr("GIF animado")
             iconName: "film"
             iconOnly: true
             enabled: !root.locked
-            checked: root.studio !== ""
-            onClicked: createMenu.popup(createButton, 0, createButton.height + 4)
-            AppMenu {
-                id: createMenu
-                AppMenuItem {
-                    iconName: "film"
-                    text: qsTr("GIF animado…")
-                    onTriggered: root.studioRequested("gif")
-                }
-                AppMenuItem {
-                    iconName: "collage"
-                    text: qsTr("Collage…")
-                    onTriggered: root.studioRequested("collage")
-                }
-            }
+            checked: root.studio === "gif"
+            onClicked: root.studioRequested("gif")
         }
         AppToolButton {
-            text: qsTr("Varias imágenes (con zoom vinculado)")
+            text: qsTr("Collage")
+            iconName: "collage"
+            iconOnly: true
+            enabled: !root.locked
+            checked: root.studio === "collage"
+            onClicked: root.studioRequested("collage")
+        }
+        AppToolButton {
+            text: qsTr("Comparador (varias imágenes con zoom vinculado)")
             iconName: "multi"
             iconOnly: true
             checkable: true
@@ -95,18 +89,26 @@ AppPanelBackground {
             onToggled: root.multiModeRequested(checked)
         }
         AppToolButton {
-            text: qsTr("Exportar por lote")
-            iconName: "export-batch"
+            id: moreButton
+            text: qsTr("Más herramientas")
+            iconName: "more"
             iconOnly: true
-            enabled: folderModel.count > 0 && !root.locked
-            onClicked: batchExportDialog.open()
-        }
-        AppToolButton {
-            text: qsTr("Renombrar por lote")
-            iconName: "rename-batch"
-            iconOnly: true
-            enabled: folderModel.count > 0 && !root.locked
-            onClicked: batchRenameDialog.open()
+            onClicked: moreMenu.popup(moreButton, moreButton.width - moreMenu.width, moreButton.height + 4)
+            AppMenu {
+                id: moreMenu
+                AppMenuItem {
+                    iconName: "export-batch"
+                    text: qsTr("Exportar por lote…")
+                    enabled: folderModel.count > 0 && !root.locked
+                    onTriggered: batchExportDialog.open()
+                }
+                AppMenuItem {
+                    iconName: "rename-batch"
+                    text: qsTr("Renombrar por lote…")
+                    enabled: folderModel.count > 0 && !root.locked
+                    onTriggered: batchRenameDialog.open()
+                }
+            }
         }
         AppToolButton {
             text: qsTr("Información")

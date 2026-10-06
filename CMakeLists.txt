@@ -105,6 +105,8 @@ add_library(imageviewer_app STATIC
     src/app/AnimStudio.cpp
     src/app/CollageStudio.h
     src/app/CollageStudio.cpp
+    src/app/ColorPicker.h
+    src/app/ColorPicker.cpp
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)

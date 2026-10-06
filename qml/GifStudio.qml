@@ -426,10 +426,6 @@ Item {
             }
         }
 
-        DropArea {
-            anchors.fill: parent
-            onDropped: function (drop) { if (drop.hasUrls) animStudio.addUrls(drop.urls); }
-        }
     }
 
     // ---------------------------------------------------------------- the right side: options
@@ -907,6 +903,15 @@ Item {
                     onClicked: { root.resultText = ""; saveDialog.open(); }
                 }
             }
+        }
+    }
+
+    // files dropped anywhere on the studio (from Explorer) are added to the strip
+    DropArea {
+        anchors.fill: parent
+        onDropped: function (drop) {
+            if (drop.hasUrls)
+                animStudio.addUrls(Array.from(drop.urls, u => u.toString()));
         }
     }
 

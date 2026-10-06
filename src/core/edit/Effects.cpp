@@ -677,6 +677,7 @@ std::vector<EffectSpec> buildCatalogue()
     addPatternSpecs(catalogue);
     addLightSpecs(catalogue);
     addGeometrySpecs(catalogue);
+    catalogue.push_back(captionSpec());
     return catalogue;
 }
 
@@ -759,7 +760,7 @@ EffectValues applyEffectPreset(const EffectSpec &spec, const EffectPreset &prese
     return values;
 }
 
-QSize effectOutputSize(const QString &id, const EffectValues &values, QSize input)
+QSize effectOutputSize(const QString &id, const EffectValues &values, QSize input, const QString &text)
 {
     const EffectSpec *spec = findEffect(id);
     if (!spec || !spec->changesSize || input.width() < 2 || input.height() < 2)
@@ -767,11 +768,13 @@ QSize effectOutputSize(const QString &id, const EffectValues &values, QSize inpu
     EffectValues v = values;
     for (size_t i = 0; i < spec->params.size() && i < v.size(); ++i)
         v[i] = clampd(v[i], spec->params[i].min, spec->params[i].max);
+    if (id == QLatin1String("caption"))
+        return captionOutputSize(v, text, input);
     return geometryOutputSize(id, v, input);
 }
 
 QImage applyEffect(const QImage &source, const QString &id, const EffectValues &values, double mix,
-                   const std::atomic<bool> *cancel)
+                   const std::atomic<bool> *cancel, const QString &text)
 {
     const Job job{cancel};
     const EffectSpec *spec = findEffect(id);
@@ -791,7 +794,9 @@ QImage applyEffect(const QImage &source, const QString &id, const EffectValues &
     const double longSide = std::max(straight.width(), straight.height());
 
     QImage result;
-    if (renderColor(job, id, straight, v, longSide, result) || renderPattern(job, id, straight, v, longSide, result)
+    if (id == QLatin1String("caption")) {
+        result = fxCaption(job, straight, v, text);
+    } else if (renderColor(job, id, straight, v, longSide, result) || renderPattern(job, id, straight, v, longSide, result)
         || renderLight(job, id, straight, v, longSide, result) || renderGeometry(job, id, straight, v, longSide, result)) {
         // one of the newer families
     } else if (usesPremultiplied(id)) {

@@ -372,9 +372,9 @@ Item {
                             collageStudio.setPicture(cell, drop.urls[0].toString());
                             collageStudio.select(cell);
                             if (drop.urls.length > 1)
-                                collageStudio.addUrls(drop.urls.slice(1));
+                                collageStudio.addUrls(Array.from(drop.urls.slice(1), u => u.toString()));
                         } else {
-                            collageStudio.addUrls(drop.urls);
+                            collageStudio.addUrls(Array.from(drop.urls, u => u.toString()));
                         }
                     }
                 }

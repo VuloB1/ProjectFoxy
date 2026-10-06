@@ -45,6 +45,7 @@ add_library(imageviewer_core STATIC
     edit/EffectsGeometry.cpp
     edit/EffectsLens.cpp
     edit/EffectsFrame.cpp
+    edit/EffectsCaption.cpp
     lens/LensDatabase.h
     lens/LensDatabase.cpp
     edit/Blend.h

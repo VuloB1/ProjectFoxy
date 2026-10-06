@@ -482,7 +482,7 @@ QImage AppController::currentBaked() const
     if (!m_effectId.isEmpty() && m_effectMix > 0.0) {
         img = (m_effectFullValid && !m_effectFull.isNull())
                   ? m_effectFull // the exact full-size result, already calculated
-                  : core::edit::applyEffect(img, m_effectId, m_effectValues, m_effectMix);
+                  : core::edit::applyEffect(img, m_effectId, m_effectValues, m_effectMix, nullptr, m_effectText);
     }
     return core::edit::renderLiveOverlay(img, m_liveFilterPreset, m_liveFilterIntensity, m_liveAdjust);
 }
@@ -1246,6 +1246,7 @@ void AppController::dropEffectPreview()
     m_effectId.clear();
     m_effectValues = {};
     m_effectMix = 1.0;
+    m_effectText.clear();
     emit effectChanged();
     emit effectValuesChanged();
     emit effectBusyChanged();
@@ -1267,6 +1268,7 @@ void AppController::selectEffect(const QString &id)
     m_effectId = id;
     m_effectValues = core::edit::defaultEffectValues(*spec);
     m_effectMix = 1.0;
+    m_effectText.clear();
     emit effectChanged();
     emit effectValuesChanged();
     if (firstEffect)
@@ -1286,6 +1288,22 @@ void AppController::setEffectValue(int index, qreal value)
     if (v == m_effectValues[size_t(index)])
         return;
     m_effectValues[size_t(index)] = v;
+    emit effectValuesChanged();
+    scheduleEffectPreview();
+}
+
+bool AppController::effectUsesText() const
+{
+    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
+    return spec && spec->usesText;
+}
+
+void AppController::setEffectText(const QString &text)
+{
+    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
+    if (!spec || !spec->usesText || text == m_effectText)
+        return;
+    m_effectText = text.left(1000);
     emit effectValuesChanged();
     scheduleEffectPreview();
 }
@@ -1388,7 +1406,8 @@ void AppController::startEffectJob(int stage)
     const int generation = m_effectGeneration;
     const std::shared_ptr<std::atomic<bool>> cancel = m_effectCancel;
     // What the exact result measures: the same as the picture, unless the effect changes the size.
-    const QSize fullSize = core::edit::effectOutputSize(id, values, base.size());
+    const QString text = m_effectText;
+    const QSize fullSize = core::edit::effectOutputSize(id, values, base.size(), text);
 
     ++m_effectJobsRunning;
     emit effectBusyChanged();
@@ -1396,7 +1415,7 @@ void AppController::startEffectJob(int stage)
     // m_effectPool runs this task; its row bands go to the dedicated
     // rowWorkerPool (see ParallelRows.h), so waiting on them cannot deadlock.
     m_effectPool.start(QRunnable::create([=, this]() {
-        QImage out = core::edit::applyEffect(input, id, values, mix, cancel.get());
+        QImage out = core::edit::applyEffect(input, id, values, mix, cancel.get(), text);
         const bool cancelled = cancel->load();
         if (cancelled)
             out = QImage(); // a stale, half-written result: do not carry a full-size buffer around until the GUI thread discards it
@@ -1450,7 +1469,7 @@ void AppController::commitPendingEffect(bool republish)
         return;
     }
 
-    const core::edit::EffectOp op{m_effectId, m_effectValues, m_effectMix};
+    const core::edit::EffectOp op{m_effectId, m_effectValues, m_effectMix, m_effectText};
     // When the exact full-size result for these very settings is already
     // there, it IS what replaying the stack would produce - reuse it instead of
     // calculating it a second time.

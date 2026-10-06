@@ -273,6 +273,10 @@ EffectSpec lensSpec();
 EffectSpec frameSpec();
 QImage fxFrameRender(const Job &job, const QImage &src, const EffectValues &v);
 QSize frameOutputSize(const EffectValues &v, QSize input);
+// The meme caption (EffectsCaption.cpp): a band with a text, or the text over the picture.
+EffectSpec captionSpec();
+QImage fxCaption(const Job &job, const QImage &src, const EffectValues &v, const QString &text);
+QSize captionOutputSize(const EffectValues &v, const QString &text, QSize input);
 // The size a geometry effect gives a picture of `input` size (see effectOutputSize()).
 QSize geometryOutputSize(const QString &id, const EffectValues &v, QSize input);
 
