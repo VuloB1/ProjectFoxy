@@ -18,6 +18,8 @@ QString FrameStyle::signature() const
     if (!effectId.isEmpty() && effectMix > 0.0)
         s += QStringLiteral("fx:%1/%2/%3;").arg(effectId).arg(effectPreset).arg(effectMix, 0, 'f', 3);
     if (!text.text.trimmed().isEmpty())
+        s += QStringLiteral("cp:%1|%2;").arg(caption).arg(bandColor.rgba(), 0, 16);
+    if (!text.text.trimmed().isEmpty())
         s += QStringLiteral("tx:%1|%2|%3,%4|%5|%6|%7|%8|%9;").arg(text.text, text.family).arg(text.x, 0, 'f', 4).arg(text.y, 0, 'f', 4)
                  .arg(text.size, 0, 'f', 3).arg(text.bold).arg(text.color.rgba(), 0, 16).arg(text.outline).arg(text.outlineColor.rgba(), 0, 16);
     return s;
@@ -109,7 +111,36 @@ QImage decorate(const QImage &fitted, const FrameStyle &style)
 {
     if (style.isPlain() || fitted.isNull())
         return fitted;
+    if (style.caption >= 0 && !style.text.text.trimmed().isEmpty())
+        return withEffect(fitted, style); // a caption needs the room it takes from the picture: see renderFrame()
     return withText(withEffect(fitted, style), style.text);
+}
+
+QImage renderFrame(const QImage &source, const Settings &settings, const FrameStyle &style)
+{
+    const bool captioned = style.caption >= 0 && !style.text.text.trimmed().isEmpty();
+    if (!captioned)
+        return decorate(fitToCanvas(source, settings), style);
+
+    const int W = settings.size.width(), H = settings.size.height();
+    auto rgb = [](const QColor &c) { return unsigned((c.red() << 16) | (c.green() << 8) | c.blue()); };
+    // the letters are asked for as a share of the short side, the caption wants them as a share of the width
+    double size = style.text.size * std::min(W, H) / double(W);
+    edit::EffectValues values = edit::captionValues(style.caption, size, rgb(style.text.color), rgb(style.bandColor));
+    int band = std::max(0, edit::effectOutputSize(QStringLiteral("caption"), values, settings.size, style.text.text).height() - H);
+    // a band may not eat the picture: a long text on a small canvas gets smaller letters instead
+    for (int guard = 0; guard < 12 && band > H * 0.55 && size > 1.0; ++guard) {
+        size *= 0.8;
+        values = edit::captionValues(style.caption, size, rgb(style.text.color), rgb(style.bandColor));
+        band = std::max(0, edit::effectOutputSize(QStringLiteral("caption"), values, settings.size, style.text.text).height() - H);
+    }
+    Settings inner = settings;
+    inner.size = QSize(W, std::max(8, H - band));
+    const QImage picture = withEffect(fitToCanvas(source, inner), style);
+    QImage out = edit::applyEffect(picture, QStringLiteral("caption"), values, 1.0, nullptr, style.text.text);
+    if (out.size() != settings.size)
+        out = out.scaled(settings.size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    return out.convertToFormat(QImage::Format_RGBA8888);
 }
 
 } // namespace core::anim

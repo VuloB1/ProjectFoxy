@@ -616,7 +616,15 @@ estilo y la tira marca con «Fx» los fotogramas que lo tienen. Prueba en `test_
   (apretar Alt no manda ningún evento de mouse), el cursor se cambia con `QGuiApplication::setOverrideCursor` y el
   clic copia `#RRGGBB` (`#RRGGBBAA` si no es opaco). La lectura de píxel muestra HEX en lugar de RGBA y aparece
   también con Alt aunque el modo pixel esté apagado.
-- **Zoom suavizado** (`AppSettings.smoothZoom`, por defecto apagado): la rueda solo mueve un objetivo y una
+- **Leyenda en el estudio de GIF**: `FrameStyle.caption` (-1 = texto libre; 0..3 = un preajuste de la leyenda) y
+  `renderFrame()` (Decorate.cpp): calcula cuánto mide la franja con `effectOutputSize("caption")`, encaja la imagen
+  en lo que queda del lienzo, le aplica el efecto del fotograma y recién después añade la franja y el texto, así
+  el lienzo conserva su tamaño y la imagen no se tapa. `captionValues()` (Effects.h) arma los valores sin el panel.
+  Si el texto no cabe se achican las letras hasta que la franja ocupe menos del 55 % del alto.
+- **Estirar**: mover una guía mientras su Horizontal/Vertical está en 100 % pone esa dirección en 150 %
+  (`AppController::setEffectValue`); sin eso, la guía no mostraba nada.
+- **Zoom suavizado** (`AppSettings.smoothZoom`, por defecto apagado; con «Zoom en números enteros» del modo pixel
+  también se desliza, hacia el siguiente paso entero): la rueda solo mueve un objetivo y una
   `FrameAnimation` se acerca a él geométricamente (constante de tiempo ~60 ms) manteniendo bajo el cursor el
   punto elegido (guardado como posición en la ventana, porque el contenido se mueve mientras tanto).
 - **Arrastrar y soltar** en el estudio de GIF vale en toda la ventana y las rutas llegan como texto; el diálogo de

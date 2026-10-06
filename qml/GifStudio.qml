@@ -592,6 +592,8 @@ Item {
                     readonly property int effectIndex: { for (let i = 0; i < effects.length; ++i) if (effects[i].id === st.effectId) return i; return -1; }
                     readonly property var presetNames: effectIndex >= 0 ? effects[effectIndex].presets : []
                     readonly property bool has: root.currentIndex >= 0 && root.currentIndex < root.count
+                    // the text is a meme caption (a band or text with outline from the Efectos catalogue)
+                    readonly property bool captioned: (st.caption ?? -1) >= 0
                     function rgbColor(v) { return Qt.rgba(((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255, 1); }
                     function packed(c) { return (Math.round(c.r * 255) << 16) | (Math.round(c.g * 255) << 8) | Math.round(c.b * 255); }
 
@@ -629,6 +631,13 @@ Item {
                         }
 
                         Label { text: qsTr("Texto"); color: themeManager.textSecondary; topPadding: 4 }
+                        AppComboBox {
+                            width: parent.width
+                            model: [qsTr("Texto libre (lo pones donde quieras)"), qsTr("Meme: franja blanca arriba"), qsTr("Franja negra abajo"),
+                                    qsTr("Texto clásico sobre la imagen"), qsTr("Subtítulo")]
+                            currentIndex: (styleSection.st.caption ?? -1) + 1
+                            onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "caption", i - 1); }
+                        }
                         AppTextField {
                             width: parent.width
                             placeholderText: qsTr("Escribí el texto del fotograma")
@@ -641,6 +650,7 @@ Item {
                             visible: (styleSection.st.text ?? "").trim().length > 0
                             AppComboBox {
                                 id: familyBox
+                                visible: !styleSection.captioned
                                 width: parent.width
                                 readonly property var families: animStudio.fontFamilies()
                                 model: [qsTr("Letra predeterminada")].concat(families)
@@ -648,8 +658,19 @@ Item {
                                 onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "family", i === 0 ? "" : families[i - 1]); }
                             }
                             StyleSlider { key: "textSize"; label: qsTr("Tamaño"); from: 2; to: 40; step: 0.5; suffix: "%"; decimals: 1 }
-                            StyleSlider { key: "textX"; label: qsTr("Posición horizontal"); from: 0; to: 100; step: 1; suffix: "%" }
-                            StyleSlider { key: "textY"; label: qsTr("Posición vertical"); from: 0; to: 100; step: 1; suffix: "%" }
+                            StyleSlider { visible: !styleSection.captioned; key: "textX"; label: qsTr("Posición horizontal"); from: 0; to: 100; step: 1; suffix: "%" }
+                            StyleSlider { visible: !styleSection.captioned; key: "textY"; label: qsTr("Posición vertical"); from: 0; to: 100; step: 1; suffix: "%" }
+                            Row {
+                                width: parent.width
+                                spacing: 10
+                                visible: styleSection.st.caption === 0 || styleSection.st.caption === 1
+                                Label { anchors.verticalCenter: parent.verticalCenter; text: qsTr("Color de la franja"); color: themeManager.textSecondary }
+                                AppColorSwatch {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    value: styleSection.rgbColor(styleSection.st.bandColor ?? 0xFFFFFF)
+                                    onPicked: function (c) { animStudio.setStyleValue(root.currentIndex, "bandColor", styleSection.packed(c)); }
+                                }
+                            }
                             Row {
                                 width: parent.width
                                 spacing: 10
@@ -660,6 +681,7 @@ Item {
                                     onPicked: function (c) { animStudio.setStyleValue(root.currentIndex, "color", styleSection.packed(c)); }
                                 }
                                 AppCheckBox {
+                                    visible: !styleSection.captioned
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: qsTr("Negrita")
                                     checked: styleSection.st.bold === true
@@ -669,6 +691,7 @@ Item {
                             Row {
                                 width: parent.width
                                 spacing: 10
+                                visible: !styleSection.captioned
                                 AppCheckBox {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: qsTr("Contorno")

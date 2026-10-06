@@ -113,6 +113,11 @@ EffectValues sampleEffectValues(const EffectSpec &spec);
 QImage applyEffect(const QImage &source, const QString &id, const EffectValues &values, double mix = 1.0,
                    const std::atomic<bool> *cancel = nullptr, const QString &text = QString());
 
+// The values of the meme caption ("caption") for one of its presets (-1: its defaults), with the size of the
+// letters (% of the picture's width) and the colours of the text and of the band (0xRRGGBB) set: for the
+// callers that drive the caption without its panel (the GIF studio).
+EffectValues captionValues(int preset, double sizePercentOfWidth, unsigned textRgb, unsigned bandRgb);
+
 // The size applyEffect() will return for a picture of `input` size (always `input` unless the effect
 // is flagged changesSize). It is what lets a preview computed on a shrunken copy be put at the
 // right size.

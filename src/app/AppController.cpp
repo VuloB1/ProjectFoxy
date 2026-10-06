@@ -1288,6 +1288,13 @@ void AppController::setEffectValue(int index, qreal value)
     if (v == m_effectValues[size_t(index)])
         return;
     m_effectValues[size_t(index)] = v;
+    // The guides of "Estirar" only mean something while that direction is being stretched: moving one while its
+    // Horizontal / Vertical slider is at 100% (no stretch) would show nothing at all, so it starts stretching.
+    if (m_effectId == QLatin1String("stretch") && index >= 0 && index <= 3) {
+        const size_t scale = index <= 1 ? 4 : 5;
+        if (std::abs(m_effectValues[scale] - 100.0) < 0.5)
+            m_effectValues[scale] = 150.0;
+    }
     emit effectValuesChanged();
     scheduleEffectPreview();
 }

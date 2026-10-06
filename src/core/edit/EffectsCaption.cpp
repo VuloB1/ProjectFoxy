@@ -178,3 +178,21 @@ EffectSpec captionSpec()
 }
 
 } // namespace core::edit::fxk
+
+namespace core::edit {
+
+EffectValues captionValues(int preset, double sizePercentOfWidth, unsigned textRgb, unsigned bandRgb)
+{
+    const EffectSpec *spec = findEffect(QStringLiteral("caption"));
+    if (!spec)
+        return {};
+    EffectValues v = defaultEffectValues(*spec);
+    if (preset >= 0 && size_t(preset) < spec->presets.size())
+        v = applyEffectPreset(*spec, spec->presets[size_t(preset)], v);
+    v[1] = std::clamp(sizePercentOfWidth, spec->params[1].min, spec->params[1].max); // "Tamaño del texto"
+    v[6] = double(textRgb & 0xFFFFFF);                                              // "Color del texto"
+    v[7] = double(bandRgb & 0xFFFFFF);                                              // "Color de la franja"
+    return v;
+}
+
+} // namespace core::edit

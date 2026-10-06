@@ -597,11 +597,13 @@ Rectangle {
     // it only got worse the more you kept zooming in.
     function zoomAt(factor, cx, cy) {
         const oldScale = image.scale;
-        if (appSettings.smoothZoom && !integerZoom && factor !== 1) {
-            // smooth zoom: the wheel only moves the target; smoothTick() glides towards it, keeping the point
-            // under the cursor (kept as a viewport position, because the content moves while it glides)
+        if (appSettings.smoothZoom && factor !== 1) {
+            // smooth zoom: the wheel only moves the target and the view glides towards it, keeping the point
+            // under the cursor (kept as a viewport position, because the content moves while it glides).
+            // With whole-number zoom (modo pixel) the target is the next whole step: it glides there.
             const base = smoothActive ? smoothTarget : oldScale;
-            smoothTarget = Math.min(topScale, Math.max(minScale, base * factor));
+            const wantedScale = integerZoom ? stepScale(base, factor > 1 ? 1 : -1) : base * factor;
+            smoothTarget = Math.min(topScale, Math.max(minScale, wantedScale));
             smoothVx = cx - flick.contentX;
             smoothVy = cy - flick.contentY;
             smoothActive = true;

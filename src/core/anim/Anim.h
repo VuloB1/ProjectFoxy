@@ -120,6 +120,10 @@ struct FrameStyle {
     int effectPreset = -1;         // -1 = the effect's own defaults
     double effectMix = 1.0;        // 0..1
     TextOverlay text;
+    // -1: the text goes where `text.x/y` say. 0..3: the meme caption of the Efectos catalogue (one of its presets: a band
+    // above or below the picture, or the text over it) - the picture gets the room the band leaves.
+    int caption = -1;
+    QColor bandColor = QColor(255, 255, 255);
     bool isPlain() const { return (effectId.isEmpty() || effectMix <= 0.0) && text.text.trimmed().isEmpty(); }
     // Equal styles give equal strings: for caches.
     QString signature() const;
@@ -131,6 +135,10 @@ bool effectUsableOnFrames(const QString &effectId);
 
 // `fitted` with the style applied (it is returned as it is when there is nothing to do).
 QImage decorate(const QImage &fitted, const FrameStyle &style);
+
+// One finished frame: `source` fitted to the canvas of `settings` and given its style. What `decorate` cannot do
+// alone (a caption band takes room from the picture) happens here, so use this one for frames.
+QImage renderFrame(const QImage &source, const Settings &settings, const FrameStyle &style);
 
 // The frames the animation is made of, in order, from how long each picture stays.
 std::vector<PlanStep> buildPlan(const std::vector<int> &holdMs, const Settings &settings);

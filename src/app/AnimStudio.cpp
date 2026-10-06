@@ -83,7 +83,7 @@ private:
         const Settings &s = m_snap->settings;
         const int side = std::max(s.size.width(), s.size.height()) * (s.fit == Fit::Cover ? 3 : 2);
         const QImage source = AnimStudio::loadEntry(m_store, m_snap->entries[size_t(index)], side);
-        QImage out = decorate(fitToCanvas(source, s), m_snap->entries[size_t(index)].style);
+        QImage out = renderFrame(source, s, m_snap->entries[size_t(index)].style);
         m_cache.push_back({index, out});
         if (m_cache.size() > 3)
             m_cache.erase(m_cache.begin());
@@ -391,6 +391,8 @@ QVariantMap AnimStudio::styleOf(int index) const
     m.insert("color", packRgb(st.text.color));
     m.insert("outline", st.text.outline);
     m.insert("outlineColor", packRgb(st.text.outlineColor));
+    m.insert("caption", st.caption);
+    m.insert("bandColor", packRgb(st.bandColor));
     return m;
 }
 
@@ -415,6 +417,16 @@ void AnimStudio::setStyleValue(int index, const QString &key, const QVariant &va
     else if (key == QLatin1String("color")) st.text.color = unpackRgb(value);
     else if (key == QLatin1String("outline")) st.text.outline = value.toBool();
     else if (key == QLatin1String("outlineColor")) st.text.outlineColor = unpackRgb(value);
+    else if (key == QLatin1String("bandColor")) st.bandColor = unpackRgb(value);
+    else if (key == QLatin1String("caption")) {
+        // the captions of the Efectos catalogue come with their own look: the colours they start from
+        const int c = std::clamp(value.toInt(), -1, 3);
+        st.caption = c;
+        if (c == 0) { st.text.color = QColor(0, 0, 0); st.bandColor = QColor(255, 255, 255); st.text.size = 9.0; }
+        else if (c == 1) { st.text.color = QColor(255, 255, 255); st.bandColor = QColor(0, 0, 0); st.text.size = 8.0; }
+        else if (c == 2) { st.text.color = QColor(255, 255, 255); st.text.size = 12.0; }
+        else if (c == 3) { st.text.color = QColor(255, 255, 255); st.text.size = 7.0; }
+    }
     else return;
     if (st == before)
         return;
@@ -550,7 +562,7 @@ QImage AnimStudio::previewFrame(int planIndex) const
                 return it.value();
         }
         const int side = std::max(ps.size.width(), ps.size.height()) * 2;
-        const QImage out = decorate(fitToCanvas(loadEntry(m_store, e, side), ps), e.style);
+        const QImage out = renderFrame(loadEntry(m_store, e, side), ps, e.style);
         QMutexLocker lock(&m_previewMutex);
         m_previewFitted.insert(key, out);
         m_previewOrder.append(key);

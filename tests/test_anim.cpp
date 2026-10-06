@@ -670,6 +670,59 @@ private slots:
             QVERIFY2(meanErr < 3.0, qPrintable(QString("dither=%1: mean error %2").arg(dither).arg(meanErr)));
         }
     }
+
+    void aCaptionFrameKeepsTheCanvasSizeAndGivesTheBandItsRoom()
+    {
+        QImage src(300, 200, QImage::Format_RGBA8888);
+        src.fill(QColor(30, 90, 200));
+        Settings st;
+        st.size = QSize(400, 300);
+        st.background = QColor(0, 0, 0);
+        FrameStyle style;
+        style.text.text = QStringLiteral("Can you gift me a game on Steam?");
+        style.caption = 0; // the white band on top with black letters
+        style.text.color = QColor(0, 0, 0);
+        style.bandColor = QColor(255, 255, 255);
+        style.text.size = 9.0;
+        const QImage out = renderFrame(src, st, style);
+        QCOMPARE(out.size(), st.size); // the canvas does not grow: the picture gets what the band leaves
+        QCOMPARE(out.pixelColor(2, 2), QColor(255, 255, 255));
+        int band = 0;
+        while (band < out.height() && out.pixelColor(2, band) == QColor(255, 255, 255))
+            ++band;
+        QVERIFY(band > 40 && band < 160);
+        int dark = 0;
+        for (int y = 0; y < band; ++y)
+            for (int x = 0; x < out.width(); ++x)
+                dark += out.pixelColor(x, y).red() < 100;
+        QVERIFY(dark > 200); // the text is in it
+        QVERIFY(out.pixelColor(200, band + (300 - band) / 2).blue() > 150); // and the picture below it
+
+        // another style, the band at the bottom
+        style.caption = 1;
+        style.text.color = QColor(255, 255, 255);
+        style.bandColor = QColor(0, 0, 0);
+        const QImage below = renderFrame(src, st, style);
+        QCOMPARE(below.size(), st.size);
+        QCOMPARE(below.pixelColor(2, below.height() - 2), QColor(0, 0, 0));
+        // the text over the picture takes no room: the picture fills as it would without it
+        style.caption = 2;
+        const QImage over = renderFrame(src, st, style);
+        QCOMPARE(over.pixelColor(200, 250), QColor(30, 90, 200));
+        // a text too long for a small canvas shrinks instead of eating the picture
+        style.caption = 0;
+        style.text.text = QString("palabra ").repeated(60);
+        const QImage crowded = renderFrame(src, st, style);
+        QCOMPARE(crowded.size(), st.size);
+        int blue = 0;
+        for (int y = 0; y < crowded.height(); ++y)
+            blue += crowded.pixelColor(200, y).blue() > 150 && crowded.pixelColor(200, y).red() < 100;
+        QVERIFY(blue > 60);
+        // different captions are told apart in caches
+        FrameStyle a = style, b = style;
+        b.caption = 2;
+        QVERIFY(a.signature() != b.signature());
+    }
 };
 
 QTEST_MAIN(TestAnim)

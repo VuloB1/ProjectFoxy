@@ -9,13 +9,16 @@
 
 namespace {
 
-// A pipette drawn pointing down-left, 32 x 32, the tip at (3, 28).
+// A pipette drawn pointing down-left, drawn on a 32 x 32 grid and enlarged (kScale) so that it is easy to see on
+// a big or high-resolution screen; the tip is the hot spot.
+constexpr double kScale = 1.9;
 QCursor eyedropperCursor()
 {
-    QPixmap pm(32, 32);
+    QPixmap pm(int(32 * kScale), int(32 * kScale));
     pm.fill(Qt::transparent);
     QPainter p(&pm);
     p.setRenderHint(QPainter::Antialiasing, true);
+    p.scale(kScale, kScale);
     auto body = [&](const QColor &fill, qreal grow) {
         p.save();
         p.translate(3, 28);
@@ -36,7 +39,7 @@ QCursor eyedropperCursor()
     body(QColor(0, 0, 0, 230), 1.1);           // a dark outline, so it shows on any picture
     body(QColor(245, 245, 245), 0.0);
     p.end();
-    return QCursor(pm, 3, 28);
+    return QCursor(pm, int(3 * kScale), int(28 * kScale));
 }
 
 } // namespace
