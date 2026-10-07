@@ -1,0 +1,16 @@
+name: Proponer una mejora
+description: Una función nueva o un cambio que te gustaría ver
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: ¿Qué te gustaría poder hacer?
+      description: Cuenta el problema o la necesidad antes que la solución.
+    validations:
+      required: true
+  - type: textarea
+    id: ejemplo
+    attributes:
+      label: ¿Cómo lo hace otro programa?
+      description: Si ya existe en otro visor o editor, dime cuál y cómo funciona (capturas bienvenidas).

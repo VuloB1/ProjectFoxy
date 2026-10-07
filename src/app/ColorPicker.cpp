@@ -10,7 +10,7 @@
 namespace {
 
 // The pipette is drawn on a 32 x 32 grid and enlarged so that it is easy to see on a big or high-resolution screen.
-constexpr double kScale = 1.9;
+constexpr double kScale = 1.1;
 
 // The shapes of the pipette in its own coordinates: the tip is the origin and the pipette lies along -y (the
 // caller turns it). A hollow glass tube that narrows to the tip, a collar, and a solid bulb on top.

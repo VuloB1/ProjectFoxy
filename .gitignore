@@ -9,3 +9,5 @@ datos/
 *.zip
 *.log
 .claude/
+dist/
+aqtinstall.log

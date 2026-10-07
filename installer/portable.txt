@@ -1,0 +1,2 @@
+Modo portable: mientras exista este archivo junto a ProjectFoxy.exe, el programa guarda su configuracion y su cache de miniaturas en la carpeta 'datos' de aqui, y no en el perfil de Windows.
+Borra este archivo para volver al modo normal.

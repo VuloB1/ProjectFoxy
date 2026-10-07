@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Preguntas y conversación
+    url: https://github.com/Vulito/ProjectFoxy/discussions
+    about: Para dudas de uso o ideas todavía sin pulir (si las Discussions están activadas en el repositorio).

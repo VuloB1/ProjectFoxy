@@ -1,0 +1,49 @@
+name: Informar de un error
+description: Algo no funciona como debería
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por avisar. Cuanto más concreto seas, más rápido se arregla.
+  - type: textarea
+    id: que-paso
+    attributes:
+      label: ¿Qué pasó?
+      description: Lo que hiciste, lo que esperabas y lo que ocurrió en cambio. Una captura ayuda mucho.
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para repetirlo
+      placeholder: |
+        1. Abrir una foto…
+        2. Ir a Editar → Efectos…
+        3. …
+  - type: input
+    id: archivo
+    attributes:
+      label: ¿Con qué tipo de archivo? (formato, tamaño, de qué cámara o programa viene)
+      description: Si el problema depende de una imagen concreta, adjúntala en un comentario.
+  - type: input
+    id: version
+    attributes:
+      label: Versión de Project Foxy
+      description: En «Información» (el ícono ⓘ de la barra superior) o en el nombre del instalador.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: instalacion
+    attributes:
+      label: ¿Cómo lo instalaste?
+      options:
+        - Instalador
+        - Portable (.zip)
+        - Lo compilé yo
+  - type: input
+    id: windows
+    attributes:
+      label: Versión de Windows y tarjeta gráfica
+      placeholder: "Windows 11 23H2 · NVIDIA RTX 3060"

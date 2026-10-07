@@ -1,0 +1,28 @@
+Project Foxy - version de prueba (portable)
+==========================================
+
+COMO USARLO
+1. Descomprime TODA la carpeta: clic derecho sobre el .zip > Extraer todo. NO abras
+   ProjectFoxy.exe desde dentro del .zip: Windows solo saca el .exe y da un error de
+   "no se encontro vips-cpp-42.dll" (o de otra .dll). Si ves ese error, es por esto.
+2. Abre ProjectFoxy.exe (doble clic). Tambien puedes arrastrar una imagen sobre el .exe.
+3. Windows puede mostrar "Windows protegio su PC" porque el programa no esta firmado:
+   pulsa "Mas informacion" y luego "Ejecutar de todas formas".
+
+Requisitos: Windows 10 u 11 de 64 bits.
+
+ES PORTABLE
+Todo lo que el programa recuerda (configuracion y miniaturas) se guarda en la carpeta
+"datos" que aparece junto a ProjectFoxy.exe. No toca el registro ni tu perfil de Windows.
+Para quitarlo: cierra el programa y borra la carpeta entera.
+
+QUE PROBAR / COMO AVISAR
+Abre carpetas con fotos, GIF, PNG con transparencia, RAW, HEIC... prueba Editar, el Modo
+pixel (Configuracion > Apariencia) y exportar/renombrar por lote. Si algo falla, cuentame que
+hiciste, con que archivo y, si puedes, una captura. OJO: el editor guarda sobre el original
+solo si lo pides con Guardar; usa copias de tus fotos importantes para probar.
+
+LICENCIAS
+Project Foxy usa Qt, libvips, LibRaw, libheif, exiv2 y otras librerias. Los avisos y licencias
+estan en la carpeta "licenses". exiv2 es GPL: quien reciba esta copia tiene derecho al codigo
+fuente del programa; pidemelo y te lo paso.

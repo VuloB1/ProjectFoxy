@@ -18,7 +18,7 @@ private slots:
     void theCursorPointsUpAndToTheRightFromItsTip()
     {
         const QImage img = ColorPicker::eyedropperPixmap().toImage().convertToFormat(QImage::Format_ARGB32);
-        QVERIFY(img.width() >= 48 && img.height() >= 48); // big enough to see on a large screen
+        QVERIFY(img.width() >= 32 && img.width() <= 48); // about the size of a normal cursor
         if (qEnvironmentVariableIsSet("EYEDROPPER_OUT"))
             img.save(qEnvironmentVariable("EYEDROPPER_OUT"));
         auto opaque = [&](int x, int y) { return x >= 0 && y >= 0 && x < img.width() && y < img.height() && qAlpha(img.pixel(x, y)) > 40; };

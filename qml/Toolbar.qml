@@ -193,6 +193,13 @@ AppPanelBackground {
                 text: qsTr("Sin datos EXIF")
             }
 
+            Rectangle { width: parent.width; height: 1; color: themeManager.border }
+            Label {
+                color: themeManager.textSecondary
+                font.pixelSize: 11
+                text: qsTr("Project Foxy %1").arg(Qt.application.version)
+            }
+
             Rectangle {
                 width: parent.width
                 height: 1

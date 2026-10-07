@@ -1273,3 +1273,25 @@ reinstale lo afectado en el siguiente `cmake --build`.
 **Rendimiento de los efectos (lag con otros programas).** Los efectos pesados (Giratorio, Zoom, Movimiento, Semitono, Quitar ruido) saturaban todos los núcleos a prioridad normal y dejaban sin CPU al resto del equipo (un vídeo de YouTube se congelaba mientras se arrastraba un slider). Ahora el pool de filas (`ParallelRows.h`) deja dos núcleos libres (uno en equipos pequeños) y sus hilos corren con prioridad `Lowest`. Además se aceleraron los bucles: muestreo bilineal en `float` (`accumulate`), giro por recurrencia con tabla de seno/coseno en Giratorio, un punto por celda calculado una sola vez en Semitono y red de ordenación de 19 comparaciones para la mediana 3×3. Resultado en 24 MP: Quitar ruido 2,7× más rápido, Semitono 3,7× (salidas idénticas bit a bit), Giratorio y Zoom ~2×. `bench_effects` (en `tests/`, no es una prueba) mide tiempo real y de CPU de cada efecto: `bench_effects [ladoLargo] [id...]`, con `BENCH_IMG`/`BENCH_SAVE` opcionales.
 
 **Reductor de ruido (Non-Local Means).** El antiguo «Quitar ruido» era una mediana 3×3/5×5: solo quita puntos sueltos y apenas cambia el ruido real de una cámara. Ahora «Quitar ruido» (`denoise`, `Denoise.{h,cpp}`) es un Non-Local Means en color y la mediana sigue existiendo como «Mediana» (`median`). **Cómo funciona:** la imagen se pasa a Y/Co/Cg; el nivel de ruido de cada plano se mide de la propia foto (el mayor de dos estimadores: mediana del Laplaciano absoluto y varianza del 10 % de bloques 8×8 más planos, con un sesgo de calibración 1,12; con ruido blanco da 9,17 frente a 9,19 reales y con ruido en manchas, el de cámara, sigue funcionando porque el Laplaciano solo no lo ve); cada píxel se sustituye por la media de los de su ventana 7×7 cuyo parche 5×5 (comparado en los tres planos a la vez) se parece al suyo, con peso exp(−exceso/h²) donde «exceso» es la distancia por encima de lo que causaría solo el ruido. Sliders: *Luminancia* (h de Y, 0,06–1,26 σ) y *Color* (h de Co/Cg, 0,06–2,46 σ, mucho más fuerte porque el ruido de color es más molesto); por defecto 50 y 60. Va por bandas de 24 filas (cada banda carga su margen, sin planos float de toda la imagen) y se cancela como el resto. **Vista previa:** como el ruido depende de los píxeles reales, `EffectSpec::fullSize` hace que no pase por el proxy de 1600 px (que ya habría perdido el ruido): se muestra el resultado exacto cuando el slider reposa (260 ms). **Medido:** ruido gaussiano de 15 sobre una ilustración: 24,7 dB → 37,0 dB (la mediana: 31,9 dB); con ruido en manchas, 26,3 → 29,8 dB (mediana 26,3); foto de cámara de 24 MP: 2,3 s con 16 hilos (15,7 s de CPU, a prioridad baja). Se probó y **se descartó** un segundo paso de suavizado del color con filtro guiado por la luminancia: bajaba la calidad (6 dB menos) y desaturaba. Pruebas en `test_edit_stack` (error medio 11,3 → 2,0 frente a 5,0 de la mediana, borde conservado, alfa intacto, fuerza 0 = identidad).
+
+## 14. Publicar una versión (6‑oct‑2026)
+
+Todo lo necesario para publicar en GitHub está en el repositorio:
+
+- `tools/Build-Release.ps1`: compila, corre las pruebas, hace `cmake --install` a `dist\ProjectFoxy`, arma
+  `dist\ProjectFoxy-portable-<versión>.zip` (la misma carpeta + `portable.txt` + `LEEME.txt`, de `installer/`), compila el
+  instalador si hay Inno Setup y escribe `dist\SHA256SUMS.txt`. `dist/` está en `.gitignore`.
+- `installer/ProjectFoxy.iss` (Inno Setup 6): instala por usuario sin administrador (o para todos, si se elige), acceso
+  directo opcional y, opcionalmente, **registra el programa como abridor de imágenes** (`ProjectFoxy.Image` con su
+  ícono, «Abrir con» para cada extensión que lee y `Capabilities` + `RegisteredApplications` para que aparezca en
+  *Aplicaciones predeterminadas*). Windows no deja que un programa se ponga solo como predeterminado: el último paso lo
+  hace la persona; cuando elige Project Foxy para un tipo, el Explorador muestra su ícono sobre esos archivos. El
+  desinstalador borra todo lo que el instalador registró.
+- `.github/workflows/ci.yml` (compila y prueba en cada *push*/PR) y `release.yml` (al subir una etiqueta `vX.Y.Z`:
+  compila, arma instalador y zip y publica la *release*). **No se pudieron probar localmente**: el primer *push* es la
+  prueba real. Usan Qt 6.7.3 con `install-qt-action`, vcpkg del *runner* con caché de binarios y Inno Setup por Chocolatey.
+- `tools/make_banner.py` dibuja `docs/assets/banner.png` a partir del logo (`docs/assets/logo.png`); las capturas del
+  README están en `docs/screenshots/`.
+- La versión sale de `project(... VERSION ...)` en `CMakeLists.txt` (el programa la muestra en el panel de información);
+  `resources/app.rc`, `vcpkg.json` y `installer/ProjectFoxy.iss` deben coincidir. Subir versión = cambiar esos sitios,
+  añadir la entrada a `CHANGELOG.md`, y `git tag vX.Y.Z && git push origin vX.Y.Z`.

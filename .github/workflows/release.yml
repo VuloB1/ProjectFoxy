@@ -1,0 +1,72 @@
+# When a tag "vX.Y.Z" is pushed: builds the program and publishes a GitHub release with the installer, the portable
+# zip and their checksums.
+#
+#     git tag v0.1.0 && git push origin v0.1.0
+#
+# The version in CMakeLists.txt (project(... VERSION ...)), in resources/app.rc and in vcpkg.json should match the tag.
+# NOTE: written without being able to run it (it only runs on GitHub); see ci.yml.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-2022
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Qt 6.7.3
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.7.3
+          arch: win64_msvc2022_64
+          cache: true
+
+      - name: Visual Studio environment
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: vcpkg
+        shell: pwsh
+        run: |
+          "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "VCPKG_DEFAULT_BINARY_CACHE=$env:RUNNER_TEMP\vcpkg-cache" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          New-Item -ItemType Directory -Force "$env:RUNNER_TEMP\vcpkg-cache" | Out-Null
+
+      - name: vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-${{ runner.os }}-
+
+      - name: Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ISCC.exe -ErrorAction SilentlyContinue) -and -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+
+      # builds, runs the tests, installs, and makes the zip, the installer and the checksums (tools/Build-Release.ps1)
+      - name: Build everything
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          $env:CMAKE_PREFIX_PATH = $env:QT_ROOT_DIR
+          cmake --preset windows-release "-DCMAKE_PREFIX_PATH=$env:QT_ROOT_DIR"
+          ./tools/Build-Release.ps1 -Preset windows-release -Version $version
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Project Foxy ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            dist/installer/ProjectFoxy-Setup-*.exe
+            dist/ProjectFoxy-portable-*.zip
+            dist/SHA256SUMS.txt

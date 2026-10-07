@@ -1,11 +1,49 @@
+<div align="center">
+
+<img src="docs/assets/banner.png" alt="Project Foxy" width="100%">
+
 # Project Foxy
 
-Visor de imágenes moderno, ligero y rápido **para Windows**, con un editor de
-fotos integrado. Interfaz en español y tres temas: *Moderno Claro*, *Moderno
-Oscuro* y *Windows 98*.
+**Visor de imágenes moderno, ligero y rápido para Windows, con un editor de fotos integrado.**
 
-> Documentación técnica completa (arquitectura, pipeline de edición, decisiones,
-> riesgos conocidos y hoja de ruta): [`docs/DESARROLLO.md`](docs/DESARROLLO.md).
+[![Descargar](https://img.shields.io/github/v/release/Vulito/ProjectFoxy?label=descargar&color=ff6a13&logo=github)](https://github.com/Vulito/ProjectFoxy/releases/latest)
+![Licencia: GPL-3.0-or-later](https://img.shields.io/badge/licencia-GPL--3.0--or--later-ff6a13)
+![Windows 10 / 11](https://img.shields.io/badge/Windows-10%20%7C%2011-3a3a3a?logo=windows&logoColor=white)
+![Qt 6.7](https://img.shields.io/badge/Qt-6.7-41cd52?logo=qt&logoColor=white)
+![C++20](https://img.shields.io/badge/C%2B%2B-20-00599c?logo=cplusplus&logoColor=white)
+
+[Descargar](#descargar) · [Qué hace](#qué-hace) · [Compilar](#compilar) · [English](#english)
+
+</div>
+
+---
+
+<p align="center">
+  <img src="docs/screenshots/visor.png" alt="El visor, con la barra de miniaturas" width="49%">
+  <img src="docs/screenshots/editor-efectos.png" alt="El editor: efectos de luz" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/editor-leyenda.png" alt="Leyenda de meme" width="32%">
+  <img src="docs/screenshots/gif.png" alt="Creador de GIF animado" width="32%">
+  <img src="docs/screenshots/collage.png" alt="Collage" width="32%">
+</p>
+
+Abre cualquier foto al instante (JPEG, PNG, WebP, TIFF, HEIC, AVIF, RAW de cámara, GIF animados…), la recorre con
+su carpeta, y cuando quieres tocarla trae un **editor completo**, un **creador de GIF/APNG/WebP animados**, un
+**collage sin límites**, un **comparador** de hasta 10 imágenes con zoom vinculado y más. Interfaz en español con
+cuatro temas: *Moderno Claro*, *Moderno Oscuro* y dos *Classic* (estilo Windows 98).
+
+## Descargar
+
+Ve a la página de [**Releases**](https://github.com/Vulito/ProjectFoxy/releases/latest) y elige:
+
+| | |
+|---|---|
+| **`ProjectFoxy-Setup-x.y.z.exe`** | El instalador. No pide permisos de administrador (se instala para tu usuario), crea el acceso directo y, si quieres, deja a Project Foxy en «Abrir con» y en *Aplicaciones predeterminadas* de Windows. |
+| **`ProjectFoxy-portable-x.y.z.zip`** | Versión portable: descomprime **toda** la carpeta y abre `ProjectFoxy.exe`. Guarda su configuración al lado del programa y no toca el registro. |
+
+Requisitos: Windows 10 u 11 de 64 bits. Windows puede avisar con «Windows protegió su PC» porque el programa aún
+no está firmado: *Más información → Ejecutar de todas formas*. Cada archivo de la release lleva su suma SHA-256.
 
 ## Qué hace
 
@@ -84,7 +122,7 @@ arrastre completo de un slider es un solo paso).
 ├── qml/        ventana, lienzo, panel de edición, controles tematizados
 │   ├── controls/  envoltorios App*.qml de cada control + iconos vectoriales
 │   └── shaders/   Grade.frag y Detail.frag (vista previa en GPU)
-├── tests/      QtTest (430 casos): núcleo, el AppController real y la paridad CPU/GPU
+├── tests/      QtTest (más de 440 casos): núcleo, el AppController real y la paridad CPU/GPU
 │               con Direct3D 11 + prueba de humo del programa real
 │               + fixtures (un archivo de ejemplo de cada formato, EXIF/XMP/IPTC, CMYK…)
 ├── tools/      archivos .reg del menú contextual y generador de avisos de terceros
@@ -119,12 +157,31 @@ instalado arranca sin depender de nada de esta máquina.
 como herramienta del host y `CMakeLists.txt` lo localiza solo.
 
 ## Estado
-- Visor, formatos, animaciones, temas, configuración, lote, Ajustes, Filtros,
-  Efectos, guardado seguro y deshacer completo: **terminados**.
-- Licencia del proyecto: **GPL-3.0-or-later**, copyright 2026 Vulito (ver `LICENSE`). Es la
-  coherente con exiv2 (GPL); las licencias de las demás dependencias están en
-  `docs/LICENCIAS.md`.
-- Desde el 4‑5 de octubre también: más efectos, corrección de lente, marcos, varias imágenes,
-  creador de GIF/APNG/WebP y collage (ver `docs/DESARROLLO.md`, secciones 4.13 a 4.18).
-- Pendientes: GitHub privado y CI, atajos de teclado, capas de texto y formas, pinceles y máscaras,
-  recetas por lote. Ver `docs/DESARROLLO.md`, sección 9.
+
+- Visor, formatos, animaciones, temas, configuración, lote, Ajustes, Filtros, Efectos, Lente, Marco,
+  Comparador, GIF/APNG/WebP, Collage, guardado seguro y deshacer completo: **terminados**.
+- Pendientes: atajos de teclado, capas de texto y formas, pinceles y máscaras, recetas por lote.
+  Ver `docs/DESARROLLO.md`, sección 9.
+
+## Licencia
+
+**GPL-3.0-or-later**, copyright 2026 Vulito (ver [`LICENSE`](LICENSE)). Es la coherente con exiv2 (GPL). Las
+licencias de las demás librerías están en [`docs/LICENCIAS.md`](docs/LICENCIAS.md) y en la carpeta `licenses` de cada
+descarga. Los perfiles de lente son de [Lensfun](https://lensfun.github.io/) (CC BY-SA 3.0).
+
+## Contribuir
+
+Los errores y las ideas son bienvenidos: abre un *issue* (hay plantillas) o lee [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+---
+
+## English
+
+**Project Foxy** is a fast, lightweight image viewer for Windows with a full photo editor built in. It opens JPEG, PNG,
+WebP, TIFF, HEIC/AVIF, camera RAW and animated GIF/APNG/WebP; edits with adjustments, filters, 40+ effects, lens
+correction (Lensfun) and picture frames; creates animated GIF/APNG/WebP and unlimited-photo collages; compares up to
+10 images with linked zoom; and saves safely (atomic writes, EXIF/IPTC/XMP kept). The interface is in Spanish.
+
+**Install:** download `ProjectFoxy-Setup-x.y.z.exe` (no administrator rights needed) or the portable `.zip` from
+[Releases](https://github.com/Vulito/ProjectFoxy/releases/latest). **Build:** see [Compilar](#compilar).
+**License:** GPL-3.0-or-later.

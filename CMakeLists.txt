@@ -121,6 +121,9 @@ target_link_libraries(imageviewer_app PUBLIC
     User32
 )
 
+# The version the program reports (Info panel) is the project's own.
+add_compile_definitions(PROJECTFOXY_VERSION="${PROJECT_VERSION}")
+
 qt_add_executable(ImageViewer
     src/app/main.cpp
 )

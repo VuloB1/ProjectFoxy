@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     app.setApplicationName("ProjectFoxy");
     app.setOrganizationName("ProjectFoxy");
+    app.setApplicationVersion(QStringLiteral(PROJECTFOXY_VERSION)); // from project(VERSION) in CMakeLists.txt
     // These two names decide where the settings and the cache live (AppPaths.h migrates the
     // settings from the old "ImageViewer" folder). The window title is set in Main.qml.
     // qt_add_qml_module puts RESOURCES under the module's own prefix
