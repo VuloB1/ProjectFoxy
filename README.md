@@ -6,7 +6,7 @@
 
 **Visor de imágenes moderno, ligero y rápido para Windows, con un editor de fotos integrado.**
 
-[![Descargar](https://img.shields.io/github/v/release/Vulito/ProjectFoxy?label=descargar&color=ff6a13&logo=github)](https://github.com/Vulito/ProjectFoxy/releases/latest)
+[![Descargar](https://img.shields.io/github/v/release/VuloB1/ProjectFoxy?label=descargar&color=ff6a13&logo=github)](https://github.com/VuloB1/ProjectFoxy/releases/latest)
 ![Licencia: GPL-3.0-or-later](https://img.shields.io/badge/licencia-GPL--3.0--or--later-ff6a13)
 ![Windows 10 / 11](https://img.shields.io/badge/Windows-10%20%7C%2011-3a3a3a?logo=windows&logoColor=white)
 ![Qt 6.7](https://img.shields.io/badge/Qt-6.7-41cd52?logo=qt&logoColor=white)
@@ -35,7 +35,7 @@ cuatro temas: *Moderno Claro*, *Moderno Oscuro* y dos *Classic* (estilo Windows 
 
 ## Descargar
 
-Ve a la página de [**Releases**](https://github.com/Vulito/ProjectFoxy/releases/latest) y elige:
+Ve a la página de [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases/latest) y elige:
 
 | | |
 |---|---|
@@ -183,5 +183,5 @@ correction (Lensfun) and picture frames; creates animated GIF/APNG/WebP and unli
 10 images with linked zoom; and saves safely (atomic writes, EXIF/IPTC/XMP kept). The interface is in Spanish.
 
 **Install:** download `ProjectFoxy-Setup-x.y.z.exe` (no administrator rights needed) or the portable `.zip` from
-[Releases](https://github.com/Vulito/ProjectFoxy/releases/latest). **Build:** see [Compilar](#compilar).
+[Releases](https://github.com/VuloB1/ProjectFoxy/releases/latest). **Build:** see [Compilar](#compilar).
 **License:** GPL-3.0-or-later.
