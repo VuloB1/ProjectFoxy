@@ -26,6 +26,7 @@ jobs:
         with:
           version: 6.7.3
           arch: win64_msvc2019_64
+          modules: qtshadertools
           cache: true
 
       - name: Visual Studio environment
@@ -41,7 +42,7 @@ jobs:
           New-Item -ItemType Directory -Force "$env:RUNNER_TEMP\vcpkg-cache" | Out-Null
 
       - name: vcpkg binary cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/vcpkg-cache
           key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
@@ -50,6 +51,14 @@ jobs:
       - name: Configure
         shell: pwsh
         run: cmake --preset windows-release "-DCMAKE_PREFIX_PATH=$env:QT_ROOT_DIR"
+
+      # Saved even when a later step fails: building the native libraries takes about an hour.
+      - name: vcpkg binary cache (save)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
 
       - name: Build
         run: cmake --build --preset windows-release
