@@ -1,6 +1,6 @@
 """Draws docs/assets/banner.png (the picture at the top of the README) from the logo.
 
-    python tools/make_banner.py <logo.png> [out.png]
+    python tools/make_banner.py <logo.png> [out.png] [es]   (the texts are English; "es" draws the Spanish ones)
 
 The logo is the full Project Foxy logo (emblem + wordmark, transparent background). The banner is the emblem on a
 light tile, the name and the tagline on a dark background with a warm glow, like the other banners of this author.
@@ -36,6 +36,7 @@ def background():
 
 def main():
     logo = Image.open(sys.argv[1]).convert("RGBA")
+    spanish = len(sys.argv) > 3 and sys.argv[3] == "es"
     out = Path(sys.argv[2]) if len(sys.argv) > 2 else Path(__file__).resolve().parent.parent / "docs" / "assets" / "banner.png"
     out.parent.mkdir(parents=True, exist_ok=True)
 
@@ -68,8 +69,10 @@ def main():
     x = 490
     d.text((x, 160), "Project", font=font("segoeuib.ttf", 128), fill=(255, 255, 255, 255))
     d.text((x, 280), "Foxy", font=font("segoeuib.ttf", 128), fill=ORANGE + (255,))
-    d.text((x + 6, 438), "Image viewer and editor for Windows.", font=font("segoeui.ttf", 40), fill=(255, 255, 255, 255))
-    d.text((x + 6, 494), "Fast, lightweight, with editor, GIF, collage and compare.", font=font("segoeui.ttf", 28), fill=(255, 190, 150, 255))
+    line1, line2 = (("Visor y editor de imágenes para Windows.", "Rápido, ligero, con editor, GIF, collage y comparador.") if spanish
+                    else ("Image viewer and editor for Windows.", "Fast, lightweight, with editor, GIF, collage and compare."))
+    d.text((x + 6, 438), line1, font=font("segoeui.ttf", 40), fill=(255, 255, 255, 255))
+    d.text((x + 6, 494), line2, font=font("segoeui.ttf", 28), fill=(255, 190, 150, 255))
     canvas.convert("RGB").save(out, optimize=True)
     print("ok", out, canvas.size)
 

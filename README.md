@@ -179,7 +179,29 @@ Bugs and ideas are welcome: open an *issue* (there are templates) or read [`CONT
 
 <a id="español"></a>
 
+<div align="center">
+
+<img src="docs/assets/banner-es.png" alt="Project Foxy" width="100%">
+
 # 🇪🇸 Español
+
+**Visor de imágenes moderno, ligero y rápido para Windows, con un editor de fotos integrado.**
+
+[English](#project-foxy) · Español
+
+[Descargar](#descargar) · [Idiomas](#idiomas) · [Qué hace](#qué-hace) · [Compilar](#compilar)
+
+</div>
+
+<p align="center">
+  <img src="docs/screenshots/es/visor.png" alt="El visor, con la barra de miniaturas" width="49%">
+  <img src="docs/screenshots/es/editor-efectos.png" alt="El editor: efectos de luz" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/es/editor-leyenda.png" alt="Leyenda de meme" width="32%">
+  <img src="docs/screenshots/es/gif.png" alt="Creador de GIF animado" width="32%">
+  <img src="docs/screenshots/es/collage.png" alt="Collage" width="32%">
+</p>
 
 Abre cualquier foto al instante (JPEG, PNG, WebP, TIFF, HEIC, AVIF, RAW de cámara, GIF animados…), la recorre con
 su carpeta, y cuando quieres tocarla trae un **editor completo**, un **creador de GIF/APNG/WebP animados**, un
