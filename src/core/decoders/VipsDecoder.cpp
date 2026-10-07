@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <cstring>
 #include <mutex>
+#include "Translate.h"
 
 using namespace vips;
 
@@ -86,7 +87,7 @@ DecodeResult VipsDecoder::decode(const QString &filePath, QSize maxSize)
 {
     if (!ensureVipsInitialized()) {
         DecodeResult failed;
-        failed.error = QStringLiteral("libvips no se pudo iniciar: %1").arg(QString::fromStdString(vipsInitError()));
+        failed.error = core::tr("libvips no se pudo iniciar: %1").arg(QString::fromStdString(vipsInitError()));
         return failed;
     }
 
@@ -126,7 +127,7 @@ DecodeResult VipsDecoder::decode(const QString &filePath, QSize maxSize)
             reader.setAutoTransform(false); // the orientation is applied below, like for every format
             QImage cmyk = reader.read();
             if (cmyk.isNull()) {
-                result.error = QStringLiteral("No se pudo convertir la imagen CMYK: %1").arg(reader.errorString());
+                result.error = core::tr("No se pudo convertir la imagen CMYK: %1").arg(reader.errorString());
                 return result;
             }
             cmyk = cmyk.convertToFormat(QImage::Format_RGBA8888);

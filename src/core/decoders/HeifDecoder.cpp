@@ -4,6 +4,7 @@
 #include <libheif/heif_cxx.h>
 #include <QFile>
 #include <cstring>
+#include "Translate.h"
 
 namespace core {
 
@@ -30,7 +31,7 @@ DecodeResult HeifDecoder::decode(const QString &filePath, QSize maxSize)
     // can fail on non-ASCII paths/filenames (accented characters, etc).
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
-        result.error = QStringLiteral("No se pudo abrir %1").arg(filePath);
+        result.error = core::tr("No se pudo abrir %1").arg(filePath);
         return result;
     }
     const QByteArray fileData = file.readAll();

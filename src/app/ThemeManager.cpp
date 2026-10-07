@@ -11,7 +11,7 @@ const std::array<ThemeManager::ThemeSpec, 4> &ThemeManager::themes()
 {
     static const std::array<ThemeSpec, 4> kThemes = { {
         {
-            "modern-light", tr("Moderno Claro"), "modern",
+            "modern-light", QT_TR_NOOP("Moderno Claro"), "modern",
             QColor("#f3f4f6"), QColor("#ffffff"), QColor("#eceef1"),
             QColor("#1a1a1a"), QColor("#66707a"), QColor("#dde1e6"),
             QColor("#3d8bfd"), QColor("#ffffff"),
@@ -21,7 +21,7 @@ const std::array<ThemeManager::ThemeSpec, 4> &ThemeManager::themes()
             QStringLiteral("Segoe UI"),
         },
         {
-            "modern-dark", tr("Moderno Oscuro"), "modern",
+            "modern-dark", QT_TR_NOOP("Moderno Oscuro"), "modern",
             QColor("#1b1c1f"), QColor("#232427"), QColor("#2b2d31"),
             QColor("#f2f2f2"), QColor("#9a9fa6"), QColor("#3a3c40"),
             QColor("#4cc2ff"), QColor("#0c0c0c"),
@@ -31,7 +31,7 @@ const std::array<ThemeManager::ThemeSpec, 4> &ThemeManager::themes()
             QStringLiteral("Segoe UI"),
         },
         {
-            "win98", tr("Classic Claro"), "win98",
+            "win98", QT_TR_NOOP("Classic Claro"), "win98",
             QColor("#808080"), QColor("#c0c0c0"), QColor("#c0c0c0"),
             QColor("#000000"), QColor("#000000"), QColor("#000000"),
             QColor("#000080"), QColor("#ffffff"),
@@ -48,7 +48,7 @@ const std::array<ThemeManager::ThemeSpec, 4> &ThemeManager::themes()
         {
             // The same chiselled look in a dark palette: charcoal faces, light text,
             // bevels turned around (light edge = mid grey, shadow = near black).
-            "win98-dark", tr("Classic Oscuro"), "win98",
+            "win98-dark", QT_TR_NOOP("Classic Oscuro"), "win98",
             QColor("#1c1c1c"), QColor("#3a3a3a"), QColor("#3a3a3a"),
             QColor("#f0f0f0"), QColor("#f0f0f0"), QColor("#000000"),
             QColor("#2a52a8"), QColor("#ffffff"),

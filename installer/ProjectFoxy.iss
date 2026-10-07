@@ -46,13 +46,42 @@ RestartApplications=no
 ChangesAssociations=yes
 
 [Languages]
-Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
+Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
+Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
+
+[CustomMessages]
+english.TaskAssoc=Let Project Foxy open images (shows up in "Open with" and in Default apps)
+english.TaskAssocGroup=Images:
+english.ImageType=Image (Project Foxy)
+english.AppDescription=Image viewer and editor
+english.RunDefaultApps=Choose Project Foxy as the default app for images
+spanish.TaskAssoc=Permitir abrir imágenes con Project Foxy (aparece en «Abrir con» y en Aplicaciones predeterminadas)
+spanish.TaskAssocGroup=Imágenes:
+spanish.ImageType=Imagen (Project Foxy)
+spanish.AppDescription=Visor y editor de imágenes
+spanish.RunDefaultApps=Elegir Project Foxy como programa predeterminado para las imágenes
+brazilianportuguese.TaskAssoc=Permitir abrir imagens com o Project Foxy (aparece em "Abrir com" e em Aplicativos padrão)
+brazilianportuguese.TaskAssocGroup=Imagens:
+brazilianportuguese.ImageType=Imagem (Project Foxy)
+brazilianportuguese.AppDescription=Visualizador e editor de imagens
+brazilianportuguese.RunDefaultApps=Escolher o Project Foxy como aplicativo padrão para imagens
+korean.TaskAssoc=Project Foxy로 이미지 열기 허용("연결 프로그램" 및 기본 앱에 표시됨)
+korean.TaskAssocGroup=이미지:
+korean.ImageType=이미지 (Project Foxy)
+korean.AppDescription=이미지 뷰어 및 편집기
+korean.RunDefaultApps=Project Foxy를 이미지의 기본 앱으로 선택
+japanese.TaskAssoc=Project Foxy で画像を開けるようにする（「プログラムから開く」と既定のアプリに表示されます）
+japanese.TaskAssocGroup=画像:
+japanese.ImageType=画像 (Project Foxy)
+japanese.AppDescription=画像ビューアーとエディター
+japanese.RunDefaultApps=Project Foxy を画像の既定のアプリに選ぶ
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "assoc"; Description: "Permitir abrir imágenes con Project Foxy (aparece en «Abrir con» y en Aplicaciones predeterminadas)"; GroupDescription: "Imágenes:"; Languages: spanish
-Name: "assoc"; Description: "Let Project Foxy open images (shows up in ""Open with"" and in Default apps)"; GroupDescription: "Images:"; Languages: english
+Name: "assoc"; Description: "{cm:TaskAssoc}"; GroupDescription: "{cm:TaskAssocGroup}"
 
 [Files]
 ; the folder produced by `cmake --install` (see tools\Build-Release.ps1)
@@ -64,7 +93,7 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopico
 
 [Registry]
 ; the type "an image of Project Foxy": its icon and how to open it
-Root: HKA; Subkey: "Software\Classes\ProjectFoxy.Image"; ValueType: string; ValueName: ""; ValueData: "Imagen (Project Foxy)"; Flags: uninsdeletekey; Tasks: assoc
+Root: HKA; Subkey: "Software\Classes\ProjectFoxy.Image"; ValueType: string; ValueName: ""; ValueData: "{cm:ImageType}"; Flags: uninsdeletekey; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\ProjectFoxy.Image\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExe},0"; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\ProjectFoxy.Image\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExe}"" ""%1"""; Tasks: assoc
 ; "Open with" for each type the program reads
@@ -93,7 +122,7 @@ Root: HKA; Subkey: "Software\Classes\.pef\OpenWithProgids"; ValueType: string; V
 Root: HKA; Subkey: "Software\Classes\.raw\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 ; the program as an option in Settings > Default apps
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities"; ValueType: string; ValueName: "ApplicationName"; ValueData: "{#AppName}"; Flags: uninsdeletekey; Tasks: assoc
-Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities"; ValueType: string; ValueName: "ApplicationDescription"; ValueData: "Visor y editor de imágenes"; Tasks: assoc
+Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities"; ValueType: string; ValueName: "ApplicationDescription"; ValueData: "{cm:AppDescription}"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".jpg"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".jpeg"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".png"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
@@ -120,6 +149,5 @@ Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueTy
 Root: HKA; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#AppName}"; ValueData: "Software\ProjectFoxy\Capabilities"; Flags: uninsdeletevalue; Tasks: assoc
 
 [Run]
-Filename: "ms-settings:defaultapps"; Description: "Elegir Project Foxy como programa predeterminado para las imágenes"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc; Languages: spanish
-Filename: "ms-settings:defaultapps"; Description: "Choose Project Foxy as the default app for images"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc; Languages: english
+Filename: "ms-settings:defaultapps"; Description: "{cm:RunDefaultApps}"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent

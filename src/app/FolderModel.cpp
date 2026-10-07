@@ -10,6 +10,7 @@
 #include <QSet>
 #include <algorithm>
 #include <numeric>
+#include "Translate.h"
 
 FolderModel::FolderModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -173,16 +174,16 @@ QVariantMap FolderModel::checkRename(const QStringList &paths, const QString &ba
     };
 
     if (paths.isEmpty())
-        return fail(QStringLiteral("No hay archivos elegidos."));
+        return fail(core::tr("No hay archivos elegidos."));
     if (baseName.trimmed().isEmpty())
-        return fail(QStringLiteral("Escribe el nombre base."));
-    static const QString illegal = QStringLiteral("<>:\"/\|?*");
+        return fail(core::tr("Escribe el nombre base."));
+    static const QString illegal = QStringLiteral("<>:\"/\\|?*");
     for (const QChar c : baseName) {
         if (illegal.contains(c) || c.unicode() < 32)
-            return fail(QStringLiteral("El nombre no puede llevar los caracteres  < > : \" / \ | ? *"));
+            return fail(core::tr("El nombre no puede llevar los caracteres  < > : \" / \\ | ? *"));
     }
     if (baseName.endsWith(QLatin1Char(' ')) || baseName.endsWith(QLatin1Char('.')))
-        return fail(QStringLiteral("El nombre no puede terminar en espacio ni en punto."));
+        return fail(core::tr("El nombre no puede terminar en espacio ni en punto."));
 
     QSet<QString> chosen;
     for (const QString &p : paths)
@@ -232,7 +233,7 @@ QVariantMap FolderModel::renameFiles(const QStringList &paths, const QString &ba
         if (!QFile::rename(paths.at(i), temp)) {
             putBack(i, 0, {});
             result.insert(QStringLiteral("error"),
-                          QStringLiteral("No se pudo renombrar «%1» (¿está abierto en otro programa?). No se cambió nada.")
+                          core::tr("No se pudo renombrar «%1» (¿está abierto en otro programa?). No se cambió nada.")
                               .arg(QFileInfo(paths.at(i)).fileName()));
             return result;
         }
@@ -246,7 +247,7 @@ QVariantMap FolderModel::renameFiles(const QStringList &paths, const QString &ba
         if (!QFile::rename(temps.at(i), target)) {
             putBack(paths.size(), i, finals);
             result.insert(QStringLiteral("error"),
-                          QStringLiteral("No se pudo crear «%1». No se cambió nada.").arg(names.at(i)));
+                          core::tr("No se pudo crear «%1». No se cambió nada.").arg(names.at(i)));
             return result;
         }
         finals << target;

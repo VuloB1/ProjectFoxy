@@ -11,6 +11,7 @@
 #include "AnimStudio.h"
 #include "CollageStudio.h"
 #include "ColorPicker.h"
+#include "Translations.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -79,6 +80,10 @@ int main(int argc, char *argv[])
     auto *appSettings = new AppSettings(&engine);
     engine.rootContext()->setContextProperty("appSettings", appSettings);
 
+    // The language: installed before any text is built (Main.qml's qsTr() are evaluated when it loads).
+    auto *translations = new Translations(&engine, appSettings, &engine);
+    engine.rootContext()->setContextProperty("translations", translations);
+
     auto *batchExporter = new BatchExporter(&engine);
     engine.rootContext()->setContextProperty("batchExporter", batchExporter);
 
@@ -87,6 +92,8 @@ int main(int argc, char *argv[])
 
     auto *lensController = new LensController(&engine);
     engine.rootContext()->setContextProperty("lensController", lensController);
+
+    QObject::connect(translations, &Translations::activeChanged, controller, &AppController::retranslate);
 
     // Filmstrip navigation (arrow keys, click, Toolbar prev/next) reports a
     // new current file here; AppController decodes and displays it.

@@ -31,6 +31,7 @@ AppSettings::AppSettings(QObject *parent)
     // The mode started life as one all-in-one switch ("view/pixelArt"). Whoever had that on keeps
     // every extra on; for everybody else the extras start off.
     const bool wasAllInOne = m_store.value(QStringLiteral("view/pixelArt"), false).toBool();
+    m_language = m_store.value(QStringLiteral("ui/language"), QStringLiteral("system")).toString();
     m_smoothZoom = m_store.value(QStringLiteral("view/smoothZoom"), false).toBool();
     m_pixelMode = m_store.value(QStringLiteral("view/pixelMode"), wasAllInOne).toBool();
     m_pixelIntegerZoom = m_store.value(QStringLiteral("view/pixelIntegerZoom"), wasAllInOne).toBool();
@@ -98,6 +99,15 @@ void AppSettings::setSlideshowRandom(bool value)
     m_slideshowRandom = value;
     m_store.setValue(QStringLiteral("slideshow/random"), value);
     emit slideshowRandomChanged();
+}
+
+void AppSettings::setLanguage(const QString &value)
+{
+    if (m_language == value)
+        return;
+    m_language = value;
+    m_store.setValue(QStringLiteral("ui/language"), value);
+    emit languageChanged();
 }
 
 void AppSettings::setSmoothZoom(bool value)

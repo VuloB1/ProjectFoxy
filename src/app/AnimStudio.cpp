@@ -14,6 +14,7 @@
 #include <QElapsedTimer>
 #include <algorithm>
 #include <cmath>
+#include "Translate.h"
 
 using namespace core::anim;
 
@@ -464,12 +465,12 @@ QVariantList AnimStudio::frameEffects() const
             continue;
         QStringList presets;
         for (const auto &p : spec.presets)
-            presets << p.name;
+            presets << core::tr(p.name);
         QString group;
         for (const auto &g : core::edit::effectGroups())
             if (g.id == spec.group)
-                group = g.name;
-        list.append(QVariantMap{{"id", spec.id}, {"name", spec.name}, {"group", group}, {"presets", presets}});
+                group = core::tr(g.name);
+        list.append(QVariantMap{{"id", spec.id}, {"name", core::tr(spec.name)}, {"group", group}, {"presets", presets}});
     }
     return list;
 }
@@ -622,7 +623,7 @@ bool AnimStudio::exportTo(const QUrl &file)
         QString error;
         bool ok = out.open(QIODevice::WriteOnly);
         if (!ok)
-            error = QStringLiteral("No se pudo crear el archivo.");
+            error = core::tr("No se pudo crear el archivo.");
         QElapsedTimer sinceReport;
         sinceReport.start();
         qreal lastReported = -1;
@@ -647,7 +648,7 @@ bool AnimStudio::exportTo(const QUrl &file)
         if (ok && !cancelled) {
             ok = out.commit();
             if (!ok)
-                error = QStringLiteral("No se pudo guardar el archivo.");
+                error = core::tr("No se pudo guardar el archivo.");
             else
                 bytes = QFileInfo(path).size();
         } else {

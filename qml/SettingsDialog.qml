@@ -220,7 +220,7 @@ AppDialog {
                 Item {
                     id: pageColumn
                     width: scroller.width - 12
-                    implicitHeight: root.page === 0 ? appearance.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + 48
+                    implicitHeight: root.page === 0 ? appearance.implicitHeight + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + 64
                                        : root.page === 1 ? slideshow.implicitHeight
                                        : root.page === 2 ? saving.implicitHeight : batch.implicitHeight
 
@@ -318,7 +318,7 @@ AppDialog {
                                     Label {
                                         anchors.bottom: parent.bottom
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        text: card.modelData.name
+                                        text: qsTr(card.modelData.name)
                                         color: themeManager.textPrimary
                                         font.bold: card.selected
                                     }
@@ -331,6 +331,30 @@ AppDialog {
                         }
                     }
 
+                    // -- Apariencia, 2nd card: Idioma -------------------------------------------
+                    Card {
+                        id: languageCard
+                        width: parent.width
+                        visible: root.page === 0
+                        y: appearance.height + 16
+                        heading: qsTr("Idioma")
+                        SettingRow {
+                            label: qsTr("Idioma de la interfaz")
+                            hint: qsTr("Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma de Windows.")
+                            AppComboBox {
+                                id: languageBox
+                                width: 190
+                                model: translations.languages.map(function (l) { return l.code === "system" ? qsTr("Según el sistema") : l.name; })
+                                function sync() {
+                                    currentIndex = Math.max(0, translations.languages.findIndex(function (l) { return l.code === appSettings.language; }));
+                                }
+                                Component.onCompleted: sync()
+                                onActivated: function (i) { appSettings.language = translations.languages[i].code; }
+                                Connections { target: appSettings; function onLanguageChanged() { languageBox.sync(); } }
+                            }
+                        }
+                    }
+
                     // -- Apariencia, 2nd card: Modo pixel -------------------------------------
                     // The switch itself keeps pictures sharp when zoomed in; the extras below it
                     // are separate switches that only count while the mode is on.
@@ -338,7 +362,7 @@ AppDialog {
                         id: zoomCard
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + 16
+                        y: appearance.height + languageCard.height + 32
                         heading: qsTr("Zoom")
                         SettingRow {
                             label: qsTr("Tipo de zoom con la rueda")
@@ -356,7 +380,7 @@ AppDialog {
                         id: pixelCard
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + zoomCard.height + 32
+                        y: appearance.height + languageCard.height + zoomCard.height + 48
                         heading: qsTr("Modo pixel")
                         SettingRow {
                             label: qsTr("Modo pixel")
@@ -435,7 +459,7 @@ AppDialog {
                         id: stripCard
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + zoomCard.height + pixelCard.height + 48
+                        y: appearance.height + languageCard.height + zoomCard.height + pixelCard.height + 64
                         heading: qsTr("Barra de miniaturas")
                         SettingRow {
                             label: qsTr("Cuándo se muestra")

@@ -68,8 +68,8 @@ def main():
     x = 490
     d.text((x, 160), "Project", font=font("segoeuib.ttf", 128), fill=(255, 255, 255, 255))
     d.text((x, 280), "Foxy", font=font("segoeuib.ttf", 128), fill=ORANGE + (255,))
-    d.text((x + 6, 438), "Visor y editor de imágenes para Windows.", font=font("segoeui.ttf", 40), fill=(255, 255, 255, 255))
-    d.text((x + 6, 494), "Rápido, ligero, con editor, GIF, collage y comparador.", font=font("segoeui.ttf", 28), fill=(255, 190, 150, 255))
+    d.text((x + 6, 438), "Image viewer and editor for Windows.", font=font("segoeui.ttf", 40), fill=(255, 255, 255, 255))
+    d.text((x + 6, 494), "Fast, lightweight, with editor, GIF, collage and compare.", font=font("segoeui.ttf", 28), fill=(255, 190, 150, 255))
     canvas.convert("RGB").save(out, optimize=True)
     print("ok", out, canvas.size)
 

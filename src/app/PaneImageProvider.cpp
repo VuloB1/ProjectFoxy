@@ -6,6 +6,7 @@
 #include <QMutexLocker>
 #include <QThreadPool>
 #include <QUrl>
+#include "Translate.h"
 
 namespace {
 // What the decoded copies may add up to before the least recently used are dropped.
@@ -32,7 +33,7 @@ QImage PaneImageStore::image(const QString &path, int maxSide, QString *error)
     const auto decoder = core::DecoderRegistry::instance().decoderFor(path);
     if (!decoder) {
         if (error)
-            *error = QStringLiteral("Formato no compatible: %1").arg(path);
+            *error = core::tr("Formato no compatible: %1").arg(path);
         return {};
     }
     const core::DecodeResult result = decoder->decode(path, maxSide > 0 ? QSize(maxSide, maxSide) : QSize());

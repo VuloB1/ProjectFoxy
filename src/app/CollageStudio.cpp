@@ -19,6 +19,7 @@
 #include <cmath>
 #include <random>
 #include <webp/encode.h>
+#include "Translate.h"
 
 using namespace core::collage;
 
@@ -166,7 +167,7 @@ QVariantList CollageStudio::presets() const
         QVariantList rects;
         for (const QRectF &r : l.rects)
             rects.append(QVariant(QVariantList{r.x(), r.y(), r.width(), r.height()})); // (a bare list would be spliced in)
-        list.append(QVariantMap{{"name", l.name}, {"rects", rects}});
+        list.append(QVariantMap{{"name", core::tr(l.name)}, {"rects", rects}});
     }
     return list;
 }
@@ -747,7 +748,7 @@ bool CollageStudio::exportTo(const QUrl &file)
         QSize size = snap->style.size;
         if (format == 2 && (size.width() > 16383 || size.height() > 16383)) {
             ok = false;
-            error = QStringLiteral("El tamaño es demasiado grande para un WebP.");
+            error = core::tr("El tamaño es demasiado grande para un WebP.");
         }
         QImage image;
         if (ok) {
@@ -757,14 +758,14 @@ bool CollageStudio::exportTo(const QUrl &file)
                 error = QStringLiteral("Cancelado.");
             } else if (image.isNull()) {
                 ok = false;
-                error = QStringLiteral("No se pudo armar el collage.");
+                error = core::tr("No se pudo armar el collage.");
             }
         }
         if (ok) {
             QSaveFile out(path);
             if (!out.open(QIODevice::WriteOnly)) {
                 ok = false;
-                error = QStringLiteral("No se pudo crear el archivo.");
+                error = core::tr("No se pudo crear el archivo.");
             } else if (format == 2) {
                 uint8_t *encoded = nullptr;
                 const QImage rgba = image.convertToFormat(QImage::Format_RGBA8888);
@@ -774,7 +775,7 @@ bool CollageStudio::exportTo(const QUrl &file)
                 if (encoded)
                     WebPFree(encoded);
                 if (!ok)
-                    error = QStringLiteral("No se pudo codificar el WebP.");
+                    error = core::tr("No se pudo codificar el WebP.");
             } else {
                 QImage toSave = image;
                 if (format == 1) { // JPEG has no transparency: lay it over white
@@ -799,7 +800,7 @@ bool CollageStudio::exportTo(const QUrl &file)
             if (ok)
                 bytes = QFileInfo(path).size();
             else if (error.isEmpty())
-                error = QStringLiteral("No se pudo guardar el archivo.");
+                error = core::tr("No se pudo guardar el archivo.");
         }
         QMetaObject::invokeMethod(this, [this, ok, path, bytes, error]() {
             m_exporting = false;

@@ -27,6 +27,7 @@
 #endif
 #include <Windows.h>
 #include <shellapi.h>
+#include "Translate.h"
 
 namespace {
 // Further moves of the same Ajustes/Filtros control within this long of the last
@@ -306,22 +307,22 @@ QVariantMap AppController::buildMetadataDisplay(const core::ImageMetadata &meta)
 
     const QString camera = (meta.cameraMake + QLatin1Char(' ') + meta.cameraModel).trimmed();
     if (!camera.isEmpty())
-        display.insert(QStringLiteral("Cámara"), camera);
+        display.insert(core::tr("Cámara"), camera);
 
     if (meta.dateTaken.isValid())
-        display.insert(QStringLiteral("Fecha"), meta.dateTaken.toString(QStringLiteral("dd/MM/yyyy HH:mm")));
+        display.insert(core::tr("Fecha"), meta.dateTaken.toString(QStringLiteral("dd/MM/yyyy HH:mm")));
 
     if (meta.focalLengthMm > 0.0)
-        display.insert(QStringLiteral("Distancia focal"), QStringLiteral("%1 mm").arg(meta.focalLengthMm, 0, 'g', 3));
+        display.insert(core::tr("Distancia focal"), QStringLiteral("%1 mm").arg(meta.focalLengthMm, 0, 'g', 3));
 
     if (meta.apertureF > 0.0)
-        display.insert(QStringLiteral("Apertura"), QStringLiteral("f/%1").arg(meta.apertureF, 0, 'g', 2));
+        display.insert(core::tr("Apertura"), QStringLiteral("f/%1").arg(meta.apertureF, 0, 'g', 2));
 
     if (meta.exposureSeconds > 0.0) {
         const QString shutter = meta.exposureSeconds < 1.0
             ? QStringLiteral("1/%1 s").arg(qRound(1.0 / meta.exposureSeconds))
             : QStringLiteral("%1 s").arg(meta.exposureSeconds, 0, 'g', 3);
-        display.insert(QStringLiteral("Velocidad"), shutter);
+        display.insert(core::tr("Velocidad"), shutter);
     }
 
     if (meta.isoSpeed > 0)
@@ -370,8 +371,8 @@ bool AppController::saveBlocked()
     if (!m_isLoading && !m_saving)
         return false;
     m_errorString = m_isLoading
-        ? QStringLiteral("Espera a que termine de cargarse la otra imagen antes de guardar.")
-        : QStringLiteral("Ya se está guardando: espera a que termine.");
+        ? core::tr("Espera a que termine de cargarse la otra imagen antes de guardar.")
+        : core::tr("Ya se está guardando: espera a que termine.");
     emit errorStringChanged();
     return true;
 }
@@ -1021,7 +1022,7 @@ QVariantList AppController::lookList() const
     for (const core::edit::LookSpec &look : core::edit::allLooks()) {
         QVariantMap m;
         m.insert(QStringLiteral("id"), look.id);
-        m.insert(QStringLiteral("name"), look.name);
+        m.insert(QStringLiteral("name"), core::tr(look.name));
         m.insert(QStringLiteral("group"), look.group);
         list.append(m);
     }
@@ -1034,7 +1035,7 @@ QVariantList AppController::lookGroups() const
     for (const core::edit::LookGroup &group : core::edit::lookGroups()) {
         QVariantMap m;
         m.insert(QStringLiteral("id"), group.id);
-        m.insert(QStringLiteral("name"), group.name);
+        m.insert(QStringLiteral("name"), core::tr(group.name));
         list.append(m);
     }
     return list;
@@ -1100,7 +1101,7 @@ QVariantList AppController::effectList() const
     for (const core::edit::EffectSpec &fx : core::edit::allEffects()) {
         QVariantMap m;
         m.insert(QStringLiteral("id"), fx.id);
-        m.insert(QStringLiteral("name"), fx.name);
+        m.insert(QStringLiteral("name"), core::tr(fx.name));
         m.insert(QStringLiteral("group"), fx.group);
         m.insert(QStringLiteral("hidden"), fx.hidden);
         m.insert(QStringLiteral("changesSize"), fx.changesSize);
@@ -1115,7 +1116,7 @@ QVariantList AppController::effectGroups() const
     for (const core::edit::EffectGroup &group : core::edit::effectGroups()) {
         QVariantMap m;
         m.insert(QStringLiteral("id"), group.id);
-        m.insert(QStringLiteral("name"), group.name);
+        m.insert(QStringLiteral("name"), core::tr(group.name));
         list.append(m);
     }
     return list;
@@ -1129,19 +1130,22 @@ QVariantList AppController::effectParams() const
         return list;
     for (const core::edit::EffectParam &p : spec->params) {
         QVariantMap m;
-        m.insert(QStringLiteral("label"), p.label);
+        m.insert(QStringLiteral("label"), core::tr(p.label));
         m.insert(QStringLiteral("min"), p.min);
         m.insert(QStringLiteral("max"), p.max);
         m.insert(QStringLiteral("def"), p.def);
         m.insert(QStringLiteral("suffix"), p.suffix);
         m.insert(QStringLiteral("integer"), p.integer);
         m.insert(QStringLiteral("toggle"), p.toggle);
-        m.insert(QStringLiteral("options"), p.options);
+        QStringList options;
+        for (const QString &o : p.options)
+            options << core::tr(o);
+        m.insert(QStringLiteral("options"), options);
         m.insert(QStringLiteral("color"), p.color);
         m.insert(QStringLiteral("seed"), p.seed);
         m.insert(QStringLiteral("dependsOn"), p.dependsOn);
         m.insert(QStringLiteral("dependsMask"), p.dependsMask);
-        m.insert(QStringLiteral("hint"), p.hint);
+        m.insert(QStringLiteral("hint"), core::tr(p.hint));
         list.append(m);
     }
     return list;
@@ -1153,7 +1157,7 @@ QStringList AppController::effectPresets() const
     const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
     if (spec)
         for (const core::edit::EffectPreset &p : spec->presets)
-            names << p.name;
+            names << core::tr(p.name);
     return names;
 }
 
@@ -1175,7 +1179,7 @@ QVariantList AppController::effectOverlays() const
         m.insert(QStringLiteral("kind"), QString::fromLatin1(kind));
         m.insert(QStringLiteral("x"), o.x);
         m.insert(QStringLiteral("y"), o.y);
-        m.insert(QStringLiteral("label"), o.label);
+        m.insert(QStringLiteral("label"), core::tr(o.label));
         m.insert(QStringLiteral("mapping"), o.mapping);
         double xlo = 0, xhi = 1, ylo = 0, yhi = 1;
         range(o.x, xlo, xhi);
@@ -1519,8 +1523,8 @@ bool AppController::saveEdited()
         return false;
     if (!canSaveInPlace()) {
         m_errorString = m_currentFilePath.isEmpty()
-            ? QStringLiteral("Esta imagen no tiene archivo: usa «Guardar como…».")
-            : QStringLiteral("Este formato no se puede escribir en el mismo archivo: usa «Guardar como…».");
+            ? core::tr("Esta imagen no tiene archivo: usa «Guardar como…».")
+            : core::tr("Este formato no se puede escribir en el mismo archivo: usa «Guardar como…».");
         emit errorStringChanged();
         return false;
     }
@@ -1595,7 +1599,7 @@ bool AppController::startSave(const QString &path)
         }
         const QImage rendered = core::edit::renderLiveOverlay(base, lookId, lookAmount, adjust);
         if (rendered.isNull()) {
-            outcome.error = QStringLiteral("No hay imagen que guardar");
+            outcome.error = core::tr("No hay imagen que guardar");
         } else {
             const core::SaveResult result = core::saveImageWithOptions(rendered, path, options);
             outcome.ok = result.ok;
@@ -1618,7 +1622,7 @@ void AppController::finishSave(const SaveOutcome &outcome)
     m_afterSavePath.clear();
 
     if (!outcome.ok) {
-        m_errorString = QStringLiteral("No se pudo guardar «%1»: %2")
+        m_errorString = core::tr("No se pudo guardar «%1»: %2")
                             .arg(QDir::toNativeSeparators(outcome.path), outcome.error);
         emit errorStringChanged();
         emit saveFinished(false, outcome.path);
@@ -1644,7 +1648,7 @@ void AppController::finishSave(const SaveOutcome &outcome)
     }
     if (!outcome.warning.isEmpty()) {
         qWarning().noquote() << "Guardado con aviso:" << outcome.warning;
-        emit saveNotice(QStringLiteral("La imagen se guardó, pero: %1.").arg(outcome.warning));
+        emit saveNotice(core::tr("La imagen se guardó, pero: %1.").arg(outcome.warning));
     }
     emit saveFinished(true, outcome.path);
 
@@ -1748,7 +1752,7 @@ bool AppController::deleteCurrentFile()
     if (m_currentFilePath.isEmpty())
         return false;
     if (m_saving) { // the writer is about to (re)create this very file
-        m_errorString = QStringLiteral("No se puede eliminar el archivo mientras se guarda.");
+        m_errorString = core::tr("No se puede eliminar el archivo mientras se guarda.");
         emit errorStringChanged();
         return false;
     }

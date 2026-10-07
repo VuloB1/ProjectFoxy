@@ -1295,3 +1295,26 @@ Todo lo necesario para publicar en GitHub está en el repositorio:
 - La versión sale de `project(... VERSION ...)` en `CMakeLists.txt` (el programa la muestra en el panel de información);
   `resources/app.rc`, `vcpkg.json` y `installer/ProjectFoxy.iss` deben coincidir. Subir versión = cambiar esos sitios,
   añadir la entrada a `CHANGELOG.md`, y `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+## 15. Idiomas de la interfaz (6‑oct‑2026)
+
+Seis idiomas: español (el original), inglés, portugués (Brasil), coreano, chino simplificado y japonés.
+
+- **El texto en español es la clave.** QML usa `qsTr("…")`; C++ usa `tr("…")` en los `QObject` y `core::tr("…")`
+  (`src/core/Translate.h`) en el núcleo. Sin traductor (pruebas, español) devuelven el texto tal cual.
+- **`src/app/Translations.{h,cpp}`**: `CatalogTranslator` (un `QTranslator` que busca el texto original en un JSON
+  `{"español": "traducción"}` e ignora el contexto) y `Translations` (elige el idioma: `AppSettings::language` =
+  `system` | `es` | `en` | `pt` | `ko` | `zh` | `ja`; `system` toma el primer idioma de Windows que tengamos, o inglés).
+  Cambiar el idioma instala el traductor y llama a `QQmlEngine::retranslate()`: **se aplica al instante**. Los nombres
+  que vienen del núcleo (efectos, ajustes, looks, preajustes, diseños de collage) se traducen en el límite con QML
+  (`AppController::effectList()`… llaman a `core::tr()`), y `AppController::retranslate()` avisa a QML con
+  `textsChanged`/`effectChanged` para que los pida de nuevo. Los temas usan `QT_TR_NOOP` + `qsTr(nombre)` en QML.
+- **Catálogo**: `i18n/strings.tsv` (español, en, pt, ko, zh, ja; una fila por texto) → `tools/i18n_tool.py build` →
+  `resources/i18n/<idioma>.json`, que se compilan en el ejecutable (`:/i18n/…`). `tools/i18n_tool.py check` lista los
+  textos del código que faltan en la tabla y los marcadores `%1` que no coinciden; `tools/i18n_add.py` agrega filas.
+  Una celda vacía = igual que el español. Los JSON generados **se suben al repositorio** (el CI no ejecuta Python).
+- **Pruebas**: `test_translations` (qué idioma sale de cada idioma de Windows, el traductor, `core::tr` y que cada
+  catálogo tenga los textos clave con sus marcadores).
+- **Instalador**: Inno Setup en inglés, español, portugués, coreano y japonés (el chino simplificado no viene con
+  Inno Setup; el instalador cae en inglés para ese idioma, el programa sí está en chino).
+- Los textos nuevos: escribirlos en español dentro de `qsTr`/`tr`, agregar la fila a `strings.tsv` y `build`.

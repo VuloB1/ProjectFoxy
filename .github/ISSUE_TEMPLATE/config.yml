@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Preguntas y conversación
+  - name: Questions and conversation / Preguntas y conversación
     url: https://github.com/VuloB1/ProjectFoxy/discussions
-    about: Para dudas de uso o ideas todavía sin pulir (si las Discussions están activadas en el repositorio).
+    about: For usage questions or rough ideas (if Discussions are enabled in the repository). / Para dudas de uso o ideas todavía sin pulir (si las Discussions están activadas en el repositorio).

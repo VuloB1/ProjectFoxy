@@ -7,6 +7,7 @@
 #include <cfloat>
 #include <cmath>
 #include <set>
+#include "Translate.h"
 
 namespace core::lens {
 
@@ -566,7 +567,7 @@ Correction LensDatabase::correction(const Lens &lens, double cameraCrop, double 
             out.scaleDist = set->crop / cameraCrop;
             out.aspect = lens.aspect;
             if (other)
-                out.note = QStringLiteral("La distorsión de esta lente está calibrada en un sensor de otro tamaño.");
+                out.note = core::tr("La distorsión de esta lente está calibrada en un sensor de otro tamaño.");
         }
     }
     // --- chromatic aberration

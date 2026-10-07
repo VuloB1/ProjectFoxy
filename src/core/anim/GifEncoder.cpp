@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include "Translate.h"
 
 namespace core::anim {
 
@@ -342,9 +343,9 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
         return false;
     };
     if (total < 1 || size.width() < 1 || size.height() < 1)
-        return fail(QStringLiteral("No hay fotogramas para guardar."));
+        return fail(core::tr("No hay fotogramas para guardar."));
     if (size.width() > 65535 || size.height() > 65535)
-        return fail(QStringLiteral("La imagen es demasiado grande para un GIF."));
+        return fail(core::tr("La imagen es demasiado grande para un GIF."));
 
     const int maxColors = std::clamp(options.colors, 2, 256);
     // one palette slot is kept for "transparent", always at index 0
@@ -360,7 +361,7 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
             int delay = 0;
             const QImage f = frames.frame(i, &delay).convertToFormat(QImage::Format_RGBA8888);
             if (f.size() != size)
-                return fail(QStringLiteral("Los fotogramas no tienen todos el mismo tamaño."));
+                return fail(core::tr("Los fotogramas no tienen todos el mismo tamaño."));
             for (int y = 0; y < f.height() && !anyTranslucent; ++y) {
                 const uchar *p = f.constScanLine(y);
                 for (int x = 0; x < f.width(); ++x)
@@ -418,7 +419,7 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
         head.append(char(0));
     }
     if (out.write(head) != head.size())
-        return fail(QStringLiteral("No se pudo escribir el archivo."));
+        return fail(core::tr("No se pudo escribir el archivo."));
 
     // ---- pass 2: the frames
     QImage previous;
@@ -426,7 +427,7 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
         int delayMs = 100;
         const QImage frame = frames.frame(i, &delayMs).convertToFormat(QImage::Format_RGBA8888);
         if (frame.size() != size)
-            return fail(QStringLiteral("Los fotogramas no tienen todos el mismo tamaño."));
+            return fail(core::tr("Los fotogramas no tienen todos el mismo tamaño."));
 
         // With anything see-through in the animation every frame is drawn on its own over a cleared
         // background; otherwise each one only adds what changed to the one before.
@@ -557,7 +558,7 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
         }
         lzwEncode(pixels, std::max(2, dataBits), block);
         if (out.write(block) != block.size())
-            return fail(QStringLiteral("No se pudo escribir el archivo."));
+            return fail(core::tr("No se pudo escribir el archivo."));
 
         previous = frame;
         if (progress && !progress(total + i + 1, total * 2))
@@ -565,7 +566,7 @@ bool writeGif(FrameSource &frames, const GifOptions &options, QIODevice &out, co
     }
     const char trailer = 0x3B;
     if (out.write(&trailer, 1) != 1)
-        return fail(QStringLiteral("No se pudo escribir el archivo."));
+        return fail(core::tr("No se pudo escribir el archivo."));
     return true;
 }
 

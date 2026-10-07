@@ -1,0 +1,873 @@
+Doble clic para restablecer	Double-click to reset	Clique duas vezes para redefinir	두 번 클릭하여 초기화	双击重置	ダブルクリックでリセット
+Automático	Automatic	Automático	자동	自动	自動
+Blancos	Whites	Brancos	흰색	白色	白レベル
+Brillo	Brightness	Brilho	밝기	亮度	明るさ
+Claridad	Clarity	Clareza	명료도	清晰度	明瞭度
+Color	Color	Cor	색상	颜色	カラー
+Contraste	Contrast	Contraste	대비	对比度	コントラスト
+Curvas	Curves	Curvas	곡선	曲线	カーブ
+Detalle	Detail	Detalhe	디테일	细节	ディテール
+Estira cada canal de color por separado	Stretches each color channel separately	Estica cada canal de cor separadamente	각 색상 채널을 따로 늘립니다	分别拉伸每个颜色通道	各色チャンネルを個別に引き伸ばします
+Estira el brillo al rango completo	Stretches brightness to the full range	Estica o brilho para todo o intervalo	밝기를 전체 범위로 늘립니다	将亮度拉伸到完整范围	明るさを全範囲に引き伸ばします
+Exposición	Exposure	Exposição	노출	曝光	露光量
+Gamma	Gamma	Gama	감마	伽马	ガンマ
+Histograma	Histogram	Histograma	히스토그램	直方图	ヒストグラム
+Intensidad	Intensity	Intensidade	강도	强度	強さ
+Luces	Highlights	Realces	밝은 영역	高光	ハイライト
+Luminosidad	Lightness	Luminosidade	명도	明度	明度
+Luz	Light	Luz	빛	光线	ライト
+Matiz	Tint	Tonalidade	틴트	色调	色合い
+Negros	Blacks	Pretos	검정	黑色	黒レベル
+Neutraliza una dominante de color	Neutralizes a color cast	Neutraliza uma dominante de cor	색 치우침을 중화합니다	中和偏色	色かぶりを中和します
+Nitidez	Sharpness	Nitidez	선명도	锐化	シャープネス
+Niveles	Levels	Níveis	레벨	色阶	レベル
+RGB					
+Restablecer ajustes	Reset adjustments	Redefinir ajustes	조정 초기화	重置调整	調整をリセット
+Saturación	Saturation	Saturação	채도	饱和度	彩度
+Sombras	Shadows	Sombras	어두운 영역	阴影	シャドウ
+Temperatura	Temperature	Temperatura	색온도	色温	色温度
+Tono	Hue	Matiz	색상	色相	色相
+No se pudo crear el archivo.	Could not create the file.	Não foi possível criar o arquivo.	파일을 만들 수 없습니다.	无法创建文件。	ファイルを作成できませんでした。
+No se pudo guardar el archivo.	Could not save the file.	Não foi possível salvar o arquivo.	파일을 저장할 수 없습니다.	无法保存文件。	ファイルを保存できませんでした。
+APNG sin fotogramas válidos: %1	APNG has no valid frames: %1	APNG sem quadros válidos: %1	유효한 프레임이 없는 APNG: %1	APNG 没有有效的帧：%1	有効なフレームのない APNG: %1
+Dimensiones de APNG inválidas: %1	Invalid APNG dimensions: %1	Dimensões de APNG inválidas: %1	잘못된 APNG 크기: %1	APNG 尺寸无效：%1	APNG のサイズが無効です: %1
+El WebP animado no tiene fotogramas.	The animated WebP has no frames.	O WebP animado não tem quadros.	애니메이션 WebP에 프레임이 없습니다.	动画 WebP 没有帧。	アニメーション WebP にフレームがありません。
+No se pudo abrir %1	Could not open %1	Não foi possível abrir %1	%1을(를) 열 수 없습니다	无法打开 %1	%1 を開けませんでした
+No se pudo decodificar %1	Could not decode %1	Não foi possível decodificar %1	%1을(를) 디코딩할 수 없습니다	无法解码 %1	%1 をデコードできませんでした
+No se pudo iniciar el decodificador de WebP.	Could not start the WebP decoder.	Não foi possível iniciar o decodificador de WebP.	WebP 디코더를 시작할 수 없습니다.	无法启动 WebP 解码器。	WebP デコーダーを起動できませんでした。
+No se pudo leer el WebP animado.	Could not read the animated WebP.	Não foi possível ler o WebP animado.	애니메이션 WebP를 읽을 수 없습니다.	无法读取动画 WebP。	アニメーション WebP を読み込めませんでした。
+Los fotogramas no tienen el mismo formato.	The frames do not all have the same format.	Os quadros não têm todos o mesmo formato.	프레임의 형식이 모두 같지 않습니다.	各帧的格式不一致。	フレームの形式が揃っていません。
+Los fotogramas no tienen todos el mismo tamaño.	The frames are not all the same size.	Os quadros não têm todos o mesmo tamanho.	프레임의 크기가 모두 같지 않습니다.	各帧的尺寸不一致。	フレームのサイズが揃っていません。
+No hay fotogramas para guardar.	There are no frames to save.	Não há quadros para salvar.	저장할 프레임이 없습니다.	没有可保存的帧。	保存するフレームがありません。
+No se pudo codificar un fotograma.	Could not encode a frame.	Não foi possível codificar um quadro.	프레임을 인코딩할 수 없습니다.	无法编码某一帧。	フレームをエンコードできませんでした。
+No se pudo escribir el archivo.	Could not write the file.	Não foi possível gravar o arquivo.	파일을 쓸 수 없습니다.	无法写入文件。	ファイルを書き込めませんでした。
+El portapapeles no contiene ninguna imagen.	The clipboard does not contain an image.	A área de transferência não contém nenhuma imagem.	클립보드에 이미지가 없습니다.	剪贴板中没有图像。	クリップボードに画像がありません。
+Espera a que termine de cargarse la otra imagen antes de guardar.	Wait for the other image to finish loading before saving.	Aguarde o carregamento da outra imagem terminar antes de salvar.	다른 이미지를 불러오는 중입니다. 완료된 후에 저장하세요.	请等另一张图像加载完成后再保存。	別の画像の読み込みが終わってから保存してください。
+Esta imagen no tiene archivo: usa «Guardar como…».	This image has no file: use "Save as…".	Esta imagem não tem arquivo: use "Salvar como…".	이 이미지는 파일이 없습니다. "다른 이름으로 저장…"을 사용하세요.	此图像没有文件：请使用“另存为…”。	この画像にはファイルがありません。「名前を付けて保存…」を使ってください。
+Este formato no se puede escribir en el mismo archivo: usa «Guardar como…».	This format cannot be written to the same file: use "Save as…".	Este formato não pode ser gravado no mesmo arquivo: use "Salvar como…".	이 형식은 같은 파일에 쓸 수 없습니다. "다른 이름으로 저장…"을 사용하세요.	此格式无法写入同一文件：请使用“另存为…”。	この形式は同じファイルに書き込めません。「名前を付けて保存…」を使ってください。
+Fecha	Date	Data	날짜	日期	日付
+La imagen se guardó, pero: %1.	The image was saved, but: %1.	A imagem foi salva, mas: %1.	이미지를 저장했지만: %1.	图像已保存，但是：%1。	画像は保存されましたが、%1。
+No hay imagen que guardar	There is no image to save	Não há imagem para salvar	저장할 이미지가 없습니다	没有可保存的图像	保存する画像がありません
+No se pudo guardar «%1»: %2	Could not save "%1": %2	Não foi possível salvar "%1": %2	"%1"을(를) 저장할 수 없습니다: %2	无法保存“%1”：%2	「%1」を保存できませんでした: %2
+No se puede eliminar el archivo mientras se guarda.	The file cannot be deleted while it is being saved.	O arquivo não pode ser excluído enquanto está sendo salvo.	저장하는 동안에는 파일을 삭제할 수 없습니다.	保存时无法删除该文件。	保存中はファイルを削除できません。
+Ya se está guardando: espera a que termine.	Already saving: wait for it to finish.	Já está salvando: aguarde terminar.	이미 저장 중입니다. 끝날 때까지 기다리세요.	正在保存：请等待完成。	すでに保存中です。終わるまでお待ちください。
+Abriendo imagen…	Opening image…	Abrindo imagem…	이미지 여는 중…	正在打开图像…	画像を開いています…
+0 = conservar el tamaño original	0 = keep the original size	0 = manter o tamanho original	0 = 원래 크기 유지	0 = 保持原始尺寸	0 = 元のサイズを維持
+Calidad JPG y WebP: %1 % (se cambia en Configuración).	JPG and WebP quality: %1 % (change it in Settings).	Qualidade JPG e WebP: %1 % (altere em Configurações).	JPG 및 WebP 품질: %1 % (설정에서 변경).	JPG 和 WebP 质量：%1 %（在设置中更改）。	JPG と WebP の品質: %1 %（設定で変更）。
+Carpeta de destino	Destination folder	Pasta de destino	대상 폴더	目标文件夹	保存先フォルダー
+Cerrar	Close	Fechar	닫기	关闭	閉じる
+Detener	Stop	Parar	중지	停止	停止
+Elegir carpeta de destino	Choose the destination folder	Escolher a pasta de destino	대상 폴더 선택	选择目标文件夹	保存先フォルダーを選択
+Elegir carpeta…	Choose folder…	Escolher pasta…	폴더 선택…	选择文件夹…	フォルダーを選択…
+Elige las imágenes de esta carpeta que quieres convertir.	Choose the images in this folder that you want to convert.	Escolha as imagens desta pasta que deseja converter.	변환할 이 폴더의 이미지를 선택하세요.	选择此文件夹中要转换的图像。	このフォルダー内の変換したい画像を選んでください。
+Exportando %1 de %2…	Exporting %1 of %2…	Exportando %1 de %2…	%2개 중 %1개 내보내는 중…	正在导出 %1/%2…	%2 件中 %1 件を書き出し中…
+Exportar	Export	Exportar	내보내기	导出	書き出し
+Exportar %1	Export %1	Exportar %1	%1 내보내기	导出 %1	%1 を書き出し
+Exportar por lote	Batch export	Exportar em lote	일괄 내보내기	批量导出	一括書き出し
+Formato	Format	Formato	형식	格式	形式
+Lado mayor máximo (px)	Maximum long side (px)	Lado maior máximo (px)	긴 변 최대 크기(px)	长边最大值（px）	長辺の最大サイズ (px)
+Listo: %1 imágenes exportadas.	Done: %1 images exported.	Pronto: %1 imagens exportadas.	완료: 이미지 %1개를 내보냈습니다.	完成：已导出 %1 张图像。	完了: %1 枚の画像を書き出しました。
+Terminado: %1 exportadas y %2 con error.	Finished: %1 exported and %2 with errors.	Concluído: %1 exportadas e %2 com erro.	완료: %1개 내보냄, %2개 오류.	完成：已导出 %1 张，%2 张出错。	完了: %1 件を書き出し、%2 件はエラーでした。
+%1 de %2 elegidos	%1 of %2 selected	%1 de %2 selecionados	%2개 중 %1개 선택됨	已选择 %1/%2	%2 件中 %1 件を選択
+Buscar por nombre…	Search by name…	Buscar por nome…	이름으로 검색…	按名称搜索…	名前で検索…
+Invertir	Invert	Inverter	반전	反选	選択を反転
+Mayús + clic: un tramo	Shift + click: a range	Shift + clique: um intervalo	Shift + 클릭: 범위 선택	Shift + 单击：选择范围	Shift + クリック: 範囲選択
+Ninguno	None	Nenhum	없음	无	なし
+Ningún archivo coincide.	No file matches.	Nenhum arquivo corresponde.	일치하는 파일이 없습니다.	没有匹配的文件。	一致するファイルがありません。
+No hay imágenes en la carpeta.	There are no images in the folder.	Não há imagens na pasta.	폴더에 이미지가 없습니다.	文件夹中没有图像。	フォルダーに画像がありません。
+Todos	All	Todos	모두	全部	すべて
+Así quedarán	How they will look	Como ficarão	결과 미리보기	结果预览	仕上がり
+Cancelar	Cancel	Cancelar	취소	取消	キャンセル
+Dígitos	Digits	Dígitos	자릿수	位数	桁数
+Elige al menos una imagen.	Choose at least one image.	Escolha pelo menos uma imagem.	이미지를 하나 이상 선택하세요.	请至少选择一张图像。	画像を 1 枚以上選んでください。
+Elige las imágenes que quieres renombrar; se numeran en el orden de la lista.	Choose the images you want to rename; they are numbered in list order.	Escolha as imagens que deseja renomear; elas são numeradas na ordem da lista.	이름을 바꿀 이미지를 선택하세요. 목록 순서대로 번호가 매겨집니다.	选择要重命名的图像；将按列表顺序编号。	名前を変更する画像を選んでください。リストの順に番号が付きます。
+Empezar en	Start at	Começar em	시작 번호	起始编号	開始番号
+Nombre base	Base name	Nome base	기본 이름	基础名称	基本名
+Renombrar	Rename	Renomear	이름 바꾸기	重命名	名前の変更
+Renombrar %1	Rename %1	Renomear %1	%1 이름 바꾸기	重命名 %1	%1 の名前を変更
+Renombrar por lote	Batch rename	Renomear em lote	일괄 이름 바꾸기	批量重命名	一括名前変更
+imagen_	image_	imagem_	image_	image_	image_
+Aclarar	Lighten	Clarear	밝게 하기	变亮	比較(明)
+Añadir	Add	Adicionar	추가	添加	加算
+Diferencia	Difference	Diferença	차이	差值	差の絶対値
+Exclusión	Exclusion	Exclusão	제외	排除	除外
+Luz focal	Pin light	Luz focal	핀 라이트	点光	ピンライト
+Luz fuerte	Hard light	Luz direta	하드 라이트	强光	ハードライト
+Luz intensa	Vivid light	Luz intensa	비비드 라이트	亮光	ビビッドライト
+Luz suave	Soft light	Luz suave	소프트 라이트	柔光	ソフトライト
+Mezcla definida	Hard mix	Mistura definida	하드 믹스	实色混合	ハードミックス
+Multiplicar	Multiply	Multiplicar	곱하기	正片叠底	乗算
+Normal					
+Oscurecer	Darken	Escurecer	어둡게 하기	变暗	比較(暗)
+Sobreexponer color	Color dodge	Superexposição de cor	컬러 닷지	颜色减淡	覆い焼きカラー
+Subexponer color	Color burn	Subexposição de cor	컬러 번	颜色加深	焼き込みカラー
+Subexposición lineal	Linear burn	Subexposição linear	리니어 번	线性加深	焼き込み (リニア)
+Superponer	Overlay	Sobrepor	오버레이	叠加	オーバーレイ
+Trama	Screen	Tela	스크린	滤色	スクリーン
+Xor					
+B					
+G					
+R					
+%1 (%2 fotos)	%1 (%2 photos)	%1 (%2 fotos)	%1 (사진 %2장)	%1（%2 张照片）	%1（写真 %2 枚）
+16:9					
+3:4					
+4:3					
+9:16					
+A4 horizontal	A4 landscape	A4 paisagem	A4 가로	A4 横向	A4 横
+A4 vertical	A4 portrait	A4 retrato	A4 세로	A4 纵向	A4 縦
+Agrega las imágenes de la carpeta que está abierta, hasta llenar 12 celdas	Adds the images of the open folder, up to 12 cells	Adiciona as imagens da pasta aberta, até preencher 12 células	열려 있는 폴더의 이미지를 12칸이 찰 때까지 추가합니다	添加当前文件夹中的图像，最多填满 12 个单元格	開いているフォルダーの画像を 12 セルまで追加します
+Agregar fotos…	Add photos…	Adicionar fotos…	사진 추가…	添加照片…	写真を追加…
+Arrastrá una celda para moverla y sus puntos para cambiarle el tamaño. Shift o botón derecho: mover la foto dentro. Rueda: acercar la foto. Doble clic: restablecerla.	Drag a cell to move it and its handles to resize it. Shift or right button: move the photo inside. Wheel: zoom the photo. Double-click: reset it.	Arraste uma célula para movê-la e os pontos para redimensioná-la. Shift ou botão direito: mover a foto dentro. Roda: aproximar a foto. Clique duplo: redefinir.	셀을 드래그해 이동하고, 점을 드래그해 크기를 바꿉니다. Shift 또는 오른쪽 버튼: 셀 안에서 사진 이동. 휠: 사진 확대. 더블 클릭: 초기화.	拖动单元格可移动，拖动其控制点可调整大小。Shift 或右键：在单元格内移动照片。滚轮：缩放照片。双击：重置。	セルをドラッグして移動、ハンドルをドラッグしてサイズ変更。Shift または右ボタン: セル内で写真を移動。ホイール: 写真を拡大。ダブルクリック: リセット。
+Arrastrá una foto para moverla dentro de su celda y usá la rueda para acercarla (sin límites: puede quedar más chica que la celda). Arrastrá las líneas para cambiar el tamaño de las celdas.	Drag a photo to move it inside its cell and use the wheel to zoom it (no limits: it can end up smaller than the cell). Drag the lines to resize the cells.	Arraste uma foto para movê-la dentro da célula e use a roda para aproximá-la (sem limites: pode ficar menor que a célula). Arraste as linhas para redimensionar as células.	사진을 드래그해 셀 안에서 이동하고 휠로 확대하세요(제한 없음: 셀보다 작아질 수도 있습니다). 선을 드래그해 셀 크기를 바꿉니다.	拖动照片可在单元格内移动，用滚轮缩放（无限制：可以比单元格更小）。拖动分隔线可调整单元格大小。	写真をドラッグしてセル内で移動し、ホイールで拡大します（制限なし: セルより小さくもできます）。線をドラッグするとセルのサイズを変更できます。
+Borde	Border	Borda	테두리	边框	枠線
+Borrar esta plantilla	Delete this template	Excluir este modelo	이 템플릿 삭제	删除此模板	このテンプレートを削除
+Cada celda se mueve y se redimensiona por su cuenta, y pueden superponerse	Each cell moves and resizes on its own, and they can overlap	Cada célula se move e se redimensiona sozinha, e podem se sobrepor	각 셀을 따로 이동하고 크기를 바꿀 수 있으며 겹칠 수도 있습니다	每个单元格可独立移动和调整大小，并且可以重叠	各セルを個別に移動・サイズ変更でき、重ねることもできます
+Calidad	Quality	Qualidade	품질	质量	品質
+Calidad (100 = sin pérdida)	Quality (100 = lossless)	Qualidade (100 = sem perda)	품질(100 = 무손실)	质量（100 = 无损）	品質 (100 = 劣化なし)
+Cambiar foto…	Change photo…	Trocar foto…	사진 바꾸기…	更换照片…	写真を変更…
+Celda vacía	Empty cell	Célula vazia	빈 셀	空单元格	空のセル
+Celdas	Cells	Células	셀	单元格	セル
+Celdas que encajan, con líneas divisorias que se arrastran	Cells that fit together, with divider lines you can drag	Células que se encaixam, com linhas divisórias que podem ser arrastadas	서로 맞물리는 셀과 드래그할 수 있는 구분선	彼此贴合的单元格，分隔线可拖动	ぴったり並ぶセルと、ドラッグできる区切り線
+Cerrar el estudio	Close the studio	Fechar o estúdio	스튜디오 닫기	关闭工作室	スタジオを閉じる
+Color del borde	Border color	Cor da borda	테두리 색	边框颜色	枠線の色
+Crear collage	Create collage	Criar colagem	콜라주 만들기	创建拼贴	コラージュを作成
+Cuadrado	Square	Quadrado	정사각형	正方形	正方形
+Degradado	Gradient	Gradiente	그라데이션	渐变	グラデーション
+Dejar que la foto salga de su celda	Let the photo go outside its cell	Deixar a foto sair da célula	사진이 셀 밖으로 나가게 하기	允许照片超出其单元格	写真をセルの外にはみ出させる
+Desenfoque	Blur	Desfoque	흐림	模糊	ぼかし
+Desenfoque de la sombra	Shadow blur	Desfoque da sombra	그림자 흐림	阴影模糊	影のぼかし
+Diseño	Layout	Layout	레이아웃	布局	レイアウト
+Distancia de la sombra	Shadow distance	Distância da sombra	그림자 거리	阴影距离	影の距離
+Elegí la foto de esta celda	Choose this cell's photo	Escolha a foto desta célula	이 셀의 사진 선택	选择此单元格的照片	このセルの写真を選択
+Elegí las fotos del collage	Choose the collage photos	Escolha as fotos da colagem	콜라주 사진 선택	选择拼贴照片	コラージュの写真を選択
+Espejo horizontal	Mirror horizontally	Espelhar horizontalmente	좌우 반전	水平镜像	左右反転
+Espejo vertical	Mirror vertically	Espelhar verticalmente	상하 반전	垂直镜像	上下反転
+Esquinas redondeadas	Rounded corners	Cantos arredondados	둥근 모서리	圆角	角を丸く
+Fondo	Background	Fundo	배경	背景	背景
+Foto	Photo	Foto	사진	照片	写真
+Foto %1	Photo %1	Foto %1	사진 %1	照片 %1	写真 %1
+Foto desenfocada	Blurred photo	Foto desfocada	흐린 사진	模糊照片	ぼかした写真
+Fotos	Photos	Fotos	사진	照片	写真
+Giro	Rotation	Giro	회전	旋转	回転
+Guarda este diseño y cómo se ve (separación, bordes, fondo...) para usarlo de nuevo, sin las fotos	Saves this layout and how it looks (spacing, borders, background…) to use it again, without the photos	Salva este layout e sua aparência (espaçamento, bordas, fundo...) para usar de novo, sem as fotos	이 레이아웃과 모양(간격, 테두리, 배경 등)을 사진 없이 저장해 다시 사용합니다	保存此布局及其外观（间距、边框、背景等），以便再次使用，不含照片	このレイアウトと見た目（間隔、枠線、背景など）を写真なしで保存し、再利用できます
+Guardado: %1 (%2)	Saved: %1 (%2)	Salvo: %1 (%2)	저장됨: %1 (%2)	已保存：%1（%2）	保存しました: %1 (%2)
+Guardando… Cancelar	Saving… Cancel	Salvando… Cancelar	저장 중… 취소	正在保存… 取消	保存中… キャンセル
+Guardar	Save	Salvar	저장	保存	保存
+Guardar como %1…	Save as %1…	Salvar como %1…	%1(으)로 저장…	另存为 %1…	%1 として保存…
+Guardar el collage	Save the collage	Salvar a colagem	콜라주 저장	保存拼贴	コラージュを保存
+Imágenes (%1)	Images (%1)	Imagens (%1)	이미지 (%1)	图像 (%1)	画像 (%1)
+La foto no se corta en el borde de la celda: pasa por encima de las vecinas	The photo is not cropped at the cell edge: it goes over its neighbors	A foto não é cortada na borda da célula: passa por cima das vizinhas	사진이 셀 가장자리에서 잘리지 않고 이웃 셀 위로 넘어갑니다	照片不会在单元格边缘被裁切：会覆盖到相邻单元格上	写真はセルの端で切られず、隣のセルの上にはみ出します
+Libre	Free	Livre	자유	自由	自由
+Margen	Margin	Margem	여백	边距	余白
+Mezclar fotos	Shuffle photos	Embaralhar fotos	사진 섞기	打乱照片	写真をシャッフル
+Mis plantillas	My templates	Meus modelos	내 템플릿	我的模板	マイテンプレート
+Mostrar en la carpeta	Show in folder	Mostrar na pasta	폴더에서 보기	在文件夹中显示	フォルダーで表示
+No se pudo guardar.	Could not save.	Não foi possível salvar.	저장할 수 없습니다.	无法保存。	保存できませんでした。
+Nombre de la plantilla	Template name	Nome do modelo	템플릿 이름	模板名称	テンプレート名
+Otro mosaico	Another mosaic	Outro mosaico	다른 모자이크	另一种马赛克	別のモザイク
+Quitar foto	Remove photo	Remover foto	사진 제거	移除照片	写真を削除
+Quitar fotos	Remove photos	Remover fotos	사진 제거	移除照片	写真を削除
+Rejilla	Grid	Grade	격자	网格	グリッド
+Relleno de las celdas	Cell padding	Preenchimento das células	셀 안쪽 여백	单元格内边距	セルの余白
+Restablecer	Reset	Redefinir	초기화	重置	リセット
+Separación	Spacing	Espaçamento	간격	间距	間隔
+Sombra	Shadow	Sombra	그림자	阴影	影
+Tamaño y archivo	Size and file	Tamanho e arquivo	크기 및 파일	尺寸和文件	サイズとファイル
+Tocá una celda para ajustar su foto.	Click a cell to adjust its photo.	Clique em uma célula para ajustar a foto.	셀을 클릭해 사진을 조정하세요.	单击单元格以调整其照片。	セルをクリックして写真を調整します。
+Toda la carpeta	Whole folder	Pasta inteira	폴더 전체	整个文件夹	フォルダー全体
+Todavía no guardaste ninguna.	You haven't saved any yet.	Você ainda não salvou nenhum.	아직 저장한 것이 없습니다.	您还没有保存任何模板。	まだ保存していません。
+Traer al frente	Bring to front	Trazer para a frente	맨 앞으로 가져오기	置于顶层	最前面へ移動
+Transparente	Transparent	Transparente	투명	透明	透明
+Una menos	One fewer	Uma a menos	하나 줄이기	减少一个	1 つ減らす
+Una más	One more	Mais uma	하나 더	增加一个	1 つ増やす
+Zoom	Zoom	Zoom	확대/축소	缩放	ズーム
+Ángulo del degradado	Gradient angle	Ângulo do gradiente	그라데이션 각도	渐变角度	グラデーションの角度
+El tamaño es demasiado grande para un WebP.	The size is too large for a WebP.	O tamanho é grande demais para um WebP.	크기가 WebP에 비해 너무 큽니다.	尺寸对于 WebP 来说过大。	サイズが WebP には大きすぎます。
+No se pudo armar el collage.	Could not assemble the collage.	Não foi possível montar a colagem.	콜라주를 만들 수 없습니다.	无法合成拼贴。	コラージュを作成できませんでした。
+No se pudo codificar el WebP.	Could not encode the WebP.	Não foi possível codificar o WebP.	WebP를 인코딩할 수 없습니다.	无法编码 WebP。	WebP をエンコードできませんでした。
+Aceptar	OK	OK	확인	确定	OK
+1:1					
+Enderezar	Straighten	Endireitar	수평 맞추기	拉直	傾き補正
+Marco	Frame	Moldura	프레임	边框	フレーム
+Recorte	Crop	Corte	자르기	裁剪	トリミング
+Recorte - arrastrá el rectángulo o sus bordes/esquinas sobre la imagen	Crop - drag the rectangle or its edges/corners over the image	Corte - arraste o retângulo ou suas bordas/cantos sobre a imagem	자르기 - 이미지 위에서 사각형이나 그 가장자리/모서리를 드래그하세요	裁剪 - 在图像上拖动矩形或其边/角	トリミング - 画像上で四角形またはその辺・角をドラッグします
+Rotar a la derecha	Rotate right	Girar à direita	오른쪽으로 회전	向右旋转	右へ回転
+Rotar a la izquierda	Rotate left	Girar à esquerda	왼쪽으로 회전	向左旋转	左へ回転
+Transformar	Transform	Transformar	변형	变换	変形
+Voltear horizontal	Flip horizontally	Inverter horizontalmente	좌우 뒤집기	水平翻转	左右反転
+Voltear vertical	Flip vertically	Inverter verticalmente	상하 뒤집기	垂直翻转	上下反転
+Restablecer curva	Reset curve	Redefinir curva	곡선 초기화	重置曲线	カーブをリセット
+Ajustes	Adjustments	Ajustes	조정	调整	調整
+Ancho, alto y escala	Width, height and scale	Largura, altura e escala	너비, 높이, 배율	宽度、高度和缩放	幅、高さ、拡大率
+Aplicar	Apply	Aplicar	적용	应用	適用
+Aplicá o cancelá para volver	Apply or cancel to go back	Aplique ou cancele para voltar	돌아가려면 적용하거나 취소하세요	应用或取消后即可返回	戻るには適用またはキャンセルしてください
+BMP (*.bmp)					
+Desenfoque, color, luz, dibujos, distorsión y más	Blur, color, light, drawings, distortion and more	Desfoque, cor, luz, desenhos, distorção e mais	흐림, 색상, 빛, 그림, 왜곡 등	模糊、颜色、光线、绘画、扭曲等	ぼかし、色、光、ドローイング、ゆがみなど
+Distorsión, franjas de color y esquinas oscuras	Distortion, color fringes and dark corners	Distorção, franjas de cor e cantos escuros	왜곡, 색 번짐, 어두운 모서리	畸变、色边和暗角	歪み、色にじみ、周辺減光
+Editar	Edit	Editar	편집	编辑	編集
+Efectos	Effects	Efeitos	효과	效果	エフェクト
+Estilos listos para aplicar	Ready-made styles to apply	Estilos prontos para aplicar	바로 적용할 수 있는 스타일	可直接应用的样式	すぐ適用できるスタイル
+Filtros	Filters	Filtros	필터	滤镜	フィルター
+Guardar como	Save as	Salvar como	다른 이름으로 저장	另存为	名前を付けて保存
+JPEG (*.jpg *.jpeg)					
+Lente	Lens	Lente	렌즈	镜头	レンズ
+Luz, color, detalle, niveles y curvas	Light, color, detail, levels and curves	Luz, cor, detalhe, níveis e curvas	빛, 색상, 디테일, 레벨, 곡선	光线、颜色、细节、色阶和曲线	光、色、ディテール、レベル、カーブ
+PNG (*.png)					
+Recortar	Crop	Cortar	자르기	裁剪	トリミング
+Recorte, giro, volteo y enderezado	Crop, rotate, flip and straighten	Corte, giro, inversão e endireitamento	자르기, 회전, 뒤집기, 수평 맞추기	裁剪、旋转、翻转和拉直	トリミング、回転、反転、傾き補正
+TIFF (*.tif *.tiff)					
+Tamaño	Size	Tamanho	크기	大小	サイズ
+WebP (*.webp)					
+Aleatoria	Random	Aleatória	무작위	随机	ランダム
+Prueba otra disposición al azar	Try another random arrangement	Tente outra disposição aleatória	무작위로 다른 배치를 시도합니다	随机尝试另一种排列	ランダムに別の配置を試します
+Acabado	Finish	Acabamento	마무리	完成效果	仕上げ
+Amplitud	Amplitude	Amplitude	진폭	振幅	振幅
+Bordes	Edges	Bordas	가장자리	边缘	エッジ
+Centro	Center	Centro	중심	中心	中心
+Centro X	Center X	Centro X	중심 X	中心 X	中心 X
+Centro Y	Center Y	Centro Y	중심 Y	中心 Y	中心 Y
+Cristalizar	Crystallize	Cristalizar	결정화	晶格化	結晶化
+Dibujo	Drawing	Desenho	그림	绘画	ドローイング
+Dirección	Direction	Direção	방향	方向	方向
+Distancia	Distance	Distância	거리	距离	距離
+Estilo	Style	Estilo	스타일	样式	スタイル
+Fondo claro	Light background	Fundo claro	밝은 배경	浅色背景	明るい背景
+Gaussiano	Gaussian	Gaussiano	가우시안	高斯	ガウス
+Giratorio	Rotary	Giratório	회전형	旋转	回転
+Grano y ruido	Grain and noise	Granulação e ruído	그레인 및 노이즈	颗粒和噪点	グレインとノイズ
+Impulso	Impulse	Impulso	임펄스	脉冲	インパルス
+Laplaciano	Laplacian	Laplaciano	라플라시안	拉普拉斯	ラプラシアン
+Longitud	Length	Comprimento	길이	长度	長さ
+Luminancia	Luminance	Luminância	휘도	光亮度	輝度
+Lápiz	Pencil	Lápis	연필	铅笔	鉛筆
+Mediana	Median	Mediana	중간값	中值	メディアン
+Monocromático	Monochrome	Monocromático	단색	单色	モノクロ
+Mosaico	Mosaic	Mosaico	모자이크	马赛克	モザイク
+Movimiento	Motion	Movimento	모션	动感	モーション
+Negativo	Negative	Negativo	네거티브	负片	ネガ
+Nivel	Level	Nível	레벨	级别	レベル
+Ojo de pez	Fisheye	Olho de peixe	어안 렌즈	鱼眼	魚眼
+Onda	Wave	Onda	물결	波浪	波
+Posterizar	Posterize	Posterizar	포스터화	色调分离	ポスタリゼーション
+Profundidad	Depth	Profundidade	깊이	深度	深さ
+Punteado	Stippling	Pontilhado	점묘	点刻	点描
+Quitar ruido	Remove noise	Remover ruído	노이즈 제거	去除噪点	ノイズ除去
+Radio	Radius	Raio	반경	半径	半径
+Redondez	Roundness	Arredondamento	둥근 정도	圆度	丸み
+Relieve	Emboss	Relevo	엠보스	浮雕	エンボス
+Remolino	Swirl	Redemoinho	소용돌이	漩涡	渦巻き
+Suavidad	Softness	Suavidade	부드러움	柔和度	やわらかさ
+Tipo	Type	Tipo	유형	类型	種類
+Trazo	Stroke	Traço	획	笔触	ストローク
+Umbral	Threshold	Limiar	임계값	阈值	しきい値
+Uniforme	Uniform	Uniforme	균일	均匀	均一
+Vidrio	Glass	Vidro	유리	玻璃	ガラス
+Viñeta	Vignette	Vinheta	비네팅	暗角	ビネット
+Ángulo	Angle	Ângulo	각도	角度	角度
+Alineación	Alignment	Alinhamento	정렬	对齐	配置
+Centrado	Centered	Centralizado	가운데	居中	中央
+Color del contorno	Outline color	Cor do contorno	윤곽선 색	轮廓颜色	輪郭の色
+Color del texto	Text color	Cor do texto	텍스트 색	文字颜色	文字の色
+Derecha	Right	Direita	오른쪽	右	右
+Franja abajo	Band at the bottom	Faixa embaixo	아래쪽 띠	底部色带	下に帯
+Franja arriba	Band on top	Faixa em cima	위쪽 띠	顶部色带	上に帯
+Grosor del contorno	Outline thickness	Espessura do contorno	윤곽선 두께	轮廓粗细	輪郭の太さ
+Izquierda	Left	Esquerda	왼쪽	左	左
+Letra	Font	Fonte	글꼴	字体	フォント
+Leyenda (meme)	Caption (meme)	Legenda (meme)	캡션(밈)	字幕（梗图）	キャプション（ミーム）
+Posición	Position	Posição	위치	位置	位置
+Sobre la imagen, abajo	Over the image, bottom	Sobre a imagem, embaixo	이미지 위, 아래쪽	图像上，底部	画像の上、下側
+Sobre la imagen, arriba	Over the image, top	Sobre a imagem, em cima	이미지 위, 위쪽	图像上，顶部	画像の上、上側
+Tamaño del texto	Text size	Tamanho do texto	텍스트 크기	文字大小	文字サイズ
+Aberración cromática	Chromatic aberration	Aberração cromática	색수차	色差	色収差
+Aclarar sombras	Lift shadows	Clarear sombras	어두운 영역 밝게	提亮阴影	シャドウを明るく
+Amarillos	Yellows	Amarelos	노랑	黄色	イエロー
+Azul / Amarillo	Blue / Yellow	Azul / Amarelo	파랑 / 노랑	蓝 / 黄	青 / 黄
+Azules	Blues	Azuis	파랑	蓝色	ブルー
+Blanca	White	Branca	흰색	白色	白
+Blanco y negro	Black and white	Preto e branco	흑백	黑白	白黒
+Borrar niebla	Remove haze	Remover névoa	안개 제거	去雾	かすみを除去
+Celofán	Cellophane	Celofane	셀로판	玻璃纸	セロハン
+Cianes	Cyans	Cianos	시안	青色	シアン
+Color del tinte	Tint color	Cor do tom	틴트 색	着色颜色	色付けの色
+Contraste alto	High contrast	Alto contraste	높은 대비	高对比度	ハイコントラスト
+Filtro amarillo	Yellow filter	Filtro amarelo	노란색 필터	黄色滤镜	イエローフィルター
+Filtro azul	Blue filter	Filtro azul	파란색 필터	蓝色滤镜	ブルーフィルター
+Filtro rojo	Red filter	Filtro vermelho	빨간색 필터	红色滤镜	レッドフィルター
+Filtro verde	Green filter	Filtro verde	초록색 필터	绿色滤镜	グリーンフィルター
+Fuerza del tinte	Tint strength	Intensidade do tom	틴트 강도	着色强度	色付けの強さ
+Infrarrojo	Infrared	Infravermelho	적외선	红外	赤外線
+Luz ambiente	Ambient light	Luz ambiente	주변광	环境光	環境光
+Magentas	Magentas	Magentas	마젠타	洋红	マゼンタ
+Mantener color	Keep color	Manter cor	색상 유지	保留颜色	色を維持
+Mejorar documento	Enhance document	Melhorar documento	문서 보정	增强文档	ドキュメントを補正
+Neutro	Neutral	Neutro	중립	中性	ニュートラル
+Predeterminada	Default	Padrão	기본값	默认	既定
+Quitar sombras	Remove shadows	Remover sombras	그림자 제거	去除阴影	影を除去
+Rojo / Cian	Red / Cyan	Vermelho / Ciano	빨강 / 시안	红 / 青	赤 / シアン
+Rojos	Reds	Vermelhos	빨강	红色	レッド
+Tinte	Tint	Tom	틴트	着色	色付け
+Verdes	Greens	Verdes	초록	绿色	グリーン
+Zona	Zone	Zona	영역	区域	ゾーン
+Fusión	Blend	Mesclagem	혼합	混合	ブレンド
+Afiladas	Sharp	Afiadas	뾰족한	尖锐	シャープ
+Arcoíris	Rainbow	Arco-íris	무지개	彩虹	虹
+Atardecer	Sunset	Pôr do sol	일몰	日落	夕焼け
+Aurora	Aurora	Aurora	오로라	极光	オーロラ
+Blanco a negro	White to black	Branco para preto	흰색에서 검정으로	白到黑	白から黒
+Bosque	Forest	Floresta	숲	森林	森
+Camuflaje	Camouflage	Camuflagem	위장	迷彩	カモフラージュ
+Caramelo	Caramel	Caramelo	카라멜	焦糖	キャラメル
+Cielo	Sky	Céu	하늘	天空	空
+Color central	Center color	Cor central	중앙 색	中心颜色	中央の色
+Color de fondo	Background color	Cor de fundo	배경 색	背景颜色	背景色
+Color del centro	Center color	Cor do centro	중심 색	中心颜色	中心の色
+Color del motivo	Pattern color	Cor do padrão	패턴 색	图案颜色	パターンの色
+Color final	End color	Cor final	끝 색	结束颜色	終了色
+Color inicial	Start color	Cor inicial	시작 색	起始颜色	開始色
+Continua	Solid	Contínua	실선	实线	実線
+Cruces	Crosses	Cruzes	십자	十字	十字
+Cuadrados	Squares	Quadrados	사각형	方块	四角
+Cuadrícula	Grid	Grade	격자	网格	グリッド
+Cuadrícula fina	Fine grid	Grade fina	가는 격자	细网格	細かいグリッド
+Cuadrícula girada	Rotated grid	Grade girada	회전된 격자	旋转网格	回転グリッド
+Círculos	Circles	Círculos	원	圆形	円
+Círculos concéntricos	Concentric circles	Círculos concêntricos	동심원	同心圆	同心円
+Cónico	Conic	Cônico	원뿔형	圆锥	円錐
+Densidad	Density	Densidade	밀도	密度	密度
+Desfase	Offset	Deslocamento	오프셋	偏移	オフセット
+Desplazamiento X	Offset X	Deslocamento X	오프셋 X	偏移 X	オフセット X
+Desplazamiento Y	Offset Y	Deslocamento Y	오프셋 Y	偏移 Y	オフセット Y
+Diagonales	Diagonals	Diagonais	대각선	对角线	斜め
+Doble	Double	Duplo	이중	双线	二重
+Escamas	Scales	Escamas	비늘	鳞片	うろこ
+Espiga	Herringbone	Espinha de peixe	헤링본	人字形	ヘリンボーン
+Estrellas	Stars	Estrelas	별	星形	星
+Finas	Thin	Finas	가는	细	細い
+Fuego	Fire	Fogo	불	火焰	炎
+Grosor	Thickness	Espessura	두께	粗细	太さ
+Guijarros	Pebbles	Seixos	조약돌	鹅卵石	小石
+Guion y punto	Dash-dot	Traço e ponto	일점쇄선	点划线	一点鎖線
+Guiones	Dashes	Tracejado	파선	虚线	破線
+Hexágonos	Hexagons	Hexágonos	육각형	六边形	六角形
+Hielo	Ice	Gelo	얼음	冰	氷
+Horizontales	Horizontal	Horizontais	가로	水平	横
+Ladrillos	Bricks	Tijolos	벽돌	砖块	レンガ
+Lavanda	Lavender	Lavanda	라벤더	薰衣草	ラベンダー
+Lineal	Linear	Linear	선형	线性	線形
+Línea de borde	Border line	Linha de borda	테두리 선	边框线	枠線のライン
+Líneas	Lines	Linhas	선	线条	ライン
+Líneas de velocidad	Speed lines	Linhas de velocidade	속도선	速度线	集中線
+Medianoche	Midnight	Meia-noite	한밤	午夜	真夜中
+Menta	Mint	Menta	민트	薄荷	ミント
+Motivo	Pattern	Padrão	패턴	图案	パターン
+Neón	Neon	Neon	네온	霓虹	ネオン
+Océano	Ocean	Oceano	바다	海洋	海
+Olas	Waves	Ondas	물결	波浪	波
+Opacidad	Opacity	Opacidade	불투명도	不透明度	不透明度
+Oro	Gold	Ouro	금	金色	ゴールド
+Panal	Honeycomb	Favo de mel	벌집	蜂巢	ハニカム
+Papel	Paper	Papel	종이	纸张	紙
+Patrón	Pattern	Padrão	패턴	图案	パターン
+Personalizado	Custom	Personalizado	사용자 지정	自定义	カスタム
+Plata	Silver	Prata	은	银色	シルバー
+Puntos	Dots	Pontos	점	点	ドット
+Puntos alternados	Alternating dots	Pontos alternados	교차하는 점	交错点	交互のドット
+Radial	Radial	Radial	방사형	径向	放射状
+Radio exterior	Outer radius	Raio externo	바깥 반경	外半径	外側の半径
+Radio interior	Inner radius	Raio interno	안쪽 반경	内半径	内側の半径
+Rayas diagonales	Diagonal stripes	Listras diagonais	대각선 줄무늬	斜条纹	斜めストライプ
+Rayas horizontales	Horizontal stripes	Listras horizontais	가로 줄무늬	横条纹	横ストライプ
+Rayas verticales	Vertical stripes	Listras verticais	세로 줄무늬	竖条纹	縦ストライプ
+Reflejado	Reflected	Refletido	반사	镜像	反射
+Regulares	Regular	Regulares	일반	常规	標準
+Relleno	Fill	Preenchimento	채우기	填充	塗りつぶし
+Relleno de degradado	Gradient fill	Preenchimento de gradiente	그라데이션 채우기	渐变填充	グラデーション塗りつぶし
+Relleno de motivo	Pattern fill	Preenchimento de padrão	패턴 채우기	图案填充	パターン塗りつぶし
+Rombos	Diamonds	Losangos	마름모	菱形	ひし形
+Rosa	Pink	Rosa	분홍	粉色	ピンク
+Rotar	Rotate	Girar	회전	旋转	回転
+Ráfaga	Burst	Rajada	버스트	爆发	バースト
+Segundo color	Second color	Segunda cor	두 번째 색	第二种颜色	2 番目の色
+Semilla	Seed	Semente	시드	随机种子	シード
+Sepia	Sepia	Sépia	세피아	棕褐色	セピア
+Tablero	Checkerboard	Tabuleiro	체크판	棋盘	市松模様
+Tartán	Tartan	Tartan	타탄	格子呢	タータン
+Triángulos	Triangles	Triângulos	삼각형	三角形	三角形
+Variación	Variation	Variação	변화	变化	ばらつき
+Verticales	Vertical	Verticais	세로	垂直	縦
+Zigzag	Zigzag	Ziguezague	지그재그	之字形	ジグザグ
+100 % llega hasta donde dejan los lados vecinos (un cuadrado pasa a círculo)	100 % reaches as far as the neighboring sides allow (a square becomes a circle)	100 % chega até onde os lados vizinhos permitem (um quadrado vira um círculo)	100 %는 이웃한 변이 허용하는 한계까지입니다(정사각형이 원이 됩니다)	100 % 表示延伸到相邻边允许的最大程度（正方形变成圆形）	100 % は隣の辺が許す限界まで丸くなります（正方形は円になります）
+Achica la foto para que todo entre en el tamaño de origen	Shrinks the photo so everything fits in the original size	Reduz a foto para que tudo caiba no tamanho original	모든 것이 원래 크기에 들어가도록 사진을 줄입니다	缩小照片，使所有内容都适合原始尺寸	すべてが元のサイズに収まるように写真を縮小します
+Ancho del contorno, en % del lado corto	Outline width, in % of the short side	Largura do contorno, em % do lado menor	윤곽선 너비(짧은 변의 %)	轮廓宽度（占短边的 %）	輪郭の幅（短辺の %）
+Color de la sombra	Shadow color	Cor da sombra	그림자 색	阴影颜色	影の色
+Con la foto de fondo	With the photo as background	Com a foto de fundo	사진을 배경으로	以照片为背景	写真を背景に
+Contorno hacia adentro	Inner outline	Contorno para dentro	안쪽 윤곽선	向内轮廓	内側の輪郭
+Cortadas	Cut	Cortados	잘린	切角	面取り
+Círculo	Circle	Círculo	원	圆形	円
+Cóncavas	Concave	Côncavos	오목	凹形	凹
+Desenfoque del fondo	Background blur	Desfoque do fundo	배경 흐림	背景模糊	背景のぼかし
+Elipse	Ellipse	Elipse	타원	椭圆	楕円
+Entrada	Ticket	Ingresso	티켓	票券	チケット
+Espacio de fondo alrededor, en % del lado corto	Background space around, in % of the short side	Espaço de fundo ao redor, em % do lado menor	주변 배경 여백(짧은 변의 %)	周围的背景空间（占短边的 %）	周囲の背景スペース（短辺の %）
+Esquinas activas	Active corners	Cantos ativos	활성 모서리	启用的角	有効な角
+Insignia	Badge	Distintivo	배지	徽章	バッジ
+Lo dibuja sobre la foto en vez de agrandar la imagen	Draws it over the photo instead of enlarging the image	Desenha sobre a foto em vez de aumentar a imagem	이미지를 키우는 대신 사진 위에 그립니다	绘制在照片上，而不是放大图像	画像を大きくせず、写真の上に描画します
+Mantener el tamaño	Keep the size	Manter o tamanho	크기 유지	保持尺寸	サイズを維持
+Marco blanco	White frame	Moldura branca	흰색 프레임	白色边框	白いフレーム
+Opacidad del contorno	Outline opacity	Opacidade do contorno	윤곽선 불투명도	轮廓不透明度	輪郭の不透明度
+Opacidad del fondo	Background opacity	Opacidade do fundo	배경 불투명도	背景不透明度	背景の不透明度
+Pegatina	Sticker	Adesivo	스티커	贴纸	ステッカー
+Redondas	Round	Redondos	둥근	圆角	丸
+Suaves	Soft	Suaves	부드러운	柔和	ソフト
+Ángulo de la sombra	Shadow angle	Ângulo da sombra	그림자 각도	阴影角度	影の角度
+Adelgazar el centro	Slim the middle	Afinar o centro	가운데 가늘게	收窄中间	中央を細く
+Alargar el centro	Lengthen the middle	Alongar o centro	가운데 길게	拉长中间	中央を長く
+Alargar piernas	Lengthen legs	Alongar pernas	다리 길게	拉长腿部	脚を長く
+Ensanchar el centro	Widen the middle	Alargar o centro	가운데 넓게	加宽中间	中央を太く
+Guía derecha	Right guide	Guia direita	오른쪽 가이드	右侧参考线	右ガイド
+Guía inferior	Bottom guide	Guia inferior	아래쪽 가이드	底部参考线	下ガイド
+Guía izquierda	Left guide	Guia esquerda	왼쪽 가이드	左侧参考线	左ガイド
+Guía superior	Top guide	Guia superior	위쪽 가이드	顶部参考线	上ガイド
+Horizontal	Horizontal	Horizontal	가로	水平	水平
+Perspectiva	Perspective	Perspectiva	원근	透视	パース
+Recortar bordes	Crop edges	Cortar bordas	가장자리 자르기	裁剪边缘	端をトリミング
+Transición	Transition	Transição	전환	过渡	移行
+Vertical	Vertical	Vertical	세로	垂直	垂直
+Aberración: bb	Aberration: bb	Aberração: bb	수차: bb	色差：bb	収差: bb
+Aberración: br	Aberration: br	Aberração: br	수차: br	色差：br	収差: br
+Aberración: cb	Aberration: cb	Aberração: cb	수차: cb	色差：cb	収差: cb
+Aberración: cr	Aberration: cr	Aberração: cr	수차: cr	色差：cr	収差: cr
+Aberración: vb	Aberration: vb	Aberração: vb	수차: vb	色差：vb	収差: vb
+Aberración: vr	Aberration: vr	Aberração: vr	수차: vr	色差：vr	収差: vr
+Ajustar para quitar los bordes vacíos	Adjust to remove the empty edges	Ajustar para remover as bordas vazias	빈 가장자리가 없어지도록 조정	调整以去除空白边缘	空白の縁がなくなるよう調整
+Corrección de lente	Lens correction	Correção de lente	렌즈 보정	镜头校正	レンズ補正
+Escala de radios	Radius scale	Escala de raios	반경 배율	半径缩放	半径スケール
+Modelo de distorsión	Distortion model	Modelo de distorção	왜곡 모델	畸变模型	歪みモデル
+Término a	Term a	Termo a	항 a	系数 a	項 a
+Término b	Term b	Termo b	항 b	系数 b	項 b
+Término c	Term c	Termo c	항 c	系数 c	項 c
+Viñeta: k1	Vignette: k1	Vinheta: k1	비네팅: k1	暗角：k1	ビネット: k1
+Viñeta: k2	Vignette: k2	Vinheta: k2	비네팅: k2	暗角：k2	ビネット: k2
+Viñeta: k3	Vignette: k3	Vinheta: k3	비네팅: k3	暗角：k3	ビネット: k3
+4 puntas	4 points	4 pontas	4각	4 角	4 点
+6 puntas	6 points	6 pontas	6각	6 角	6 点
+8 puntas	8 points	8 pontas	8각	8 角	8 点
+Abajo	Bottom	Embaixo	아래	下	下
+Abertura	Aperture	Abertura	조리개	光圈	絞り
+Al azar	Random	Aleatório	무작위	随机	ランダム
+Anamórfico	Anamorphic	Anamórfico	아나모픽	变形宽银幕	アナモルフィック
+Anillo	Ring	Anel	링	环形	リング
+Arriba	Top	Em cima	위	上	上
+Azul y violeta	Blue and violet	Azul e violeta	파랑과 보라	蓝紫	青と紫
+Bokeh	Bokeh	Bokeh	보케	焦外成像	ボケ
+Borde brillante	Bright edge	Borda brilhante	밝은 가장자리	明亮边缘	明るい縁
+Burbujas	Bubbles	Bolhas	거품	气泡	シャボン玉
+Cantidad de rayos	Number of rays	Quantidade de raios	광선 수	光线数量	光線の数
+Centro del foco	Spotlight center	Centro do foco	스포트라이트 중심	聚光灯中心	スポットの中心
+Cinematográfico	Cinematic	Cinematográfico	시네마틱	电影感	シネマティック
+Colocación	Placement	Posicionamento	배치	放置方式	配置
+Corazones	Hearts	Corações	하트	心形	ハート
+Cruz	Cross	Cruz	십자	十字	十字
+Cálida	Warm	Quente	따뜻한	暖色	暖かい
+De la imagen	From the image	Da imagem	이미지에서	取自图像	画像から
+Destello de lente	Lens flare	Reflexo de lente	렌즈 플레어	镜头光晕	レンズフレア
+Destellos	Sparkles	Brilhos	반짝임	闪光	きらめき
+Distribución	Distribution	Distribuição	분포	分布	分布
+Dorada	Golden	Dourada	황금빛	金黄	ゴールデン
+En el centro	In the center	No centro	중앙	中心	中央
+En las luces	On the highlights	Nas luzes	밝은 부분	在高光处	ハイライト部
+Foco de luz	Spotlight	Foco de luz	스포트라이트	聚光灯	スポットライト
+Fuga de luz	Light leak	Vazamento de luz	빛 새어듦	漏光	ライトリーク
+Hacia los bordes	Towards the edges	Em direção às bordas	가장자리 쪽	靠近边缘	端に向かって
+Halo					
+Largo de los rayos	Ray length	Comprimento dos raios	광선 길이	光线长度	光線の長さ
+Luciérnagas	Fireflies	Vaga-lumes	반딧불	萤火虫	ホタル
+Nieve	Snow	Neve	눈	雪	雪
+Origen	Origin	Origem	원점	原点	原点
+Origen X	Origin X	Origem X	원점 X	原点 X	原点 X
+Origen Y	Origin Y	Origem Y	원점 Y	原点 Y	原点 Y
+Origen de la luz	Light origin	Origem da luz	빛의 원점	光源起点	光の原点
+Oscurecer fuera	Darken outside	Escurecer fora	바깥 어둡게	外部变暗	外側を暗く
+Partículas grandes	Large particles	Partículas grandes	큰 입자	大颗粒	大きな粒子
+Pentágono	Pentagon	Pentágono	오각형	五边形	五角形
+Polvo fino	Fine dust	Poeira fina	고운 먼지	细尘	細かいほこり
+Polvo y partículas	Dust and particles	Poeira e partículas	먼지와 입자	灰尘和粒子	ほこりと粒子
+Posición X	Position X	Posição X	위치 X	位置 X	位置 X
+Posición Y	Position Y	Posição Y	위치 Y	位置 Y	位置 Y
+Posición de la luz	Light position	Posição da luz	빛의 위치	光源位置	光の位置
+Puntas	Points	Pontas	꼭짓점	角数	先端の数
+Rayas de película	Film streaks	Riscos de filme	필름 줄무늬	胶片条纹	フィルムの筋
+Rayos	Rays	Raios	광선	光线	光線
+Rayos de luz	Light rays	Raios de luz	빛줄기	光束	光の筋
+Reflejos	Reflections	Reflexos	반사광	反光	反射光
+Resplandor	Glow	Resplendor	광채	辉光	グロー
+Sol	Sun	Sol	태양	太阳	太陽
+Suavidad del borde	Edge softness	Suavidade da borda	가장자리 부드러움	边缘柔和度	縁のやわらかさ
+También del lado opuesto	Also from the opposite side	Também do lado oposto	반대쪽에서도	也从对侧产生	反対側にも
+Toda la imagen	Whole image	Imagem inteira	이미지 전체	整个图像	画像全体
+Un tinte	A tint	Um tom	하나의 색조	单一色调	ひとつの色合い
+Variación de tamaño	Size variation	Variação de tamanho	크기 변화	大小变化	サイズのばらつき
+Color (CMY)	Color (CMY)	Cor (CMY)	색상(CMY)	颜色 (CMY)	カラー (CMY)
+Color (CMYK)	Color (CMYK)	Cor (CMYK)	색상(CMYK)	颜色 (CMYK)	カラー (CMYK)
+Forma del punto	Dot shape	Forma do ponto	점 모양	网点形状	ドットの形
+Ganancia de punto	Dot gain	Ganho de ponto	망점 증가	网点扩大	ドットゲイン
+Imprenta	Printing press	Impressão	인쇄	印刷	印刷
+Línea	Line	Linha	선	线	線
+Periódico	Newspaper	Jornal	신문	报纸	新聞
+Semitono	Halftone	Meio-tom	하프톤	半色调	ハーフトーン
+Tinta	Ink	Tinta	잉크	墨水	インク
+Calculando…	Calculating…	Calculando…	계산 중…	正在计算…	計算中…
+Elegí un efecto para ver cómo queda en toda la imagen. Hasta que lo apliques, no cambia nada.	Choose an effect to see how it looks on the whole image. Nothing changes until you apply it.	Escolha um efeito para ver como fica na imagem inteira. Nada muda até você aplicar.	효과를 선택하면 이미지 전체에 어떻게 보이는지 확인할 수 있습니다. 적용하기 전에는 아무것도 바뀌지 않습니다.	选择一种效果，查看它在整张图像上的样子。在应用之前不会有任何改变。	エフェクトを選ぶと、画像全体での見た目を確認できます。適用するまで何も変わりません。
+Escribí el texto de la leyenda	Type the caption text	Digite o texto da legenda	캡션 텍스트를 입력하세요	输入字幕文字	キャプションのテキストを入力
+Mezcla	Mix	Mistura	혼합	混合	ミックス
+Preajustes	Presets	Predefinições	프리셋	预设	プリセット
+Texto	Text	Texto	텍스트	文字	テキスト
+Valores iniciales	Initial values	Valores iniciais	초기값	初始值	初期値
+Vuelve a los valores iniciales del efecto	Returns to the effect's initial values	Volta aos valores iniciais do efeito	효과의 초기값으로 되돌립니다	恢复为效果的初始值	エフェクトの初期値に戻します
+Cantidad	Amount	Quantidade	양	数量	量
+Abrir	Open	Abrir	열기	打开	開く
+Ajustar	Fit	Ajustar	맞추기	适应	合わせる
+Anterior	Previous	Anterior	이전	上一张	前へ
+Cerrar edición	Close editing	Fechar edição	편집 닫기	关闭编辑	編集を閉じる
+Comparar	Compare	Comparar	비교	对比	比較
+Deshacer	Undo	Desfazer	실행 취소	撤销	元に戻す
+Girar der.	Rotate right	Girar dir.	오른쪽 회전	右转	右回転
+Girar izq.	Rotate left	Girar esq.	왼쪽 회전	左转	左回転
+Guardar como…	Save as…	Salvar como…	다른 이름으로 저장…	另存为…	名前を付けて保存…
+Presentación	Slideshow	Apresentação	슬라이드쇼	幻灯片放映	スライドショー
+Rehacer	Redo	Refazer	다시 실행	重做	やり直し
+Siguiente	Next	Próxima	다음	下一张	次へ
+El nombre no puede llevar los caracteres  < > : " / \ | ? *	The name cannot contain the characters  < > : " / \ | ? *	O nome não pode conter os caracteres  < > : " / \ | ? *	이름에 다음 문자를 사용할 수 없습니다:  < > : " / \ | ? *	名称不能包含以下字符： < > : " / \ | ? *	名前には次の文字を使えません:  < > : " / \ | ? *
+El nombre no puede terminar en espacio ni en punto.	The name cannot end with a space or a period.	O nome não pode terminar com espaço nem ponto.	이름은 공백이나 마침표로 끝날 수 없습니다.	名称不能以空格或句点结尾。	名前の末尾にスペースやピリオドは使えません。
+Escribe el nombre base.	Type the base name.	Digite o nome base.	기본 이름을 입력하세요.	请输入基础名称。	基本名を入力してください。
+No hay archivos elegidos.	No files selected.	Nenhum arquivo selecionado.	선택한 파일이 없습니다.	没有选择文件。	ファイルが選択されていません。
+No se pudo crear «%1». No se cambió nada.	Could not create "%1". Nothing was changed.	Não foi possível criar "%1". Nada foi alterado.	"%1"을(를) 만들 수 없습니다. 변경된 것은 없습니다.	无法创建“%1”。未做任何更改。	「%1」を作成できませんでした。何も変更されていません。
+No se pudo renombrar «%1» (¿está abierto en otro programa?). No se cambió nada.	Could not rename "%1" (is it open in another program?). Nothing was changed.	Não foi possível renomear "%1" (está aberto em outro programa?). Nada foi alterado.	"%1"의 이름을 바꿀 수 없습니다(다른 프로그램에서 열려 있나요?). 변경된 것은 없습니다.	无法重命名“%1”（是否在其他程序中打开？）。未做任何更改。	「%1」の名前を変更できませんでした（別のプログラムで開いていませんか？）。何も変更されていません。
+Esquina inferior derecha	Bottom-right corner	Canto inferior direito	오른쪽 아래 모서리	右下角	右下の角
+Esquina inferior izquierda	Bottom-left corner	Canto inferior esquerdo	왼쪽 아래 모서리	左下角	左下の角
+Esquina superior derecha	Top-right corner	Canto superior direito	오른쪽 위 모서리	右上角	右上の角
+Esquina superior izquierda	Top-left corner	Canto superior esquerdo	왼쪽 위 모서리	左上角	左上の角
+Contorno	Outline	Contorno	윤곽선	轮廓	輪郭
+Corazón	Heart	Coração	하트	心形	ハート
+Corte de las esquinas	Corner cut	Corte dos cantos	모서리 자르기	角的切割方式	角のカット
+Cortá la foto con la forma que quieras y rodeala de contorno, sombra y fondo. La imagen crece para que todo entre; si querés mantener el tamaño, activalo abajo.	Cut the photo into any shape and surround it with an outline, shadow and background. The image grows so everything fits; to keep the size, turn it on below.	Corte a foto na forma que quiser e cerque-a com contorno, sombra e fundo. A imagem cresce para que tudo caiba; para manter o tamanho, ative abaixo.	원하는 모양으로 사진을 자르고 윤곽선, 그림자, 배경으로 감싸 보세요. 모든 것이 들어가도록 이미지가 커집니다. 크기를 유지하려면 아래에서 켜세요.	将照片裁成任意形状，并为其添加轮廓、阴影和背景。图像会变大以容纳所有内容；若要保持尺寸，请在下方开启。	写真を好きな形に切り抜き、輪郭・影・背景で囲みます。すべてが収まるよう画像が大きくなります。サイズを維持したい場合は下で有効にしてください。
+Elipse o círculo	Ellipse or circle	Elipse ou círculo	타원 또는 원	椭圆或圆形	楕円または円
+Esquinas cortadas en recto	Corners cut straight	Cantos cortados em reto	직선으로 잘린 모서리	直切的角	まっすぐ面取りした角
+Esquinas cóncavas, como una entrada	Concave corners, like a ticket	Cantos côncavos, como um ingresso	티켓처럼 오목한 모서리	凹角，像票券一样	チケットのような凹んだ角
+Esquinas redondas	Round corners	Cantos redondos	둥근 모서리	圆角	丸い角
+Esquinas suaves (curva más amplia)	Soft corners (wider curve)	Cantos suaves (curva mais ampla)	부드러운 모서리(더 넓은 곡선)	柔和的角（曲线更宽）	やわらかい角（より大きなカーブ）
+Estrella	Star	Estrela	별	星形	星
+Forma	Shape	Forma	모양	形状	形
+Hexágono	Hexagon	Hexágono	육각형	六边形	六角形
+La forma llena toda la foto: si querés un círculo o un hexágono parejo, recortala antes en 1:1.	The shape fills the whole photo: for an even circle or hexagon, crop it to 1:1 first.	A forma preenche toda a foto: para um círculo ou hexágono regular, corte-a antes em 1:1.	모양이 사진 전체를 채웁니다. 반듯한 원이나 육각형을 원하면 먼저 1:1로 자르세요.	形状会填满整张照片：若要得到规整的圆形或六边形，请先将其裁剪为 1:1。	形が写真全体に広がります。きれいな円や六角形にしたい場合は、先に 1:1 でトリミングしてください。
+Octágono	Octagon	Octógono	팔각형	八边形	八角形
+Rectángulo	Rectangle	Retângulo	직사각형	矩形	長方形
+Rombo	Diamond	Losango	마름모	菱形	ひし形
+Tocá cada esquina para redondearla o dejarla recta.	Click each corner to round it or leave it square.	Clique em cada canto para arredondá-lo ou deixá-lo reto.	각 모서리를 클릭해 둥글게 하거나 직각으로 두세요.	单击每个角可将其变圆或保持直角。	各角をクリックして丸くするか、直角のままにします。
+Triángulo	Triangle	Triângulo	삼각형	三角形	三角形
+La imagen es demasiado grande para un GIF.	The image is too large for a GIF.	A imagem é grande demais para um GIF.	이미지가 GIF에 비해 너무 큽니다.	图像对于 GIF 来说过大。	画像が GIF には大きすぎます。
+%1 fotogramas · %2 · %3×%4	%1 frames · %2 · %3×%4	%1 quadros · %2 · %3×%4	%1 프레임 · %2 · %3×%4	%1 帧 · %2 · %3×%4	%1 フレーム · %2 · %3×%4
+1 vez	1 time	1 vez	1회	1 次	1 回
+10 veces	10 times	10 vezes	10회	10 次	10 回
+2 veces	2 times	2 vezes	2회	2 次	2 回
+3 veces	3 times	3 vezes	3회	3 次	3 回
+5 veces	5 times	5 vezes	5회	5 次	5 回
+A todos los fotogramas	To all frames	A todos os quadros	모든 프레임에	应用于所有帧	すべてのフレームに
+Agrega todas las imágenes de la carpeta que está abierta	Adds all the images of the open folder	Adiciona todas as imagens da pasta aberta	열려 있는 폴더의 모든 이미지를 추가합니다	添加当前文件夹中的所有图像	開いているフォルダーのすべての画像を追加します
+Agregar imágenes	Add images	Adicionar imagens	이미지 추가	添加图像	画像を追加
+Agregar imágenes…	Add images…	Adicionar imagens…	이미지 추가…	添加图像…	画像を追加…
+Agregá las imágenes con las que armar la animación	Add the images to build the animation from	Adicione as imagens para montar a animação	애니메이션을 만들 이미지를 추가하세요	添加用于制作动画的图像	アニメーションに使う画像を追加してください
+Animación	Animation	Animação	애니메이션	动画	アニメーション
+Color de la franja	Band color	Cor da faixa	띠 색	色带颜色	帯の色
+Colores	Colors	Cores	색상	颜色	色
+Colores completos y transparencia suave; lo abren los navegadores y los visores modernos. Pesa más.	Full colors and smooth transparency; browsers and modern viewers open it. Larger file.	Cores completas e transparência suave; abre em navegadores e visualizadores modernos. Arquivo maior.	풀 컬러와 부드러운 투명도를 지원하며 브라우저와 최신 뷰어에서 열립니다. 파일이 더 큽니다.	完整色彩和柔和透明度；浏览器和现代查看器均可打开。文件较大。	フルカラーとなめらかな透明に対応し、ブラウザーや最新のビューアーで開けます。サイズは大きくなります。
+Crear GIF animado	Create animated GIF	Criar GIF animado	애니메이션 GIF 만들기	创建动画 GIF	アニメーション GIF を作成
+Cuántos milisegundos dura cada imagen que agregues de ahora en adelante. No cambia las que ya están en la tira.	How many milliseconds each image you add from now on lasts. It doesn't change the ones already in the strip.	Quantos milissegundos cada imagem adicionada daqui em diante dura. Não altera as que já estão na tira.	지금부터 추가하는 각 이미지의 지속 시간(밀리초)입니다. 이미 목록에 있는 이미지는 바뀌지 않습니다.	从现在起，你添加的每张图像持续多少毫秒。不会改变已在序列中的图像。	今後追加する各画像の表示時間（ミリ秒）です。すでに並んでいる画像は変わりません。
+Cómo entra cada imagen	How each image comes in	Como cada imagem entra	각 이미지가 나타나는 방식	每张图像的进入方式	各画像の入り方
+Deslizar a la derecha	Slide right	Deslizar para a direita	오른쪽으로 밀기	向右滑动	右へスライド
+Deslizar a la izquierda	Slide left	Deslizar para a esquerda	왼쪽으로 밀기	向左滑动	左へスライド
+Deslizar hacia abajo	Slide down	Deslizar para baixo	아래로 밀기	向下滑动	下へスライド
+Deslizar hacia arriba	Slide up	Deslizar para cima	위로 밀기	向上滑动	上へスライド
+Duplicar	Duplicate	Duplicar	복제	复制	複製
+Duración de la transición	Transition duration	Duração da transição	전환 시간	过渡时长	移行の長さ
+Duración de las nuevas	Duration of new ones	Duração das novas	새 이미지의 시간	新图像的时长	新規の長さ
+Duración de los fotogramas	Frame duration	Duração dos quadros	프레임 시간	帧时长	フレームの長さ
+Efecto	Effect	Efeito	효과	效果	エフェクト
+Efecto y texto del fotograma	Frame effect and text	Efeito e texto do quadro	프레임 효과 및 텍스트	帧的效果和文字	フレームのエフェクトとテキスト
+El más liviano, con colores completos y transparencia suave; lo abren los navegadores modernos.	The lightest, with full colors and smooth transparency; modern browsers open it.	O mais leve, com cores completas e transparência suave; abre em navegadores modernos.	가장 가벼우며 풀 컬러와 부드러운 투명도를 지원합니다. 최신 브라우저에서 열립니다.	最轻量，支持完整色彩和柔和透明度；现代浏览器可打开。	最も軽量で、フルカラーとなめらかな透明に対応します。最新のブラウザーで開けます。
+Elegí las imágenes de la animación	Choose the animation images	Escolha as imagens da animação	애니메이션 이미지 선택	选择动画图像	アニメーションの画像を選択
+Elegí un fotograma de la tira para cambiarle la duración.	Pick a frame in the strip to change its duration.	Escolha um quadro da tira para alterar a duração.	길이를 바꾸려면 목록에서 프레임을 선택하세요.	在序列中选择一帧以更改其时长。	長さを変更するには、一覧からフレームを選んでください。
+Elegí un fotograma de la tira para ponerle un efecto o un texto.	Pick a frame in the strip to give it an effect or text.	Escolha um quadro da tira para aplicar um efeito ou texto.	효과나 텍스트를 넣으려면 목록에서 프레임을 선택하세요.	在序列中选择一帧以添加效果或文字。	エフェクトやテキストを付けるには、一覧からフレームを選んでください。
+Entera, con fondo	Whole, with background	Inteira, com fundo	전체, 배경 포함	完整显示，带背景	全体を表示（背景あり）
+Escribí el texto del fotograma	Type the frame text	Digite o texto do quadro	프레임 텍스트를 입력하세요	输入帧文字	フレームのテキストを入力
+Este fotograma	This frame	Este quadro	이 프레임	此帧	このフレーム
+Estirar	Stretch	Esticar	늘리기	拉伸	引き伸ばし
+Fotograma %1	Frame %1	Quadro %1	프레임 %1	第 %1 帧	フレーム %1
+Fotogramas por transición	Frames per transition	Quadros por transição	전환당 프레임 수	每次过渡的帧数	移行あたりのフレーム数
+Franja negra abajo	Black band at the bottom	Faixa preta embaixo	아래쪽 검은 띠	底部黑色色带	下に黒い帯
+Fundido	Fade	Esmaecer	페이드	淡入淡出	フェード
+Guardar la animación	Save the animation	Salvar a animação	애니메이션 저장	保存动画	アニメーションを保存
+Ida y vuelta	Back and forth	Vai e volta	왕복	往返	往復
+Invertir el orden	Reverse the order	Inverter a ordem	순서 뒤집기	反转顺序	順序を逆にする
+Invertir orden	Reverse order	Inverter ordem	순서 뒤집기	反转顺序	順序を逆に
+Letra predeterminada	Default font	Fonte padrão	기본 글꼴	默认字体	既定のフォント
+Llenar y recortar	Fill and crop	Preencher e cortar	채우고 자르기	填充并裁剪	埋めてトリミング
+Mantener las proporciones: activado	Keep proportions: on	Manter proporções: ativado	비율 유지: 켜짐	保持比例：开	縦横比を維持: オン
+Mantener las proporciones: desactivado	Keep proportions: off	Manter proporções: desativado	비율 유지: 꺼짐	保持比例：关	縦横比を維持: オフ
+Meme: franja blanca arriba	Meme: white band on top	Meme: faixa branca em cima	밈: 위쪽 흰색 띠	梗图：顶部白色色带	ミーム: 上に白い帯
+Mover a la derecha	Move right	Mover para a direita	오른쪽으로 이동	向右移动	右へ移動
+Mover a la izquierda	Move left	Mover para a esquerda	왼쪽으로 이동	向左移动	左へ移動
+Negrita	Bold	Negrito	굵게	粗体	太字
+Ninguna (corte directo)	None (straight cut)	Nenhuma (corte direto)	없음(바로 전환)	无（直接切换）	なし（カット）
+Para siempre	Forever	Para sempre	무한 반복	永远	無限
+Pausa	Pause	Pausa	일시정지	暂停	一時停止
+Podés soltarlas acá, elegirlas o usar todas las de la carpeta. Un GIF, APNG o WebP animado que agregues se desarma en sus fotogramas.	You can drop them here, choose them or use all of the folder's. A GIF, APNG or animated WebP you add is split into its frames.	Você pode soltá-las aqui, escolhê-las ou usar todas da pasta. Um GIF, APNG ou WebP animado adicionado é dividido em seus quadros.	여기에 끌어다 놓거나, 직접 선택하거나, 폴더의 모든 이미지를 사용할 수 있습니다. 추가한 GIF, APNG, 애니메이션 WebP는 프레임별로 분해됩니다.	你可以将它们拖放到此处、手动选择，或使用文件夹中的全部图像。添加的 GIF、APNG 或动画 WebP 会被拆分为各帧。	ここにドロップするか、選ぶか、フォルダー内のすべてを使えます。追加した GIF・APNG・アニメーション WebP はフレームごとに分解されます。
+Posición horizontal	Horizontal position	Posição horizontal	가로 위치	水平位置	水平位置
+Posición vertical	Vertical position	Posição vertical	세로 위치	垂直位置	垂直位置
+Quitar	Remove	Remover	제거	移除	削除
+Quitar todas	Remove all	Remover todas	모두 제거	全部移除	すべて削除
+Repeticiones	Repeats	Repetições	반복 횟수	重复次数	繰り返し
+Reproducir	Play	Reproduzir	재생	播放	再生
+Se abre en todas partes. Hasta 256 colores y transparencia de todo o nada.	Opens everywhere. Up to 256 colors and all-or-nothing transparency.	Abre em qualquer lugar. Até 256 cores e transparência de tudo ou nada.	어디서나 열립니다. 최대 256색, 투명도는 있음/없음만 지원합니다.	随处可打开。最多 256 色，透明度仅支持“全透明或不透明”。	どこでも開けます。最大 256 色で、透明は「あり／なし」のみです。
+Sin pérdida de calidad	Lossless	Sem perda de qualidade	품질 손실 없음	无损画质	画質の劣化なし
+Subtítulo	Subtitle	Legenda	자막	字幕	字幕
+También de la última a la primera	Also from the last to the first	Também do último ao primeiro	마지막에서 첫 번째로도	也从最后一帧回到第一帧	最後から最初へも
+Texto clásico sobre la imagen	Classic text over the image	Texto clássico sobre a imagem	이미지 위의 클래식 텍스트	图像上的经典文字	画像の上のクラシックなテキスト
+Texto libre (lo pones donde quieras)	Free text (place it wherever you want)	Texto livre (coloque onde quiser)	자유 텍스트(원하는 곳에 배치)	自由文字（可放在任意位置）	自由なテキスト（好きな場所に配置）
+Tramado (degradados más suaves)	Dithering (smoother gradients)	Pontilhado (gradientes mais suaves)	디더링(더 부드러운 그라데이션)	抖动（渐变更平滑）	ディザリング（なめらかなグラデーション）
+Transición entre imágenes	Transition between images	Transição entre imagens	이미지 간 전환	图像之间的过渡	画像間の移行
+Una paleta por fotograma (mejor, pesa más)	One palette per frame (better, larger)	Uma paleta por quadro (melhor, mais pesado)	프레임마다 팔레트 하나(더 좋지만 용량 큼)	每帧一个调色板（效果更好，体积更大）	フレームごとにパレットを使用（高品質、サイズ大）
+Valores de fábrica	Factory defaults	Valores de fábrica	초기 설정값	出厂设置	初期設定
+Velocidad	Speed	Velocidade	속도	速度	速度
+%1 / %2					
+%1%					
+Arrastrá sobre la imagen para seleccionar el área a recortar	Drag over the image to select the area to crop	Arraste sobre a imagem para selecionar a área a cortar	이미지 위를 드래그하여 자를 영역을 선택하세요	在图像上拖动以选择要裁剪的区域	画像上をドラッグしてトリミングする範囲を選択
+Arrastrá una imagen o usá Abrir	Drag an image or use Open	Arraste uma imagem ou use Abrir	이미지를 끌어다 놓거나 열기를 사용하세요	拖入图像或使用“打开”	画像をドラッグするか「開く」を使ってください
+Copiar imagen	Copy image	Copiar imagem	이미지 복사	复制图像	画像をコピー
+Eliminar archivo…	Delete file…	Excluir arquivo…	파일 삭제…	删除文件…	ファイルを削除…
+Guardado	Saved	Salvo	저장됨	已保存	保存しました
+Guardando…	Saving…	Salvando…	저장 중…	正在保存…	保存中…
+Pegar imagen	Paste image	Colar imagem	이미지 붙여넣기	粘贴图像	画像を貼り付け
+Poner como fondo de escritorio	Set as desktop wallpaper	Definir como plano de fundo da área de trabalho	바탕 화면으로 설정	设为桌面壁纸	デスクトップの背景に設定
+X %1  Y %2   %3					
+X %1  Y %2   %3   ·   Copiado	X %1  Y %2   %3   ·   Copied	X %1  Y %2   %3   ·   Copiado	X %1  Y %2   %3   ·   복사됨	X %1  Y %2   %3   ·   已复制	X %1  Y %2   %3   ·   コピーしました
+Formato no soportado	Unsupported format	Formato não suportado	지원하지 않는 형식	不支持的格式	サポートされていない形式
+Formato no soportado para escritura (.%1)	Unsupported format for writing (.%1)	Formato não suportado para gravação (.%1)	쓰기를 지원하지 않는 형식(.%1)	不支持写入的格式 (.%1)	書き込みに対応していない形式 (.%1)
+La imagen está vacía	The image is empty	A imagem está vazia	이미지가 비어 있습니다	图像为空	画像が空です
+Los metadatos de los archivos .%1 no se pueden conservar al guardar	The metadata of .%1 files cannot be preserved when saving	Os metadados dos arquivos .%1 não podem ser preservados ao salvar	.%1 파일의 메타데이터는 저장할 때 유지할 수 없습니다	保存时无法保留 .%1 文件的元数据	.%1 ファイルのメタデータは保存時に保持できません
+No se pudieron copiar los metadatos: %1	Could not copy the metadata: %1	Não foi possível copiar os metadados: %1	메타데이터를 복사할 수 없습니다: %1	无法复制元数据：%1	メタデータをコピーできませんでした: %1
+No se pudieron leer los metadatos del original	Could not read the original's metadata	Não foi possível ler os metadados do original	원본의 메타데이터를 읽을 수 없습니다	无法读取原图的元数据	元のメタデータを読み取れませんでした
+No se pudo abrir el destino para escribir: %1	Could not open the destination for writing: %1	Não foi possível abrir o destino para gravação: %1	쓰기 위해 대상을 열 수 없습니다: %1	无法打开目标位置进行写入：%1	書き込み先を開けませんでした: %1
+No se pudo escribir el archivo: %1	Could not write the file: %1	Não foi possível gravar o arquivo: %1	파일을 쓸 수 없습니다: %1	无法写入文件：%1	ファイルを書き込めませんでした: %1
+No se pudo reemplazar el archivo: %1	Could not replace the file: %1	Não foi possível substituir o arquivo: %1	파일을 바꿀 수 없습니다: %1	无法替换文件：%1	ファイルを置き換えられませんでした: %1
+Qt no pudo codificar la imagen (%1)	Qt could not encode the image (%1)	O Qt não conseguiu codificar a imagem (%1)	Qt가 이미지를 인코딩할 수 없습니다(%1)	Qt 无法编码图像 (%1)	Qt が画像をエンコードできませんでした (%1)
+libvips no produjo datos	libvips produced no data	libvips não produziu dados	libvips가 데이터를 생성하지 않았습니다	libvips 没有产生数据	libvips がデータを生成しませんでした
+En columna	In a column	Em coluna	열 배치	纵向排列	縦に並べる
+En fila	In a row	Em linha	행 배치	横向排列	横に並べる
+Filas	Rows	Linhas	행	行	行
+Grande a la derecha	Large on the right	Grande à direita	오른쪽에 크게	右侧大图	右を大きく
+Grande a la izquierda	Large on the left	Grande à esquerda	왼쪽에 크게	左侧大图	左を大きく
+Grande abajo	Large at the bottom	Grande embaixo	아래에 크게	底部大图	下を大きく
+Grande arriba	Large on top	Grande em cima	위에 크게	顶部大图	上を大きく
+Lado a lado	Side by side	Lado a lado	나란히	并排	左右に並べる
+Mosaico %1	Mosaic %1	Mosaico %1	모자이크 %1	马赛克 %1	モザイク %1
+Principal y filas	Main and rows	Principal e linhas	메인과 행	主图和多行	メインと行
+Una foto	One photo	Uma foto	사진 한 장	一张照片	写真 1 枚
+Una sobre otra	One above the other	Uma sobre a outra	위아래로	上下排列	上下に並べる
+La distorsión de esta lente está calibrada en un sensor de otro tamaño.	This lens's distortion is calibrated on a sensor of a different size.	A distorção desta lente foi calibrada em um sensor de outro tamanho.	이 렌즈의 왜곡은 다른 크기의 센서에서 보정된 값입니다.	此镜头的畸变数据是在不同尺寸的传感器上标定的。	このレンズの歪みは別サイズのセンサーで校正されています。
+A mano	Manual	Manual	수동	手动	手動
+Apertura	Aperture	Abertura	조리개	光圈	絞り
+Buscar (por ejemplo 18-55, 50mm, nikkor)…	Search (for example 18-55, 50mm, nikkor)…	Buscar (por exemplo 18-55, 50mm, nikkor)…	검색 (예: 18-55, 50mm, nikkor)…	搜索（例如 18-55、50mm、nikkor）…	検索（例: 18-55、50mm、nikkor）…
+Cargando la base de cámaras y objetivos…	Loading the camera and lens database…	Carregando o banco de câmeras e lentes…	카메라 및 렌즈 데이터베이스를 불러오는 중…	正在加载相机和镜头数据库…	カメラとレンズのデータベースを読み込み中…
+Con perfil	With profile	Com perfil	프로파일 사용	使用配置文件	プロファイルあり
+Corregir la distorsión	Correct distortion	Corrigir a distorção	왜곡 보정	校正畸变	歪みを補正
+Corregir las esquinas oscuras	Correct dark corners	Corrigir os cantos escuros	어두운 모서리 보정	校正暗角	周辺減光を補正
+Corrige la distorsión, las franjas de color y el oscurecimiento de las esquinas con el perfil de tu cámara y tu objetivo.	Corrects distortion, color fringes and corner darkening using your camera and lens profile.	Corrige a distorção, as franjas de cor e o escurecimento dos cantos com o perfil da sua câmera e lente.	카메라와 렌즈 프로파일로 왜곡, 색 번짐, 모서리 어두워짐을 보정합니다.	使用你的相机和镜头配置文件校正畸变、色边和四角变暗。	お使いのカメラとレンズのプロファイルで、歪み・色にじみ・四隅の暗さを補正します。
+Cámara	Camera	Câmera	카메라	相机	カメラ
+Cámara y objetivo reconocidos por los datos de la foto.	Camera and lens recognized from the photo's data.	Câmera e lente reconhecidas pelos dados da foto.	사진 데이터에서 카메라와 렌즈를 인식했습니다.	已根据照片数据识别出相机和镜头。	写真のデータからカメラとレンズを認識しました。
+Distancia focal	Focal length	Distância focal	초점 거리	焦距	焦点距離
+Distorsión	Distortion	Distorção	왜곡	畸变	歪み
+Elegí un objetivo…	Choose a lens…	Escolha uma lente…	렌즈 선택…	选择镜头…	レンズを選択…
+Esquinas	Corners	Cantos	모서리	四角	四隅
+Franjas de color	Color fringes	Franjas de cor	색 번짐	色边	色にじみ
+Fuerza	Strength	Intensidade	강도	强度	強さ
+Marca…	Brand…	Marca…	제조사…	品牌…	メーカー…
+Modelo…	Model…	Modelo…	모델…	型号…	モデル…
+No hay objetivos que coincidan.	No lenses match.	Nenhuma lente corresponde.	일치하는 렌즈가 없습니다.	没有匹配的镜头。	一致するレンズがありません。
+Objetivo	Lens	Lente	렌즈	镜头	レンズ
+Objetivo de tipo %1: solo se corrige la forma, no se cambia la proyección.	%1-type lens: only the shape is corrected, the projection is not changed.	Lente do tipo %1: só a forma é corrigida, a projeção não é alterada.	%1 유형 렌즈: 모양만 보정하며 투영은 바뀌지 않습니다.	%1 类型镜头：仅校正形状，不改变投影方式。	%1 タイプのレンズ: 形状のみ補正し、投影方式は変わりません。
+Para objetivos que no están en la base: ajustá cada cosa mirando la imagen.	For lenses not in the database: adjust each setting while looking at the image.	Para lentes que não estão no banco: ajuste cada item olhando a imagem.	데이터베이스에 없는 렌즈: 이미지를 보며 각 항목을 직접 조정하세요.	对于数据库中没有的镜头：请一边看图像一边调整各项。	データベースにないレンズ: 画像を見ながら各項目を調整してください。
+Perfil: distorsión %1 · aberración %2 · viñeta %3	Profile: distortion %1 · aberration %2 · vignette %3	Perfil: distorção %1 · aberração %2 · vinheta %3	프로파일: 왜곡 %1 · 수차 %2 · 비네팅 %3	配置文件：畸变 %1 · 色差 %2 · 暗角 %3	プロファイル: 歪み %1 · 収差 %2 · ビネット %3
+Positivo aclara las esquinas, negativo las oscurece.	Positive lightens the corners, negative darkens them.	Positivo clareia os cantos, negativo os escurece.	양수는 모서리를 밝게, 음수는 어둡게 합니다.	正值使四角变亮，负值使其变暗。	プラスで四隅が明るく、マイナスで暗くなります。
+Positivo corrige un barril (líneas curvadas hacia afuera).	Positive corrects barrel distortion (lines curving outwards).	Positivo corrige uma distorção em barril (linhas curvadas para fora).	양수는 배럴 왜곡(선이 바깥으로 휨)을 보정합니다.	正值校正桶形畸变（线条向外弯曲）。	プラスで樽型歪み（線が外側に湾曲）を補正します。
+Quitar las franjas de color	Remove color fringes	Remover franjas de cor	색 번짐 제거	去除色边	色にじみを除去
+Quitar los bordes vacíos	Remove empty edges	Remover bordas vazias	빈 가장자리 제거	去除空白边缘	空白の縁を除去
+Blanco	White	Branco	흰색	白色	白
+Negro	Black	Preto	검정	黑色	黒
+Restablecer niveles	Reset levels	Redefinir níveis	레벨 초기화	重置色阶	レベルをリセット
+Salida: blanco	Output: white	Saída: branco	출력: 흰색	输出：白	出力: 白
+Salida: negro	Output: black	Saída: preto	출력: 검정	输出：黑	出力: 黒
+Amanecer	Dawn	Amanhecer	새벽	黎明	夜明け
+Azul y naranja	Blue and orange	Azul e laranja	파랑과 주황	蓝橙	青とオレンジ
+Años 70	70s	Anos 70	70년대	70 年代	70 年代
+Años 80	80s	Anos 80	80년대	80 年代	80 年代
+B/N	B/W	P/B	흑백	黑白	白黒
+B/N contrastado	High-contrast B/W	P/B contrastado	고대비 흑백	高对比黑白	高コントラスト白黒
+B/N película	B/W film	P/B filme	흑백 필름	黑白胶片	白黒フィルム
+B/N suave	Soft B/W	P/B suave	부드러운 흑백	柔和黑白	やわらかい白黒
+Blockbuster					
+Cianotipo	Cyanotype	Cianotipia	사이아노타입	氰版照相	サイアノタイプ
+Cine	Cinema	Cinema	시네마	电影	シネマ
+Cine cálido	Warm cinema	Cinema quente	따뜻한 시네마	暖调电影	暖かいシネマ
+Cine frío	Cool cinema	Cinema frio	차가운 시네마	冷调电影	冷たいシネマ
+Crepúsculo	Twilight	Crepúsculo	황혼	暮色	黄昏
+Cálido	Warm	Quente	따뜻함	暖色	暖色
+Cámara vieja	Old camera	Câmera antiga	오래된 카메라	老相机	古いカメラ
+Desvaído	Faded	Desbotado	바랜 느낌	褪色	色あせ
+Dramático	Dramatic	Dramático	드라마틱	戏剧性	ドラマチック
+Duotono	Duotone	Duotone	듀오톤	双色调	デュオトーン
+Frío	Cool	Frio	차가움	冷色	寒色
+Grafito	Graphite	Grafite	흑연	石墨	グラファイト
+Instantánea	Instant	Instantânea	인스턴트	即影	インスタント
+Lomo					
+Magenta y cian	Magenta and cyan	Magenta e ciano	마젠타와 시안	洋红与青色	マゼンタとシアン
+Matrix					
+Noir					
+Otoño	Autumn	Outono	가을	秋天	秋
+Pastel					
+Polaroid					
+Proceso cruzado	Cross process	Processo cruzado	크로스 프로세스	交叉冲印	クロスプロセス
+Púrpura y oro	Purple and gold	Roxo e ouro	보라와 금	紫金	紫とゴールド
+Retro	Retro	Retrô	레트로	复古	レトロ
+Rojo y crema	Red and cream	Vermelho e creme	빨강과 크림	红与奶油色	赤とクリーム
+Verano	Summer	Verão	여름	夏天	夏
+Verde menta	Mint green	Verde menta	민트 그린	薄荷绿	ミントグリーン
+Vintage	Vintage	Vintage	빈티지	怀旧	ビンテージ
+Vívido	Vivid	Vívido	선명한	鲜艳	ビビッド
+100 %					
+Ajustar todas a la ventana	Fit all to the window	Ajustar todas à janela	모두 창에 맞추기	全部适应窗口	すべてをウィンドウに合わせる
+Cada imagen en sus píxeles reales	Each image at its real pixels	Cada imagem em seus pixels reais	각 이미지를 실제 픽셀 크기로	每张图像按实际像素显示	各画像を実際のピクセル等倍で
+El zoom no está vinculado: cada imagen se mueve por su cuenta. Shift mueve todas.	Zoom is not linked: each image moves on its own. Shift moves all of them.	O zoom não está vinculado: cada imagem se move sozinha. Shift move todas.	확대/축소가 연결되지 않았습니다. 각 이미지가 따로 움직입니다. Shift를 누르면 모두 움직입니다.	缩放未关联：每张图像独立移动。按住 Shift 可同时移动全部。	ズームはリンクされていません。各画像が個別に動きます。Shift で全部が動きます。
+Elegir imágenes…	Choose images…	Escolher imagens…	이미지 선택…	选择图像…	画像を選択…
+Elegí las imágenes que querés comparar	Choose the images you want to compare	Escolha as imagens que deseja comparar	비교할 이미지를 선택하세요	选择要对比的图像	比較する画像を選択
+Rueda para acercar, arrastrá para mover: todas se mueven juntas. Shift mueve solo una.	Wheel to zoom, drag to move: they all move together. Shift moves just one.	Roda para aproximar, arraste para mover: todas se movem juntas. Shift move só uma.	휠로 확대/축소하고 드래그로 이동합니다. 모두 함께 움직입니다. Shift를 누르면 하나만 움직입니다.	滚轮缩放，拖动移动：全部一起移动。按住 Shift 只移动一张。	ホイールでズーム、ドラッグで移動: すべて一緒に動きます。Shift で 1 枚だけ動きます。
+Se acomodan según el tamaño y la forma de cada imagen	They are arranged according to each image's size and shape	Elas se organizam conforme o tamanho e a forma de cada imagem	각 이미지의 크기와 모양에 맞게 배치됩니다	根据每张图像的大小和形状自动排列	各画像のサイズと形に合わせて配置されます
+Todas en una columna	All in one column	Todas em uma coluna	모두 한 열로	全部排成一列	すべて 1 列に
+Todas en una fila	All in one row	Todas em uma linha	모두 한 행으로	全部排成一行	すべて 1 行に
+Una imagen menos	One image fewer	Uma imagem a menos	이미지 하나 줄이기	减少一张图像	画像を 1 枚減らす
+Una imagen más	One more image	Mais uma imagem	이미지 하나 더	增加一张图像	画像を 1 枚増やす
+Volver a una sola imagen	Back to a single image	Voltar a uma única imagem	이미지 한 장으로 돌아가기	返回单张图像	1 枚表示に戻る
+Zoom vinculado: activado (Shift mueve solo una)	Linked zoom: on (Shift moves just one)	Zoom vinculado: ativado (Shift move só uma)	연결된 확대/축소: 켜짐 (Shift: 하나만 이동)	缩放关联：开（Shift 只移动一张）	リンクズーム: オン（Shift で 1 枚だけ移動）
+Zoom vinculado: desactivado	Linked zoom: off	Zoom vinculado: desativado	연결된 확대/축소: 꺼짐	缩放关联：关	リンクズーム: オフ
+Al ser JPEG/WebP se vuelve a comprimir (con calidad alta). Se conservan los datos de la cámara, la fecha, el GPS y el perfil de color. Si quieres quedarte también con la foto original, guarda una copia.	Being JPEG/WebP, it is recompressed (at high quality). The camera data, date, GPS and color profile are kept. If you also want to keep the original photo, save a copy.	Por ser JPEG/WebP, é recomprimida (com alta qualidade). Os dados da câmera, a data, o GPS e o perfil de cor são mantidos. Se também quiser ficar com a foto original, salve uma cópia.	JPEG/WebP이므로 다시 압축됩니다(높은 품질). 카메라 데이터, 날짜, GPS, 색상 프로파일은 유지됩니다. 원본 사진도 보관하려면 사본을 저장하세요.	由于是 JPEG/WebP，将重新压缩（高质量）。相机数据、日期、GPS 和颜色配置文件会被保留。如果还想保留原始照片，请另存一份副本。	JPEG/WebP のため再圧縮されます（高品質）。カメラ情報・日付・GPS・カラープロファイルは保持されます。元の写真も残したい場合はコピーを保存してください。
+Guardar copia…	Save a copy…	Salvar uma cópia…	사본 저장…	保存副本…	コピーを保存…
+No volver a preguntar	Don't ask again	Não perguntar novamente	다시 묻지 않기	不再询问	今後は確認しない
+Se conservan los datos de la cámara, la fecha, el GPS y el perfil de color. Si quieres quedarte también con la foto original, guarda una copia.	The camera data, date, GPS and color profile are kept. If you also want to keep the original photo, save a copy.	Os dados da câmera, a data, o GPS e o perfil de cor são mantidos. Se também quiser ficar com a foto original, salve uma cópia.	카메라 데이터, 날짜, GPS, 색상 프로파일은 유지됩니다. 원본 사진도 보관하려면 사본을 저장하세요.	相机数据、日期、GPS 和颜色配置文件会被保留。如果还想保留原始照片，请另存一份副本。	カメラ情報・日付・GPS・カラープロファイルは保持されます。元の写真も残したい場合はコピーを保存してください。
+Sobrescribir	Overwrite	Sobrescrever	덮어쓰기	覆盖	上書き
+Sobrescribir el original	Overwrite the original	Sobrescrever o original	원본 덮어쓰기	覆盖原图	元のファイルを上書き
+«%1» se va a reemplazar por la imagen editada.	"%1" will be replaced by the edited image.	"%1" será substituído pela imagem editada.	"%1"이(가) 편집한 이미지로 바뀝니다.	“%1”将被编辑后的图像替换。	「%1」は編集した画像で置き換えられます。
+Formato no compatible: %1	Unsupported format: %1	Formato não compatível: %1	지원하지 않는 형식: %1	不支持的格式：%1	非対応の形式: %1
+Cargando…	Loading…	Carregando…	불러오는 중…	正在加载…	読み込み中…
+No se pudo abrir esta imagen	Could not open this image	Não foi possível abrir esta imagem	이 이미지를 열 수 없습니다	无法打开此图像	この画像を開けませんでした
+Quitar esta imagen	Remove this image	Remover esta imagem	이 이미지 제거	移除此图像	この画像を削除
+Soltá una imagen acá	Drop an image here	Solte uma imagem aqui	여기에 이미지를 놓으세요	将图像拖放到此处	ここに画像をドロップ
+Alto	Height	Altura	높이	高度	高さ
+Ancho	Width	Largura	너비	宽度	幅
+Escala	Scale	Escala	배율	缩放	拡大率
+Mantener proporción	Keep proportions	Manter proporção	비율 유지	保持比例	縦横比を維持
+Mejorar nitidez al ampliar	Improve sharpness when enlarging	Melhorar nitidez ao ampliar	확대 시 선명도 개선	放大时提升清晰度	拡大時にシャープさを向上
+Modo pixel: se redimensiona sin suavizar (vecino más cercano), así los píxeles no se mezclan.	Pixel mode: resizes without smoothing (nearest neighbor), so pixels don't blend.	Modo pixel: redimensiona sem suavizar (vizinho mais próximo), para que os pixels não se misturem.	픽셀 모드: 부드럽게 하지 않고(최근접 이웃) 크기를 바꾸므로 픽셀이 섞이지 않습니다.	像素模式：缩放时不做平滑（最近邻），因此像素不会混合。	ピクセルモード: 補間せず（最近傍）にリサイズするため、ピクセルが混ざりません。
+Tamaño original (px)	Original size (px)	Tamanho original (px)	원본 크기(px)	原始大小（px）	元のサイズ (px)
+Tamaño resultante (px)	Resulting size (px)	Tamanho resultante (px)	결과 크기(px)	结果大小（px）	変更後のサイズ (px)
+ px					
+ s					
+1×, 2×, 3×, 4×… Las imágenes pequeñas se abren ampliadas.	1×, 2×, 3×, 4×… Small images open enlarged.	1×, 2×, 3×, 4×… As imagens pequenas abrem ampliadas.	1×, 2×, 3×, 4×… 작은 이미지는 확대되어 열립니다.	1×、2×、3×、4×… 小图像会以放大状态打开。	1×、2×、3×、4×… 小さい画像は拡大して開きます。
+Abajo a la izquierda: posición y color del píxel bajo el cursor.	Bottom left: position and color of the pixel under the cursor.	Embaixo à esquerda: posição e cor do pixel sob o cursor.	왼쪽 아래: 커서 아래 픽셀의 위치와 색상.	左下角：光标下像素的位置和颜色。	左下: カーソル下のピクセルの位置と色。
+Al llegar a la última vuelve a empezar.	When it reaches the last one it starts over.	Ao chegar à última, recomeça.	마지막에 도달하면 처음부터 다시 시작합니다.	到达最后一张后重新开始。	最後まで行くと最初に戻ります。
+Al renombrar por lote: 3 da imagen_001, imagen_002…	When batch renaming: 3 gives image_001, image_002…	Ao renomear em lote: 3 gera imagem_001, imagem_002…	일괄 이름 바꾸기 시: 3이면 image_001, image_002…	批量重命名时：3 会得到 image_001、image_002…	一括名前変更時: 3 だと image_001、image_002…
+Aparece al ampliar desde 8×.	Appears when zoomed in from 8×.	Aparece ao ampliar a partir de 8×.	8× 이상 확대하면 나타납니다.	放大到 8× 以上时出现。	8× 以上に拡大すると表示されます。
+Apariencia	Appearance	Aparência	모양	外观	外観
+Automática	Automatic	Automática	자동	自动	自動
+Barra de miniaturas	Thumbnail bar	Barra de miniaturas	미리보기 막대	缩略图栏	サムネイルバー
+Calidad de exportación	Export quality	Qualidade de exportação	내보내기 품질	导出质量	書き出し品質
+Columnas	Columns	Colunas	열	列数	列数
+Con pestaña	With tab	Com aba	탭 사용	带标签	タブ付き
+Configuración	Settings	Configurações	설정	设置	設定
+Cuadrícula entre píxeles	Grid between pixels	Grade entre pixels	픽셀 사이 격자	像素间网格	ピクセル間のグリッド
+Cuándo se muestra	When it is shown	Quando é exibida	표시 시점	何时显示	表示するタイミング
+Cuánto se muestra cada imagen antes de pasar a la siguiente.	How long each image is shown before moving on to the next.	Por quanto tempo cada imagem é exibida antes de passar para a próxima.	다음 이미지로 넘어가기 전에 각 이미지를 보여 주는 시간입니다.	每张图像显示多长时间后切换到下一张。	次の画像に進むまで各画像を表示する時間です。
+Cómo avanza la presentación de diapositivas.	How the slideshow advances.	Como a apresentação de slides avança.	슬라이드쇼가 진행되는 방식입니다.	幻灯片放映的推进方式。	スライドショーの進み方です。
+Cómo se ve el programa.	How the program looks.	Como o programa se parece.	프로그램의 모양입니다.	程序的外观。	プログラムの見た目です。
+Deja ver las zonas transparentes.	Lets you see the transparent areas.	Permite ver as áreas transparentes.	투명한 영역을 볼 수 있습니다.	可以看到透明区域。	透明な部分が見えるようになります。
+Duración por foto	Time per photo	Duração por foto	사진당 시간	每张照片时长	1 枚あたりの時間
+Dígitos de numeración	Numbering digits	Dígitos de numeração	번호 자릿수	编号位数	番号の桁数
+Editar sin suavizar	Edit without smoothing	Editar sem suavizar	부드럽게 하지 않고 편집	编辑时不平滑	補間せずに編集
+Escalonado	Stepped	Escalonado	단계별	阶梯式	段階的
+Extras del modo pixel	Pixel mode extras	Extras do modo pixel	픽셀 모드 추가 기능	像素模式附加选项	ピクセルモードの追加機能
+Fondo de ajedrez	Checkerboard background	Fundo xadrez	체크무늬 배경	棋盘格背景	市松模様の背景
+Lectura del píxel	Pixel readout	Leitura do pixel	픽셀 정보 표시	像素读数	ピクセル情報
+Mezcla las imágenes de la carpeta.	Shuffles the images in the folder.	Embaralha as imagens da pasta.	폴더의 이미지를 섞습니다.	打乱文件夹中的图像顺序。	フォルダー内の画像をシャッフルします。
+Modo pixel	Pixel mode	Modo pixel	픽셀 모드	像素模式	ピクセルモード
+Orden aleatorio	Random order	Ordem aleatória	무작위 순서	随机顺序	ランダム順
+Para JPG y WebP al exportar por lote.	For JPG and WebP when batch exporting.	Para JPG e WebP ao exportar em lote.	일괄 내보내기 시 JPG와 WebP에 적용됩니다.	用于批量导出 JPG 和 WebP 时。	一括書き出し時の JPG と WebP に適用されます。
+Para sprites, íconos y dibujos hechos de píxeles: se ven nítidos al ampliar, sin borrosidad, y el zoom llega a 64×.	For sprites, icons and drawings made of pixels: they look sharp when enlarged, with no blur, and zoom goes up to 64×.	Para sprites, ícones e desenhos feitos de pixels: ficam nítidos ao ampliar, sem desfoque, e o zoom chega a 64×.	스프라이트, 아이콘, 픽셀로 만든 그림용: 확대해도 흐릿하지 않고 선명하며 최대 64×까지 확대됩니다.	适用于精灵图、图标和像素绘画：放大后清晰不模糊，缩放最高可达 64×。	スプライト、アイコン、ドット絵向け: 拡大してもぼやけず鮮明で、ズームは 64× まで可能です。
+Pide confirmación al guardar encima del archivo original.	Asks for confirmation when saving over the original file.	Pede confirmação ao salvar sobre o arquivo original.	원본 파일 위에 저장할 때 확인을 요청합니다.	覆盖原始文件保存时要求确认。	元のファイルに上書き保存するときに確認します。
+Preguntar antes de sobrescribir	Ask before overwriting	Perguntar antes de sobrescrever	덮어쓰기 전에 확인	覆盖前询问	上書き前に確認する
+Procesos por lote	Batch processes	Processos em lote	일괄 처리	批处理	一括処理
+Qué pasa al guardar una imagen editada.	What happens when saving an edited image.	O que acontece ao salvar uma imagem editada.	편집한 이미지를 저장할 때의 동작입니다.	保存编辑后的图像时的行为。	編集した画像を保存するときの動作です。
+Repetir en bucle	Loop	Repetir em loop	반복 재생	循环播放	ループ再生
+Siempre abierta	Always open	Sempre aberta	항상 열어 두기	始终打开	常に表示
+Siempre cerrada	Always closed	Sempre fechada	항상 닫아 두기	始终关闭	常に非表示
+Suavizado	Smooth	Suave	부드럽게	平滑	なめらか
+Tamaño de las miniaturas	Thumbnail size	Tamanho das miniaturas	미리보기 크기	缩略图大小	サムネイルのサイズ
+También puedes arrastrar el borde de la barra con el mouse.	You can also drag the bar's edge with the mouse.	Você também pode arrastar a borda da barra com o mouse.	마우스로 막대의 가장자리를 끌어서 조절할 수도 있습니다.	也可以用鼠标拖动栏的边缘。	マウスでバーの端をドラッグして調整することもできます。
+Tema	Theme	Tema	테마	主题	テーマ
+Tipo de zoom con la rueda	Wheel zoom type	Tipo de zoom com a roda	휠 확대/축소 방식	滚轮缩放方式	ホイールズームの種類
+Valores para exportar y renombrar carpetas enteras.	Values for exporting and renaming whole folders.	Valores para exportar e renomear pastas inteiras.	폴더 전체를 내보내고 이름을 바꿀 때 쓰는 값입니다.	用于导出和重命名整个文件夹的设置。	フォルダー全体の書き出しと名前変更に使う値です。
+Zoom en números enteros	Whole-number zoom	Zoom em números inteiros	정수 배율 확대/축소	整数倍缩放	整数倍ズーム
+«Con pestaña» la abres y cierras tú. «Automática» se cierra al editar, en la presentación y en ventanas estrechas.	"With tab": you open and close it yourself. "Automatic": it closes when editing, during the slideshow and in narrow windows.	"Com aba": você a abre e fecha. "Automática": fecha ao editar, na apresentação e em janelas estreitas.	"탭 사용": 직접 열고 닫습니다. "자동": 편집 중, 슬라이드쇼 중, 좁은 창에서 닫힙니다.	“带标签”：由你手动打开和关闭。“自动”：编辑时、幻灯片放映时以及窗口较窄时自动关闭。	「タブ付き」: 自分で開閉します。「自動」: 編集中、スライドショー中、狭いウィンドウで閉じます。
+«Escalonado» salta de a un paso por vez. «Suavizado» se desliza hacia el nuevo tamaño, con una sensación más fluida.	"Stepped" jumps one step at a time. "Smooth" glides to the new size, for a more fluid feel.	"Escalonado" salta um passo por vez. "Suave" desliza até o novo tamanho, com uma sensação mais fluida.	"단계별"은 한 단계씩 이동합니다. "부드럽게"는 새 크기로 미끄러지듯 이동해 더 매끄럽게 느껴집니다.	“阶梯式”每次跳一档。“平滑”会平滑过渡到新的大小，手感更流畅。	「段階的」は 1 段ずつ切り替わります。「なめらか」は新しいサイズへ滑らかに移り、より流れるような操作感です。
+«Tamaño» y «Enderezar» copian píxeles (vecino más cercano), así no aparecen colores nuevos.	"Size" and "Straighten" copy pixels (nearest neighbor), so no new colors appear.	"Tamanho" e "Endireitar" copiam pixels (vizinho mais próximo), então não surgem cores novas.	"크기"와 "수평 맞추기"는 픽셀을 그대로 복사하므로(최근접 이웃) 새로운 색이 생기지 않습니다.	“大小”和“拉直”会复制像素（最近邻），因此不会出现新的颜色。	「サイズ」と「傾き補正」はピクセルをそのままコピーする（最近傍）ため、新しい色は生まれません。
+Útil con muchas imágenes en la carpeta.	Useful with many images in the folder.	Útil com muitas imagens na pasta.	폴더에 이미지가 많을 때 유용합니다.	文件夹中图像较多时很有用。	フォルダー内の画像が多いときに便利です。
+Classic Claro	Classic Light	Classic Claro	Classic 라이트	经典浅色	クラシック ライト
+Classic Oscuro	Classic Dark	Classic Escuro	Classic 다크	经典深色	クラシック ダーク
+Moderno Claro	Modern Light	Moderno Claro	모던 라이트	现代浅色	モダン ライト
+Moderno Oscuro	Modern Dark	Moderno Escuro	모던 다크	现代深色	モダン ダーク
+Abrir imagen	Open image	Abrir imagem	이미지 열기	打开图像	画像を開く
+Collage	Collage	Colagem	콜라주	拼贴	コラージュ
+Comparador (varias imágenes con zoom vinculado)	Compare (several images with linked zoom)	Comparador (várias imagens com zoom vinculado)	비교 보기(여러 이미지, 확대/축소 연동)	对比器（多张图像，缩放联动）	比較ビュー（ズーム連動で複数画像）
+Dimensiones: %1 x %2	Dimensions: %1 x %2	Dimensões: %1 x %2	크기: %1 x %2	尺寸：%1 x %2	サイズ: %1 x %2
+Eliminar	Delete	Excluir	삭제	删除	削除
+Exportar por lote…	Batch export…	Exportar em lote…	일괄 내보내기…	批量导出…	一括書き出し…
+GIF animado	Animated GIF	GIF animado	애니메이션 GIF	动画 GIF	アニメーション GIF
+Imagen %1 de %2	Image %1 of %2	Imagem %1 de %2	이미지 %1 / %2	图像 %1/%2	画像 %1 / %2
+Información	Information	Informações	정보	信息	情報
+Más herramientas	More tools	Mais ferramentas	도구 더 보기	更多工具	その他のツール
+Podrás recuperarlo desde la Papelera si cambias de idea.	You can recover it from the Recycle Bin if you change your mind.	Você poderá recuperá-lo da Lixeira se mudar de ideia.	마음이 바뀌면 휴지통에서 복구할 수 있습니다.	如果改变主意，可以从回收站中恢复。	気が変わった場合はごみ箱から復元できます。
+Project Foxy %1					
+Renombrar por lote…	Batch rename…	Renomear em lote…	일괄 이름 바꾸기…	批量重命名…	一括名前変更…
+Sin datos EXIF	No EXIF data	Sem dados EXIF	EXIF 데이터 없음	无 EXIF 数据	EXIF データなし
+Sin imagen	No image	Sem imagem	이미지 없음	无图像	画像なし
+Zoom: %1%	Zoom: %1%	Zoom: %1%	확대/축소: %1%	缩放：%1%	ズーム: %1%
+«%1» se enviará a la Papelera de reciclaje.	"%1" will be sent to the Recycle Bin.	"%1" será enviado para a Lixeira.	"%1"이(가) 휴지통으로 이동됩니다.	“%1”将被移到回收站。	「%1」はごみ箱に移動されます。
+¿Eliminar este archivo?	Delete this file?	Excluir este arquivo?	이 파일을 삭제할까요?	删除此文件？	このファイルを削除しますか？
+Cambios sin guardar	Unsaved changes	Alterações não salvas	저장하지 않은 변경 사항	未保存的更改	未保存の変更
+Descartar	Discard	Descartar	버리기	放弃	破棄
+Este archivo no se puede sobrescribir. Cancela y usa «Guardar como…» si quieres conservarlos.	This file cannot be overwritten. Cancel and use "Save as…" if you want to keep them.	Este arquivo não pode ser sobrescrito. Cancele e use "Salvar como…" se quiser mantê-las.	이 파일은 덮어쓸 수 없습니다. 변경 사항을 유지하려면 취소하고 "다른 이름으로 저장…"을 사용하세요.	无法覆盖此文件。如果要保留更改，请取消并使用“另存为…”。	このファイルは上書きできません。変更を残すにはキャンセルして「名前を付けて保存…」を使ってください。
+«%1» tiene cambios que no se han guardado.	"%1" has changes that have not been saved.	"%1" tem alterações que não foram salvas.	"%1"에 저장하지 않은 변경 사항이 있습니다.	“%1”有尚未保存的更改。	「%1」には保存されていない変更があります。
+¿Quieres guardarlos antes de abrir otra imagen?	Do you want to save them before opening another image?	Deseja salvá-las antes de abrir outra imagem?	다른 이미지를 열기 전에 저장할까요?	要在打开另一张图像之前保存吗？	別の画像を開く前に保存しますか？
+¿Quieres guardarlos antes de cerrar?	Do you want to save them before closing?	Deseja salvá-las antes de fechar?	닫기 전에 저장할까요?	要在关闭之前保存吗？	閉じる前に保存しますか？
+No se pudo convertir la imagen CMYK: %1	Could not convert the CMYK image: %1	Não foi possível converter a imagem CMYK: %1	CMYK 이미지를 변환할 수 없습니다: %1	无法转换 CMYK 图像：%1	CMYK 画像を変換できませんでした: %1
+libvips no se pudo iniciar: %1	libvips could not start: %1	Não foi possível iniciar o libvips: %1	libvips를 시작할 수 없습니다: %1	无法启动 libvips：%1	libvips を起動できませんでした: %1
+La imagen es demasiado grande para un WebP.	The image is too large for a WebP.	A imagem é grande demais para um WebP.	이미지가 WebP에 비해 너무 큽니다.	图像对于 WebP 来说过大。	画像が WebP には大きすぎます。
+Las opciones de WebP no son válidas.	The WebP options are not valid.	As opções do WebP não são válidas.	WebP 옵션이 올바르지 않습니다.	WebP 选项无效。	WebP のオプションが無効です。
+No se pudo armar el WebP: %1	Could not assemble the WebP: %1	Não foi possível montar o WebP: %1	WebP를 만들 수 없습니다: %1	无法合成 WebP：%1	WebP を作成できませんでした: %1
+No se pudo codificar un fotograma: %1	Could not encode a frame: %1	Não foi possível codificar um quadro: %1	프레임을 인코딩할 수 없습니다: %1	无法编码某一帧：%1	フレームをエンコードできませんでした: %1
+No se pudo iniciar el codificador de WebP.	Could not start the WebP encoder.	Não foi possível iniciar o codificador de WebP.	WebP 인코더를 시작할 수 없습니다.	无法启动 WebP 编码器。	WebP エンコーダーを起動できませんでした。
+No se pudo preparar un fotograma.	Could not prepare a frame.	Não foi possível preparar um quadro.	프레임을 준비할 수 없습니다.	无法准备某一帧。	フレームを準備できませんでした。
+No se pudo terminar el WebP.	Could not finish the WebP.	Não foi possível finalizar o WebP.	WebP를 완료할 수 없습니다.	无法完成 WebP。	WebP を完了できませんでした。
+Idioma	Language	Idioma	언어	语言	言語
+Idioma de la interfaz	Interface language	Idioma da interface	인터페이스 언어	界面语言	インターフェースの言語
+Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma de Windows.	Applies instantly, no restart needed. "Follow the system" uses the language of Windows.	Aplica-se na hora, sem reiniciar. "Seguir o sistema" usa o idioma do Windows.	즉시 적용되며 다시 시작할 필요가 없습니다. "시스템 설정 따르기"는 Windows의 언어를 사용합니다.	立即生效，无需重启。“跟随系统”会使用 Windows 的语言。	すぐに反映され、再起動は不要です。「システムに合わせる」は Windows の言語を使います。
+Según el sistema	Follow the system	Seguir o sistema	시스템 설정 따르기	跟随系统	システムに合わせる

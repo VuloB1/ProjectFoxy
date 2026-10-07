@@ -105,8 +105,8 @@ class AppController : public QObject {
     Q_PROPERTY(bool gradeActive READ gradeActive NOTIFY liveAdjustChanged)
     Q_PROPERTY(QString lookLutSource READ lookLutSource NOTIFY liveFilterChanged)
     // The catalogue: [{id, name, group}] and [{id, name}] for the groups.
-    Q_PROPERTY(QVariantList lookList READ lookList CONSTANT)
-    Q_PROPERTY(QVariantList lookGroups READ lookGroups CONSTANT)
+    Q_PROPERTY(QVariantList lookList READ lookList NOTIFY textsChanged)
+    Q_PROPERTY(QVariantList lookGroups READ lookGroups NOTIFY textsChanged)
     // Bumped each time the preview thumbnails are re-rendered for a new photo;
     // put it in the thumbnail URL: "image://viewer/lookthumb/<id>?rev=N".
     Q_PROPERTY(int lookThumbRevision READ lookThumbRevision NOTIFY lookThumbsChanged)
@@ -117,8 +117,8 @@ class AppController : public QObject {
     // history) until commitEffect() bakes it in as an undoable edit, or
     // cancelEffect() throws it away.
     // [{id, name, group}] and [{id, name}] for the groups.
-    Q_PROPERTY(QVariantList effectList READ effectList CONSTANT)
-    Q_PROPERTY(QVariantList effectGroups READ effectGroups CONSTANT)
+    Q_PROPERTY(QVariantList effectList READ effectList NOTIFY textsChanged)
+    Q_PROPERTY(QVariantList effectGroups READ effectGroups NOTIFY textsChanged)
     // The effect being previewed ("" = none).
     Q_PROPERTY(QString effectId READ effectId NOTIFY effectChanged)
     // Its sliders, [{label, min, max, def, suffix, integer, toggle}] - changes
@@ -237,6 +237,7 @@ public:
     bool animationPlaying() const { return m_animationPlaying; }
 
 public slots:
+    void retranslate() { emit textsChanged(); emit effectChanged(); }
     // No-op when the current image isn't animated (or already in the
     // requested state). Play/pause only - there's no scrubbing to a
     // specific frame yet, matching the scope of the feature (view/play,
@@ -388,6 +389,8 @@ signals:
     // unsaved changes and did nothing yet: the UI must ask, then call resolveUnsaved().
     void unsavedChangesBlocked();
     void effectChanged();
+    // The language changed: the names that come from the core (effects, looks, sliders...) are asked again.
+    void textsChanged();
     void effectValuesChanged();
     void effectBusyChanged();
     void histogramChanged();

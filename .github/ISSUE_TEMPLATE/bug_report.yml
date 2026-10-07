@@ -1,49 +1,50 @@
-name: Informar de un error
-description: Algo no funciona como debería
+name: Report a bug / Informar de un error
+description: Something does not work as it should / Algo no funciona como debería
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Gracias por avisar. Cuanto más concreto seas, más rápido se arregla.
+        Thanks for letting me know — English or Español, both are fine. The more specific you are, the faster it gets fixed.
+        Gracias por avisar: en inglés o en español. Cuanto más concreto seas, más rápido se arregla.
   - type: textarea
-    id: que-paso
+    id: what-happened
     attributes:
-      label: ¿Qué pasó?
-      description: Lo que hiciste, lo que esperabas y lo que ocurrió en cambio. Una captura ayuda mucho.
+      label: What happened? / ¿Qué pasó?
+      description: What you did, what you expected and what happened instead. A screenshot helps a lot. / Lo que hiciste, lo que esperabas y lo que ocurrió en cambio. Una captura ayuda mucho.
     validations:
       required: true
   - type: textarea
-    id: pasos
+    id: steps
     attributes:
-      label: Pasos para repetirlo
+      label: Steps to reproduce / Pasos para repetirlo
       placeholder: |
-        1. Abrir una foto…
-        2. Ir a Editar → Efectos…
+        1. Open a photo… / Abrir una foto…
+        2. Edit → Effects… / Editar → Efectos…
         3. …
   - type: input
-    id: archivo
+    id: file
     attributes:
-      label: ¿Con qué tipo de archivo? (formato, tamaño, de qué cámara o programa viene)
-      description: Si el problema depende de una imagen concreta, adjúntala en un comentario.
+      label: What kind of file? / ¿Con qué tipo de archivo?
+      description: Format, size, which camera or program it comes from. If the problem depends on one image, attach it in a comment. / Formato, tamaño, de qué cámara o programa viene. Si depende de una imagen concreta, adjúntala en un comentario.
   - type: input
     id: version
     attributes:
-      label: Versión de Project Foxy
-      description: En «Información» (el ícono ⓘ de la barra superior) o en el nombre del instalador.
+      label: Project Foxy version / Versión de Project Foxy
+      description: In "Information" (the ⓘ icon of the top bar) or in the installer's name. / En «Información» (el ícono ⓘ de la barra superior) o en el nombre del instalador.
       placeholder: "0.1.0"
     validations:
       required: true
   - type: dropdown
-    id: instalacion
+    id: install
     attributes:
-      label: ¿Cómo lo instalaste?
+      label: How did you install it? / ¿Cómo lo instalaste?
       options:
-        - Instalador
+        - Installer / Instalador
         - Portable (.zip)
-        - Lo compilé yo
+        - I built it myself / Lo compilé yo
   - type: input
     id: windows
     attributes:
-      label: Versión de Windows y tarjeta gráfica
+      label: Windows version and graphics card / Versión de Windows y tarjeta gráfica
       placeholder: "Windows 11 23H2 · NVIDIA RTX 3060"

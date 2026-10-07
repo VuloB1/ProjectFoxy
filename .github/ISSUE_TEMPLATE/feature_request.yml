@@ -1,16 +1,16 @@
-name: Proponer una mejora
-description: Una función nueva o un cambio que te gustaría ver
+name: Suggest an improvement / Proponer una mejora
+description: A new feature or a change you would like to see / Una función nueva o un cambio que te gustaría ver
 labels: ["enhancement"]
 body:
   - type: textarea
     id: idea
     attributes:
-      label: ¿Qué te gustaría poder hacer?
-      description: Cuenta el problema o la necesidad antes que la solución.
+      label: What would you like to be able to do? / ¿Qué te gustaría poder hacer?
+      description: Describe the problem or need before the solution. / Cuenta el problema o la necesidad antes que la solución.
     validations:
       required: true
   - type: textarea
-    id: ejemplo
+    id: example
     attributes:
-      label: ¿Cómo lo hace otro programa?
-      description: Si ya existe en otro visor o editor, dime cuál y cómo funciona (capturas bienvenidas).
+      label: How does another program do it? / ¿Cómo lo hace otro programa?
+      description: If it already exists in another viewer or editor, tell me which and how it works (screenshots welcome). / Si ya existe en otro visor o editor, dime cuál y cómo funciona (capturas bienvenidas).

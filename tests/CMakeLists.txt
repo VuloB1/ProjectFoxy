@@ -96,3 +96,9 @@ add_test(NAME smoke_startup
 add_executable(bench_effects bench_effects.cpp)
 target_link_libraries(bench_effects PRIVATE imageviewer_core Qt6::Core)
 target_include_directories(bench_effects PRIVATE ${CMAKE_SOURCE_DIR}/src/core)
+
+# The language of the interface and its catalogues (resources/i18n).
+add_executable(test_translations test_translations.cpp)
+target_link_libraries(test_translations PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+target_compile_definitions(test_translations PRIVATE I18N_DIR="${CMAKE_SOURCE_DIR}/resources/i18n")
+add_test(NAME test_translations COMMAND test_translations)

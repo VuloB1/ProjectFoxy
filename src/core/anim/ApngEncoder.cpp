@@ -12,6 +12,7 @@
 #include <array>
 #include <cstdint>
 #include <cstring>
+#include "Translate.h"
 
 namespace core::anim {
 
@@ -108,7 +109,7 @@ bool writeApng(FrameSource &frames, const ApngOptions &options, QIODevice &out, 
         return false;
     };
     if (total < 1 || size.width() < 1 || size.height() < 1)
-        return fail(QStringLiteral("No hay fotogramas para guardar."));
+        return fail(core::tr("No hay fotogramas para guardar."));
 
     QByteArray file("\x89PNG\r\n\x1a\n", 8);
     QByteArray ihdr;
@@ -119,7 +120,7 @@ bool writeApng(FrameSource &frames, const ApngOptions &options, QIODevice &out, 
         int delayMs = 100;
         QImage frame = frames.frame(i, &delayMs).convertToFormat(QImage::Format_RGBA8888);
         if (frame.size() != size)
-            return fail(QStringLiteral("Los fotogramas no tienen todos el mismo tamaño."));
+            return fail(core::tr("Los fotogramas no tienen todos el mismo tamaño."));
 
         // the part that changed (the first frame is always the whole picture)
         int x0 = 0, y0 = 0, x1 = size.width() - 1, y1 = size.height() - 1;
@@ -140,10 +141,10 @@ bool writeApng(FrameSource &frames, const ApngOptions &options, QIODevice &out, 
 
         QByteArray png;
         if (!encodePng(part, png))
-            return fail(QStringLiteral("No se pudo codificar un fotograma."));
+            return fail(core::tr("No se pudo codificar un fotograma."));
         const PngParts parts = splitPng(png);
         if (!parts.ok)
-            return fail(QStringLiteral("No se pudo codificar un fotograma."));
+            return fail(core::tr("No se pudo codificar un fotograma."));
 
         if (i == 0) {
             ihdr = parts.ihdr;
@@ -153,7 +154,7 @@ bool writeApng(FrameSource &frames, const ApngOptions &options, QIODevice &out, 
             put32(actl, uint32_t(std::max(0, options.loops)));
             chunk(file, "acTL", actl);
         } else if (parts.ihdr.mid(8, 5) != ihdr.mid(8, 5)) {
-            return fail(QStringLiteral("Los fotogramas no tienen el mismo formato."));
+            return fail(core::tr("Los fotogramas no tienen el mismo formato."));
         }
 
         QByteArray fctl;
@@ -179,7 +180,7 @@ bool writeApng(FrameSource &frames, const ApngOptions &options, QIODevice &out, 
 
         // write in pieces so a long animation does not pile up in memory
         if (out.write(file) != file.size())
-            return fail(QStringLiteral("No se pudo escribir el archivo."));
+            return fail(core::tr("No se pudo escribir el archivo."));
         file.clear();
         previous = frame;
         if (progress && !progress(i + 1, total))
@@ -187,7 +188,7 @@ bool writeApng(FrameSource &frames, const ApngOptions &options, QIODevice &out, 
     }
     chunk(file, "IEND", QByteArray());
     if (out.write(file) != file.size())
-        return fail(QStringLiteral("No se pudo escribir el archivo."));
+        return fail(core::tr("No se pudo escribir el archivo."));
     return true;
 }
 

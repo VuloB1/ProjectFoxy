@@ -107,6 +107,8 @@ add_library(imageviewer_app STATIC
     src/app/CollageStudio.cpp
     src/app/ColorPicker.h
     src/app/ColorPicker.cpp
+    src/app/Translations.h
+    src/app/Translations.cpp
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)
@@ -205,6 +207,14 @@ qt_add_resources(ImageViewer "lensfun_db"
     PREFIX "/lensfun"
     BASE "${CMAKE_SOURCE_DIR}/resources/lensfun"
     FILES ${_iv_lensfun_files}
+)
+
+# The translations of the interface (resources/i18n/<language>.json, built from i18n/strings.tsv by tools/i18n_tool.py).
+file(GLOB _iv_i18n_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/i18n/*.json")
+qt_add_resources(ImageViewer "i18n"
+    PREFIX "/i18n"
+    BASE "${CMAKE_SOURCE_DIR}/resources/i18n"
+    FILES ${_iv_i18n_files}
 )
 
 target_link_libraries(ImageViewer PRIVATE

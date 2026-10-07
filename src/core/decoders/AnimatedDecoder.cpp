@@ -8,6 +8,7 @@
 #include <webp/demux.h>
 #include <array>
 #include <cstring>
+#include "Translate.h"
 
 namespace core {
 
@@ -167,7 +168,7 @@ bool decodeApngFrames(const QString &filePath, bool wantAllFrames,
 {
     QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly)) {
-        error = QStringLiteral("No se pudo abrir %1").arg(filePath);
+        error = core::tr("No se pudo abrir %1").arg(filePath);
         return false;
     }
     const QByteArray bytes = f.readAll();
@@ -218,14 +219,14 @@ bool decodeApngFrames(const QString &filePath, bool wantAllFrames,
     }
 
     if (ihdrData.size() < 13 || rawFrames.isEmpty()) {
-        error = QStringLiteral("APNG sin fotogramas válidos: %1").arg(filePath);
+        error = core::tr("APNG sin fotogramas válidos: %1").arg(filePath);
         return false;
     }
 
     const quint32 canvasWidth = qFromBigEndian<quint32>(ihdrData.constData());
     const quint32 canvasHeight = qFromBigEndian<quint32>(ihdrData.constData() + 4);
     if (canvasWidth == 0 || canvasHeight == 0 || canvasWidth > 20000 || canvasHeight > 20000) {
-        error = QStringLiteral("Dimensiones de APNG inválidas: %1").arg(filePath);
+        error = core::tr("Dimensiones de APNG inválidas: %1").arg(filePath);
         return false;
     }
 
@@ -320,14 +321,14 @@ bool decodeWebpFrames(const QString &filePath, bool wantAllFrames,
     WebPData data{reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size())};
     WebPAnimDecoderOptions options;
     if (!WebPAnimDecoderOptionsInit(&options)) {
-        error = QStringLiteral("No se pudo iniciar el decodificador de WebP.");
+        error = core::tr("No se pudo iniciar el decodificador de WebP.");
         return false;
     }
     options.color_mode = MODE_RGBA;
     options.use_threads = 1;
     WebPAnimDecoder *decoder = WebPAnimDecoderNew(&data, &options);
     if (!decoder) {
-        error = QStringLiteral("No se pudo leer el WebP animado.");
+        error = core::tr("No se pudo leer el WebP animado.");
         return false;
     }
     WebPAnimInfo info;
@@ -348,7 +349,7 @@ bool decodeWebpFrames(const QString &filePath, bool wantAllFrames,
     }
     WebPAnimDecoderDelete(decoder);
     if (frames.isEmpty())
-        error = QStringLiteral("El WebP animado no tiene fotogramas.");
+        error = core::tr("El WebP animado no tiene fotogramas.");
     return !frames.isEmpty();
 }
 
@@ -384,7 +385,7 @@ DecodeResult AnimatedDecoder::decode(const QString &filePath, QSize maxSize)
             : decodeApngFrames(filePath, wantAllFrames, frames, delays, error);
 
     if (!decoded || frames.isEmpty()) {
-        result.error = error.isEmpty() ? QStringLiteral("No se pudo decodificar %1").arg(filePath) : error;
+        result.error = error.isEmpty() ? core::tr("No se pudo decodificar %1").arg(filePath) : error;
         return result;
     }
 

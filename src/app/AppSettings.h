@@ -32,6 +32,8 @@ class AppSettings : public QObject {
     // sharp (no smoothing) once zoomed in, up to 64x. The rest are extras of that mode, each one
     // on its own switch, and only count while the mode is on.
     // Wheel zoom: in fixed steps (false) or glided smoothly towards the new size (true).
+    // The language of the interface: "system" (follows Windows) or es / en / pt / ko / zh / ja.
+    Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
     Q_PROPERTY(bool smoothZoom READ smoothZoom WRITE setSmoothZoom NOTIFY smoothZoomChanged)
     Q_PROPERTY(bool pixelMode READ pixelMode WRITE setPixelMode NOTIFY pixelModeChanged)
     Q_PROPERTY(bool pixelIntegerZoom READ pixelIntegerZoom WRITE setPixelIntegerZoom NOTIFY pixelIntegerZoomChanged)
@@ -64,6 +66,9 @@ public:
     void setStripColumns(int value);
     QString stripMode() const { return m_stripMode; }
     void setStripMode(const QString &value);
+
+    QString language() const { return m_language; }
+    void setLanguage(const QString &value);
 
     bool smoothZoom() const { return m_smoothZoom; }
     void setSmoothZoom(bool value);
@@ -99,6 +104,7 @@ signals:
     void stripThumbSizeChanged();
     void stripColumnsChanged();
     void stripModeChanged();
+    void languageChanged();
     void smoothZoomChanged();
     void pixelModeChanged();
     void pixelIntegerZoomChanged();
@@ -122,6 +128,7 @@ private:
     int m_stripThumbSize = 88;
     int m_stripColumns = 1;
     QString m_stripMode = QStringLiteral("manual");
+    QString m_language = QStringLiteral("system");
     bool m_smoothZoom = false;
     bool m_pixelMode = false;
     bool m_pixelIntegerZoom = false;

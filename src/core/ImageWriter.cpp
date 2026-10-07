@@ -11,6 +11,7 @@
 #include <array>
 #include <mutex>
 #include <vector>
+#include "Translate.h"
 
 using namespace vips;
 
@@ -36,7 +37,7 @@ bool encodeWithQt(const QImage &image, const char *format, QByteArray &out, QStr
 {
     QBuffer buffer(&out);
     if (!buffer.open(QIODevice::WriteOnly) || !image.save(&buffer, format)) {
-        error = QStringLiteral("Qt no pudo codificar la imagen (%1)").arg(QString::fromLatin1(format));
+        error = core::tr("Qt no pudo codificar la imagen (%1)").arg(QString::fromLatin1(format));
         return false;
     }
     return true;
@@ -47,7 +48,7 @@ bool encodeWithVips(const QImage &image, Format format, int quality, const QByte
 {
     const QImage rgba = image.format() == QImage::Format_RGBA8888 ? image : image.convertToFormat(QImage::Format_RGBA8888);
     if (rgba.isNull()) {
-        error = QStringLiteral("La imagen está vacía");
+        error = core::tr("La imagen está vacía");
         return false;
     }
 
@@ -69,12 +70,12 @@ bool encodeWithVips(const QImage &image, Format format, int quality, const QByte
         suffix = QStringLiteral(".tif[compression=lzw,predictor=horizontal]");
         break;
     default:
-        error = QStringLiteral("Formato no soportado");
+        error = core::tr("Formato no soportado");
         return false;
     }
 
     if (!ensureVipsInitialized()) {
-        error = QStringLiteral("libvips no se pudo iniciar: %1").arg(QString::fromStdString(vipsInitError()));
+        error = core::tr("libvips no se pudo iniciar: %1").arg(QString::fromStdString(vipsInitError()));
         return false;
     }
     // See VipsGuard.h - serializes every entry into libvips across the app.
@@ -95,7 +96,7 @@ bool encodeWithVips(const QImage &image, Format format, int quality, const QByte
         size_t len = 0;
         vimg.write_to_buffer(suffix.toUtf8().constData(), &buf, &len);
         if (!buf || len == 0) {
-            error = QStringLiteral("libvips no produjo datos");
+            error = core::tr("libvips no produjo datos");
             return false;
         }
         out = QByteArray(static_cast<const char *>(buf), static_cast<qsizetype>(len));
@@ -221,7 +222,7 @@ QByteArray withMetadata(const QByteArray &encoded, const QString &sourcePath, co
         if (!sourcePath.isEmpty()) {
             QFile srcFile(sourcePath); // read through QFile: correct with Unicode paths on Windows
             if (!srcFile.open(QIODevice::ReadOnly)) {
-                warning = QStringLiteral("No se pudieron leer los metadatos del original");
+                warning = core::tr("No se pudieron leer los metadatos del original");
             } else {
                 const QByteArray srcBytes = srcFile.readAll();
                 srcFile.close();
@@ -257,7 +258,7 @@ QByteArray withMetadata(const QByteArray &encoded, const QString &sourcePath, co
                         copied = true;
                     }
                 } catch (const Exiv2::Error &e) {
-                    warning = QStringLiteral("No se pudieron copiar los metadatos: %1").arg(QString::fromUtf8(e.what()));
+                    warning = core::tr("No se pudieron copiar los metadatos: %1").arg(QString::fromUtf8(e.what()));
                 }
             }
         }
@@ -278,7 +279,7 @@ QByteArray withMetadata(const QByteArray &encoded, const QString &sourcePath, co
     } catch (const Exiv2::Error &e) {
         copied = false;
         if (warning.isEmpty())
-            warning = QStringLiteral("No se pudieron copiar los metadatos: %1").arg(QString::fromUtf8(e.what()));
+            warning = core::tr("No se pudieron copiar los metadatos: %1").arg(QString::fromUtf8(e.what()));
         return {};
     }
 }
@@ -289,14 +290,14 @@ SaveResult saveImageWithOptions(const QImage &image, const QString &path, const 
 {
     SaveResult result;
     if (image.isNull() || path.isEmpty()) {
-        result.error = QStringLiteral("No hay imagen que guardar");
+        result.error = core::tr("No hay imagen que guardar");
         return result;
     }
 
     const QString ext = QFileInfo(path).suffix().toLower();
     const Format format = formatFor(ext);
     if (format == Format::Unknown) {
-        result.error = QStringLiteral("Formato no soportado para escritura (.%1)").arg(ext);
+        result.error = core::tr("Formato no soportado para escritura (.%1)").arg(ext);
         return result;
     }
 
@@ -335,7 +336,7 @@ SaveResult saveImageWithOptions(const QImage &image, const QString &path, const 
         if (!warning.isEmpty())
             result.warning = warning;
         if (!copyFromSource && !options.metadataSource.isEmpty() && sourceMetadataIsOutOfReach(options.metadataSource)) {
-            result.warning = QStringLiteral("Los metadatos de los archivos .%1 no se pueden conservar al guardar")
+            result.warning = core::tr("Los metadatos de los archivos .%1 no se pueden conservar al guardar")
                                  .arg(QFileInfo(options.metadataSource).suffix().toLower());
         }
     }
@@ -345,17 +346,17 @@ SaveResult saveImageWithOptions(const QImage &image, const QString &path, const 
     // fully replaced or untouched.
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly)) {
-        result.error = QStringLiteral("No se pudo abrir el destino para escribir: %1").arg(file.errorString());
+        result.error = core::tr("No se pudo abrir el destino para escribir: %1").arg(file.errorString());
         return result;
     }
     if (file.write(bytes) != bytes.size()) {
         const QString why = file.errorString();
         file.cancelWriting();
-        result.error = QStringLiteral("No se pudo escribir el archivo: %1").arg(why);
+        result.error = core::tr("No se pudo escribir el archivo: %1").arg(why);
         return result;
     }
     if (!file.commit()) {
-        result.error = QStringLiteral("No se pudo reemplazar el archivo: %1").arg(file.errorString());
+        result.error = core::tr("No se pudo reemplazar el archivo: %1").arg(file.errorString());
         return result;
     }
 
