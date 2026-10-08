@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.vulob1.ProjectFoxy</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Project Foxy</name>
+  <summary>Fast image viewer and editor with GIF maker, collage and compare</summary>
+  <description>
+    <p>
+      Project Foxy opens JPEG, PNG, WebP, TIFF, BMP, GIF, ICO, HEIC/HEIF, AVIF and camera RAW files quickly, with a thumbnail
+      bar, smooth GPU zoom, slideshow and a before/after comparison.
+    </p>
+    <p>
+      It also edits: crop, rotate, resize, light and colour adjustments with levels and curves, ready-made looks, more than
+      forty effects, lens correction, frames and captions. It can make animated GIF, APNG and WebP files, build collages and
+      process many pictures at once.
+    </p>
+    <p>The interface is available in English, Spanish, Portuguese, Korean, Chinese and Japanese.</p>
+  </description>
+  <launchable type="desktop-id">io.github.vulob1.ProjectFoxy.desktop</launchable>
+  <url type="homepage">https://github.com/VuloB1/ProjectFoxy</url>
+  <url type="bugtracker">https://github.com/VuloB1/ProjectFoxy/issues</url>
+  <categories>
+    <category>Graphics</category>
+    <category>Viewer</category>
+    <category>Photography</category>
+  </categories>
+  <provides>
+    <binary>ProjectFoxy</binary>
+  </provides>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  <content_rating type="oars-1.1"/>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/VuloB1/ProjectFoxy/main/docs/screenshots/visor.png</image>
+      <caption>The viewer</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/VuloB1/ProjectFoxy/main/docs/screenshots/editor-efectos.png</image>
+      <caption>The editor</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/VuloB1/ProjectFoxy/main/docs/screenshots/collage.png</image>
+      <caption>Collage maker</caption>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="0.1.0" date="2026-10-07"/>
+  </releases>
+</component>

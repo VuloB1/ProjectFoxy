@@ -47,6 +47,17 @@ Go to the [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases/latest) 
 Requirements: 64-bit Windows 10 or 11. Windows may warn "Windows protected your PC" because the program is not signed
 yet: *More info → Run anyway*. Every file in a release comes with its SHA-256 checksum.
 
+**Linux** (from the next release on): `ProjectFoxy-x.y.z-x86_64.AppImage`. Make it executable and run it, no installation:
+
+```bash
+chmod +x ProjectFoxy-*-x86_64.AppImage
+./ProjectFoxy-*-x86_64.AppImage photo.jpg
+```
+
+It runs on any 64-bit distribution with glibc 2.35 or newer (Ubuntu 22.04+, Debian 12+, Fedora 36+, openSUSE
+Tumbleweed, Arch...), on X11 and Wayland. If your system lacks FUSE 2 (`libfuse2`), run it with
+`--appimage-extract-and-run`. Settings live in `~/.config/ProjectFoxy`.
+
 ## Languages
 
 English · Español · Português · 한국어 · 中文（简体） · 日本語
@@ -147,6 +158,21 @@ To produce the installer and the portable `.zip` in one go: `tools\Build-Release
 `smoke_startup` test starts the real program without a visible window and fails if it dies or prints any message on
 startup. `test_gpu_parity` needs a Direct3D 11 device and skips itself without one.
 
+On **Linux** (Ubuntu 22.04 or newer; the CI does exactly this): the packages listed in the `System packages` step of
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml), Qt 6.7.3 (for example with
+[aqtinstall](https://github.com/miurahr/aqtinstall)) and vcpkg (`VCPKG_ROOT` set):
+
+```bash
+cmake --preset linux-release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.7.3/gcc_64
+cmake --build --preset linux-release
+ctest --preset linux-release                     # needs a display: `xvfb-run -a ctest ...` on a server
+QT_ROOT_DIR=$HOME/Qt/6.7.3/gcc_64 packaging/linux/build-appimage.sh    # dist/ProjectFoxy-x.y.z-x86_64.AppImage
+```
+
+Build the AppImage on the oldest distribution you want to support: it runs on every one with a glibc at least as new
+as the one it was built on. On Linux Qt picks OpenGL for the preview; `test_gpu_parity` then compares it with the CPU
+result using Mesa's software renderer when there is no GPU.
+
 ## Translating
 
 Every text of the program is written in Spanish and the Spanish text is the key of its translations
@@ -219,6 +245,18 @@ Ve a la página de [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases
 
 Requisitos: Windows 10 u 11 de 64 bits. Windows puede avisar con «Windows protegió su PC» porque el programa aún
 no está firmado: *Más información → Ejecutar de todas formas*. Cada archivo de la release lleva su suma SHA-256.
+
+**Linux** (desde la próxima release): `ProjectFoxy-x.y.z-x86_64.AppImage`. Dale permiso de ejecución y ábrelo, sin
+instalar nada:
+
+```bash
+chmod +x ProjectFoxy-*-x86_64.AppImage
+./ProjectFoxy-*-x86_64.AppImage foto.jpg
+```
+
+Funciona en cualquier distribución de 64 bits con glibc 2.35 o más nueva (Ubuntu 22.04+, Debian 12+, Fedora 36+,
+openSUSE Tumbleweed, Arch...), con X11 y con Wayland. Si tu sistema no tiene FUSE 2 (`libfuse2`), ábrelo con
+`--appimage-extract-and-run`. La configuración queda en `~/.config/ProjectFoxy`.
 
 ## Idiomas
 
@@ -335,6 +373,21 @@ sin ventana visible y falla si muere o escribe cualquier mensaje al arrancar. La
 `test_gpu_parity` necesita un dispositivo Direct3D 11 y se omite sola si no lo hay.
 `tools/Test-Install.ps1` instala en una carpeta temporal y comprueba que el programa
 instalado arranca sin depender de nada de esta máquina.
+
+En **Linux** (Ubuntu 22.04 o más nuevo; el CI hace exactamente esto): los paquetes del paso `System packages` de
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml), Qt 6.7.3 (por ejemplo con
+[aqtinstall](https://github.com/miurahr/aqtinstall)) y vcpkg (`VCPKG_ROOT` definido):
+
+```bash
+cmake --preset linux-release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.7.3/gcc_64
+cmake --build --preset linux-release
+ctest --preset linux-release                     # necesita pantalla: `xvfb-run -a ctest ...` en un servidor
+QT_ROOT_DIR=$HOME/Qt/6.7.3/gcc_64 packaging/linux/build-appimage.sh    # dist/ProjectFoxy-x.y.z-x86_64.AppImage
+```
+
+Compila el AppImage en la distribución más antigua que quieras soportar: funciona en todas las que tengan una glibc
+igual o más nueva que la de la compilación. En Linux Qt usa OpenGL para la vista previa; `test_gpu_parity` la compara
+con el resultado de la CPU y, si no hay GPU, usa el renderizador por software de Mesa.
 
 `pkg-config` no hace falta instalarlo aparte: `vcpkg.json` declara `pkgconf`
 como herramienta del host y `CMakeLists.txt` lo localiza solo.

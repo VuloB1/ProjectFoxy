@@ -35,6 +35,11 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     installFontSubstitutions();
     app.setApplicationName("ProjectFoxy");
+#ifndef Q_OS_WIN
+    // Wayland matches a window to its .desktop file (icon, name, taskbar) by this ID, which is also the AppStream
+    // and Flatpak ID (packaging/linux).
+    app.setDesktopFileName(QStringLiteral("io.github.vulob1.ProjectFoxy"));
+#endif
     app.setOrganizationName("ProjectFoxy");
     app.setApplicationVersion(QStringLiteral(PROJECTFOXY_VERSION)); // from project(VERSION) in CMakeLists.txt
     // These two names decide where the settings and the cache live (AppPaths.h migrates the
