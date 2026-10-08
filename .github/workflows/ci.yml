@@ -141,3 +141,21 @@ jobs:
           name: ProjectFoxy-AppImage
           path: dist/ProjectFoxy-*-x86_64.AppImage
           retention-days: 14
+
+  # The Flatpak, built in the official image of the KDE 6.10 runtime (its flatpak-builder is a current one, so the
+  # AppStream metadata is composed and checked too). Slower than the other jobs: libvips, LibRaw and exiv2 are built.
+  flatpak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.10
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: ProjectFoxy.flatpak
+          manifest-path: packaging/linux/flatpak/io.github.vulob1.ProjectFoxy.yml
+          cache-key: flatpak-builder-${{ github.sha }}
+          restore-cache: true

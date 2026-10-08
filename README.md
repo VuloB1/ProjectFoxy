@@ -58,6 +58,17 @@ It runs on any 64-bit distribution with glibc 2.35 or newer (Ubuntu 22.04+, Debi
 Tumbleweed, Arch...), on X11 and Wayland. If your system lacks FUSE 2 (`libfuse2`), run it with
 `--appimage-extract-and-run`. Settings live in `~/.config/ProjectFoxy`.
 
+**Flatpak** (also from the next release on): `ProjectFoxy-x.y.z.flatpak`. It carries its own runtime, so it works on
+distributions that are too old or too different for the AppImage (Debian 11, Ubuntu 20.04, RHEL/Alma/Rocky 8-9...):
+
+```bash
+flatpak install --user ProjectFoxy-*.flatpak     # the KDE runtime comes from Flathub
+flatpak run io.github.vulob1.ProjectFoxy photo.jpg
+```
+
+It has access to your files (`--filesystem=host`) because the thumbnail bar shows the other pictures of the folder.
+Deleting goes to your real trash and the wallpaper is set, both through the desktop portals.
+
 ## Languages
 
 English · Español · Português · 한국어 · 中文（简体） · 日本語
@@ -173,6 +184,10 @@ Build the AppImage on the oldest distribution you want to support: it runs on ev
 as the one it was built on. On Linux Qt picks OpenGL for the preview; `test_gpu_parity` then compares it with the CPU
 result using Mesa's software renderer when there is no GPU.
 
+The Flatpak is built with `packaging/linux/flatpak/build-flatpak.sh` (needs `flatpak`, `flatpak-builder` and the Flathub
+remote); `--test` builds it with the tests and runs them against the runtime's Qt 6.10 and libraries. Its manifest
+builds libvips, LibRaw, exiv2 and inih from source, at the versions of `vcpkg.json`.
+
 ## Translating
 
 Every text of the program is written in Spanish and the Spanish text is the key of its translations
@@ -257,6 +272,18 @@ chmod +x ProjectFoxy-*-x86_64.AppImage
 Funciona en cualquier distribución de 64 bits con glibc 2.35 o más nueva (Ubuntu 22.04+, Debian 12+, Fedora 36+,
 openSUSE Tumbleweed, Arch...), con X11 y con Wayland. Si tu sistema no tiene FUSE 2 (`libfuse2`), ábrelo con
 `--appimage-extract-and-run`. La configuración queda en `~/.config/ProjectFoxy`.
+
+**Flatpak** (también desde la próxima release): `ProjectFoxy-x.y.z.flatpak`. Lleva su propio runtime, así que funciona
+en distribuciones demasiado viejas o distintas para el AppImage (Debian 11, Ubuntu 20.04, RHEL/Alma/Rocky 8-9...):
+
+```bash
+flatpak install --user ProjectFoxy-*.flatpak     # el runtime de KDE viene de Flathub
+flatpak run io.github.vulob1.ProjectFoxy foto.jpg
+```
+
+Tiene acceso a tus archivos (`--filesystem=host`) porque la barra de miniaturas muestra las demás imágenes de la
+carpeta. Eliminar manda el archivo a tu papelera real y el fondo de pantalla se cambia, ambos a través de los portales
+del escritorio.
 
 ## Idiomas
 
@@ -388,6 +415,10 @@ QT_ROOT_DIR=$HOME/Qt/6.7.3/gcc_64 packaging/linux/build-appimage.sh    # dist/Pr
 Compila el AppImage en la distribución más antigua que quieras soportar: funciona en todas las que tengan una glibc
 igual o más nueva que la de la compilación. En Linux Qt usa OpenGL para la vista previa; `test_gpu_parity` la compara
 con el resultado de la CPU y, si no hay GPU, usa el renderizador por software de Mesa.
+
+El Flatpak se compila con `packaging/linux/flatpak/build-flatpak.sh` (necesita `flatpak`, `flatpak-builder` y el remoto
+de Flathub); con `--test` lo compila con las pruebas y las ejecuta contra el Qt 6.10 y las bibliotecas del runtime. Su
+manifiesto compila libvips, LibRaw, exiv2 e inih desde el código fuente, en las versiones de `vcpkg.json`.
 
 `pkg-config` no hace falta instalarlo aparte: `vcpkg.json` declara `pkgconf`
 como herramienta del host y `CMakeLists.txt` lo localiza solo.

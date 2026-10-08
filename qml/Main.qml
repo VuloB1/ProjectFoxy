@@ -255,7 +255,7 @@ ApplicationWindow {
 
     Shortcut { sequence: StandardKey.MoveToPreviousChar; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: folderModel.previous() }
     Shortcut { sequence: StandardKey.MoveToNextChar; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: folderModel.next() }
-    Shortcut { sequence: StandardKey.Open; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: toolbar.requestOpen() }
+    Shortcut { sequences: [StandardKey.Open]; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: toolbar.requestOpen() }
     // Disabled while editing (so it doesn't replace the image mid-edit) and
     // while a text field has focus (so Ctrl+V pastes text there as normal,
     // e.g. the batch rename/export dialogs) - "cursorPosition" is a cheap

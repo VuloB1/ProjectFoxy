@@ -40,7 +40,8 @@ private slots:
         FolderModel model;
         const QString first = makePng(dir(), "FOTO.PNG", 10);
         makePng(dir(), "otra.Png", 20);
-        QFile(dir().filePath("notas.txt")).open(QIODevice::WriteOnly);
+        QFile notes(dir().filePath("notas.txt"));
+        QVERIFY(notes.open(QIODevice::WriteOnly));
         model.openFolderForFile(first);
         QCOMPARE(model.count(), 2);
     }

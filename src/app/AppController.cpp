@@ -34,6 +34,7 @@
 #else
 #include <QProcess>
 #include <QStandardPaths>
+#include "LinuxPortal.h"
 #endif
 #include "Translate.h"
 
@@ -1801,9 +1802,14 @@ bool AppController::deleteCurrentFile()
     if (SHFileOperationW(&op) != 0 || op.fAnyOperationsAborted)
         return false;
 #else
-    // The desktop's trash (freedesktop.org Trash specification); never a permanent delete.
-    if (!QFile::moveToTrash(m_currentFilePath))
+    // The desktop's trash (freedesktop.org Trash specification); never a permanent delete. A sandbox has a trash of
+    // its own that nobody empties, so inside Flatpak the file goes to the real one through the Trash portal.
+    if (LinuxPortal::inFlatpak()) {
+        if (!LinuxPortal::trashFile(m_currentFilePath))
+            return false;
+    } else if (!QFile::moveToTrash(m_currentFilePath) && !LinuxPortal::trashFile(m_currentFilePath)) {
         return false;
+    }
 #endif
 
     m_savedRecipe = currentRecipe(); // the file the edits belonged to is gone: nothing to protect
@@ -1869,44 +1875,52 @@ bool AppController::setAsWallpaper()
     if (!baked.save(path, "PNG"))
         return false;
 
-    const QString desktop = qEnvironmentVariable("XDG_CURRENT_DESKTOP").toLower();
-    const QString uri = QUrl::fromLocalFile(path).toString();
-    auto run = [](const QString &program, const QStringList &args) {
-        QProcess p;
-        p.start(program, args);
-        return p.waitForFinished(5000) && p.exitStatus() == QProcess::NormalExit && p.exitCode() == 0;
-    };
-    if (desktop.contains(QLatin1String("kde")))
-        return run(QStringLiteral("plasma-apply-wallpaperimage"), {path});
-    if (desktop.contains(QLatin1String("xfce"))) {
-        // One property per monitor/workspace: set them all.
-        QProcess list;
-        list.start(QStringLiteral("xfconf-query"), {QStringLiteral("-c"), QStringLiteral("xfce4-desktop"), QStringLiteral("-l")});
-        if (!list.waitForFinished(5000))
-            return false;
-        bool any = false;
-        for (const QString &prop : QString::fromUtf8(list.readAllStandardOutput()).split(QLatin1Char('\n'))) {
-            if (prop.endsWith(QLatin1String("/last-image")))
-                any = run(QStringLiteral("xfconf-query"), {QStringLiteral("-c"), QStringLiteral("xfce4-desktop"), QStringLiteral("-p"), prop, QStringLiteral("-s"), path}) || any;
+    // Inside Flatpak the desktop's tools do not exist: only the Wallpaper portal can do it.
+    if (LinuxPortal::inFlatpak())
+        return LinuxPortal::setWallpaper(path);
+
+    const auto viaDesktopTools = [&path]() {
+        const QString desktop = qEnvironmentVariable("XDG_CURRENT_DESKTOP").toLower();
+        const QString uri = QUrl::fromLocalFile(path).toString();
+        auto run = [](const QString &program, const QStringList &args) {
+            QProcess p;
+            p.start(program, args);
+            return p.waitForFinished(5000) && p.exitStatus() == QProcess::NormalExit && p.exitCode() == 0;
+        };
+        if (desktop.contains(QLatin1String("kde")))
+            return run(QStringLiteral("plasma-apply-wallpaperimage"), {path});
+        if (desktop.contains(QLatin1String("xfce"))) {
+            // One property per monitor/workspace: set them all.
+            QProcess list;
+            list.start(QStringLiteral("xfconf-query"), {QStringLiteral("-c"), QStringLiteral("xfce4-desktop"), QStringLiteral("-l")});
+            if (!list.waitForFinished(5000))
+                return false;
+            bool any = false;
+            for (const QString &prop : QString::fromUtf8(list.readAllStandardOutput()).split(QLatin1Char('\n'))) {
+                if (prop.endsWith(QLatin1String("/last-image")))
+                    any = run(QStringLiteral("xfconf-query"), {QStringLiteral("-c"), QStringLiteral("xfce4-desktop"), QStringLiteral("-p"), prop, QStringLiteral("-s"), path}) || any;
+            }
+            return any;
         }
-        return any;
-    }
-    // GNOME, Cinnamon, MATE, Budgie, COSMIC... share the gsettings route with different schemas.
-    struct Schema { const char *name; const char *key; const char *keyDark; };
-    const Schema schemas[] = {
-        {"org.gnome.desktop.background", "picture-uri", "picture-uri-dark"},
-        {"org.cinnamon.desktop.background", "picture-uri", nullptr},
-        {"org.mate.background", "picture-filename", nullptr},
+        // GNOME, Cinnamon, MATE, Budgie, COSMIC... share the gsettings route with different schemas.
+        struct Schema { const char *name; const char *key; const char *keyDark; };
+        const Schema schemas[] = {
+            {"org.gnome.desktop.background", "picture-uri", "picture-uri-dark"},
+            {"org.cinnamon.desktop.background", "picture-uri", nullptr},
+            {"org.mate.background", "picture-filename", nullptr},
+        };
+        for (const Schema &s : schemas) {
+            const QString schema = QString::fromLatin1(s.name);
+            const QString value = (s.key == QLatin1String("picture-filename")) ? path : uri;
+            if (!run(QStringLiteral("gsettings"), {QStringLiteral("set"), schema, QString::fromLatin1(s.key), value}))
+                continue;
+            if (s.keyDark)
+                run(QStringLiteral("gsettings"), {QStringLiteral("set"), schema, QString::fromLatin1(s.keyDark), value});
+            return true;
+        }
+        return false;
     };
-    for (const Schema &s : schemas) {
-        const QString schema = QString::fromLatin1(s.name);
-        const QString value = (s.key == QLatin1String("picture-filename")) ? path : uri;
-        if (!run(QStringLiteral("gsettings"), {QStringLiteral("set"), schema, QString::fromLatin1(s.key), value}))
-            continue;
-        if (s.keyDark)
-            run(QStringLiteral("gsettings"), {QStringLiteral("set"), schema, QString::fromLatin1(s.keyDark), value});
-        return true;
-    }
-    return false;
+    // The desktop's own tool first (its result is known); the portal covers the rest (Cinnamon-less setups, COSMIC...).
+    return viaDesktopTools() || LinuxPortal::setWallpaper(path);
 #endif
 }
