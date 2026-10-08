@@ -159,10 +159,24 @@ jobs:
           path: files
           merge-multiple: true
 
+      # upload-artifact keeps the folder of a file when the artifact holds files from several folders (the Windows one
+      # has the installer in installer/): everything goes to one level, or the globs below miss it.
+      - name: Flatten
+        working-directory: files
+        run: find . -mindepth 2 -type f -exec mv -t . {} + && find . -mindepth 1 -type d -empty -delete && ls -l
+
       # The Flatpak bundle gets the version in its name like the other files; then one checksum file for everything.
       - name: Name the Flatpak bundle
         working-directory: files
         run: mv "$(ls *.flatpak | head -n1)" "ProjectFoxy-${GITHUB_REF_NAME#v}.flatpak"
+
+      # A release without one of its four downloads must not go out: stop here instead.
+      - name: Check that everything is there
+        working-directory: files
+        run: |
+          for pattern in 'ProjectFoxy-Setup-*.exe' 'ProjectFoxy-portable-*.zip' 'ProjectFoxy-*-x86_64.AppImage' 'ProjectFoxy-*.flatpak'; do
+            ls $pattern > /dev/null || { echo "missing: $pattern"; exit 1; }
+          done
 
       - name: Checksums
         working-directory: files
@@ -173,6 +187,7 @@ jobs:
         with:
           name: Project Foxy ${{ github.ref_name }}
           generate_release_notes: true
+          fail_on_unmatched_files: true
           files: |
             files/ProjectFoxy-*
             files/SHA256SUMS.txt
