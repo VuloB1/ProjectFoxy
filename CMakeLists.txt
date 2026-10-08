@@ -62,7 +62,15 @@ pkg_check_modules(LIBRAW REQUIRED IMPORTED_TARGET libraw_r)
 pkg_check_modules(LIBHEIF REQUIRED IMPORTED_TARGET libheif)
 pkg_check_modules(EXIV2 REQUIRED IMPORTED_TARGET exiv2)
 # The animated WebP writer (libwebp's animation encoder lives in libwebpmux); both DLLs already ship with libvips.
-find_package(WebP CONFIG REQUIRED)
+find_package(WebP CONFIG QUIET)
+if(NOT WebP_FOUND)
+    # Many distributions' libwebp (the Flatpak runtime's, for one) ship pkg-config files but no CMake package: build
+    # the same three targets out of those.
+    pkg_check_modules(WEBP REQUIRED IMPORTED_TARGET GLOBAL libwebp libwebpmux libwebpdemux)
+    add_library(WebP::webp ALIAS PkgConfig::WEBP)
+    add_library(WebP::libwebpmux ALIAS PkgConfig::WEBP)
+    add_library(WebP::webpdemux ALIAS PkgConfig::WEBP)
+endif()
 
 # The shipped folder is flat on Windows (ProjectFoxy.exe next to its DLLs), so
 # `cmake --install` puts the executable at the prefix root instead of in bin/.
@@ -114,6 +122,13 @@ add_library(imageviewer_app STATIC
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)
+
+# Linux: the desktop portals (trash, wallpaper) speak DBus; see src/app/LinuxPortal.h.
+if(UNIX AND NOT APPLE)
+    find_package(Qt6 6.6 REQUIRED COMPONENTS DBus)
+    target_sources(imageviewer_app PRIVATE src/app/LinuxPortal.h src/app/LinuxPortal.cpp)
+    target_link_libraries(imageviewer_app PUBLIC Qt6::DBus)
+endif()
 
 target_link_libraries(imageviewer_app PUBLIC
     imageviewer_core
@@ -413,5 +428,8 @@ endif()
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+option(IMAGEVIEWER_BUILD_TESTS "Build the tests (the Flatpak and other packages turn them off)" ON)
+if(IMAGEVIEWER_BUILD_TESTS)
 enable_testing()
 add_subdirectory(tests)
+endif()

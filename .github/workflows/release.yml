@@ -1,5 +1,5 @@
 # When a tag "vX.Y.Z" is pushed: builds the program for Windows and Linux and publishes a GitHub release with the installer, the portable
-# zip, the AppImage and their checksums.
+# zip, the AppImage, the Flatpak bundle and their checksums.
 #
 #     git tag v0.1.0 && git push origin v0.1.0
 #
@@ -135,8 +135,23 @@ jobs:
           path: dist/ProjectFoxy-*-x86_64.AppImage
           if-no-files-found: error
 
+  flatpak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.10
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: ProjectFoxy.flatpak
+          manifest-path: packaging/linux/flatpak/io.github.vulob1.ProjectFoxy.yml
+          cache-key: flatpak-builder-${{ github.sha }}
+
   publish:
-    needs: [windows, linux]
+    needs: [windows, linux, flatpak]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/download-artifact@v4
@@ -144,7 +159,11 @@ jobs:
           path: files
           merge-multiple: true
 
-      # One checksum file for everything in the release.
+      # The Flatpak bundle gets the version in its name like the other files; then one checksum file for everything.
+      - name: Name the Flatpak bundle
+        working-directory: files
+        run: mv "$(ls *.flatpak | head -n1)" "ProjectFoxy-${GITHUB_REF_NAME#v}.flatpak"
+
       - name: Checksums
         working-directory: files
         run: sha256sum ProjectFoxy-* > SHA256SUMS.txt && cat SHA256SUMS.txt

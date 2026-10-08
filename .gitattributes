@@ -15,3 +15,4 @@
 *.exe binary
 *.dll binary
 *.sh text eol=lf
+packaging/linux/** text eol=lf

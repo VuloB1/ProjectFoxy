@@ -1,0 +1,142 @@
+# Flatpak manifest of Project Foxy. Build and install it with packaging/linux/flatpak/build-flatpak.sh.
+#
+# The KDE runtime brings Qt 6, Mesa (OpenGL), libheif, libaom, libwebp, libtiff, libjpeg, libpng and lcms2, kept up to date
+# by the runtime. What it does not have is built here from source, each pinned by hash: libvips, LibRaw, exiv2 and inih.
+# Versions are the ones of vcpkg.json's baseline, i.e. the ones the program is validated with on Windows and in the CI.
+app-id: io.github.vulob1.ProjectFoxy
+runtime: org.kde.Platform
+runtime-version: "6.10"
+sdk: org.kde.Sdk
+command: ProjectFoxy
+
+# flatpak-builder 1.2 (Ubuntu 22.04) cannot find the appstream-compose of the new SDKs; the metainfo is installed as it is
+# anyway. Flathub builds with its own, current flatpak-builder: delete this line when submitting.
+appstream-compose: false
+
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # The thumbnail bar shows the OTHER pictures of the folder of the one that was opened, and the program saves and
+  # exports next to them: a file chooser alone (which only hands over the chosen file) is not enough. Same as other
+  # image viewers. Trash and wallpaper go through the desktop portals (src/app/LinuxPortal.cpp), which need no access.
+  - --filesystem=host
+
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /lib/cmake
+  - /share/pkgconfig
+  - "*.a"
+  - "*.la"
+
+modules:
+  - name: inih
+    buildsystem: meson
+    config-opts:
+      - --libdir=lib
+      - -Ddefault_library=shared
+      - -Ddistro_install=true
+      - -Dwith_INIReader=true
+    sources:
+      - type: archive
+        url: https://github.com/benhoyt/inih/archive/refs/tags/r62.tar.gz
+        sha256: 9c15fa751bb8093d042dae1b9f125eb45198c32c6704cd5481ccde460d4f8151
+
+  # GPL-2.0-or-later (see docs/LICENCIAS.md). 'bmff' (HEIC/AVIF metadata) is left off on purpose, like in vcpkg.json.
+  - name: exiv2
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_SHARED_LIBS=ON
+      - -DCMAKE_INSTALL_LIBDIR=lib
+      - -DEXIV2_ENABLE_PNG=ON
+      - -DEXIV2_ENABLE_XMP=ON
+      - -DEXIV2_ENABLE_BMFF=OFF
+      - -DEXIV2_ENABLE_INIH=ON
+      - -DEXIV2_ENABLE_NLS=OFF
+      - -DEXIV2_ENABLE_WEBREADY=OFF
+      - -DEXIV2_ENABLE_CURL=OFF
+      - -DEXIV2_ENABLE_BROTLI=OFF
+      - -DEXIV2_BUILD_EXIV2_COMMAND=OFF
+      - -DEXIV2_BUILD_SAMPLES=OFF
+      - -DEXIV2_BUILD_UNIT_TESTS=OFF
+      - -DEXIV2_BUILD_DOC=OFF
+    sources:
+      - type: archive
+        url: https://github.com/Exiv2/exiv2/archive/refs/tags/v0.28.8.tar.gz
+        sha256: ea51b0609f58a9afa063b60daa1539948b62247721e154f4fff0ad3aec9f9756
+
+  # libraw_r (the thread-safe one) is built together with libraw. No Jasper (only for RedCine .R3D) and no lcms.
+  - name: libraw
+    buildsystem: autotools
+    config-opts:
+      - --enable-shared
+      - --disable-static
+      - --disable-examples
+      - --disable-jasper
+      - --disable-lcms
+    sources:
+      - type: archive
+        url: https://www.libraw.org/data/LibRaw-0.22.2.tar.gz
+        sha256: de86b035655accff8d4010f1a221fdf50d353cb7b1422ba26f14a0db92612cfa
+
+  # JPEG, PNG, TIFF and WebP, as in vcpkg.json. HEIC/AVIF are read through libheif directly (src/core/decoders).
+  - name: libvips
+    buildsystem: meson
+    config-opts:
+      - --libdir=lib
+      - -Dcplusplus=true
+      - -Dintrospection=disabled
+      - -Dmodules=disabled
+      - -Dexamples=false
+      - -Ddocs=false
+      - -Dcfitsio=disabled
+      - -Dcgif=disabled
+      - -Dexif=disabled
+      - -Dfftw=disabled
+      - -Dfontconfig=disabled
+      - -Dheif=disabled
+      - -Dhighway=disabled
+      - -Dimagequant=disabled
+      - -Djpeg=enabled
+      - -Djpeg-xl=disabled
+      - -Dlcms=enabled
+      - -Dmagick=disabled
+      - -Dmatio=disabled
+      - -Dopenexr=disabled
+      - -Dopenjpeg=disabled
+      - -Dopenslide=disabled
+      - -Dorc=disabled
+      - -Dpangocairo=disabled
+      - -Dpdfium=disabled
+      - -Dpng=enabled
+      - -Dpoppler=disabled
+      - -Dquantizr=disabled
+      - -Drsvg=disabled
+      - -Dspng=disabled
+      - -Dtiff=enabled
+      - -Dwebp=enabled
+      - -Dzlib=enabled
+    sources:
+      - type: archive
+        url: https://github.com/libvips/libvips/releases/download/v8.18.5/vips-8.18.5.tar.xz
+        sha256: 8c4e6332d818249ed05ce98e36e6ed8a08e3249ac70f69680842ab2e5fee8510
+
+  - name: projectfoxy
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_LIBDIR=lib
+      - -DIMAGEVIEWER_BUILD_TESTS=OFF
+    sources:
+      # The working tree this manifest sits in (for a Flathub submission this becomes a git source at a release tag).
+      - type: dir
+        path: ../../..
+        skip:
+          - .git
+          - build
+          - dist
+          - vcpkg_installed
+          - .flatpak-builder
