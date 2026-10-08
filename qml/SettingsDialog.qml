@@ -340,7 +340,7 @@ AppDialog {
                         heading: qsTr("Idioma")
                         SettingRow {
                             label: qsTr("Idioma de la interfaz")
-                            hint: qsTr("Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma de Windows.")
+                            hint: qsTr("Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma del sistema.")
                             AppComboBox {
                                 id: languageBox
                                 width: 190

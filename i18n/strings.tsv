@@ -869,5 +869,5 @@ No se pudo preparar un fotograma.	Could not prepare a frame.	Não foi possível 
 No se pudo terminar el WebP.	Could not finish the WebP.	Não foi possível finalizar o WebP.	WebP를 완료할 수 없습니다.	无法完成 WebP。	WebP を完了できませんでした。
 Idioma	Language	Idioma	언어	语言	言語
 Idioma de la interfaz	Interface language	Idioma da interface	인터페이스 언어	界面语言	インターフェースの言語
-Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma de Windows.	Applies instantly, no restart needed. "Follow the system" uses the language of Windows.	Aplica-se na hora, sem reiniciar. "Seguir o sistema" usa o idioma do Windows.	즉시 적용되며 다시 시작할 필요가 없습니다. "시스템 설정 따르기"는 Windows의 언어를 사용합니다.	立即生效，无需重启。“跟随系统”会使用 Windows 的语言。	すぐに反映され、再起動は不要です。「システムに合わせる」は Windows の言語を使います。
+Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma del sistema.	Applies instantly, no restart needed. "Follow the system" uses the language of the system.	Aplica-se na hora, sem reiniciar. "Seguir o sistema" usa o idioma do sistema.	즉시 적용되며 다시 시작할 필요가 없습니다. "시스템 설정 따르기"는 시스템의 언어를 사용합니다.	立即生效，无需重启。“跟随系统”会使用系统的语言。	すぐに反映され、再起動は不要です。「システムに合わせる」はシステムの言語を使います。
 Según el sistema	Follow the system	Seguir o sistema	시스템 설정 따르기	跟随系统	システムに合わせる

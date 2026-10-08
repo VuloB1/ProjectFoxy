@@ -65,3 +65,64 @@ jobs:
 
       - name: Test
         run: ctest --preset windows-release
+
+  # The same build and tests on Linux. The oldest supported base on purpose (Ubuntu 22.04): what builds there also builds
+  # on newer distributions, and it is the base the AppImage will be built on.
+  linux:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: System packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential ninja-build git curl zip unzip tar pkg-config autoconf automake libtool bison flex nasm \
+            libgl1-mesa-dev libegl1-mesa-dev libvulkan-dev libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev \
+            libfreetype-dev libdbus-1-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev \
+            libxcb1-dev libxcb-cursor0 libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev \
+            libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev \
+            libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libwayland-dev \
+            libgl1-mesa-dri xvfb
+
+      - name: Qt 6.7.3
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.7.3
+          arch: linux_gcc_64
+          modules: qtshadertools
+          cache: true
+
+      - name: vcpkg
+        run: |
+          echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> "$GITHUB_ENV"
+          echo "VCPKG_DEFAULT_BINARY_CACHE=$RUNNER_TEMP/vcpkg-cache" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/vcpkg-cache"
+
+      - name: vcpkg binary cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: vcpkg-${{ runner.os }}-
+
+      - name: Configure
+        run: cmake --preset linux-release "-DCMAKE_PREFIX_PATH=$QT_ROOT_DIR"
+
+      - name: vcpkg binary cache (save)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+
+      - name: Build
+        run: cmake --build --preset linux-release
+
+      # No GPU on the runner: an X server without a screen and Mesa's software renderer draw the preview.
+      - name: Test
+        env:
+          QT_QPA_PLATFORM: xcb
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: xvfb-run -a -s "-screen 0 1280x1024x24" ctest --preset linux-release

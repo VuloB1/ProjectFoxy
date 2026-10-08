@@ -119,8 +119,8 @@ target_link_libraries(imageviewer_app PUBLIC
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
-    Shell32
-    User32
+    $<$<PLATFORM_ID:Windows>:Shell32>
+    $<$<PLATFORM_ID:Windows>:User32>
 )
 
 # The version the program reports (Info panel) is the project's own.
@@ -227,8 +227,8 @@ target_link_libraries(ImageViewer PRIVATE
     Qt6::QuickControls2
     Qt6::QuickDialogs2
     Qt6::Svg
-    Shell32
-    User32
+    $<$<PLATFORM_ID:Windows>:Shell32>
+    $<$<PLATFORM_ID:Windows>:User32>
 )
 
 # Custom fragment shaders for the live GPU preview of the edits
@@ -271,6 +271,10 @@ qt_add_shaders(ImageViewer "imageviewer_shaders"
 # windeployqt finds the plugin by scanning the QML imports (see "Installation"
 # below). The SDK paths come from the QT6_INSTALL_* variables Qt itself defines
 # instead of being hand-built with "../../..".
+#
+# Windows only: on Linux QtQuick.Effects is found in the Qt prefix at run time
+# (and bundled into AppImage / Flatpak by their deploy tools).
+if(WIN32)
 set(_iv_qt_qml_dir "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_QML}")
 set(_iv_qt_bin_dir "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_BINS}")
 add_custom_command(TARGET ImageViewer POST_BUILD
@@ -289,6 +293,7 @@ add_custom_command(TARGET ImageViewer POST_BUILD
         "$<TARGET_FILE_DIR:ImageViewer>/"
     COMMENT "Deploying QtQuick.Effects QML plugin into the build tree"
 )
+endif()
 
 set_target_properties(ImageViewer PROPERTIES
     WIN32_EXECUTABLE TRUE

@@ -1,5 +1,6 @@
 #include "BatchExporter.h"
 #include "DecoderRegistry.h"
+#include "AppPaths.h"
 #include "ImageWriter.h"
 
 #include <QDir>
@@ -54,12 +55,12 @@ void BatchExporter::start(const QStringList &sourceFiles, const QUrl &destFolder
                         // Never over the picture being exported (same folder, same format) nor over
                         // another one of this batch that has the same base name (a.png and a.jpg).
                         const QString baseName = QFileInfo(sourcePath).completeBaseName();
-                        const QString sourceKey = QFileInfo(sourcePath).absoluteFilePath().toLower();
+                        const QString sourceKey = AppPaths::samePathKey(QFileInfo(sourcePath).absoluteFilePath());
                         QString destPath = destFolder + QLatin1Char('/') + baseName + QLatin1Char('.') + format;
-                        for (int n = 2; usedNames.contains(QFileInfo(destPath).absoluteFilePath().toLower())
-                                        || QFileInfo(destPath).absoluteFilePath().toLower() == sourceKey; ++n)
+                        for (int n = 2; usedNames.contains(AppPaths::samePathKey(QFileInfo(destPath).absoluteFilePath()))
+                                        || AppPaths::samePathKey(QFileInfo(destPath).absoluteFilePath()) == sourceKey; ++n)
                             destPath = destFolder + QLatin1Char('/') + QStringLiteral("%1_%2.%3").arg(baseName).arg(n).arg(format);
-                        usedNames.insert(QFileInfo(destPath).absoluteFilePath().toLower());
+                        usedNames.insert(AppPaths::samePathKey(QFileInfo(destPath).absoluteFilePath()));
                         // Keep the original's camera/GPS/date information (and colour
                         // profile) in the exported copy where the format can hold it.
                         core::SaveOptions options;

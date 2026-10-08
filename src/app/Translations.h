@@ -25,7 +25,7 @@ private:
 };
 
 // The language of the interface: Spanish (the language the program is written in), English, Portuguese, Korean,
-// Chinese (simplified) and Japanese. `AppSettings::language` holds the choice ("system" follows Windows); changing it
+// Chinese (simplified) and Japanese. `AppSettings::language` holds the choice ("system" follows the operating system); changing it
 // swaps the translator and asks QML to evaluate every qsTr() again, so no restart is needed.
 class Translations : public QObject {
     Q_OBJECT
@@ -43,7 +43,7 @@ public:
     QVariantList languages() const;
     int revision() const { return m_revision; }
 
-    // The supported language for a settings value: "system" -> the one of Windows (English when it is none of ours).
+    // The supported language for a settings value: "system" -> the one of the system (English when it is none of ours).
     static QString resolve(const QString &choice, const QLocale &system = QLocale::system());
     static QStringList codes();
 

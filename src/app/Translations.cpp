@@ -67,7 +67,7 @@ QString Translations::resolve(const QString &choice, const QLocale &system)
 {
     if (codes().contains(choice))
         return choice;
-    // "system": the first of Windows' preferred languages that we have
+    // "system": the first of the system's preferred languages that we have
     for (const QString &name : system.uiLanguages()) {
         const QString lang = name.section(QLatin1Char('-'), 0, 0).toLower();
         if (codes().contains(lang))

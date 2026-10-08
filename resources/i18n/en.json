@@ -700,7 +700,7 @@
 "Saturación": "Saturation",
 "Se abre en todas partes. Hasta 256 colores y transparencia de todo o nada.": "Opens everywhere. Up to 256 colors and all-or-nothing transparency.",
 "Se acomodan según el tamaño y la forma de cada imagen": "They are arranged according to each image's size and shape",
-"Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma de Windows.": "Applies instantly, no restart needed. \"Follow the system\" uses the language of Windows.",
+"Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma del sistema.": "Applies instantly, no restart needed. \"Follow the system\" uses the language of the system.",
 "Se conservan los datos de la cámara, la fecha, el GPS y el perfil de color. Si quieres quedarte también con la foto original, guarda una copia.": "The camera data, date, GPS and color profile are kept. If you also want to keep the original photo, save a copy.",
 "Segundo color": "Second color",
 "Según el sistema": "Follow the system",
