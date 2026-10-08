@@ -1,6 +1,6 @@
 {
   "name": "image-viewer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "$comment": "Licensing-sensitive choices are annotated on the dependency they affect. See docs/LICENCIAS.md before changing any of them.",
   "builtin-baseline": "10541e317a660f4165ba4ac2851ab54a8d4577b1",
   "dependencies": [

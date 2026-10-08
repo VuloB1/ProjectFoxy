@@ -4,11 +4,12 @@
 
 # Project Foxy
 
-**A modern, lightweight and fast image viewer for Windows, with a full photo editor built in.**
+**A modern, lightweight and fast image viewer for Windows and Linux, with a full photo editor built in.**
 
 [![Download](https://img.shields.io/github/v/release/VuloB1/ProjectFoxy?label=download&color=ff6a13&logo=github)](https://github.com/VuloB1/ProjectFoxy/releases/latest)
 ![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-ff6a13)
 ![Windows 10 / 11](https://img.shields.io/badge/Windows-10%20%7C%2011-3a3a3a?logo=windows&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-AppImage%20%7C%20Flatpak-3a3a3a?logo=linux&logoColor=white)
 ![Qt 6.7](https://img.shields.io/badge/Qt-6.7-41cd52?logo=qt&logoColor=white)
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-00599c?logo=cplusplus&logoColor=white)
 
@@ -47,7 +48,7 @@ Go to the [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases/latest) 
 Requirements: 64-bit Windows 10 or 11. Windows may warn "Windows protected your PC" because the program is not signed
 yet: *More info → Run anyway*. Every file in a release comes with its SHA-256 checksum.
 
-**Linux** (from the next release on): `ProjectFoxy-x.y.z-x86_64.AppImage`. Make it executable and run it, no installation:
+**Linux** (from v0.2.0): `ProjectFoxy-x.y.z-x86_64.AppImage`. Make it executable and run it, no installation:
 
 ```bash
 chmod +x ProjectFoxy-*-x86_64.AppImage
@@ -60,7 +61,7 @@ Tumbleweed, Arch...), on X11 and Wayland. If your system lacks FUSE 2 (`libfuse2
 graphics stack comes from your system, so a minimal install without a desktop may lack `libOpenGL.so.0`
 (`libopengl0` on Debian/Ubuntu, `libglvnd-opengl` on Fedora/RHEL).
 
-**Flatpak** (also from the next release on): `ProjectFoxy-x.y.z.flatpak`. It carries its own runtime, so it works on
+**Flatpak** (also from v0.2.0): `ProjectFoxy-x.y.z.flatpak`. It carries its own runtime, so it works on
 distributions that are too old or too different for the AppImage (Debian 11, Ubuntu 20.04, RHEL/Alma/Rocky 8-9...):
 
 ```bash
@@ -235,7 +236,7 @@ Bugs and ideas are welcome: open an *issue* (there are templates) or read [`CONT
 
 # 🇪🇸 Español
 
-**Visor de imágenes moderno, ligero y rápido para Windows, con un editor de fotos integrado.**
+**Visor de imágenes moderno, ligero y rápido para Windows y Linux, con un editor de fotos integrado.**
 
 [English](#project-foxy) · Español
 
@@ -270,7 +271,7 @@ Ve a la página de [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases
 Requisitos: Windows 10 u 11 de 64 bits. Windows puede avisar con «Windows protegió su PC» porque el programa aún
 no está firmado: *Más información → Ejecutar de todas formas*. Cada archivo de la release lleva su suma SHA-256.
 
-**Linux** (desde la próxima release): `ProjectFoxy-x.y.z-x86_64.AppImage`. Dale permiso de ejecución y ábrelo, sin
+**Linux** (desde la v0.2.0): `ProjectFoxy-x.y.z-x86_64.AppImage`. Dale permiso de ejecución y ábrelo, sin
 instalar nada:
 
 ```bash
@@ -284,7 +285,7 @@ openSUSE Tumbleweed, Arch...), con X11 y con Wayland. Si tu sistema no tiene FUS
 dentro; la parte gráfica la pone tu sistema, así que una instalación mínima sin escritorio puede no tener
 `libOpenGL.so.0` (`libopengl0` en Debian/Ubuntu, `libglvnd-opengl` en Fedora/RHEL).
 
-**Flatpak** (también desde la próxima release): `ProjectFoxy-x.y.z.flatpak`. Lleva su propio runtime, así que funciona
+**Flatpak** (también desde la v0.2.0): `ProjectFoxy-x.y.z.flatpak`. Lleva su propio runtime, así que funciona
 en distribuciones demasiado viejas o distintas para el AppImage (Debian 11, Ubuntu 20.04, RHEL/Alma/Rocky 8-9...):
 
 ```bash
