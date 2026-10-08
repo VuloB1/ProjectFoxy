@@ -236,8 +236,10 @@ private:
 
 int main(int argc, char *argv[])
 {
-    // The preview is drawn with Direct3D 11 in the application; do the same here.
+    // The preview is drawn with Direct3D 11 in the application (on Windows); do the same here.
+#ifdef Q_OS_WIN
     qputenv("QSG_RHI_BACKEND", "d3d11");
+#endif
     QGuiApplication app(argc, argv);
     TestGpuParity test;
     return QTest::qExec(&test, argc, argv);

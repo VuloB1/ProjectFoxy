@@ -84,6 +84,12 @@ QImage withText(const QImage &img, const TextOverlay &t)
     if (path.boundingRect().width() > room) {
         px *= room / path.boundingRect().width();
         path = build(px);
+        // The glyphs are hinted at whole pixel sizes, so the width is not exactly proportional to the size: step down
+        // until it fits (a font with different metrics, like the fallback on Linux, can overshoot by a pixel or two).
+        for (int guard = 0; guard < 40 && path.boundingRect().width() > room && px > 4.0; ++guard) {
+            px -= 1.0;
+            path = build(px);
+        }
     }
     const QRectF box = path.boundingRect();
     // keep the whole block inside the picture whatever x, y say

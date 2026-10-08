@@ -25,8 +25,11 @@ int main(int argc, char *argv[])
     // Render with Direct3D 11 unless the caller already chose a backend, so it
     // can be overridden from the environment (QSG_RHI_BACKEND=software, opengl,
     // vulkan...) to compare or to work around a driver, without rebuilding.
+#ifdef Q_OS_WIN
     if (!qEnvironmentVariableIsSet("QSG_RHI_BACKEND"))
         qputenv("QSG_RHI_BACKEND", "d3d11");
+#endif
+    // (Elsewhere Qt picks the platform's backend: OpenGL on Linux, Metal on macOS.)
 
     QGuiApplication app(argc, argv);
     app.setApplicationName("ProjectFoxy");

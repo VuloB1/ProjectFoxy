@@ -11,14 +11,24 @@
 #include <cstdio>
 #include <random>
 #include <vector>
+#ifdef _WIN32
 #include <windows.h>
+#else
+#include <ctime>
+#endif
 
 static double cpuSeconds()
 {
+#ifdef _WIN32
     FILETIME c, e, k, u;
     GetProcessTimes(GetCurrentProcess(), &c, &e, &k, &u);
     auto t = [](FILETIME f) { return double((quint64(f.dwHighDateTime) << 32) | f.dwLowDateTime) * 1e-7; };
     return t(k) + t(u);
+#else
+    timespec ts;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);   // user + system time of every thread of the process
+    return double(ts.tv_sec) + double(ts.tv_nsec) * 1e-9;
+#endif
 }
 
 // PSNR of RGB between two same-size pictures (alpha ignored), in dB.

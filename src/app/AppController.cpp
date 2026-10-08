@@ -11,7 +11,10 @@
 #include <array>
 #include <QVector3D>
 #include <QFileInfo>
+#include <QDateTime>
 #include <QDir>
+#include <QFile>
+#include <QUrl>
 #include <QStandardPaths>
 #include <QGuiApplication>
 #include <QClipboard>
@@ -19,6 +22,7 @@
 #include <QRunnable>
 #include <QThreadPool>
 
+#ifdef _WIN32
 // NOMINMAX before Windows.h - otherwise its min/max macros shadow std::min/
 // std::max used throughout this file (and everywhere that includes
 // AppController.h afterward).
@@ -27,6 +31,10 @@
 #endif
 #include <Windows.h>
 #include <shellapi.h>
+#else
+#include <QProcess>
+#include <QStandardPaths>
+#endif
 #include "Translate.h"
 
 namespace {
@@ -185,11 +193,25 @@ void AppController::applyNewDocument(const core::ImageDocument &doc)
         // The history remembers finished full-size results so undo/redo of a slow
         // edit is instant. Give it a quarter of the memory that is free right now
         // (between 256 MB and 1.5 GB) rather than a number that ignores the machine.
+        qint64 budget = 600LL * 1024 * 1024;
+#ifdef _WIN32
         MEMORYSTATUSEX mem{};
         mem.dwLength = sizeof(mem);
-        qint64 budget = 600LL * 1024 * 1024;
         if (GlobalMemoryStatusEx(&mem))
             budget = std::clamp<qint64>(qint64(mem.ullAvailPhys / 4), 256LL * 1024 * 1024, 1536LL * 1024 * 1024);
+#else
+        QFile info(QStringLiteral("/proc/meminfo"));
+        if (info.open(QIODevice::ReadOnly)) {
+            for (const QByteArray &line : info.readAll().split('\n')) {
+                if (line.startsWith("MemAvailable:")) { // in kB
+                    const qint64 kb = line.mid(13).trimmed().split(' ').value(0).toLongLong();
+                    if (kb > 0)
+                        budget = std::clamp<qint64>(kb * 1024 / 4, 256LL * 1024 * 1024, 1536LL * 1024 * 1024);
+                    break;
+                }
+            }
+        }
+#endif
         m_editStack.setCheckpointBudget(budget);
     }
     m_liveAdjust = AdjustOp();
@@ -1767,6 +1789,7 @@ bool AppController::deleteCurrentFile()
         nextPath = m_folderModel->data(m_folderModel->index(nextIndex, 0), FolderModel::FilePathRole).toString();
     }
 
+#ifdef _WIN32
     // Double-null-terminated, per SHFileOperationW's pFrom contract.
     std::wstring wpath = m_currentFilePath.toStdWString();
     wpath.push_back(L'\0');
@@ -1777,6 +1800,11 @@ bool AppController::deleteCurrentFile()
     op.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
     if (SHFileOperationW(&op) != 0 || op.fAnyOperationsAborted)
         return false;
+#else
+    // The desktop's trash (freedesktop.org Trash specification); never a permanent delete.
+    if (!QFile::moveToTrash(m_currentFilePath))
+        return false;
+#endif
 
     m_savedRecipe = currentRecipe(); // the file the edits belonged to is gone: nothing to protect
     const QString deletedPath = m_currentFilePath;
@@ -1821,6 +1849,7 @@ bool AppController::setAsWallpaper()
     if (baked.isNull())
         return false;
 
+#ifdef _WIN32
     const QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
         + QStringLiteral("/imageviewer_wallpaper.png");
     if (!baked.save(tempPath, "PNG"))
@@ -1829,4 +1858,55 @@ bool AppController::setAsWallpaper()
     const std::wstring wpath = QDir::toNativeSeparators(tempPath).toStdWString();
     return SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, const_cast<wchar_t *>(wpath.c_str()),
                                   SPIF_UPDATEINIFILE | SPIF_SENDCHANGE) != 0;
+#else
+    // Linux has no single wallpaper API: ask the desktop's own tool. The file gets a new name every time (GNOME
+    // ignores a change of the picture when the path stays the same) and lives in the user's data folder, not in /tmp.
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(dir);
+    for (const QString &old : QDir(dir).entryList({QStringLiteral("wallpaper-*.png")}, QDir::Files))
+        QFile::remove(dir + QLatin1Char('/') + old);
+    const QString path = QStringLiteral("%1/wallpaper-%2.png").arg(dir).arg(QDateTime::currentMSecsSinceEpoch());
+    if (!baked.save(path, "PNG"))
+        return false;
+
+    const QString desktop = qEnvironmentVariable("XDG_CURRENT_DESKTOP").toLower();
+    const QString uri = QUrl::fromLocalFile(path).toString();
+    auto run = [](const QString &program, const QStringList &args) {
+        QProcess p;
+        p.start(program, args);
+        return p.waitForFinished(5000) && p.exitStatus() == QProcess::NormalExit && p.exitCode() == 0;
+    };
+    if (desktop.contains(QLatin1String("kde")))
+        return run(QStringLiteral("plasma-apply-wallpaperimage"), {path});
+    if (desktop.contains(QLatin1String("xfce"))) {
+        // One property per monitor/workspace: set them all.
+        QProcess list;
+        list.start(QStringLiteral("xfconf-query"), {QStringLiteral("-c"), QStringLiteral("xfce4-desktop"), QStringLiteral("-l")});
+        if (!list.waitForFinished(5000))
+            return false;
+        bool any = false;
+        for (const QString &prop : QString::fromUtf8(list.readAllStandardOutput()).split(QLatin1Char('\n'))) {
+            if (prop.endsWith(QLatin1String("/last-image")))
+                any = run(QStringLiteral("xfconf-query"), {QStringLiteral("-c"), QStringLiteral("xfce4-desktop"), QStringLiteral("-p"), prop, QStringLiteral("-s"), path}) || any;
+        }
+        return any;
+    }
+    // GNOME, Cinnamon, MATE, Budgie, COSMIC... share the gsettings route with different schemas.
+    struct Schema { const char *name; const char *key; const char *keyDark; };
+    const Schema schemas[] = {
+        {"org.gnome.desktop.background", "picture-uri", "picture-uri-dark"},
+        {"org.cinnamon.desktop.background", "picture-uri", nullptr},
+        {"org.mate.background", "picture-filename", nullptr},
+    };
+    for (const Schema &s : schemas) {
+        const QString schema = QString::fromLatin1(s.name);
+        const QString value = (s.key == QLatin1String("picture-filename")) ? path : uri;
+        if (!run(QStringLiteral("gsettings"), {QStringLiteral("set"), schema, QString::fromLatin1(s.key), value}))
+            continue;
+        if (s.keyDark)
+            run(QStringLiteral("gsettings"), {QStringLiteral("set"), schema, QString::fromLatin1(s.keyDark), value});
+        return true;
+    }
+    return false;
+#endif
 }
