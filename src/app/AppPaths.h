@@ -20,6 +20,17 @@ inline bool portable()
     return QFileInfo::exists(QCoreApplication::applicationDirPath() + QStringLiteral("/portable.txt"));
 }
 
+// Two paths name the same file when their keys are equal. Windows (and macOS by default) ignore the case of file names;
+// on Linux "A.jpg" and "a.jpg" are two different files.
+inline QString samePathKey(const QString &path)
+{
+#ifdef Q_OS_LINUX
+    return QDir::cleanPath(path);
+#else
+    return QDir::cleanPath(path).toLower();
+#endif
+}
+
 inline QString configDir()
 {
     return portable() ? QCoreApplication::applicationDirPath() + QStringLiteral("/datos")

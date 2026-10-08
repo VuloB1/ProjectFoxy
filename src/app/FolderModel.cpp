@@ -1,5 +1,6 @@
 #include "FolderModel.h"
 #include "DecoderRegistry.h"
+#include "AppPaths.h"
 
 #include <QDir>
 #include <QFile>
@@ -63,11 +64,15 @@ void FolderModel::openFolderForFile(const QString &filePath)
     const QFileInfo info(filePath);
     const QDir dir = info.dir();
 
-    QStringList nameFilters;
+    // Matched by hand, ignoring case: a QDir name filter is case-sensitive on Linux, where "FOTO.JPG" must be found too.
+    QSet<QString> extensions;
     for (const auto &ext : core::DecoderRegistry::instance().allSupportedExtensions())
-        nameFilters << QStringLiteral("*.%1").arg(ext);
+        extensions.insert(QString(ext).toLower());
 
-    QFileInfoList entries = dir.entryInfoList(nameFilters, QDir::Files);
+    QFileInfoList entries = dir.entryInfoList(QDir::Files);
+    entries.erase(std::remove_if(entries.begin(), entries.end(),
+                                 [&extensions](const QFileInfo &e) { return !extensions.contains(e.suffix().toLower()); }),
+                  entries.end());
 
     // Natural sort (img2 before img10) instead of plain lexicographic order.
     QCollator collator;
@@ -156,7 +161,7 @@ namespace {
 
 QString samePathKey(const QString &path)
 {
-    return QDir::cleanPath(path).toLower(); // Windows paths are case-insensitive
+    return AppPaths::samePathKey(path);
 }
 
 } // namespace

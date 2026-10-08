@@ -711,7 +711,7 @@
 "Saturación": "彩度",
 "Se abre en todas partes. Hasta 256 colores y transparencia de todo o nada.": "どこでも開けます。最大 256 色で、透明は「あり／なし」のみです。",
 "Se acomodan según el tamaño y la forma de cada imagen": "各画像のサイズと形に合わせて配置されます",
-"Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma de Windows.": "すぐに反映され、再起動は不要です。「システムに合わせる」は Windows の言語を使います。",
+"Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma del sistema.": "すぐに反映され、再起動は不要です。「システムに合わせる」はシステムの言語を使います。",
 "Se conservan los datos de la cámara, la fecha, el GPS y el perfil de color. Si quieres quedarte también con la foto original, guarda una copia.": "カメラ情報・日付・GPS・カラープロファイルは保持されます。元の写真も残したい場合はコピーを保存してください。",
 "Segundo color": "2 番目の色",
 "Según el sistema": "システムに合わせる",

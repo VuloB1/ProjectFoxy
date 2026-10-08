@@ -711,7 +711,7 @@
 "Saturación": "채도",
 "Se abre en todas partes. Hasta 256 colores y transparencia de todo o nada.": "어디서나 열립니다. 최대 256색, 투명도는 있음/없음만 지원합니다.",
 "Se acomodan según el tamaño y la forma de cada imagen": "각 이미지의 크기와 모양에 맞게 배치됩니다",
-"Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma de Windows.": "즉시 적용되며 다시 시작할 필요가 없습니다. \"시스템 설정 따르기\"는 Windows의 언어를 사용합니다.",
+"Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma del sistema.": "즉시 적용되며 다시 시작할 필요가 없습니다. \"시스템 설정 따르기\"는 시스템의 언어를 사용합니다.",
 "Se conservan los datos de la cámara, la fecha, el GPS y el perfil de color. Si quieres quedarte también con la foto original, guarda una copia.": "카메라 데이터, 날짜, GPS, 색상 프로파일은 유지됩니다. 원본 사진도 보관하려면 사본을 저장하세요.",
 "Segundo color": "두 번째 색",
 "Según el sistema": "시스템 설정 따르기",

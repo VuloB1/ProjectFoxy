@@ -711,7 +711,7 @@
 "Saturación": "饱和度",
 "Se abre en todas partes. Hasta 256 colores y transparencia de todo o nada.": "随处可打开。最多 256 色，透明度仅支持“全透明或不透明”。",
 "Se acomodan según el tamaño y la forma de cada imagen": "根据每张图像的大小和形状自动排列",
-"Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma de Windows.": "立即生效，无需重启。“跟随系统”会使用 Windows 的语言。",
+"Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma del sistema.": "立即生效，无需重启。“跟随系统”会使用系统的语言。",
 "Se conservan los datos de la cámara, la fecha, el GPS y el perfil de color. Si quieres quedarte también con la foto original, guarda una copia.": "相机数据、日期、GPS 和颜色配置文件会被保留。如果还想保留原始照片，请另存一份副本。",
 "Segundo color": "第二种颜色",
 "Según el sistema": "跟随系统",

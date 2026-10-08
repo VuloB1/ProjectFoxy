@@ -12,6 +12,7 @@
 #include "CollageStudio.h"
 #include "ColorPicker.h"
 #include "Translations.h"
+#include "FontSubstitutions.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -32,6 +33,7 @@ int main(int argc, char *argv[])
     // (Elsewhere Qt picks the platform's backend: OpenGL on Linux, Metal on macOS.)
 
     QGuiApplication app(argc, argv);
+    installFontSubstitutions();
     app.setApplicationName("ProjectFoxy");
     app.setOrganizationName("ProjectFoxy");
     app.setApplicationVersion(QStringLiteral(PROJECTFOXY_VERSION)); // from project(VERSION) in CMakeLists.txt

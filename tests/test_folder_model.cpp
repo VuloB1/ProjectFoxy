@@ -34,6 +34,29 @@ private slots:
             dir().remove(f);
     }
 
+    // "FOTO.PNG" is a picture as much as "foto.png": on Linux a name filter would not match it.
+    void picturesAreFoundWhateverTheCaseOfTheirExtension()
+    {
+        FolderModel model;
+        const QString first = makePng(dir(), "FOTO.PNG", 10);
+        makePng(dir(), "otra.Png", 20);
+        QFile(dir().filePath("notas.txt")).open(QIODevice::WriteOnly);
+        model.openFolderForFile(first);
+        QCOMPARE(model.count(), 2);
+    }
+
+#ifdef Q_OS_LINUX
+    // Linux keeps "A.png" and "a.png" apart: both are listed, and neither is taken for the other.
+    void namesThatDifferOnlyInCaseAreTwoFilesOnLinux()
+    {
+        FolderModel model;
+        const QString upper = makePng(dir(), "A.png", 10);
+        makePng(dir(), "a.png", 20);
+        model.openFolderForFile(upper);
+        QCOMPARE(model.count(), 2);
+    }
+#endif
+
     void checkRenameBuildsTheNamesInTheGivenOrder()
     {
         FolderModel model;
