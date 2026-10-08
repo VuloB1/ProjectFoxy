@@ -1,0 +1,23 @@
+[Desktop Entry]
+Type=Application
+Name=Project Foxy
+GenericName=Image Viewer
+GenericName[es]=Visor de imágenes
+GenericName[pt]=Visualizador de imagens
+GenericName[ja]=画像ビューアー
+GenericName[ko]=이미지 뷰어
+GenericName[zh_CN]=图片查看器
+Comment=Fast image viewer and editor with GIF maker, collage and compare
+Comment[es]=Visor y editor de imágenes rápido, con creador de GIF, collage y comparador
+Comment[pt]=Visualizador e editor de imagens rápido, com criador de GIF, colagem e comparador
+Comment[ja]=GIF 作成、コラージュ、比較機能を備えた高速な画像ビューアー兼エディター
+Comment[ko]=GIF 만들기, 콜라주, 비교 기능을 갖춘 빠른 이미지 뷰어 및 편집기
+Comment[zh_CN]=快速的图片查看与编辑器，含 GIF 制作、拼贴和对比功能
+Exec=ProjectFoxy %F
+Icon=io.github.vulob1.ProjectFoxy
+Terminal=false
+Categories=Graphics;2DGraphics;RasterGraphics;Viewer;Photography;
+Keywords=image;photo;viewer;editor;gif;collage;raw;heic;picture;imagen;foto;
+StartupWMClass=ProjectFoxy
+StartupNotify=true
+MimeType=image/jpeg;image/png;image/gif;image/webp;image/tiff;image/bmp;image/heif;image/heic;image/avif;image/vnd.microsoft.icon;image/x-icon;image/x-canon-cr2;image/x-canon-cr3;image/x-adobe-dng;image/x-nikon-nef;image/x-olympus-orf;image/x-pentax-pef;image/x-fuji-raf;image/x-panasonic-rw2;image/x-panasonic-raw;image/x-samsung-srw;image/x-sony-arw;

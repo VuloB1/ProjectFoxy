@@ -126,3 +126,18 @@ jobs:
           QT_QPA_PLATFORM: xcb
           LIBGL_ALWAYS_SOFTWARE: "1"
         run: xvfb-run -a -s "-screen 0 1280x1024x24" ctest --preset linux-release
+
+      # The AppImage is built here on every change, not only at release time, so a packaging problem shows up in the
+      # pull request that causes it; the smoke test starts the bundle itself, which is what proves it is complete.
+      - name: AppImage
+        run: QT_ROOT_DIR="$QT_ROOT_DIR" packaging/linux/build-appimage.sh
+
+      - name: AppImage smoke test
+        run: packaging/linux/smoke-appimage.sh dist/ProjectFoxy-*-x86_64.AppImage
+
+      - name: Keep the AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProjectFoxy-AppImage
+          path: dist/ProjectFoxy-*-x86_64.AppImage
+          retention-days: 14

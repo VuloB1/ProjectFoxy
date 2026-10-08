@@ -67,7 +67,9 @@ find_package(WebP CONFIG REQUIRED)
 # The shipped folder is flat on Windows (ProjectFoxy.exe next to its DLLs), so
 # `cmake --install` puts the executable at the prefix root instead of in bin/.
 # Must be set before qt_standard_project_setup() pulls in GNUInstallDirs.
-set(CMAKE_INSTALL_BINDIR ".")
+if(WIN32)
+    set(CMAKE_INSTALL_BINDIR ".")
+endif()
 
 qt_standard_project_setup(REQUIRES 6.6)
 
@@ -390,6 +392,22 @@ set(IV_VCPKG_BIN \"${_iv_vcpkg_bin}\")")
 
     install(FILES docs/THIRD_PARTY_NOTICES.txt DESTINATION licenses)
     install(FILES LICENSE DESTINATION licenses RENAME LICENSE-ProjectFoxy.txt)
+endif()
+
+# Linux: the standard layout under the prefix (bin/, share/applications, share/icons, share/metainfo, share/doc).
+# `cmake --install <build dir> --prefix /usr` is what a distribution package runs; the AppImage runs it with
+# --prefix AppDir/usr and lets linuxdeploy bundle Qt and the system libraries (packaging/linux/build-appimage.sh).
+# The native libraries (libvips, LibRaw, libheif, exiv2...) are static in the vcpkg triplet x64-linux, so the binary
+# carries them. The ID is the same everywhere (desktop file, icon, AppStream) so Flatpak can reuse these files.
+if(UNIX AND NOT APPLE)
+    set(IV_APP_ID io.github.vulob1.ProjectFoxy)
+    install(TARGETS ImageViewer RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(FILES packaging/linux/${IV_APP_ID}.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    install(FILES packaging/linux/${IV_APP_ID}.metainfo.xml DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+    install(FILES resources/icons/icon.png
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/512x512/apps RENAME ${IV_APP_ID}.png)
+    install(FILES docs/THIRD_PARTY_NOTICES.txt DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/projectfoxy)
+    install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/projectfoxy RENAME LICENSE-ProjectFoxy.txt)
 endif()
 
 # ---------------------------------------------------------------------------
