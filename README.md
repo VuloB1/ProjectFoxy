@@ -56,7 +56,9 @@ chmod +x ProjectFoxy-*-x86_64.AppImage
 
 It runs on any 64-bit distribution with glibc 2.35 or newer (Ubuntu 22.04+, Debian 12+, Fedora 36+, openSUSE
 Tumbleweed, Arch...), on X11 and Wayland. If your system lacks FUSE 2 (`libfuse2`), run it with
-`--appimage-extract-and-run`. Settings live in `~/.config/ProjectFoxy`.
+`--appimage-extract-and-run`. Settings live in `~/.config/ProjectFoxy`. Qt and the image libraries are inside; the
+graphics stack comes from your system, so a minimal install without a desktop may lack `libOpenGL.so.0`
+(`libopengl0` on Debian/Ubuntu, `libglvnd-opengl` on Fedora/RHEL).
 
 **Flatpak** (also from the next release on): `ProjectFoxy-x.y.z.flatpak`. It carries its own runtime, so it works on
 distributions that are too old or too different for the AppImage (Debian 11, Ubuntu 20.04, RHEL/Alma/Rocky 8-9...):
@@ -68,6 +70,13 @@ flatpak run io.github.vulob1.ProjectFoxy photo.jpg
 
 It has access to your files (`--filesystem=host`) because the thumbnail bar shows the other pictures of the folder.
 Deleting goes to your real trash and the wallpaper is set, both through the desktop portals.
+
+Tested on (the files built by the CI, started on X11 and, for the AppImage, native Wayland):
+
+| | AppImage | Flatpak |
+|---|---|---|
+| Ubuntu 24.04, Debian 13, Fedora 43, Arch | works | works |
+| AlmaLinux 9 (glibc 2.34) | does not start: glibc and libstdc++ too old | works |
 
 ## Languages
 
@@ -271,7 +280,9 @@ chmod +x ProjectFoxy-*-x86_64.AppImage
 
 Funciona en cualquier distribución de 64 bits con glibc 2.35 o más nueva (Ubuntu 22.04+, Debian 12+, Fedora 36+,
 openSUSE Tumbleweed, Arch...), con X11 y con Wayland. Si tu sistema no tiene FUSE 2 (`libfuse2`), ábrelo con
-`--appimage-extract-and-run`. La configuración queda en `~/.config/ProjectFoxy`.
+`--appimage-extract-and-run`. La configuración queda en `~/.config/ProjectFoxy`. Qt y las bibliotecas de imagen van
+dentro; la parte gráfica la pone tu sistema, así que una instalación mínima sin escritorio puede no tener
+`libOpenGL.so.0` (`libopengl0` en Debian/Ubuntu, `libglvnd-opengl` en Fedora/RHEL).
 
 **Flatpak** (también desde la próxima release): `ProjectFoxy-x.y.z.flatpak`. Lleva su propio runtime, así que funciona
 en distribuciones demasiado viejas o distintas para el AppImage (Debian 11, Ubuntu 20.04, RHEL/Alma/Rocky 8-9...):
@@ -284,6 +295,13 @@ flatpak run io.github.vulob1.ProjectFoxy foto.jpg
 Tiene acceso a tus archivos (`--filesystem=host`) porque la barra de miniaturas muestra las demás imágenes de la
 carpeta. Eliminar manda el archivo a tu papelera real y el fondo de pantalla se cambia, ambos a través de los portales
 del escritorio.
+
+Probado en (los archivos construidos por el CI, abiertos con X11 y, el AppImage, también con Wayland nativo):
+
+| | AppImage | Flatpak |
+|---|---|---|
+| Ubuntu 24.04, Debian 13, Fedora 43, Arch | funciona | funciona |
+| AlmaLinux 9 (glibc 2.34) | no arranca: glibc y libstdc++ demasiado viejas | funciona |
 
 ## Idiomas
 
