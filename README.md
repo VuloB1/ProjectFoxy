@@ -10,8 +10,8 @@
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-ff6a13)](LICENSE)
 [![Windows 10 / 11](https://img.shields.io/badge/Windows-10%20%7C%2011-3a3a3a?logo=windows&logoColor=white)](#download)
 [![Linux](https://img.shields.io/badge/Linux-AppImage%20%7C%20Flatpak-3a3a3a?logo=linux&logoColor=white)](#download)
-![Qt 6.7](https://img.shields.io/badge/Qt-6.7-41cd52?logo=qt&logoColor=white)
-![C++20](https://img.shields.io/badge/C%2B%2B-20-00599c?logo=cplusplus&logoColor=white)
+[![Qt 6.7](https://img.shields.io/badge/Qt-6.7-41cd52?logo=qt&logoColor=white)](https://www.qt.io/)
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-00599c?logo=cplusplus&logoColor=white)](https://en.cppreference.com/w/cpp/20)
 
 English · [Español](#español)
 
