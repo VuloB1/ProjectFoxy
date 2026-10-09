@@ -2,6 +2,7 @@
 
 #include "ThumbnailCache.h"
 #include <QAbstractListModel>
+#include <QDateTime>
 #include <QStringList>
 #include <QVariantMap>
 
@@ -90,6 +91,8 @@ private:
     void regenerateShuffleOrder();
 
     QStringList m_files; // absolute paths, naturally sorted
+    QString m_scannedDir;          // folder m_files was listed from
+    QDateTime m_scannedModified;   // that folder's modification time at the time of the listing
     int m_currentIndex = -1;
     core::ThumbnailCache m_thumbnailCache;
 

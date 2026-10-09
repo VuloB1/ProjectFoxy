@@ -64,6 +64,18 @@ void FolderModel::openFolderForFile(const QString &filePath)
     const QFileInfo info(filePath);
     const QDir dir = info.dir();
 
+    // Moving between pictures of the same folder (every arrow key press) must not list, sort and
+    // reset the whole model again: that costs hundreds of ms on a big folder, on the UI thread,
+    // and rebuilds the filmstrip. The listing is only redone when the folder itself changed
+    // (a file added, removed or renamed moves its modification time) or the file is not in it.
+    const QString dirPath = dir.absolutePath();
+    const QDateTime modified = QFileInfo(dirPath).lastModified();
+    const int known = m_files.indexOf(info.absoluteFilePath());
+    if (known >= 0 && dirPath == m_scannedDir && modified.isValid() && modified == m_scannedModified) {
+        setCurrentIndexInternal(known, /*announceFilePath=*/false);
+        return;
+    }
+
     // Matched by hand, ignoring case: a QDir name filter is case-sensitive on Linux, where "FOTO.JPG" must be found too.
     QSet<QString> extensions;
     for (const auto &ext : core::DecoderRegistry::instance().allSupportedExtensions())
@@ -82,6 +94,8 @@ void FolderModel::openFolderForFile(const QString &filePath)
         return collator.compare(a.fileName(), b.fileName()) < 0;
     });
 
+    m_scannedDir = dirPath;
+    m_scannedModified = modified;
     beginResetModel();
     m_files.clear();
     m_files.reserve(entries.size());

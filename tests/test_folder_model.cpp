@@ -46,6 +46,29 @@ private slots:
         QCOMPARE(model.count(), 2);
     }
 
+    // Going from one picture to the next in the same folder only moves the marker: the list is not
+    // listed, sorted and reset again (that was a visible pause on big folders). A file added since
+    // is still noticed, because the folder's modification time moved.
+    void movingWithinTheFolderDoesNotRescanItButAChangedFolderIs()
+    {
+        FolderModel model;
+        const QString a = makePng(dir(), "a.png", 10);
+        const QString b = makePng(dir(), "b.png", 20);
+        model.openFolderForFile(a);
+        QSignalSpy resets(&model, &QAbstractItemModel::modelReset);
+
+        model.openFolderForFile(b);
+        QCOMPARE(resets.count(), 0);
+        QCOMPARE(model.currentIndex(), 1);
+
+        QTest::qWait(50); // let the folder's timestamp tick on coarse file systems
+        makePng(dir(), "c.png", 30);
+        model.openFolderForFile(b);
+        QCOMPARE(resets.count(), 1);
+        QCOMPARE(model.count(), 3);
+        QCOMPARE(model.currentIndex(), 1);
+    }
+
 #ifdef Q_OS_LINUX
     // Linux keeps "A.png" and "a.png" apart: both are listed, and neither is taken for the other.
     void namesThatDifferOnlyInCaseAreTwoFilesOnLinux()
