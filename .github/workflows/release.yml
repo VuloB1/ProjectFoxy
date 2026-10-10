@@ -1,7 +1,7 @@
 # When a tag "vX.Y.Z" is pushed: builds the program for Windows and Linux and publishes a GitHub release with the installer, the portable
 # zip, the AppImage, the Flatpak bundle and their checksums.
 #
-#     git tag v0.2.0 && git push origin v0.2.0
+#     git tag v0.2.1 && git push origin v0.2.1
 #
 # The version in CMakeLists.txt (project(... VERSION ...)), in resources/app.rc and in vcpkg.json should match the tag.
 # NOTE: written without being able to run it (it only runs on GitHub); see ci.yml.

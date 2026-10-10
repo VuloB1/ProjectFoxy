@@ -3,6 +3,14 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.2.1] — Faster browsing
+
+- Moving from one picture to the next in a folder no longer lists, sorts and rebuilds the whole folder each time
+  (it showed as a pause of a few hundred milliseconds on big folders). The folder is only read again when it changes.
+- The thumbnail strip first looks for a thumbnail the system already made (Windows: Explorer's thumbnail cache;
+  Linux: `~/.cache/thumbnails`) and only decodes the original when there is none. Thumbnails also load at low
+  priority and are skipped when they scroll out of view, so they do not slow down opening a picture.
+
 ## [0.2.0] — Linux
 
 ### Linux
@@ -51,6 +59,15 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.2.1] — Navegación más rápida
+
+- Pasar de una imagen a la siguiente dentro de una carpeta ya no lista, ordena y reconstruye la carpeta entera cada
+  vez (se notaba como una pausa de unos cientos de milisegundos en carpetas grandes). La carpeta solo se vuelve a leer
+  cuando cambia.
+- La barra de miniaturas busca primero una miniatura que el sistema ya hizo (Windows: la caché de miniaturas del
+  Explorador; Linux: `~/.cache/thumbnails`) y solo decodifica el original si no hay ninguna. Además las miniaturas
+  cargan con prioridad baja y se saltean si salen de pantalla, para que no frenen la apertura de una imagen.
 
 ## [0.2.0] — Linux
 

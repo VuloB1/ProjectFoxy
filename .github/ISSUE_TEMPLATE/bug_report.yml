@@ -32,7 +32,7 @@ body:
     attributes:
       label: Project Foxy version / Versión de Project Foxy
       description: In "Information" (the ⓘ icon of the top bar) or in the installer's name. / En «Información» (el ícono ⓘ de la barra superior) o en el nombre del instalador.
-      placeholder: "0.2.0"
+      placeholder: "0.2.1"
     validations:
       required: true
   - type: dropdown
