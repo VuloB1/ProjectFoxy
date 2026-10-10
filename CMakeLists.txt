@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(ImageViewer VERSION 0.2.0 LANGUAGES CXX)
+project(ImageViewer VERSION 0.2.1 LANGUAGES CXX)
 if(WIN32)
     enable_language(RC)   # the executable carries its icon as a resource (resources/app.rc)
 endif()
