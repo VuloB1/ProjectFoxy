@@ -1,5 +1,6 @@
 #include "ThumbnailCache.h"
 #include "DecoderRegistry.h"
+#include "SystemThumbnails.h"
 
 #include <QCache>
 #include <QMutex>
@@ -99,6 +100,17 @@ QImage ThumbnailCache::thumbnail(const QString &filePath, int edgeLength)
 {
     if (auto cached = cachedThumbnail(filePath, edgeLength))
         return *cached;
+
+    // The system may already have this one (Explorer's cache, the freedesktop store): reading a
+    // small ready-made picture is far cheaper than decoding the original.
+    {
+        const QImage fromSystem = systemThumbnail(filePath, edgeLength);
+        if (!fromSystem.isNull()) {
+            QMutexLocker lock(&m_impl->mutex);
+            m_impl->memoryCache.insert(cacheKey(filePath, edgeLength), new QImage(fromSystem), fromSystem.sizeInBytes());
+            return fromSystem;
+        }
+    }
 
     auto decoder = DecoderRegistry::instance().decoderFor(filePath);
     if (!decoder)

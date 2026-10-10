@@ -1,4 +1,5 @@
 #include "DecoderRegistry.h"
+#include "SystemThumbnails.h"
 #include "ThumbnailCache.h"
 #include <QtTest>
 #include <memory>
@@ -86,6 +87,56 @@ private slots:
         const QStringList files = QDir(cacheDir.path()).entryList(QDir::Files);
         QCOMPARE(files.size(), 1);
         QVERIFY(files.first().endsWith(QLatin1String(".jpg")));
+    }
+
+    // ---- the freedesktop store (~/.cache/thumbnails): what file managers already made
+
+    static QString makeStoreEntry(const QString &root, const char *sizeDir, const QString &file, int side, qint64 mtime)
+    {
+        const QString path = core::detail::freedesktopThumbnailPath(root, QLatin1String(sizeDir), file);
+        QDir().mkpath(QFileInfo(path).absolutePath());
+        QImage img(side, side / 2, QImage::Format_RGBA8888);
+        img.fill(QColor(10, 200, 30));
+        img.setText(QStringLiteral("Thumb::MTime"), QString::number(mtime));
+        img.save(path, "PNG");
+        return path;
+    }
+
+    void aThumbnailFromTheSystemStoreIsUsedWithoutDecoding()
+    {
+        QTemporaryDir dir;
+        const QString file = dir.filePath(QStringLiteral("a b.solid"));
+        QFile f(file);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.write("x");
+        f.close();
+        const qint64 mtime = QFileInfo(file).lastModified().toSecsSinceEpoch();
+        QTemporaryDir store;
+
+        QVERIFY(core::detail::freedesktopThumbnail(store.path(), file, 160).isNull()); // nothing there yet
+        makeStoreEntry(store.path(), "large", file, 256, mtime);
+        const QImage got = core::detail::freedesktopThumbnail(store.path(), file, 160);
+        QVERIFY(!got.isNull());
+        QCOMPARE(std::max(got.width(), got.height()), 160); // brought down to the size asked for
+        QCOMPARE(got.pixelColor(5, 5).green(), 200);        // and it is the stored picture, not a decode (which is red)
+    }
+
+    void aStaleOrTooSmallSystemThumbnailIsIgnored()
+    {
+        QTemporaryDir dir;
+        const QString file = dir.filePath(QStringLiteral("p.solid"));
+        QFile f(file);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.write("x");
+        f.close();
+        const qint64 mtime = QFileInfo(file).lastModified().toSecsSinceEpoch();
+        QTemporaryDir store;
+
+        makeStoreEntry(store.path(), "large", file, 256, mtime - 100);   // made before the file last changed
+        QVERIFY(core::detail::freedesktopThumbnail(store.path(), file, 160).isNull());
+        makeStoreEntry(store.path(), "normal", file, 128, mtime);        // right date, but soft for 256
+        QVERIFY(core::detail::freedesktopThumbnail(store.path(), file, 256).isNull());
+        QVERIFY(!core::detail::freedesktopThumbnail(store.path(), file, 128).isNull());
     }
 };
 

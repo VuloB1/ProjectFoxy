@@ -20,6 +20,8 @@ add_library(imageviewer_core STATIC
     decoders/AnimatedDecoder.cpp
     ThumbnailCache.h
     ThumbnailCache.cpp
+    SystemThumbnails.h
+    SystemThumbnails.cpp
     ColorManagement.h
     ColorManagement.cpp
     ImageWriter.h
@@ -68,6 +70,10 @@ add_library(imageviewer_core STATIC
 )
 
 target_include_directories(imageviewer_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(WIN32)
+    target_link_libraries(imageviewer_core PUBLIC shell32 ole32 shlwapi)
+endif()
 
 target_link_libraries(imageviewer_core PUBLIC
     Qt6::Core
