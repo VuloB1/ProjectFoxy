@@ -2,7 +2,7 @@
 #include "ThumbnailCache.h"
 
 #include <QUrl>
-#include <QThreadPool>
+#include <QThread>
 
 namespace {
 constexpr int kDefaultEdgeLength = 160;
@@ -20,7 +20,8 @@ ThumbnailImageResponse::ThumbnailImageResponse(core::ThumbnailCache *cache, QStr
 
 void ThumbnailImageResponse::run()
 {
-    m_image = m_cache->thumbnail(m_filePath, m_edgeLength);
+    if (!m_cancelled.load())
+        m_image = m_cache->thumbnail(m_filePath, m_edgeLength);
     emit finished();
 }
 
@@ -32,6 +33,8 @@ QQuickTextureFactory *ThumbnailImageResponse::textureFactory() const
 ThumbnailImageProvider::ThumbnailImageProvider(core::ThumbnailCache *cache)
     : m_cache(cache)
 {
+    m_pool.setMaxThreadCount(qMax(1, QThread::idealThreadCount() / 2));
+    m_pool.setThreadPriority(QThread::LowPriority);
 }
 
 QQuickImageResponse *ThumbnailImageProvider::requestImageResponse(const QString &id, const QSize &requestedSize)
@@ -42,6 +45,6 @@ QQuickImageResponse *ThumbnailImageProvider::requestImageResponse(const QString 
         : kDefaultEdgeLength;
 
     auto *response = new ThumbnailImageResponse(m_cache, filePath, edge);
-    QThreadPool::globalInstance()->start(response);
+    m_pool.start(response);
     return response;
 }

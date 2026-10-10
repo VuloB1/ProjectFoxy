@@ -3,6 +3,8 @@
 #include <QQuickAsyncImageProvider>
 #include <QQuickImageResponse>
 #include <QRunnable>
+#include <QThreadPool>
+#include <atomic>
 #include <QImage>
 
 namespace core { class ThumbnailCache; }
@@ -18,12 +20,16 @@ public:
 
     void run() override;
     QQuickTextureFactory *textureFactory() const override;
+    // The thumbnail scrolled out of view (or its cell was destroyed) before a worker reached it:
+    // skip the work. A decode already under way finishes; its result is simply not used.
+    void cancel() override { m_cancelled.store(true); }
 
 private:
     core::ThumbnailCache *m_cache;
     QString m_filePath;
     int m_edgeLength;
     QImage m_image;
+    std::atomic<bool> m_cancelled{false};
 };
 
 // Registered as "thumb" in main.cpp. FolderModel builds source URLs like
@@ -37,4 +43,7 @@ public:
 
 private:
     core::ThumbnailCache *m_cache;
+    // Its own pool, at low priority and with fewer threads than the machine has, so a folder full
+    // of thumbnails never competes with opening the picture the user is waiting for.
+    QThreadPool m_pool;
 };
