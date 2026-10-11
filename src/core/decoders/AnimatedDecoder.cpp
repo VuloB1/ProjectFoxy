@@ -14,6 +14,28 @@ namespace core {
 
 namespace {
 
+AnimatedDecoder::Limits g_limits;
+
+// Keeps the running total of decoded frames and says when the next one no longer fits.
+struct FrameBudget {
+    qint64 bytes = 0;
+    int count = 0;
+    // The first frame is always accepted: a picture that is big but allowed must still open.
+    bool accept(const QImage &frame)
+    {
+        if (count > 0 && (count >= g_limits.maxFrames || bytes + frame.sizeInBytes() > g_limits.maxAnimationBytes))
+            return false;
+        bytes += frame.sizeInBytes();
+        ++count;
+        return true;
+    }
+};
+
+bool canvasAllowed(qint64 width, qint64 height)
+{
+    return width > 0 && height > 0 && width * height <= g_limits.maxCanvasPixels;
+}
+
 // --- PNG chunk plumbing -----------------------------------------------
 // Just enough of the PNG container format to walk chunks and rebuild new
 // ones - no pixel-level PNG knowledge here, that's all left to Qt's own
@@ -171,6 +193,10 @@ bool decodeApngFrames(const QString &filePath, bool wantAllFrames,
         error = core::tr("No se pudo abrir %1").arg(filePath);
         return false;
     }
+    if (f.size() > g_limits.maxInputBytes) {
+        error = core::tr("El archivo es demasiado grande para abrirlo con seguridad: %1").arg(filePath);
+        return false;
+    }
     const QByteArray bytes = f.readAll();
     const QVector<PngChunk> chunks = readPngChunks(bytes);
 
@@ -229,6 +255,11 @@ bool decodeApngFrames(const QString &filePath, bool wantAllFrames,
         error = core::tr("Dimensiones de APNG inválidas: %1").arg(filePath);
         return false;
     }
+    if (!canvasAllowed(canvasWidth, canvasHeight)) {
+        error = core::tr("La imagen es demasiado grande para abrirla con seguridad: %1").arg(filePath);
+        return false;
+    }
+    FrameBudget budget;
 
     QImage canvas(int(canvasWidth), int(canvasHeight), QImage::Format_ARGB32_Premultiplied);
     canvas.fill(Qt::transparent);
@@ -238,6 +269,14 @@ bool decodeApngFrames(const QString &filePath, bool wantAllFrames,
 
     for (int i = 0; i < rawFrames.size(); ++i) {
         const ApngFrame &frame = rawFrames[i];
+        // A frame outside the canvas is not a valid APNG; do not build a picture of whatever size it claims.
+        if (qint64(frame.xOffset) + frame.width > canvasWidth || qint64(frame.yOffset) + frame.height > canvasHeight) {
+            if (frames.isEmpty()) {
+                error = core::tr("APNG sin fotogramas válidos: %1").arg(filePath);
+                return false;
+            }
+            break;
+        }
         const QRect rect(int(frame.xOffset), int(frame.yOffset), int(frame.width), int(frame.height));
 
         if (i > 0) {
@@ -262,7 +301,10 @@ bool decodeApngFrames(const QString &filePath, bool wantAllFrames,
             paint.drawImage(rect.topLeft(), sub);
         }
 
-        frames.push_back(canvas.convertToFormat(QImage::Format_RGBA8888));
+        QImage done = canvas.convertToFormat(QImage::Format_RGBA8888);
+        if (!budget.accept(done))
+            break; // the rest would not fit in memory: keep the frames so far
+        frames.push_back(done);
         delays.push_back(apngDelayMs(frame.delayNum, frame.delayDen));
 
         prevDisposeOp = frame.disposeOp;
@@ -284,8 +326,16 @@ bool decodeGifFrames(const QString &filePath, bool wantAllFrames,
         error = reader.errorString();
         return false;
     }
+    if (!canvasAllowed(frame.width(), frame.height())) {
+        error = core::tr("La imagen es demasiado grande para abrirla con seguridad: %1").arg(filePath);
+        return false;
+    }
+    FrameBudget budget;
     while (!frame.isNull()) {
-        frames.push_back(frame.convertToFormat(QImage::Format_RGBA8888));
+        const QImage converted = frame.convertToFormat(QImage::Format_RGBA8888);
+        if (!budget.accept(converted))
+            break;
+        frames.push_back(converted);
         const int delay = reader.nextImageDelay();
         delays.push_back(delay > 0 ? delay : 100);
         if (!wantAllFrames)
@@ -317,6 +367,10 @@ bool decodeWebpFrames(const QString &filePath, bool wantAllFrames,
         error = file.errorString();
         return false;
     }
+    if (file.size() > g_limits.maxInputBytes) {
+        error = core::tr("El archivo es demasiado grande para abrirlo con seguridad: %1").arg(filePath);
+        return false;
+    }
     const QByteArray bytes = file.readAll();
     WebPData data{reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size())};
     WebPAnimDecoderOptions options;
@@ -333,14 +387,23 @@ bool decodeWebpFrames(const QString &filePath, bool wantAllFrames,
     }
     WebPAnimInfo info;
     WebPAnimDecoderGetInfo(decoder, &info);
+    if (!canvasAllowed(info.canvas_width, info.canvas_height)) {
+        WebPAnimDecoderDelete(decoder);
+        error = core::tr("La imagen es demasiado grande para abrirla con seguridad: %1").arg(filePath);
+        return false;
+    }
+    FrameBudget budget;
     int previous = 0;
     while (WebPAnimDecoderHasMoreFrames(decoder)) {
         uint8_t *rgba = nullptr;
         int timestamp = 0;
         if (!WebPAnimDecoderGetNext(decoder, &rgba, &timestamp))
             break;
-        frames.push_back(QImage(rgba, int(info.canvas_width), int(info.canvas_height), int(info.canvas_width) * 4,
-                                QImage::Format_RGBA8888).copy()); // the decoder reuses its buffer
+        const QImage copy = QImage(rgba, int(info.canvas_width), int(info.canvas_height), int(info.canvas_width) * 4,
+                                   QImage::Format_RGBA8888).copy(); // the decoder reuses its buffer
+        if (!budget.accept(copy))
+            break;
+        frames.push_back(copy);
         const int delay = timestamp - previous;
         delays.push_back(delay > 0 ? delay : 100);
         previous = timestamp;
@@ -354,6 +417,9 @@ bool decodeWebpFrames(const QString &filePath, bool wantAllFrames,
 }
 
 } // namespace
+
+void AnimatedDecoder::setLimits(const Limits &limits) { g_limits = limits; }
+AnimatedDecoder::Limits AnimatedDecoder::limits() { return g_limits; }
 
 bool AnimatedDecoder::canDecode(const QString &filePath) const
 {
