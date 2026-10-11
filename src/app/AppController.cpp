@@ -87,7 +87,7 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
                     m_pendingAction = PendingAction::OpenPath;
                     m_pendingPath = doc.filePath;
                     if (!m_currentFilePath.isEmpty())
-                        m_folderModel->openFolderForFile(m_currentFilePath);
+                        m_folderModel->openFolderForFileAsync(m_currentFilePath);
                     emit isLoadingChanged();
                     emit unsavedChangesBlocked();
                     return;
@@ -163,7 +163,7 @@ void AppController::loadPath(const QString &path)
         // The folder strip already moved to the requested file; put it back on the
         // one that is still showing.
         if (!m_currentFilePath.isEmpty())
-            m_folderModel->openFolderForFile(m_currentFilePath);
+            m_folderModel->openFolderForFileAsync(m_currentFilePath);
         emit unsavedChangesBlocked();
         return;
     }
@@ -180,7 +180,7 @@ void AppController::loadPath(const QString &path)
 
     // Silently syncs the filmstrip to this file's folder/position - does
     // NOT emit currentFilePathChanged, so this never loops back into us.
-    m_folderModel->openFolderForFile(path);
+    m_folderModel->openFolderForFileAsync(path);
 }
 
 void AppController::applyNewDocument(const core::ImageDocument &doc)
@@ -1656,7 +1656,7 @@ void AppController::finishSave(const SaveOutcome &outcome)
         // Whatever was waiting on this save is dropped; the filmstrip may already have
         // moved to the picture that was asked for - put it back on the open one.
         if (after != PendingAction::None && !m_currentFilePath.isEmpty())
-            m_folderModel->openFolderForFile(m_currentFilePath);
+            m_folderModel->openFolderForFileAsync(m_currentFilePath);
         return;
     }
 
@@ -1827,7 +1827,7 @@ bool AppController::deleteCurrentFile()
 
     // No siblings left - rescan (the folder model will find itself empty,
     // since the deleted file was the only one) and clear the viewer.
-    m_folderModel->openFolderForFile(deletedPath);
+    m_folderModel->openFolderForFileAsync(deletedPath);
     m_originalImage = QImage();
     m_editStack.clear();
     m_liveAdjust = AdjustOp();

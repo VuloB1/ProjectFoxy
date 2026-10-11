@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QCollator>
+#include <QMetaObject>
+#include <QRunnable>
 #include <QUrl>
 #include <QRandomGenerator>
 #include <QSet>
@@ -16,6 +18,11 @@
 FolderModel::FolderModel(QObject *parent)
     : QAbstractListModel(parent)
 {
+    m_scanPool.setMaxThreadCount(1);
+    m_rescanTimer.setSingleShot(true);
+    m_rescanTimer.setInterval(400);
+    connect(&m_rescanTimer, &QTimer::timeout, this, &FolderModel::rescanCurrentFolder);
+    connect(&m_watcher, &QFileSystemWatcher::directoryChanged, &m_rescanTimer, qOverload<>(&QTimer::start));
     // m_thumbnailCache is a plain value member (not parented to `this`):
     // its lifetime is already tied to FolderModel via normal C++ member
     // destruction order, so it doesn't need Qt's parent/child ownership too.
@@ -59,22 +66,16 @@ QHash<int, QByteArray> FolderModel::roleNames() const
     };
 }
 
-void FolderModel::openFolderForFile(const QString &filePath)
-{
-    const QFileInfo info(filePath);
-    const QDir dir = info.dir();
+namespace {
 
-    // Moving between pictures of the same folder (every arrow key press) must not list, sort and
-    // reset the whole model again: that costs hundreds of ms on a big folder, on the UI thread,
-    // and rebuilds the filmstrip. The listing is only redone when the folder itself changed
-    // (a file added, removed or renamed moves its modification time) or the file is not in it.
-    const QString dirPath = dir.absolutePath();
-    const QDateTime modified = QFileInfo(dirPath).lastModified();
-    const int known = m_files.indexOf(info.absoluteFilePath());
-    if (known >= 0 && dirPath == m_scannedDir && modified.isValid() && modified == m_scannedModified) {
-        setCurrentIndexInternal(known, /*announceFilePath=*/false);
-        return;
-    }
+// Lists, filters and sorts the folder of `filePath`. Touches nothing shared, so it can run on a worker.
+FolderModel::Scan scanFolder(const QString &filePath)
+{
+    FolderModel::Scan scan;
+    const QDir dir = QFileInfo(filePath).dir();
+    scan.dir = dir.absolutePath();
+    // Read before listing: a change made during the listing then shows up as "modified" the next time.
+    scan.modified = QFileInfo(scan.dir).lastModified();
 
     // Matched by hand, ignoring case: a QDir name filter is case-sensitive on Linux, where "FOTO.JPG" must be found too.
     QSet<QString> extensions;
@@ -94,22 +95,98 @@ void FolderModel::openFolderForFile(const QString &filePath)
         return collator.compare(a.fileName(), b.fileName()) < 0;
     });
 
-    m_scannedDir = dirPath;
-    m_scannedModified = modified;
-    beginResetModel();
-    m_files.clear();
-    m_files.reserve(entries.size());
+    scan.files.reserve(entries.size());
     for (const auto &entry : entries)
-        m_files << entry.absoluteFilePath();
-    endResetModel();
-    emit countChanged();
+        scan.files << entry.absoluteFilePath();
+    return scan;
+}
 
-    const QString absolutePath = info.absoluteFilePath();
-    int index = m_files.indexOf(absolutePath);
+} // namespace
+
+FolderModel::~FolderModel()
+{
+    ++m_scanGeneration; // whatever a worker is still listing is not wanted
+    m_scanPool.waitForDone(); // it posts its result to this object
+}
+
+bool FolderModel::selectIfFolderUnchanged(const QString &filePath)
+{
+    // Moving between pictures of the same folder (every arrow key press) must not list, sort and
+    // reset the whole model again: that costs hundreds of ms on a big folder and rebuilds the
+    // filmstrip. The listing is only redone when the folder itself changed (a file added,
+    // removed or renamed moves its modification time) or the file is not in it.
+    const QFileInfo info(filePath);
+    const QString dirPath = info.dir().absolutePath();
+    const QDateTime modified = QFileInfo(dirPath).lastModified();
+    const int known = m_files.indexOf(info.absoluteFilePath());
+    if (known < 0 || dirPath != m_scannedDir || !modified.isValid() || modified != m_scannedModified)
+        return false;
+    setCurrentIndexInternal(known, /*announceFilePath=*/false);
+    return true;
+}
+
+void FolderModel::applyScan(const Scan &scan, const QString &filePath, int fallbackIndex)
+{
+    m_scannedDir = scan.dir;
+    m_scannedModified = scan.modified;
+    // Watch the folder just listed (one at a time). Where the file system cannot be watched (some network shares)
+    // addPath fails and the folder's modification time, checked on every move, still catches changes.
+    if (m_watcher.directories() != QStringList{scan.dir}) {
+        if (!m_watcher.directories().isEmpty())
+            m_watcher.removePaths(m_watcher.directories());
+        m_watcher.addPath(scan.dir);
+    }
+    // The same list again (a rescan that found nothing new) changes nothing: no reset, so the strip keeps its place.
+    if (scan.files != m_files) {
+        beginResetModel();
+        m_files = scan.files;
+        endResetModel();
+        emit countChanged();
+    }
+
+    int index = m_files.indexOf(QFileInfo(filePath).absoluteFilePath());
     if (index < 0 && !m_files.isEmpty())
-        index = 0; // opened file wasn't in the scanned list (unsupported ext, etc.)
+        index = qBound(0, fallbackIndex, int(m_files.size()) - 1); // not in the list (unsupported ext, deleted...)
 
     setCurrentIndexInternal(index, /*announceFilePath=*/false);
+}
+
+void FolderModel::openFolderForFile(const QString &filePath)
+{
+    ++m_scanGeneration; // an asynchronous listing still under way is now out of date
+    if (selectIfFolderUnchanged(filePath))
+        return;
+    applyScan(scanFolder(filePath), filePath);
+}
+
+void FolderModel::openFolderForFileAsync(const QString &filePath)
+{
+    startScan(filePath, 0);
+}
+
+void FolderModel::startScan(const QString &filePath, int fallbackIndex)
+{
+    const quint64 generation = ++m_scanGeneration;
+    if (selectIfFolderUnchanged(filePath))
+        return;
+    // A big or remote folder can take long to list: it is done on a worker and the strip fills in when it is ready.
+    // The newest request wins; an older one that finishes later is dropped.
+    m_scanPool.start(QRunnable::create([this, filePath, generation, fallbackIndex]() {
+        const Scan scan = scanFolder(filePath);
+        QMetaObject::invokeMethod(this, [this, scan, filePath, generation, fallbackIndex]() {
+            if (generation == m_scanGeneration)
+                applyScan(scan, filePath, fallbackIndex);
+        }, Qt::QueuedConnection);
+    }));
+}
+
+// Someone else added, removed or renamed a file in the folder on show: list it again, keeping the picture on show
+// (or, if that one is gone, the position it had).
+void FolderModel::rescanCurrentFolder()
+{
+    if (m_currentIndex < 0 || m_currentIndex >= m_files.size())
+        return;
+    startScan(m_files.at(m_currentIndex), m_currentIndex);
 }
 
 void FolderModel::setCurrentIndex(int index)

@@ -3,6 +3,9 @@
 #include "ThumbnailCache.h"
 #include <QAbstractListModel>
 #include <QDateTime>
+#include <QFileSystemWatcher>
+#include <QTimer>
+#include <QThreadPool>
 #include <QStringList>
 #include <QVariantMap>
 
@@ -33,6 +36,14 @@ public:
     Q_ENUM(Roles)
 
     explicit FolderModel(QObject *parent = nullptr);
+    ~FolderModel() override;
+
+    // One folder listing: the files (absolute paths, naturally sorted) and the folder's modification time when it was read.
+    struct Scan {
+        QString dir;
+        QDateTime modified;
+        QStringList files;
+    };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
@@ -53,6 +64,9 @@ public slots:
     // to filePath's position - without emitting currentFilePathChanged
     // (the caller already knows what it opened).
     void openFolderForFile(const QString &filePath);
+    // The same, without waiting for a listing that has to be redone: it runs on a worker and the model changes when it
+    // arrives (the newest call wins). Moving within an already listed, unchanged folder is still immediate.
+    void openFolderForFileAsync(const QString &filePath);
 
     // Navigation entry points for QML: these DO emit currentFilePathChanged.
     void setCurrentIndex(int index);
@@ -88,11 +102,19 @@ signals:
 
 private:
     void setCurrentIndexInternal(int index, bool announceFilePath);
+    bool selectIfFolderUnchanged(const QString &filePath);
+    void applyScan(const Scan &scan, const QString &filePath, int fallbackIndex = 0);
+    void startScan(const QString &filePath, int fallbackIndex);
+    void rescanCurrentFolder();
     void regenerateShuffleOrder();
 
     QStringList m_files; // absolute paths, naturally sorted
     QString m_scannedDir;          // folder m_files was listed from
     QDateTime m_scannedModified;   // that folder's modification time at the time of the listing
+    quint64 m_scanGeneration = 0;  // bumped by every request; a worker's result counts only if it is still the latest
+    QFileSystemWatcher m_watcher;  // the listed folder: a change made by someone else refreshes the strip
+    QTimer m_rescanTimer;          // waits for a burst of changes (a copy in progress) to settle
+    QThreadPool m_scanPool;        // one listing at a time; waited for in the destructor (its result is posted to this)
     int m_currentIndex = -1;
     core::ThumbnailCache m_thumbnailCache;
 

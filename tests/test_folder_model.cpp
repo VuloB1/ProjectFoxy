@@ -69,6 +69,105 @@ private slots:
         QCOMPARE(model.currentIndex(), 1);
     }
 
+    // The listing of a folder that has to be (re)read does not block the caller: the model fills in when the worker
+    // is done, and only the newest request counts.
+    void theAsyncOpenFillsTheModelLaterAndMovingWithinTheFolderIsImmediate()
+    {
+        FolderModel model;
+        const QString a = makePng(dir(), "a.png", 10);
+        const QString b = makePng(dir(), "b.png", 20);
+        QSignalSpy counts(&model, &FolderModel::countChanged);
+
+        model.openFolderForFileAsync(a);
+        QCOMPARE(model.count(), 0);                         // not yet: it is being listed
+        QTRY_COMPARE(model.count(), 2);
+        QCOMPARE(model.currentIndex(), 0);
+
+        QSignalSpy resets(&model, &QAbstractItemModel::modelReset);
+        model.openFolderForFileAsync(b);                    // same folder, unchanged: nothing to wait for
+        QCOMPARE(model.currentIndex(), 1);
+        QCOMPARE(resets.count(), 0);
+    }
+
+    void aNewerRequestMakesAnOlderListingIrrelevant()
+    {
+        QTemporaryDir other;
+        FolderModel model;
+        const QString a = makePng(dir(), "a.png", 10);
+        makePng(dir(), "a2.png", 10);
+        const QString z = makePng(QDir(other.path()), "z.png", 30);
+
+        model.openFolderForFileAsync(a);
+        model.openFolderForFileAsync(z);                    // asked for before the first listing is applied
+        QTRY_COMPARE(model.count(), 1);
+        QTest::qWait(100);                                  // the first listing must not arrive after and win
+        QCOMPARE(model.count(), 1);
+        QCOMPARE(model.filePaths().first(), QFileInfo(z).absoluteFilePath());
+    }
+
+    void aRescanThatFindsTheSameListDoesNotResetTheModel()
+    {
+        FolderModel model;
+        const QString a = makePng(dir(), "a.png", 10);
+        makePng(dir(), "b.png", 20);
+        model.openFolderForFile(a);
+        QSignalSpy resets(&model, &QAbstractItemModel::modelReset);
+        QTest::qWait(50);
+        // a file that is not a picture changes the folder's time but not the list
+        QFile notes(dir().filePath("notas.txt"));
+        QVERIFY(notes.open(QIODevice::WriteOnly));
+        notes.close();
+        model.openFolderForFile(a);
+        QCOMPARE(resets.count(), 0);
+        QCOMPARE(model.count(), 2);
+    }
+
+    // A picture added or removed by another program shows up in the strip by itself, and the picture on show stays on.
+    void theStripFollowsChangesMadeByOthers()
+    {
+        FolderModel model;
+        const QString a = makePng(dir(), "a.png", 10);
+        const QString c = makePng(dir(), "c.png", 30);
+        model.openFolderForFile(c);
+        QCOMPARE(model.count(), 2);
+        QCOMPARE(model.currentIndex(), 1);
+
+        QTest::qWait(50);
+        makePng(dir(), "b.png", 20);                         // lands between a and c
+        QTRY_COMPARE_WITH_TIMEOUT(model.count(), 3, 8000);
+        QCOMPARE(model.currentIndex(), 2);                   // still on c.png
+        QCOMPARE(model.filePaths().at(2), QFileInfo(c).absoluteFilePath());
+
+        QTest::qWait(50);
+        QVERIFY(QFile::remove(a));
+        QTRY_COMPARE_WITH_TIMEOUT(model.count(), 2, 8000);
+        QCOMPARE(model.currentIndex(), 1);
+    }
+
+    void whenThePictureOnShowIsDeletedTheStripStaysNearTheSamePlace()
+    {
+        FolderModel model;
+        makePng(dir(), "a.png", 10);
+        const QString b = makePng(dir(), "b.png", 20);
+        makePng(dir(), "c.png", 30);
+        model.openFolderForFile(b);
+        QCOMPARE(model.currentIndex(), 1);
+        QTest::qWait(50);
+        QVERIFY(QFile::remove(b));
+        QTRY_COMPARE_WITH_TIMEOUT(model.count(), 2, 8000);
+        QCOMPARE(model.currentIndex(), 1);                   // c.png took its place; not thrown back to the first
+    }
+
+    void destroyingTheModelWhileItListsIsSafe()
+    {
+        const QString a = makePng(dir(), "a.png", 10);
+        {
+            FolderModel model;
+            model.openFolderForFileAsync(a);
+        }
+        QTest::qWait(100); // the result posted to the dead model must not run
+    }
+
 #ifdef Q_OS_LINUX
     // Linux keeps "A.png" and "a.png" apart: both are listed, and neither is taken for the other.
     void namesThatDifferOnlyInCaseAreTwoFilesOnLinux()
