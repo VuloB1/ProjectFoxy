@@ -1866,7 +1866,40 @@ bool wallpaperViaDesktopTools(const QString &path)
         QProcess p;
         p.start(program, args);
         return p.waitForFinished(5000) && p.exitStatus() == QProcess::NormalExit && p.exitCode() == 0;
+    };
+    if (desktop.contains(QLatin1String("kde")))
+        return run(QStringLiteral("plasma-apply-wallpaperimage"), {path});
+    if (desktop.contains(QLatin1String("xfce"))) {
+        // One property per monitor/workspace: set them all.
+        QProcess list;
+        list.start(QStringLiteral("xfconf-query"), {QStringLiteral("-c"), QStringLiteral("xfce4-desktop"), QStringLiteral("-l")});
+        if (!list.waitForFinished(5000))
+            return false;
+        bool any = false;
+        for (const QString &prop : QString::fromUtf8(list.readAllStandardOutput()).split(QLatin1Char('\n'))) {
+            if (prop.endsWith(QLatin1String("/last-image")))
+                any = run(QStringLiteral("xfconf-query"), {QStringLiteral("-c"), QStringLiteral("xfce4-desktop"), QStringLiteral("-p"), prop, QStringLiteral("-s"), path}) || any;
+        }
+        return any;
     }
+    // GNOME, Cinnamon, MATE, Budgie, COSMIC... share the gsettings route with different schemas.
+    struct Schema { const char *name; const char *key; const char *keyDark; };
+    const Schema schemas[] = {
+        {"org.gnome.desktop.background", "picture-uri", "picture-uri-dark"},
+        {"org.cinnamon.desktop.background", "picture-uri", nullptr},
+        {"org.mate.background", "picture-filename", nullptr},
+    };
+    for (const Schema &s : schemas) {
+        const QString schema = QString::fromLatin1(s.name);
+        const QString value = (s.key == QLatin1String("picture-filename")) ? path : uri;
+        if (!run(QStringLiteral("gsettings"), {QStringLiteral("set"), schema, QString::fromLatin1(s.key), value}))
+            continue;
+        if (s.keyDark)
+            run(QStringLiteral("gsettings"), {QStringLiteral("set"), schema, QString::fromLatin1(s.keyDark), value});
+        return true;
+    }
+    return false;
+}
 
 } // namespace
 #endif
