@@ -2,6 +2,7 @@
 
 #include "AnimationPlayback.h"
 #include "DesktopWallpaper.h"
+#include "EffectPreview.h"
 #include "ImageLoader.h"
 #include "Histogram.h"
 #include "edit/EditStack.h"
@@ -190,13 +191,13 @@ public:
     bool canUndoEdit() const
     {
         const bool stack = m_editStack.canUndo() && (!m_toolSession || m_editStack.undoPosition() > m_toolSessionStart);
-        return stack || !m_effectId.isEmpty();
+        return stack || m_effect.active();
     }
     bool toolSessionActive() const { return m_toolSession; }
     // Something was done since the tool was opened (an edit, or an effect being previewed).
     bool toolSessionDirty() const
     {
-        return m_toolSession && (m_editStack.undoPosition() > m_toolSessionStart || !m_effectId.isEmpty());
+        return m_toolSession && (m_editStack.undoPosition() > m_toolSessionStart || m_effect.active());
     }
     bool canRedoEdit() const { return m_editStack.canRedo(); }
     bool hasEdits() const;
@@ -223,17 +224,17 @@ public:
     QVariantMap histogramChannels() const;
     QVariantMap adjustedHistogram() const;
 
-    QVariantList effectList() const;
-    QVariantList effectGroups() const;
-    QString effectId() const { return m_effectId; }
-    QVariantList effectParams() const;
-    QStringList effectPresets() const;
-    QVariantList effectOverlays() const;
-    QVariantList effectValues() const;
-    qreal effectMix() const { return m_effectMix; }
-    bool effectUsesText() const;
-    QString effectText() const { return m_effectText; }
-    bool effectBusy() const { return m_effectJobsRunning > 0 || m_effectDebounce.isActive(); }
+    QVariantList effectList() const { return EffectPreview::list(); }
+    QVariantList effectGroups() const { return EffectPreview::groups(); }
+    QString effectId() const { return m_effect.id(); }
+    QVariantList effectParams() const { return m_effect.params(); }
+    QStringList effectPresets() const { return m_effect.presets(); }
+    QVariantList effectOverlays() const { return m_effect.overlays(); }
+    QVariantList effectValues() const { return m_effect.values(); }
+    qreal effectMix() const { return m_effect.mix(); }
+    bool effectUsesText() const { return m_effect.usesText(); }
+    QString effectText() const { return m_effect.text(); }
+    bool effectBusy() const { return m_effect.busy(); }
 
     bool isAnimated() const { return m_animation.isAnimated(); }
     bool animationPlaying() const { return m_animation.playing(); }
@@ -308,13 +309,13 @@ public slots:
     // original - both refresh the preview. commitEffect() makes it permanent
     // (one undo step); cancelEffect() brings the untouched picture back.
     void selectEffect(const QString &id);
-    void setEffectValue(int index, qreal value);
-    void setEffectMix(qreal mix);
-    void setEffectText(const QString &text);
-    void resetEffectValues();
+    void setEffectValue(int index, qreal value) { m_effect.setValue(index, value); }
+    void setEffectMix(qreal mix) { m_effect.setMix(mix); }
+    void setEffectText(const QString &text) { m_effect.setText(text); }
+    void resetEffectValues() { m_effect.resetValues(); }
     // Sets every slider of the picked effect at once (one preview instead of one per slider).
-    void setEffectValues(const QVariantList &values);
-    void applyEffectPreset(int index);
+    void setEffectValues(const QVariantList &values) { m_effect.setValues(values); }
+    void applyEffectPreset(int index) { m_effect.applyPreset(index); }
     void commitEffect();
     void cancelEffect();
 
@@ -447,22 +448,6 @@ private:
     // effect previews, and putting the real picture back afterwards.
     void publishPicture(const QImage &image);
 
-    // --- Efectos plumbing -------------------------------------------------
-    // Forgets the effect being previewed (cancelling any calculation in flight)
-    // WITHOUT restoring the canvas - callers that replace the picture anyway
-    // (every structural edit, a new image) use this; cancelEffect() adds the
-    // restore.
-    void dropEffectPreview();
-    // Called after any parameter change: starts the quick preview and
-    // (re)arms the debounce timer that launches the exact full-size one.
-    void scheduleEffectPreview();
-    // stage 1 = preview computed on a shrunken copy and stretched back up;
-    // stage 2 = the effect on the real pixels.
-    void startEffectJob(int stage);
-    void finishEffectJob(int generation, int stage, const QImage &image, bool wasCancelled);
-    // structuralBaked() shrunk for the quick preview, cached.
-    QImage effectProxy() const;
-
     // The result of replaying m_editStack (crop/resize/rotate/flip) alone,
     // cached and only recomputed when the structural stack actually changes
     // - not on every brightness/contrast/filter tick, which would otherwise
@@ -472,9 +457,9 @@ private:
     QImage structuralBaked() const;
     void markStructuralDirty()
     {
-        dropEffectPreview(); // an uncommitted effect was computed from the old picture
+        m_effect.drop(); // an uncommitted effect was computed from the old picture (the canvas is not touched here)
         m_liveCoalesce.stop(); // the next slider move starts a new history entry
-        m_effectProxy = QImage();
+        m_effect.invalidateProxy();
         m_structuralDirty = true;
         m_histogramDirty = true;
         m_proxyDirty = true;
@@ -573,26 +558,10 @@ private:
     PendingAction m_afterSaveAction = PendingAction::None;
     QString m_afterSavePath;
 
-    // Efectos preview state. A "generation" is one set of parameters: any
-    // change starts a new one, which cancels the previous one's work (its
-    // `m_effectCancel` flag) so stale results are never shown.
-    QString m_effectId;
+    // Efectos: the picked effect, its sliders and the preview calculations (see EffectPreview.h).
+    EffectPreview m_effect;
     bool m_toolSession = false;
     size_t m_toolSessionStart = 0;
-    core::edit::EffectValues m_effectValues{};
-    double m_effectMix = 1.0;
-    QString m_effectText;
-    int m_effectGeneration = 0;
-    int m_effectJobsRunning = 0;
-    std::shared_ptr<std::atomic<bool>> m_effectCancel;
-    // The effect calculations run here (not on the application-wide pool), so the
-    // destructor can wait for exactly these - they hold `this` - and nothing else.
-    QThreadPool m_effectPool;
-    QTimer m_effectDebounce; // single-shot: starts the full-size calculation once the sliders rest
-    QImage m_effectFull;     // the exact full-size result for the current generation...
-    bool m_effectFullValid = false; // ...once it has been calculated
-    bool m_effectShown = false;     // a preview (not the real picture) is on the canvas
-    mutable QImage m_effectProxy;
 
     // Animated GIF/APNG playback. A still picture (one frame or none) leaves editing/crop/filters working exactly as
     // before, untouched by any of this.

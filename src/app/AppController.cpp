@@ -56,16 +56,19 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
     : QObject(parent)
     , m_provider(provider)
     , m_folderModel(folderModel)
+    , m_effect([this]() { return structuralBaked(); })
 {
-    m_effectPool.setMaxThreadCount(3); // the quick preview, the exact one, and one being cancelled
     m_savePool.setMaxThreadCount(1);   // one save at a time
     connect(&m_animation, &AnimationPlayback::frameChanged, this, &AppController::showAnimationFrame);
     connect(&m_animation, &AnimationPlayback::playingChanged, this, &AppController::animationPlayingChanged);
     connect(&m_wallpaper, &DesktopWallpaper::finished, this, &AppController::wallpaperResult);
     m_liveCoalesce.setSingleShot(true);
     m_liveCoalesce.setInterval(kLiveCoalesceMs);
-    m_effectDebounce.setSingleShot(true);
-    connect(&m_effectDebounce, &QTimer::timeout, this, [this]() { startEffectJob(2); });
+    connect(&m_effect, &EffectPreview::changed, this, &AppController::effectChanged);
+    connect(&m_effect, &EffectPreview::valuesChanged, this, &AppController::effectValuesChanged);
+    connect(&m_effect, &EffectPreview::busyChanged, this, &AppController::effectBusyChanged);
+    connect(&m_effect, &EffectPreview::activeChanged, this, &AppController::editStackChanged); // hasEdits() counts a previewed effect
+    connect(&m_effect, &EffectPreview::pictureReady, this, &AppController::publishPicture);
     refreshAdjustLut();
     refreshLookLut();
 
@@ -110,14 +113,7 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
 
 AppController::~AppController()
 {
-    // Stop any effect still being calculated and let the workers finish, so none can
-    // post its result to an object that no longer exists. The kernels poll the
-    // cancel flag between rows, so this is a short wait - and it is a complete one:
-    // a worker that outlived a timeout would be holding a dangling `this`.
-    m_effectDebounce.stop();
-    if (m_effectCancel)
-        m_effectCancel->store(true);
-    m_effectPool.waitForDone();
+    // The effect preview (m_effect) cancels and waits for its own workers.
     // A save that is still writing is allowed to finish: closing the program must not
     // leave a half-done file (the write is atomic, but the user asked for it).
     m_savePool.waitForDone();
@@ -335,7 +331,7 @@ bool AppController::hasEdits() const
     // LiveOps in the history do not count by themselves: what matters is whether
     // the picture would come out different from the original.
     return m_editStack.hasActivePixelOps() || !m_liveAdjust.isIdentity() || !m_liveFilterPreset.isEmpty()
-        || !m_effectId.isEmpty();
+        || m_effect.active();
 }
 
 core::edit::EditRecipe AppController::currentRecipe() const
@@ -474,11 +470,7 @@ QImage AppController::currentBaked() const
     // An effect that is only being previewed is part of what is on screen, so it is
     // part of what gets saved / copied - but it is NOT committed: the history is
     // not touched and the preview stays pending (the user can still cancel it).
-    if (!m_effectId.isEmpty() && m_effectMix > 0.0) {
-        img = (m_effectFullValid && !m_effectFull.isNull())
-                  ? m_effectFull // the exact full-size result, already calculated
-                  : core::edit::applyEffect(img, m_effectId, m_effectValues, m_effectMix, nullptr, m_effectText);
-    }
+    img = m_effect.applyTo(img);
     return core::edit::renderLiveOverlay(img, m_liveFilterPreset, m_liveFilterIntensity, m_liveAdjust);
 }
 
@@ -602,7 +594,7 @@ void AppController::endToolSession(bool keep)
 void AppController::undoEdit()
 {
     // With an effect being previewed, "undo" means "never mind that effect".
-    if (!m_effectId.isEmpty()) {
+    if (m_effect.active()) {
         cancelEffect();
         return;
     }
@@ -1075,141 +1067,6 @@ void AppController::applyFilterPreset(const QString &presetId, qreal intensity)
 
 // --- Efectos ------------------------------------------------------------------
 
-namespace {
-
-// The quick preview is calculated on a copy shrunk to this long side and then
-// stretched back to the real size; it is only worth the shortcut above
-// kEffectProxyThreshold.
-constexpr int kEffectProxySide = 1600;
-constexpr int kEffectProxyThreshold = 2200;
-// How long the sliders must rest before the exact full-size calculation starts
-// (shorter for small pictures, where it is nearly instant anyway).
-constexpr int kEffectSettleMs = 260;
-constexpr int kEffectSmallSettleMs = 40;
-
-} // namespace
-
-QVariantList AppController::effectList() const
-{
-    QVariantList list;
-    for (const core::edit::EffectSpec &fx : core::edit::allEffects()) {
-        QVariantMap m;
-        m.insert(QStringLiteral("id"), fx.id);
-        m.insert(QStringLiteral("name"), core::tr(fx.name));
-        m.insert(QStringLiteral("group"), fx.group);
-        m.insert(QStringLiteral("hidden"), fx.hidden);
-        m.insert(QStringLiteral("changesSize"), fx.changesSize);
-        list.append(m);
-    }
-    return list;
-}
-
-QVariantList AppController::effectGroups() const
-{
-    QVariantList list;
-    for (const core::edit::EffectGroup &group : core::edit::effectGroups()) {
-        QVariantMap m;
-        m.insert(QStringLiteral("id"), group.id);
-        m.insert(QStringLiteral("name"), core::tr(group.name));
-        list.append(m);
-    }
-    return list;
-}
-
-QVariantList AppController::effectParams() const
-{
-    QVariantList list;
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (!spec)
-        return list;
-    for (const core::edit::EffectParam &p : spec->params) {
-        QVariantMap m;
-        m.insert(QStringLiteral("label"), core::tr(p.label));
-        m.insert(QStringLiteral("min"), p.min);
-        m.insert(QStringLiteral("max"), p.max);
-        m.insert(QStringLiteral("def"), p.def);
-        m.insert(QStringLiteral("suffix"), p.suffix);
-        m.insert(QStringLiteral("integer"), p.integer);
-        m.insert(QStringLiteral("toggle"), p.toggle);
-        QStringList options;
-        for (const QString &o : p.options)
-            options << core::tr(o);
-        m.insert(QStringLiteral("options"), options);
-        m.insert(QStringLiteral("color"), p.color);
-        m.insert(QStringLiteral("seed"), p.seed);
-        m.insert(QStringLiteral("dependsOn"), p.dependsOn);
-        m.insert(QStringLiteral("dependsMask"), p.dependsMask);
-        m.insert(QStringLiteral("hint"), core::tr(p.hint));
-        list.append(m);
-    }
-    return list;
-}
-
-QStringList AppController::effectPresets() const
-{
-    QStringList names;
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (spec)
-        for (const core::edit::EffectPreset &p : spec->presets)
-            names << core::tr(p.name);
-    return names;
-}
-
-QVariantList AppController::effectOverlays() const
-{
-    QVariantList list;
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (!spec)
-        return list;
-    auto range = [spec](int index, double &lo, double &hi) {
-        if (index >= 0 && size_t(index) < spec->params.size()) {
-            lo = spec->params[size_t(index)].min;
-            hi = spec->params[size_t(index)].max;
-        }
-    };
-    for (const core::edit::EffectOverlay &o : spec->overlays) {
-        QVariantMap m;
-        const char *kind = o.kind == core::edit::EffectOverlay::Point ? "point" : o.kind == core::edit::EffectOverlay::VLine ? "vline" : "hline";
-        m.insert(QStringLiteral("kind"), QString::fromLatin1(kind));
-        m.insert(QStringLiteral("x"), o.x);
-        m.insert(QStringLiteral("y"), o.y);
-        m.insert(QStringLiteral("label"), core::tr(o.label));
-        m.insert(QStringLiteral("mapping"), o.mapping);
-        double xlo = 0, xhi = 1, ylo = 0, yhi = 1;
-        range(o.x, xlo, xhi);
-        range(o.y, ylo, yhi);
-        m.insert(QStringLiteral("xmin"), xlo);
-        m.insert(QStringLiteral("xmax"), xhi);
-        m.insert(QStringLiteral("ymin"), ylo);
-        m.insert(QStringLiteral("ymax"), yhi);
-        list.append(m);
-    }
-    return list;
-}
-
-QVariantList AppController::effectValues() const
-{
-    QVariantList list;
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (!spec)
-        return list;
-    for (size_t i = 0; i < spec->params.size() && i < m_effectValues.size(); ++i)
-        list.append(m_effectValues[i]);
-    return list;
-}
-
-QImage AppController::effectProxy() const
-{
-    if (m_effectProxy.isNull()) {
-        const QImage base = structuralBaked();
-        if (std::max(base.width(), base.height()) > kEffectProxySide)
-            m_effectProxy = base.scaled(kEffectProxySide, kEffectProxySide, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        else
-            m_effectProxy = base;
-    }
-    return m_effectProxy;
-}
-
 void AppController::publishPicture(const QImage &image)
 {
     m_provider->setImage(image);
@@ -1228,235 +1085,22 @@ void AppController::publishPicture(const QImage &image)
         emit structuralImageChanged();
 }
 
-void AppController::dropEffectPreview()
-{
-    m_effectDebounce.stop();
-    if (m_effectCancel) {
-        m_effectCancel->store(true); // anything still being calculated is now stale
-        m_effectCancel.reset();
-    }
-    ++m_effectGeneration;
-    m_effectFull = QImage();
-    m_effectFullValid = false;
-    m_effectShown = false;
-    if (m_effectId.isEmpty())
-        return;
-    m_effectId.clear();
-    m_effectValues = {};
-    m_effectMix = 1.0;
-    m_effectText.clear();
-    emit effectChanged();
-    emit effectValuesChanged();
-    emit effectBusyChanged();
-    emit editStackChanged(); // hasEdits() counts a previewed effect
-}
-
 void AppController::selectEffect(const QString &id)
 {
     if (m_originalImage.isNull() || isAnimated())
         return;
-    const core::edit::EffectSpec *spec = core::edit::findEffect(id);
-    if (!spec) {
+    if (!core::edit::findEffect(id)) { // an empty or unknown id cancels
         cancelEffect();
         return;
     }
-    if (id == m_effectId)
-        return;
-    const bool firstEffect = m_effectId.isEmpty();
-    m_effectId = id;
-    m_effectValues = core::edit::defaultEffectValues(*spec);
-    m_effectMix = 1.0;
-    m_effectText.clear();
-    emit effectChanged();
-    emit effectValuesChanged();
-    if (firstEffect)
-        emit editStackChanged(); // hasEdits() counts a previewed effect
-    scheduleEffectPreview();
-}
-
-void AppController::setEffectValue(int index, qreal value)
-{
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (!spec || index < 0 || size_t(index) >= spec->params.size())
-        return;
-    const core::edit::EffectParam &p = spec->params[size_t(index)];
-    double v = std::clamp(double(value), p.min, p.max);
-    if (p.integer)
-        v = std::round(v);
-    if (v == m_effectValues[size_t(index)])
-        return;
-    m_effectValues[size_t(index)] = v;
-    // The guides of "Estirar" only mean something while that direction is being stretched: moving one while its
-    // Horizontal / Vertical slider is at 100% (no stretch) would show nothing at all, so it starts stretching.
-    if (m_effectId == QLatin1String("stretch") && index >= 0 && index <= 3) {
-        const size_t scale = index <= 1 ? 4 : 5;
-        if (std::abs(m_effectValues[scale] - 100.0) < 0.5)
-            m_effectValues[scale] = 150.0;
-    }
-    emit effectValuesChanged();
-    scheduleEffectPreview();
-}
-
-bool AppController::effectUsesText() const
-{
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    return spec && spec->usesText;
-}
-
-void AppController::setEffectText(const QString &text)
-{
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (!spec || !spec->usesText || text == m_effectText)
-        return;
-    m_effectText = text.left(1000);
-    emit effectValuesChanged();
-    scheduleEffectPreview();
-}
-
-void AppController::setEffectMix(qreal mix)
-{
-    if (m_effectId.isEmpty())
-        return;
-    const double v = std::clamp(double(mix), 0.0, 1.0);
-    if (v == m_effectMix)
-        return;
-    m_effectMix = v;
-    emit effectValuesChanged();
-    scheduleEffectPreview();
-}
-
-void AppController::applyEffectPreset(int index)
-{
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (!spec || index < 0 || size_t(index) >= spec->presets.size())
-        return;
-    m_effectValues = core::edit::applyEffectPreset(*spec, spec->presets[size_t(index)], m_effectValues);
-    emit effectValuesChanged();
-    scheduleEffectPreview();
-}
-
-void AppController::setEffectValues(const QVariantList &values)
-{
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (!spec)
-        return;
-    bool changed = false;
-    for (int i = 0; i < values.size() && size_t(i) < spec->params.size(); ++i) {
-        const core::edit::EffectParam &p = spec->params[size_t(i)];
-        double v = std::clamp(values[i].toDouble(), p.min, p.max);
-        if (p.integer)
-            v = std::round(v);
-        if (v != m_effectValues[size_t(i)]) {
-            m_effectValues[size_t(i)] = v;
-            changed = true;
-        }
-    }
-    if (!changed)
-        return;
-    emit effectValuesChanged();
-    scheduleEffectPreview();
-}
-
-void AppController::resetEffectValues()
-{
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (!spec)
-        return;
-    m_effectValues = core::edit::defaultEffectValues(*spec);
-    m_effectMix = 1.0;
-    emit effectValuesChanged();
-    scheduleEffectPreview();
-}
-
-void AppController::scheduleEffectPreview()
-{
-    if (m_effectId.isEmpty() || m_originalImage.isNull())
-        return;
-
-    // A new generation: whatever the previous one is still calculating is stale.
-    if (m_effectCancel)
-        m_effectCancel->store(true);
-    m_effectCancel = std::make_shared<std::atomic<bool>>(false);
-    ++m_effectGeneration;
-    m_effectFull = QImage();
-    m_effectFullValid = false;
-
-    const QImage base = structuralBaked();
-    const core::edit::EffectSpec *spec = core::edit::findEffect(m_effectId);
-    if (spec && spec->fullSize) {
-        // Noise reduction only means something on the real pixels (a shrunken copy has already
-        // lost most of its noise): no quick approximation, just the exact result once the sliders rest.
-        m_effectDebounce.start(kEffectSettleMs);
-    } else if (std::max(base.width(), base.height()) > kEffectProxyThreshold) {
-        startEffectJob(1); // approximate, immediately...
-        m_effectDebounce.start(kEffectSettleMs); // ...exact once the sliders rest
-    } else {
-        m_effectDebounce.start(kEffectSmallSettleMs);
-    }
-    emit effectBusyChanged();
-}
-
-void AppController::startEffectJob(int stage)
-{
-    if (m_effectId.isEmpty() || !m_effectCancel)
-        return;
-    const QImage base = structuralBaked();
-    if (base.isNull())
-        return;
-
-    const QImage input = stage == 1 ? effectProxy() : base;
-    const QString id = m_effectId;
-    const core::edit::EffectValues values = m_effectValues;
-    const double mix = m_effectMix;
-    const int generation = m_effectGeneration;
-    const std::shared_ptr<std::atomic<bool>> cancel = m_effectCancel;
-    // What the exact result measures: the same as the picture, unless the effect changes the size.
-    const QString text = m_effectText;
-    const QSize fullSize = core::edit::effectOutputSize(id, values, base.size(), text);
-
-    ++m_effectJobsRunning;
-    emit effectBusyChanged();
-
-    // m_effectPool runs this task; its row bands go to the dedicated
-    // rowWorkerPool (see ParallelRows.h), so waiting on them cannot deadlock.
-    m_effectPool.start(QRunnable::create([=, this]() {
-        QImage out = core::edit::applyEffect(input, id, values, mix, cancel.get(), text);
-        const bool cancelled = cancel->load();
-        if (cancelled)
-            out = QImage(); // a stale, half-written result: do not carry a full-size buffer around until the GUI thread discards it
-        else if (out.size() != fullSize)
-            out = out.scaled(fullSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        QMetaObject::invokeMethod(
-            this, [this, generation, stage, out, cancelled]() { finishEffectJob(generation, stage, out, cancelled); },
-            Qt::QueuedConnection);
-    }));
-}
-
-void AppController::finishEffectJob(int generation, int stage, const QImage &image, bool wasCancelled)
-{
-    --m_effectJobsRunning;
-    const bool current = !wasCancelled && generation == m_effectGeneration && !m_effectId.isEmpty();
-    if (current) {
-        if (stage == 2) {
-            m_effectFull = image;
-            m_effectFullValid = true;
-            m_effectShown = true;
-            publishPicture(image);
-        } else if (!m_effectFullValid) { // the approximate one, unless the exact one already beat it
-            m_effectShown = true;
-            publishPicture(image);
-        }
-    }
-    emit effectBusyChanged();
+    m_effect.select(id);
 }
 
 void AppController::cancelEffect()
 {
-    if (m_effectId.isEmpty())
+    if (!m_effect.active())
         return;
-    const bool shown = m_effectShown;
-    dropEffectPreview();
-    if (shown)
+    if (m_effect.drop()) // a preview was on the canvas: bring the real picture back
         publishPicture(structuralBaked());
 }
 
@@ -1467,19 +1111,19 @@ void AppController::commitEffect()
 
 void AppController::commitPendingEffect(bool republish)
 {
-    if (m_effectId.isEmpty() || m_originalImage.isNull())
+    if (!m_effect.active() || m_originalImage.isNull())
         return;
-    if (m_effectMix <= 0.0) { // nothing would change
+    if (m_effect.mix() <= 0.0) { // nothing would change
         cancelEffect();
         return;
     }
 
-    const core::edit::EffectOp op{m_effectId, m_effectValues, m_effectMix, m_effectText};
+    const core::edit::EffectOp op = m_effect.operation();
     // When the exact full-size result for these very settings is already
     // there, it IS what replaying the stack would produce - reuse it instead of
     // calculating it a second time.
-    const bool exact = m_effectFullValid && m_effectCancel && !m_effectCancel->load();
-    const QImage full = m_effectFull;
+    const bool exact = m_effect.exactReady();
+    const QImage full = m_effect.exactResult();
 
     m_editStack.push(op);
     markStructuralDirty(); // also drops the preview state
@@ -1550,7 +1194,7 @@ bool AppController::startSave(const QString &path)
     // then put the screen back to a state the file contradicts. (When the exact result
     // is already calculated this is instant; otherwise the effect is calculated by the
     // worker below, not here.)
-    if (!m_effectId.isEmpty())
+    if (m_effect.active())
         commitPendingEffect(false);
 
     // ---- the snapshot: everything the worker needs, taken now, immutable from here on.
