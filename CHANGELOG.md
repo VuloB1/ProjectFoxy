@@ -3,6 +3,13 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.2.4] — Lighter on large photos
+
+- Large photos (about 21 megapixels and up) use much less graphics memory: while one is shown fitted to the window,
+  or with only tone and colour edits, a reduced copy is drawn instead of the whole image (on a 37-megapixel test photo
+  the graphics memory in the viewer went from 236 MB to 93 MB, and with a tone edit from 616 MB to 196 MB). Zooming in
+  or using sharpness, clarity or grain switches to the full picture, so what you see is what you save.
+
 ## [0.2.3] — Safer and smoother
 
 - Animated GIF, APNG and WebP files are opened within memory limits (file size, picture size, total decoded size and
@@ -82,6 +89,14 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.2.4] — Más liviano con fotos grandes
+
+- Las fotos grandes (de unos 21 megapíxeles en adelante) usan mucha menos memoria gráfica: mientras una se ve ajustada a
+  la ventana, o con solo ediciones de tono y color, se dibuja una copia reducida en vez de la imagen entera (con una foto
+  de prueba de 37 megapíxeles, la memoria gráfica en el visor pasó de 236 MB a 93 MB, y con un ajuste de tono de 616 MB a
+  196 MB). Al acercar el zoom o usar nitidez, claridad o grano se pasa a la imagen completa, así que lo que ves es lo que
+  guardás.
 
 ## [0.2.3] — Más seguro y fluido
 
