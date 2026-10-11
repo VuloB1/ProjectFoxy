@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.3" date="2026-10-11">
+      <description>
+        <p>Safer and smoother: memory limits for animated files, quicker HEIC thumbnails, the wallpaper request no longer freezes the window on Linux, and the folder is listed in the background and follows changes made by other programs.</p>
+      </description>
+    </release>
     <release version="0.2.2" date="2026-10-11">
       <description>
         <p>Robustness: closing the program during an export no longer risks a crash, thumbnails follow the freedesktop specification, and a release can no longer carry a version number different from the program's.</p>
