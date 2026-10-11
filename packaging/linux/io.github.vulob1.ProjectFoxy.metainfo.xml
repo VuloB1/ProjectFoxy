@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.4" date="2026-10-11">
+      <description>
+        <p>Large photos use much less graphics memory: while a big picture is shown fitted to the window, a reduced copy is drawn instead of the whole image.</p>
+      </description>
+    </release>
     <release version="0.2.3" date="2026-10-11">
       <description>
         <p>Safer and smoother: memory limits for animated files, quicker HEIC thumbnails, the wallpaper request no longer freezes the window on Linux, and the folder is listed in the background and follows changes made by other programs.</p>
