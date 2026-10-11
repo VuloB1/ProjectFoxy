@@ -19,8 +19,22 @@ namespace core {
 // and decoded via QImage::fromData - reusing Qt's own PNG codec rather than
 // re-implementing deflate/PNG filtering - then composited frame-over-frame
 // per the APNG spec's dispose/blend rules.
+//
+// Memory is bounded (a valid file can still be absurdly big): see Limits. A file over the input or canvas limit is
+// refused with an error; an animation whose decoded frames would pass the byte or frame limit is cut short at the
+// frames that fit (the first one is always kept), so the picture still opens.
 class AnimatedDecoder : public IImageDecoder {
 public:
+    struct Limits {
+        qint64 maxInputBytes = 512LL * 1024 * 1024;       // the file itself (APNG and WebP are read whole)
+        qint64 maxCanvasPixels = 100LL * 1000 * 1000;      // one frame's canvas
+        qint64 maxAnimationBytes = 1024LL * 1024 * 1024;   // all decoded frames together
+        int maxFrames = 10000;
+    };
+    // Process-wide; meant for tests (set it before any decode runs, not while one is in progress).
+    static void setLimits(const Limits &limits);
+    static Limits limits();
+
     bool canDecode(const QString &filePath) const override;
     DecodeResult decode(const QString &filePath, QSize maxSize = QSize()) override;
     QStringList supportedExtensions() const override;

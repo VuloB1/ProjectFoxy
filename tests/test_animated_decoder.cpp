@@ -8,6 +8,14 @@
 #define FIXTURES_DIR "."
 #endif
 
+namespace {
+// Puts the process-wide limits back when a test that lowered them ends.
+struct LimitsGuard {
+    core::AnimatedDecoder::Limits saved = core::AnimatedDecoder::limits();
+    ~LimitsGuard() { core::AnimatedDecoder::setLimits(saved); }
+};
+} // namespace
+
 class TestAnimatedDecoder : public QObject {
     Q_OBJECT
 private slots:
@@ -84,6 +92,73 @@ private slots:
         QVERIFY(result.frames[0] != result.frames[1]);
         QVERIFY(result.frames[1] != result.frames[2]);
         QVERIFY(result.frames[2] != result.frames[3]);
+    }
+
+    // ---- memory limits (a valid file can still be absurdly big)
+
+    // The frames that fit are kept, the first one always; the picture still opens.
+    void anAnimationOverTheByteLimitIsCutShort()
+    {
+        LimitsGuard guard;
+        auto limits = guard.saved;
+        limits.maxAnimationBytes = 200 * 200 * 4 * 2; // two 200x200 frames
+        core::AnimatedDecoder::setLimits(limits);
+        core::AnimatedDecoder decoder;
+        for (const char *file : {"/test_animation.gif", "/test_animation.png"}) {
+            const core::DecodeResult result = decoder.decode(QString(FIXTURES_DIR) + QLatin1String(file));
+            QVERIFY2(result.ok, file);
+            QCOMPARE(result.frames.size(), 2);
+            QCOMPARE(result.frameDelaysMs.size(), 2);
+        }
+    }
+
+    void theFrameCountLimitAlsoCutsAnAnimation()
+    {
+        LimitsGuard guard;
+        auto limits = guard.saved;
+        limits.maxFrames = 3;
+        core::AnimatedDecoder::setLimits(limits);
+        core::AnimatedDecoder decoder;
+        const core::DecodeResult result = decoder.decode(QStringLiteral(FIXTURES_DIR "/test_animation.gif"));
+        QVERIFY(result.ok);
+        QCOMPARE(result.frames.size(), 3);
+    }
+
+    void aCanvasOverTheLimitIsRefused()
+    {
+        LimitsGuard guard;
+        auto limits = guard.saved;
+        limits.maxCanvasPixels = 100 * 100; // the fixtures are 200x200
+        core::AnimatedDecoder::setLimits(limits);
+        core::AnimatedDecoder decoder;
+        for (const char *file : {"/test_animation.gif", "/test_animation.png"}) {
+            const core::DecodeResult result = decoder.decode(QString(FIXTURES_DIR) + QLatin1String(file));
+            QVERIFY2(!result.ok, file);
+            QVERIFY(!result.error.isEmpty());
+        }
+    }
+
+    void aFileOverTheInputLimitIsRefused()
+    {
+        LimitsGuard guard;
+        auto limits = guard.saved;
+        limits.maxInputBytes = 100;
+        core::AnimatedDecoder::setLimits(limits);
+        core::AnimatedDecoder decoder;
+        QVERIFY(!decoder.decode(QStringLiteral(FIXTURES_DIR "/test_animation.png")).ok);
+    }
+
+    void aPreviewIsAlwaysOneFrameWhateverTheLimits()
+    {
+        LimitsGuard guard;
+        auto limits = guard.saved;
+        limits.maxAnimationBytes = 1; // not even one frame "fits", yet the first is always kept
+        core::AnimatedDecoder::setLimits(limits);
+        core::AnimatedDecoder decoder;
+        const core::DecodeResult result = decoder.decode(QStringLiteral(FIXTURES_DIR "/test_animation.gif"));
+        QVERIFY(result.ok);
+        QVERIFY(result.frames.isEmpty()); // a single frame is a still picture, not an animation
+        QVERIFY(!result.image.isNull());
     }
 };
 
