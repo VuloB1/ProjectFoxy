@@ -100,6 +100,8 @@ add_library(imageviewer_app STATIC
     src/app/DesktopWallpaper.cpp
     src/app/EffectPreview.h
     src/app/EffectPreview.cpp
+    src/app/SaveCoordinator.h
+    src/app/SaveCoordinator.cpp
     src/app/ThemeManager.h
     src/app/ThemeManager.cpp
     src/app/AppPaths.h

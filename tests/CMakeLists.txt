@@ -54,6 +54,11 @@ add_executable(test_collage_studio test_collage_studio.cpp)
 target_link_libraries(test_collage_studio PRIVATE imageviewer_app imageviewer_core Qt6::Test)
 add_test(NAME test_collage_studio COMMAND test_collage_studio)
 
+# Saving on its own thread, and the open/paste requests that wait for a save.
+add_executable(test_save_coordinator test_save_coordinator.cpp)
+target_link_libraries(test_save_coordinator PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_save_coordinator COMMAND test_save_coordinator)
+
 # The effect preview (Efectos): the picked effect, its sliders and the calculations behind them.
 add_executable(test_effect_preview test_effect_preview.cpp)
 target_link_libraries(test_effect_preview PRIVATE imageviewer_app imageviewer_core Qt6::Test)

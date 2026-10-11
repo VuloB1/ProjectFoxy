@@ -58,7 +58,7 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
     , m_folderModel(folderModel)
     , m_effect([this]() { return structuralBaked(); })
 {
-    m_savePool.setMaxThreadCount(1);   // one save at a time
+    connect(&m_save, &SaveCoordinator::finished, this, &AppController::finishSave);
     connect(&m_animation, &AnimationPlayback::frameChanged, this, &AppController::showAnimationFrame);
     connect(&m_animation, &AnimationPlayback::playingChanged, this, &AppController::animationPlayingChanged);
     connect(&m_wallpaper, &DesktopWallpaper::finished, this, &AppController::wallpaperResult);
@@ -88,8 +88,7 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
                 // from disk if they answer "save" or "discard").
                 if (currentRecipe() != m_loadStartRecipe && isDirty()) {
                     m_isLoading = false;
-                    m_pendingAction = PendingAction::OpenPath;
-                    m_pendingPath = doc.filePath;
+                    m_save.blockOnUnsaved(PendingAction::OpenPath, doc.filePath);
                     if (!m_currentFilePath.isEmpty())
                         m_folderModel->openFolderForFileAsync(m_currentFilePath);
                     emit isLoadingChanged();
@@ -114,9 +113,7 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
 AppController::~AppController()
 {
     // The effect preview (m_effect) cancels and waits for its own workers.
-    // A save that is still writing is allowed to finish: closing the program must not
-    // leave a half-done file (the write is atomic, but the user asked for it).
-    m_savePool.waitForDone();
+    // The save coordinator (m_save) lets a save that is still writing finish.
 }
 
 QStringList AppController::supportedExtensions() const
@@ -143,17 +140,15 @@ void AppController::loadPath(const QString &path)
 {
     // A save is still writing this picture's file: wait for it, then go (the picture is
     // clean by then unless it was edited meanwhile, and the usual question follows).
-    if (m_saving) {
-        m_afterSaveAction = PendingAction::OpenPath;
-        m_afterSavePath = path;
+    if (m_save.saving()) {
+        m_save.afterSave(PendingAction::OpenPath, path);
         return;
     }
 
     // Replacing the picture would throw away edits nobody has saved: do nothing yet
     // and let the UI ask (it calls resolveUnsaved() with the answer).
-    if (isDirty() && !m_discardApproved) {
-        m_pendingAction = PendingAction::OpenPath;
-        m_pendingPath = path;
+    if (isDirty() && !m_save.discardApproved()) {
+        m_save.blockOnUnsaved(PendingAction::OpenPath, path);
         // The folder strip already moved to the requested file; put it back on the
         // one that is still showing.
         if (!m_currentFilePath.isEmpty())
@@ -351,14 +346,14 @@ bool AppController::isDirty() const
 
 bool AppController::canSaveInPlace() const
 {
-    if (m_isLoading || m_saving || m_currentFilePath.isEmpty())
+    if (m_isLoading || m_save.saving() || m_currentFilePath.isEmpty())
         return false;
     return core::supportedSaveExtensions().contains(QFileInfo(m_currentFilePath).suffix().toLower());
 }
 
 bool AppController::saveBlocked()
 {
-    if (!m_isLoading && !m_saving)
+    if (!m_isLoading && !m_save.saving())
         return false;
     m_errorString = m_isLoading
         ? core::tr("Espera a que termine de cargarse la otra imagen antes de guardar.")
@@ -1197,67 +1192,40 @@ bool AppController::startSave(const QString &path)
     if (m_effect.active())
         commitPendingEffect(false);
 
-    // ---- the snapshot: everything the worker needs, taken now, immutable from here on.
-    // QImage is copy-on-write, so holding these costs no pixels; the history and the
-    // live overlay are small records.
-    const QImage original = m_originalImage;
-    const std::vector<core::edit::Operation> ops = m_editStack.activePixelOps();
-    const QImage structural = m_structuralDirty ? QImage() : m_structuralBaked; // null: the worker replays `ops`
-    const AdjustOp adjust = m_liveAdjust;
-    const QString lookId = m_liveFilterPreset;
-    const double lookAmount = m_liveFilterIntensity;
-    const core::edit::EditRecipe recipe = currentRecipe();
-    const quint64 serial = m_docSerial;
+    // ---- the snapshot: everything the worker needs, taken now, immutable from here on (see SaveJob).
+    SaveJob job;
+    job.original = m_originalImage;
+    job.ops = m_editStack.activePixelOps();
+    job.structural = m_structuralDirty ? QImage() : m_structuralBaked; // null: the worker replays `ops`
+    job.adjust = m_liveAdjust;
+    job.lookId = m_liveFilterPreset;
+    job.lookAmount = m_liveFilterIntensity;
+    job.recipe = currentRecipe();
+    job.serial = m_docSerial;
+    job.path = path;
 
     // The file is written atomically (a failure leaves the original untouched),
     // JPEG/WebP at high quality, and the original's camera / GPS / date information
     // travels with the picture - see core::saveImageWithOptions(). The colour profile
     // does NOT come from the original: the pixels are sRGB, and the file is tagged so.
-    core::SaveOptions options;
     if (!m_currentFilePath.isEmpty() && QFileInfo::exists(m_currentFilePath))
-        options.metadataSource = m_currentFilePath;
-    options.iccProfile = m_iccProfile; // empty (the normal case) = write an sRGB profile
+        job.options.metadataSource = m_currentFilePath;
+    job.options.iccProfile = m_iccProfile; // empty (the normal case) = write an sRGB profile
 
     m_errorString.clear();
-    m_saving = true;
+    m_save.start(std::move(job));
     emit errorStringChanged();
     emit isSavingChanged();
-
-    m_savePool.start(QRunnable::create([=, this]() {
-        SaveOutcome outcome;
-        outcome.serial = serial;
-        outcome.recipe = recipe;
-        outcome.path = path;
-
-        QImage base = structural;
-        if (base.isNull()) {
-            base = core::edit::bakeOperations(original, ops);
-            outcome.structural = base; // handed back so the UI can reuse it instead of recalculating
-            outcome.ops = ops;
-        }
-        const QImage rendered = core::edit::renderLiveOverlay(base, lookId, lookAmount, adjust);
-        if (rendered.isNull()) {
-            outcome.error = core::tr("No hay imagen que guardar");
-        } else {
-            const core::SaveResult result = core::saveImageWithOptions(rendered, path, options);
-            outcome.ok = result.ok;
-            outcome.error = result.error;
-            outcome.warning = result.warning;
-        }
-        QMetaObject::invokeMethod(this, [this, outcome]() { finishSave(outcome); }, Qt::QueuedConnection);
-    }));
     return true;
 }
 
 void AppController::finishSave(const SaveOutcome &outcome)
 {
-    m_saving = false;
-    emit isSavingChanged();
+    emit isSavingChanged(); // (m_save.saving() is already false)
 
-    const PendingAction after = m_afterSaveAction;
-    const QString afterPath = m_afterSavePath;
-    m_afterSaveAction = PendingAction::None;
-    m_afterSavePath.clear();
+    const PendingRequest afterRequest = m_save.takeAfterSave();
+    const PendingAction after = afterRequest.action;
+    const QString afterPath = afterRequest.path;
 
     if (!outcome.ok) {
         m_errorString = core::tr("No se pudo guardar «%1»: %2")
@@ -1299,30 +1267,26 @@ void AppController::finishSave(const SaveOutcome &outcome)
 
 void AppController::resolveUnsaved(const QString &choice)
 {
-    const PendingAction action = m_pendingAction;
-    const QString path = m_pendingPath;
-    m_pendingAction = PendingAction::None;
-    m_pendingPath.clear();
+    const PendingRequest request = m_save.takeBlocked();
+    const PendingAction action = request.action;
+    const QString path = request.path;
     if (action == PendingAction::None || choice == QLatin1String("cancel"))
         return; // (loadPath already put the folder strip back on the open picture)
 
     if (choice == QLatin1String("save")) {
         // Save first; the picture that was asked for is opened when the file is on disk.
-        m_afterSaveAction = action;
-        m_afterSavePath = path;
-        if (!saveEdited()) { // refused: stay, with the error on screen
-            m_afterSaveAction = PendingAction::None;
-            m_afterSavePath.clear();
-        }
+        m_save.afterSave(action, path);
+        if (!saveEdited()) // refused: stay, with the error on screen
+            m_save.takeAfterSave();
         return;
     }
 
-    m_discardApproved = true;
+    m_save.setDiscardApproved(true);
     if (action == PendingAction::OpenPath)
         loadPath(path);
     else
         pasteFromClipboard();
-    m_discardApproved = false;
+    m_save.setDiscardApproved(false);
 }
 
 bool AppController::copyToClipboard()
@@ -1340,14 +1304,12 @@ bool AppController::pasteFromClipboard()
 
     const QImage img = clipboard->image();
     if (!img.isNull()) {
-        if (m_saving) { // see loadPath()
-            m_afterSaveAction = PendingAction::Paste;
-            m_afterSavePath.clear();
+        if (m_save.saving()) { // see loadPath()
+            m_save.afterSave(PendingAction::Paste);
             return false;
         }
-        if (isDirty() && !m_discardApproved) {
-            m_pendingAction = PendingAction::Paste;
-            m_pendingPath.clear();
+        if (isDirty() && !m_save.discardApproved()) {
+            m_save.blockOnUnsaved(PendingAction::Paste);
             emit unsavedChangesBlocked();
             return false;
         }
@@ -1389,7 +1351,7 @@ bool AppController::deleteCurrentFile()
 {
     if (m_currentFilePath.isEmpty())
         return false;
-    if (m_saving) { // the writer is about to (re)create this very file
+    if (m_save.saving()) { // the writer is about to (re)create this very file
         m_errorString = core::tr("No se puede eliminar el archivo mientras se guarda.");
         emit errorStringChanged();
         return false;
