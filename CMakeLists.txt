@@ -98,6 +98,8 @@ add_library(imageviewer_app STATIC
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
     src/app/DesktopWallpaper.cpp
+    src/app/EffectPreview.h
+    src/app/EffectPreview.cpp
     src/app/ThemeManager.h
     src/app/ThemeManager.cpp
     src/app/AppPaths.h

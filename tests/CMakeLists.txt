@@ -54,6 +54,11 @@ add_executable(test_collage_studio test_collage_studio.cpp)
 target_link_libraries(test_collage_studio PRIVATE imageviewer_app imageviewer_core Qt6::Test)
 add_test(NAME test_collage_studio COMMAND test_collage_studio)
 
+# The effect preview (Efectos): the picked effect, its sliders and the calculations behind them.
+add_executable(test_effect_preview test_effect_preview.cpp)
+target_link_libraries(test_effect_preview PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_effect_preview COMMAND test_effect_preview)
+
 # Playback of an animated picture in the viewer.
 add_executable(test_animation_playback test_animation_playback.cpp)
 target_link_libraries(test_animation_playback PRIVATE imageviewer_app imageviewer_core Qt6::Test)
