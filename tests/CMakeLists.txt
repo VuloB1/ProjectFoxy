@@ -54,6 +54,11 @@ add_executable(test_collage_studio test_collage_studio.cpp)
 target_link_libraries(test_collage_studio PRIVATE imageviewer_app imageviewer_core Qt6::Test)
 add_test(NAME test_collage_studio COMMAND test_collage_studio)
 
+# Playback of an animated picture in the viewer.
+add_executable(test_animation_playback test_animation_playback.cpp)
+target_link_libraries(test_animation_playback PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_animation_playback COMMAND test_animation_playback)
+
 # The picture provider and its display proxy (a reduced copy for the canvas).
 add_executable(test_image_provider test_image_provider.cpp)
 target_link_libraries(test_image_provider PRIVATE imageviewer_app imageviewer_core Qt6::Test)
