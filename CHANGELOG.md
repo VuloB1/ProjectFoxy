@@ -3,6 +3,18 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.2.3] — Safer and smoother
+
+- Animated GIF, APNG and WebP files are opened within memory limits (file size, picture size, total decoded size and
+  number of frames). A file over the limits is refused with a message; an animation too long for them plays the frames
+  that fit.
+- HEIC/AVIF previews (the thumbnail strip) use the thumbnail stored in the file when it is big enough, instead of
+  decoding the whole picture.
+- Linux: setting the wallpaper no longer freezes the window; the real answer of the desktop portal is awaited and a
+  notice says whether it worked (Windows shows the notice too).
+- The folder is listed in the background, so a big or slow folder does not block the window, and the thumbnail strip
+  follows files added, removed or renamed by other programs, staying on the picture you are viewing.
+
 ## [0.2.2] — Robustness
 
 - Closing the program while a batch export, an animation or a collage is being written (or while the lens database
@@ -70,6 +82,18 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.2.3] — Más seguro y fluido
+
+- Los GIF, APNG y WebP animados se abren dentro de límites de memoria (tamaño del archivo, de la imagen, total
+  decodificado y cantidad de fotogramas). Un archivo que los pasa se rechaza con un mensaje; una animación demasiado
+  larga reproduce los fotogramas que caben.
+- Las vistas previas de HEIC/AVIF (la barra de miniaturas) usan la miniatura guardada en el archivo cuando es lo bastante
+  grande, en vez de decodificar toda la imagen.
+- Linux: poner el fondo de escritorio ya no congela la ventana; se espera la respuesta real del portal del escritorio y
+  un aviso dice si funcionó (Windows también muestra el aviso).
+- La carpeta se lista en segundo plano, así una carpeta grande o lenta no bloquea la ventana, y la barra de miniaturas
+  sigue los archivos agregados, quitados o renombrados por otros programas, sin salirse de la imagen que estás viendo.
 
 ## [0.2.2] — Robustez
 
