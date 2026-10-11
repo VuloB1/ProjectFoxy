@@ -94,6 +94,10 @@ add_subdirectory(src/core)
 add_library(imageviewer_app STATIC
     src/app/AppController.h
     src/app/AppController.cpp
+    src/app/AnimationPlayback.h
+    src/app/AnimationPlayback.cpp
+    src/app/DesktopWallpaper.h
+    src/app/DesktopWallpaper.cpp
     src/app/ThemeManager.h
     src/app/ThemeManager.cpp
     src/app/AppPaths.h

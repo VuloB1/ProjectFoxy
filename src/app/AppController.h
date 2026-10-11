@@ -1,5 +1,7 @@
 #pragma once
 
+#include "AnimationPlayback.h"
+#include "DesktopWallpaper.h"
 #include "ImageLoader.h"
 #include "Histogram.h"
 #include "edit/EditStack.h"
@@ -233,8 +235,8 @@ public:
     QString effectText() const { return m_effectText; }
     bool effectBusy() const { return m_effectJobsRunning > 0 || m_effectDebounce.isActive(); }
 
-    bool isAnimated() const { return m_animationFrames.size() > 1; }
-    bool animationPlaying() const { return m_animationPlaying; }
+    bool isAnimated() const { return m_animation.isAnimated(); }
+    bool animationPlaying() const { return m_animation.playing(); }
 
 public slots:
     void retranslate() { emit textsChanged(); emit effectChanged(); }
@@ -242,7 +244,7 @@ public slots:
     // requested state). Play/pause only - there's no scrubbing to a
     // specific frame yet, matching the scope of the feature (view/play,
     // not frame-by-frame editing).
-    void setAnimationPlaying(bool playing);
+    void setAnimationPlaying(bool playing) { m_animation.setPlaying(playing); }
     void openFile(const QUrl &fileUrl);
     void openPath(const QString &filePath);
 
@@ -500,10 +502,8 @@ private:
     // both the async loader's `loaded` handler and pasteFromClipboard(),
     // which has no file to hand the loader in the first place).
     void applyNewDocument(const core::ImageDocument &doc);
-    // m_animationTimer's timeout handler: publishes the next frame through
-    // ImageProvider exactly like republishBaked() does for an edit, then
-    // reschedules itself for that new frame's own delay.
-    void advanceAnimationFrame();
+    // m_animation's next frame is due: publishes it through ImageProvider.
+    void showAnimationFrame(const QImage &frame);
 
     core::ImageLoader m_loader;
     ImageProvider *m_provider = nullptr;
@@ -564,12 +564,6 @@ private:
     // Saving. One at a time; the work runs on m_savePool (which the destructor waits
     // for: the worker posts its result back to `this`).
     QThreadPool m_savePool;
-#ifndef _WIN32
-    // Linux wallpaper: the worker writes the picture and runs the desktop's tool; the result is finished on this thread.
-    QThreadPool m_wallpaperPool;
-    bool m_settingWallpaper = false;
-    void finishWallpaper(const QString &path, bool done);
-#endif
     bool m_saving = false;
     // Which document the running save belongs to: bumped by every applyNewDocument().
     quint64 m_docSerial = 0;
@@ -600,14 +594,11 @@ private:
     bool m_effectShown = false;     // a preview (not the real picture) is on the canvas
     mutable QImage m_effectProxy;
 
-    // Animated GIF/APNG playback state. Empty/size-1 frames means the
-    // current image is a plain static one - editing/crop/filters keep
-    // working exactly as before in that case, untouched by any of this.
-    QVector<QImage> m_animationFrames;
-    QVector<int> m_animationDelaysMs;
-    int m_animationFrameIndex = 0;
-    bool m_animationPlaying = false;
-    QTimer m_animationTimer; // single-shot, restarted per-frame with that frame's own delay
+    // Animated GIF/APNG playback. A still picture (one frame or none) leaves editing/crop/filters working exactly as
+    // before, untouched by any of this.
+    AnimationPlayback m_animation;
+    // "Poner como fondo de escritorio".
+    DesktopWallpaper m_wallpaper;
 
     static constexpr auto kCurrentRequestId = "current";
 };
