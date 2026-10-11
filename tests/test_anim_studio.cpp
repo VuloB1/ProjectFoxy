@@ -252,6 +252,28 @@ private slots:
         QVERIFY(!s.exporting());
     }
 
+    // Closing the program while a file is being written: the studio is destroyed with the worker still running, and
+    // must wait for it (a worker that outlived it would report back to a deleted object).
+    void destroyingTheStudioDuringAnExportIsSafe()
+    {
+        PaneImageStore store;
+        const QString path = m_dir.filePath("destroyed.gif");
+        {
+            AnimStudio s(&store);
+            QStringList paths;
+            for (int i = 0; i < 20; ++i)
+                paths << makePng(QString("gone%1.png").arg(i), QColor(i * 12, 100, 255 - i * 12), 400, 300);
+            s.addPaths(paths);
+            s.setOption("transition", 1);
+            s.setOption("transitionSteps", 8);
+            s.setOption("width", 400);
+            QVERIFY(s.exportTo(QUrl::fromLocalFile(path)));
+            QVERIFY(s.exporting());
+        } // ~AnimStudio: cancel, then wait
+        QTest::qWait(200); // anything the worker posted to the dead object must not run
+        QVERIFY(!QFileInfo::exists(path));
+    }
+
     void exportingNothingIsRefused()
     {
         PaneImageStore store;

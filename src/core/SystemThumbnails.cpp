@@ -60,8 +60,17 @@ QImage freedesktopThumbnail(const QString &storeRoot, const QString &filePath, i
         // Stale unless the file has not changed since the thumbnail was made.
         bool ok = false;
         const qint64 recorded = image.text(QStringLiteral("Thumb::MTime")).toLongLong(&ok);
-        if (ok && recorded == source.lastModified().toSecsSinceEpoch())
-            return fitTo(image, edgeLength);
+        if (!ok || recorded != source.lastModified().toSecsSinceEpoch())
+            continue;
+        // The URI guards against two files sharing a hash; the size (recommended by the specification) against a
+        // file replaced within the same second. Absent tags are accepted: not every generator writes them.
+        const QString uri = image.text(QStringLiteral("Thumb::URI"));
+        if (!uri.isEmpty() && uri.toUtf8() != QUrl::fromLocalFile(source.absoluteFilePath()).toEncoded())
+            continue;
+        const QString size = image.text(QStringLiteral("Thumb::Size"));
+        if (!size.isEmpty() && size.toLongLong() != source.size())
+            continue;
+        return fitTo(image, edgeLength);
     }
     return {};
 }
@@ -154,20 +163,13 @@ QImage systemThumbnail(const QString &filePath, int edgeLength)
 {
     if (edgeLength <= 0)
         return {};
-    // $HOME/.cache is where file managers write, also inside a Flatpak sandbox, where XDG_CACHE_HOME
-    // points at the app's own private cache instead.
-    QStringList roots;
-    const QByteArray xdg = qgetenv("XDG_CACHE_HOME");
-    roots << QDir::homePath() + QStringLiteral("/.cache/thumbnails");
-    if (!xdg.isEmpty())
-        roots << QString::fromLocal8Bit(xdg) + QStringLiteral("/thumbnails");
-    roots.removeDuplicates();
-    for (const QString &root : std::as_const(roots)) {
-        const QImage image = detail::freedesktopThumbnail(root, filePath, edgeLength);
-        if (!image.isNull())
-            return image;
-    }
-    return {};
+    // One store, as the specification says: $XDG_CACHE_HOME/thumbnails, or ~/.cache/thumbnails without it.
+    // Inside a Flatpak XDG_CACHE_HOME is the app's own private cache, so the host's (what file managers write
+    // to) is used instead.
+    const bool flatpak = QFileInfo::exists(QStringLiteral("/.flatpak-info"));
+    QByteArray base = qgetenv(flatpak ? "HOST_XDG_CACHE_HOME" : "XDG_CACHE_HOME");
+    QString dir = base.isEmpty() ? QDir::homePath() + QStringLiteral("/.cache") : QString::fromLocal8Bit(base);
+    return detail::freedesktopThumbnail(dir + QStringLiteral("/thumbnails"), filePath, edgeLength);
 }
 
 #else

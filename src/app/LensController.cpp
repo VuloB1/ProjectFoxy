@@ -15,12 +15,17 @@ using core::lens::LensDatabase;
 
 LensController::LensController(QObject *parent) : QObject(parent) {}
 
+LensController::~LensController()
+{
+    m_pool.waitForDone();
+}
+
 void LensController::load()
 {
     if (m_started)
         return;
     m_started = true;
-    QThreadPool::globalInstance()->start(QRunnable::create([this]() {
+    m_pool.start(QRunnable::create([this]() {
         LensDatabase::instance().ensureLoaded();
         QMetaObject::invokeMethod(this, [this]() {
             m_ready = true;

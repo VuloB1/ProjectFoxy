@@ -84,7 +84,11 @@ jobs:
             libxcb1-dev libxcb-cursor0 libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev \
             libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev \
             libxcb-render-util0-dev libxcb-util-dev libxcb-xinerama0-dev libxcb-xkb-dev libwayland-dev \
-            libgl1-mesa-dri xvfb
+            libgl1-mesa-dri xvfb appstream
+
+      # The Flatpak manifest turns off flatpak-builder's own AppStream check (see its comment), so it is done here.
+      - name: AppStream metadata
+        run: appstreamcli validate --no-net packaging/linux/io.github.vulob1.ProjectFoxy.metainfo.xml
 
       - name: Qt 6.7.3
         uses: jurplel/install-qt-action@v4

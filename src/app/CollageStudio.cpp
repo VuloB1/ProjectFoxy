@@ -86,7 +86,7 @@ CollageStudio::~CollageStudio()
 {
     if (m_cancel)
         m_cancel->store(true);
-    QThreadPool::globalInstance()->waitForDone(3000);
+    m_pool.waitForDone(); // no timeout: an export still running reports back to this object
 }
 
 // ---- reading -----------------------------------------------------------------------------------------------------------
@@ -741,7 +741,7 @@ bool CollageStudio::exportTo(const QUrl &file)
     emit exportingChanged();
     const auto cancel = m_cancel;
     PaneImageStore *store = m_store;
-    QThreadPool::globalInstance()->start(QRunnable::create([this, snap, path, format, quality, cancel, store]() {
+    m_pool.start(QRunnable::create([this, snap, path, format, quality, cancel, store]() {
         bool ok = true;
         QString error;
         qint64 bytes = 0;

@@ -39,7 +39,14 @@ Set-Location $root
 $cmakeVersion = ([regex]::Match((Get-Content "$root\CMakeLists.txt" -Raw), 'project\(\w+\s+VERSION\s+([\d.]+)')).Groups[1].Value
 if (-not $Version) { $Version = $cmakeVersion }
 if ($Version -ne $cmakeVersion) {
-    Write-Warning "The version asked for ($Version) is not the one in CMakeLists.txt ($cmakeVersion): the program itself still says $cmakeVersion."
+    throw "The version asked for ($Version) is not the one in CMakeLists.txt ($cmakeVersion): the program itself would say $cmakeVersion. Bump the version first."
+}
+# the other places the number lives must agree too, or the installer and the program would disagree
+$vcpkgVersion = (Get-Content (Join-Path $root "vcpkg.json") -Raw | ConvertFrom-Json).version
+$rcVersion = ([regex]::Match((Get-Content (Join-Path $root "resources/app.rc") -Raw), 'FILEVERSION\s+(\d+),(\d+),(\d+)')).Groups
+$rcDotted = "$($rcVersion[1].Value).$($rcVersion[2].Value).$($rcVersion[3].Value)"
+if ($vcpkgVersion -ne $Version -or $rcDotted -ne $Version) {
+    throw "Version mismatch: release $Version, vcpkg.json $vcpkgVersion, resources/app.rc $rcDotted."
 }
 Write-Host "Project Foxy $Version" -ForegroundColor Cyan
 

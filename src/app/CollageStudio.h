@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QQuickImageProvider>
 #include <QStringList>
+#include <QThreadPool>
 #include <QUrl>
 #include <QVariantList>
 #include <QVariantMap>
@@ -156,6 +157,7 @@ private:
 
     bool m_exporting = false;
     std::shared_ptr<std::atomic<bool>> m_cancel;
+    QThreadPool m_pool; // the export worker holds `this`: its own pool, waited for in the destructor
 };
 
 // "image://collageprev/<revision>": the collage as the page shows it.
