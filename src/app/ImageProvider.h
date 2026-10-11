@@ -19,6 +19,10 @@
 // request from the proxy image set by setLookProxy() - and
 // "image://viewer/effectthumb/<effectId>?rev=N", the same for an Efectos effect
 // at its "sample" settings (see core::edit::sampleEffectValues).
+//
+// "image://viewer/current?rev=N&side=S" (and "original" likewise) is the same picture brought down so its long side is S pixels (the display
+// proxy: a picture shown far smaller than it is needs no full-size GPU texture). The reduced copy is made once per
+// picture and side and kept; the full picture is untouched, so every edit, readout and save still uses it.
 class ImageProvider : public QQuickImageProvider {
 public:
     ImageProvider();
@@ -33,6 +37,9 @@ public:
     void setLookLut(const QImage &image);
     void setLookProxy(const QImage &image);
 
+    // `image` brought down to `side` pixels on its long side (smooth); the picture itself when it is not bigger.
+    static QImage reducedTo(const QImage &image, int side);
+
 private:
     mutable QMutex m_mutex;
     QImage m_current;
@@ -40,4 +47,14 @@ private:
     QImage m_lut;
     QImage m_lookLut;
     QImage m_lookProxy;
+    // The reduced copy of a picture, valid for `side` while `serial` is the one it was made from.
+    struct Proxy {
+        QImage image;
+        int side = 0;
+        quint64 serial = 0;
+    };
+    quint64 m_currentSerial = 0;
+    quint64 m_originalSerial = 0;
+    Proxy m_currentProxy;
+    Proxy m_originalProxy;
 };
