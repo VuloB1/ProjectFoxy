@@ -12,6 +12,10 @@
 > la auditoría técnica final, está en 8.8). Todo lo que aparece
 > aquí sale del código, de pruebas ejecutadas o de mediciones; lo que **no está
 > verificado** está marcado como tal (sección 10.2).
+>
+> **Actualización del 11 de octubre de 2026 (versión 0.2.1).** Desde el 5 de octubre se añadieron: git/GitHub, CI,
+> instalador, licencia, 6 idiomas, el puerto a Linux (sección 16) y mejoras de navegación y miniaturas (sección 17).
+> Las secciones 8 y 10 conservan el texto de su fecha; lo que quedó **superado** está marcado con «(superado: …)».
 
 ---
 
@@ -110,8 +114,9 @@ Tamaño del código (líneas no vacías, aproximado, 5‑oct‑2026): núcleo C+
 - **Pruebas**: QtTest, 19 ejecutables, **430 casos** (incluida la **paridad CPU↔GPU con
   Direct3D 11** y el `AppController` real), más una **prueba de humo** del programa real
   (`smoke_startup`): 12 entradas en `ctest`, todas pasan.
-- **Plataforma**: solo Windows (usa `Shell32`/`User32`, fondo de escritorio por
-  `SPI_SETDESKWALLPAPER`, papelera de Windows).
+- **Plataforma**: Windows (usa `Shell32`/`User32`, fondo de escritorio por
+  `SPI_SETDESKWALLPAPER`, papelera de Windows) y, desde la 0.2.0, Linux (sección 16). *(Superado: el texto original
+  decía «solo Windows».)*
 
 ---
 
@@ -934,7 +939,7 @@ que debía fallar si el problema existía).
 | Modelo de documento antes de capas/pinceles | De acuerdo; pendiente de decisión (sección 9) |
 | 16 bits e ICC (primero ICC) | **ICC hecho** (4.12: todo a sRGB al abrir, etiquetado al guardar); 16 bits solo se leen y se escalan a 8 |
 | Fuzzing y causa de `VipsGuard` | Pendiente (5.2, sección 9) |
-| Git, tooling dentro del repo, versiones fijadas | Parcial: `smoke_startup`, `make_third_party_notices.ps1` y fixtures ya están en el repo; **git no** (decisión del propietario) |
+| Git, tooling dentro del repo, versiones fijadas | Parcial: `smoke_startup`, `make_third_party_notices.ps1` y fixtures ya están en el repo; **git no** en esa fecha (después sí: ver la actualización del encabezado) |
 
 ### 8.4 Cosas de la revisión que NO he podido verificar
 - Estado actual de las licencias de patentes de HEVC y de que exiv2 no ofrezca licencia
@@ -1066,7 +1071,7 @@ decide**):
 licencias analizadas ✔ · invariantes de carga/guardado/«sin guardar» ✔ (4.10) · alfa
 CPU/GPU ✔ · 16 bits/CMYK ✔ · metadatos reales en PNG/XMP ✔ · guardado asíncrono ✔ (4.11) ·
 **pendiente**: control de versiones (git, `.gitignore`, etiquetas), scripts de build y
-verificación dentro del repo, elegir licencia del proyecto, resolver exiv2.
+verificación dentro del repo, elegir licencia del proyecto, resolver exiv2. *(Todo resuelto después; ver la actualización de arriba.)*
 
 **B. Ingeniería de entrega**: CI (compilar → pruebas → humo → paridad → empaquetado) ·
 ejecutar `ctest` completo en el CI (la paridad CPU/GPU ya es una prueba: `test_gpu_parity`;
@@ -1102,7 +1107,7 @@ modelos externos pequeños).
 ## 10. Deuda técnica y riesgos
 
 ### 10.1 Confirmados
-1. **El proyecto no está bajo control de versiones** (no es un repositorio git).
+1. ~~El proyecto no está bajo control de versiones.~~ *(Superado: está en git y GitHub, con CI en cada PR.)*
 2. Los **scripts de compilación y de verificación de paridad** viven en una carpeta
    temporal, **fuera del repositorio**; el directorio de build es
    `C:\build\imageviewer\release`. (El ejemplo de presets de usuario ya apunta a Qt 6.7.3,
@@ -1112,10 +1117,10 @@ modelos externos pequeños).
    versión exacta (la etapa aproximada cubre la espera).
 5. `BatchExporter` decodifica todos los fotogramas de un GIF/APNG para usar solo el primero.
 6. Animaciones: bucle siempre infinito y sin edición ni selección de fotograma.
-7. Sin traducciones (cadenas en español dentro de `qsTr`, sin catálogos `.ts`).
-8. Hay carpeta de entrega reproducible (`cmake --install`, ver 8.7) pero **sin instalador**,
-   sin CI, sin archivo de licencia, sin CHANGELOG, sin firma de código, sin informe de
-   fallos.
+7. ~~Sin traducciones.~~ *(Superado: 6 idiomas, sección 15.)*
+8. Hay carpeta de entrega reproducible (`cmake --install`, ver 8.7). *(Superado: ya hay instalador, CI,
+   `LICENSE`, `CHANGELOG.md`, `SECURITY.md` y `CONTRIBUTING.md`, y las versiones se publican con `release.yml`.)*
+   **Sigue sin haber** firma de código ni informe automático de fallos.
 9. Los efectos de ruido solo se verificaron a 100 % de zoom.
 10. Sin pruebas automáticas de interacción de la interfaz (la paridad GPU↔CPU **sí** está
     automatizada: `test_gpu_parity`).
@@ -1138,7 +1143,7 @@ modelos externos pequeños).
 20. Fusión de *undo* por tiempo (900 ms) en lugar de gestos explícitos.
 13. La miniatura de un archivo recién sobrescrito en la barra lateral no se refresca hasta
     que se vuelve a pedir (la clave de caché incluye la fecha de modificación).
-14. **Licencia**: exiv2 (GPL) impide distribuir cerrado; el proyecto no tiene `LICENSE`.
+14. **Licencia**: exiv2 (GPL) impide distribuir cerrado. *(Superado: el proyecto es GPL-3.0-or-later y tiene `LICENSE`.)*
 
 ### 10.2 Sospechas o puntos **sin verificar**
 - **Accesibilidad** (lectores de pantalla, teclado, DPI altos): no revisado; los controles
@@ -1288,8 +1293,8 @@ Todo lo necesario para publicar en GitHub está en el repositorio:
   hace la persona; cuando elige Project Foxy para un tipo, el Explorador muestra su ícono sobre esos archivos. El
   desinstalador borra todo lo que el instalador registró.
 - `.github/workflows/ci.yml` (compila y prueba en cada *push*/PR) y `release.yml` (al subir una etiqueta `vX.Y.Z`:
-  compila, arma instalador y zip y publica la *release*). **No se pudieron probar localmente**: el primer *push* es la
-  prueba real. Usan Qt 6.7.3 con `install-qt-action`, vcpkg del *runner* con caché de binarios y Inno Setup por Chocolatey.
+  compila, arma instalador y zip y publica la *release*). **No se pudieron probar localmente**; el CI y `release.yml` ya
+  funcionan (0.2.0 y 0.2.1 publicadas con ellos; la 0.2.0 necesitó un arreglo del instalador, ya corregido). Usan Qt 6.7.3 con `install-qt-action`, vcpkg del *runner* con caché de binarios y Inno Setup por Chocolatey.
 - `tools/make_banner.py` dibuja `docs/assets/banner.png` a partir del logo (`docs/assets/logo.png`); las capturas del
   README están en `docs/screenshots/`.
 - La versión sale de `project(... VERSION ...)` en `CMakeLists.txt` (el programa la muestra en el panel de información);
@@ -1318,3 +1323,50 @@ Seis idiomas: español (el original), inglés, portugués (Brasil), coreano, chi
 - **Instalador**: Inno Setup en inglés, español, portugués, coreano y japonés (el chino simplificado no viene con
   Inno Setup; el instalador cae en inglés para ese idioma, el programa sí está en chino).
 - Los textos nuevos: escribirlos en español dentro de `qsTr`/`tr`, agregar la fila a `strings.tsv` y `build`.
+
+## 16. Linux (8‑oct‑2026, versión 0.2.0)
+
+Project Foxy corre en Linux como **AppImage** y **Flatpak**. Todo vive en `packaging/linux/` y en `.github/workflows/`.
+
+- **AppImage** (`build-appimage.sh`): linuxdeploy + plugin de Qt fijados por hash, compilado en Ubuntu 22.04; exige
+  glibc ≥ 2.35 (libstdc++ de GCC 12). Los plugins de Wayland se copian a mano. `smoke-appimage.sh` lo arranca en el CI.
+- **Flatpak** (`flatpak/io.github.vulob1.ProjectFoxy.yml`, `build-flatpak.sh`): runtime KDE 6.10; compila libvips,
+  LibRaw, exiv2 e inih desde fuente con las versiones de `vcpkg.json`; `build-flatpak.sh --test` corre la suite contra la
+  Qt 6.10 del runtime. Pide `--filesystem=host` porque la barra de miniaturas lista las demás imágenes de la carpeta.
+  Para Flathub habría que quitar `appstream-compose: false` (solo está por el `flatpak-builder` viejo de Ubuntu 22.04) y
+  usar una fuente git con etiqueta; **no se envió a Flathub** (decisión del propietario, por ahora).
+- **Código específico**: `src/app/LinuxPortal.*` (papelera y fondo de pantalla por los portales de escritorio, que es lo
+  que se usa dentro de Flatpak), `FontSubstitutions.h` (Segoe UI/Arial/Impact → equivalentes libres),
+  `AppPaths::samePathKey` (los nombres de archivo distinguen mayúsculas; `FOTO.JPG` se encuentra igual que `foto.jpg`).
+- **CI** (`ci.yml`): `build` (Windows), `linux` (preset `linux-release`, Xvfb + llvmpipe, pruebas, AppImage y humo) y
+  `flatpak` (imagen kde-6.10). **`release.yml`** al subir una etiqueta `v*`: `windows`, `linux`, `flatpak` y `publish`
+  (una sola release con instalador, zip portable, AppImage, Flatpak y `SHA256SUMS.txt`).
+- **Probado a mano (WSL2, 8‑oct)**: AppImage en Ubuntu 24.04, Debian 13, Fedora 43 y Arch (X11 y Wayland); falla en
+  AlmaLinux 9 (glibc 2.34, esperado). Flatpak funciona en esas cinco. Qt 6.10.3 pasa las 22 pruebas.
+- **Nunca verificado**: un escritorio Linux real con GPU real (WSL no tiene portales ni GPU real), la papelera y el fondo
+  de pantalla por portales, y el rendimiento real en Linux.
+
+## 17. Navegación y miniaturas (9‑oct‑2026, versión 0.2.1)
+
+Un tercero reportó una demora de ~300 ms al cargar archivos. Dos cambios (el reporte tenía «2 errores»; **el segundo no se
+conoce**):
+
+1. **`FolderModel::openFolderForFile`** listaba la carpeta, la ordenaba con `QCollator` y reseteaba el modelo
+   (reconstruyendo la tira de miniaturas) **en cada cambio de imagen**, en el hilo de la interfaz. Ahora solo reescanea si
+   cambió la fecha de modificación de la carpeta, es otra carpeta o el archivo no está en la lista. Prueba nueva en
+   `tests/test_folder_model.cpp`. **No se midió el tiempo antes/después.** Límite: depende de que el sistema de archivos
+   actualice la fecha de la carpeta (no hay `QFileSystemWatcher`).
+2. **Miniaturas del sistema** (`src/core/SystemThumbnails.*`, llamado desde `ThumbnailCache::thumbnail` tras la caché
+   propia y antes de decodificar): Windows pide la miniatura a la caché del Explorador con `IShellItemImageFactory`
+   (`SIIGBF_THUMBNAILONLY | SIIGBF_INCACHEONLY | SIIGBF_BIGGERSIZEOK`; una falta de caché falla al instante y no hace
+   generar nada al shell; COM se inicia una vez por hilo); Linux lee el almacén freedesktop
+   (`~/.cache/thumbnails/{normal,large,x-large,xx-large}`, nombre = MD5 de la URI, entrada descartada si `Thumb::MTime`
+   no coincide, o si el nivel es más de un 20 % menor que lo pedido). Medido en Windows: ~2 ms por miniatura con COM
+   iniciado contra 12–78 ms decodificando con Qt; la primera consulta de cada hilo tarda ~55–65 ms. **La parte de Linux
+   solo tiene pruebas unitarias** (`tests/test_thumbnail_cache.cpp`). Solo se lee: no se escribe en esos almacenes.
+3. **`ThumbnailImageProvider`**: pool de hilos propio (mitad de los núcleos, prioridad baja) y cancelación de las
+   peticiones que salen de pantalla, para que las miniaturas no compitan con abrir la imagen.
+
+Pendientes y decisiones abiertas: atajos de teclado (se diseñarán en conjunto, al final), ícono superpuesto en la
+miniatura del Explorador (necesita ser la app predeterminada del tipo), firma de código, actualizador automático,
+Flathub (descartado por ahora).
