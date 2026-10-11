@@ -81,15 +81,54 @@ Rectangle {
     // degrees off from 0/90/180/270. Track the target separately instead.
     property int targetRotation: 0
 
+    // The picture's real size in pixels. It comes from the controller, not from the loaded texture: that can be a
+    // reduced copy (the display proxy below) while the picture is far from full size. Read through the getter, so it
+    // is already the new size when a signal of the same change is handled.
+    readonly property size pictureSize: appController.currentImageSize
     function computeFitScale() {
-        if (image.sourceSize.width <= 0 || image.sourceSize.height <= 0)
+        const size = appController.currentImageSize;
+        if (size.width <= 0 || size.height <= 0)
             return 1.0;
-        const ratio = Math.min(flick.width / image.sourceSize.width,
-                                flick.height / image.sourceSize.height);
+        const ratio = Math.min(flick.width / size.width,
+                                flick.height / size.height);
         // With whole-number zoom, a small picture opens as big as a whole number allows.
         if (integerZoom && ratio >= 1.0)
             return Math.min(Math.floor(ratio), topScale);
         return Math.min(ratio, 1.0);
+    }
+
+    // ---- Display proxy ------------------------------------------------------------------------------------------
+    // A 37-megapixel photo seen fitted to the window is drawn with a few million pixels; keeping all of it as
+    // GPU textures (the picture plus one per edit stage) costs hundreds of megabytes for nothing. While the picture
+    // is shown no bigger than proxyMax pixels on its long side, the provider serves a reduced copy of that size
+    // (also for the "Comparar" original). It is used only where the result is the same as at full size: not when
+    // sharpness, clarity or grain are on (their radius is in picture pixels), and not for animations.
+    readonly property int proxyMax: 4096
+    property int proxySide: 0 // what is loaded now: 0 = the full picture
+    readonly property int pictureLong: Math.max(pictureSize.width, pictureSize.height)
+    readonly property bool detailOn: appController.adjust.sharpness > 0 || appController.adjust.clarity > 0
+                                     || appController.adjust.grain > 0 || appController.look.grain > 0
+    readonly property bool proxyAllowed: pictureLong > proxyMax * 1.25 && !detailOn && !appController.isAnimated
+    // How big the picture is on screen, in device pixels along its long side.
+    readonly property real shownLong: pictureLong * image.scale * Screen.devicePixelRatio
+    // Wanted: the reduced copy when it is enough (with a margin before going back to it, so zooming around the
+    // limit does not reload the picture back and forth).
+    readonly property bool proxyWanted: proxyAllowed && shownLong <= proxyMax * (proxySide > 0 ? 1.0 : 0.85)
+    onProxyWantedChanged: proxyTimer.restart()
+    onProxyAllowedChanged: if (!proxyAllowed) proxySide = 0   // fine detail needed: full picture, at once
+    Timer {
+        id: proxyTimer
+        // Leaving the proxy is urgent (the picture would look soft); entering it can wait for the zoom to settle.
+        interval: root.proxyWanted ? 350 : 0
+        onTriggered: root.proxySide = root.proxyWanted ? root.proxyMax : 0
+    }
+    // The edit stages render into textures as big as the picture actually loaded (0 = as big as the item).
+    readonly property size stageTextureSize: proxySide > 0 ? Qt.size(image.implicitWidth, image.implicitHeight) : Qt.size(0, 0)
+
+    // The display proxy decision applied at once (a new picture, once its view is fitted).
+    function applyProxyNow() {
+        proxyTimer.stop();
+        proxySide = proxyWanted ? proxyMax : 0;
     }
 
     function centerContent() {
@@ -204,8 +243,9 @@ Rectangle {
             // A quarter turn swaps the image's width and height, so the fit
             // scale changes with it; animate that too, or the view would
             // snap to the new scale the moment the edit is baked.
-            const swappedFit = Math.min(flick.width / image.sourceSize.height,
-                                        flick.height / image.sourceSize.width, 1.0);
+            const pictureNow = appController.currentImageSize;
+            const swappedFit = Math.min(flick.width / pictureNow.height,
+                                        flick.height / pictureNow.width, 1.0);
             rotateAngleAnim.to = image.rotation + (kind === "rotateL" ? -90 : 90);
             rotateScaleAnim.to = swappedFit;
             rotateAnim.start();
@@ -690,14 +730,19 @@ Rectangle {
 
         Image {
             id: image
-            source: appController.currentSource
+            // The display proxy: while the picture is shown much smaller than it is (and nothing needs its fine detail),
+            // the provider hands over a reduced copy, so the GPU holds a texture of the size on show instead of
+            // the whole 20-40 megapixels. The item keeps the picture's real size, so everything laid out on it
+            // (zoom, crop, readouts) is unchanged.
+            source: root.proxySide > 0 ? appController.currentSource + "&side=" + root.proxySide
+                                       : appController.currentSource
             anchors.centerIn: parent
-            fillMode: Image.PreserveAspectFit
+            fillMode: Image.Stretch
             // Until a picture is loaded it fills the viewport. (Not `parent`:
             // that is the Flickable's content item, whose size is contentWidth/
             // Height - and those depend on this width/height: a binding loop.)
-            width: sourceSize.width > 0 ? sourceSize.width : flick.width
-            height: sourceSize.height > 0 ? sourceSize.height : flick.height
+            width: root.pictureSize.width > 0 ? root.pictureSize.width : flick.width
+            height: root.pictureSize.height > 0 ? root.pictureSize.height : flick.height
             smooth: !root.nearest
             mipmap: true
             // The Ajustes sliders are applied live by the shader chain below
@@ -739,6 +784,7 @@ Rectangle {
                     image.rotation = 0;
                     root.suppressRotationAnimation = false;
                     root.zoomToFit();
+                    root.applyProxyNow(); // a new picture is shown fitted: no reason to load it whole first
                 }
             }
         }
@@ -750,7 +796,7 @@ Rectangle {
             id: originalImage
             // Loaded only while "Comparar" is held: kept resident it would cost a
             // second full-size texture (about 200 MB for a 37 MP photo) for nothing.
-            source: root.compareOriginal ? appController.originalSource : ""
+            source: root.compareOriginal ? appController.originalSource + (root.proxySide > 0 ? "&side=" + root.proxySide : "") : ""
             visible: false
             x: image.x
             y: image.y
@@ -833,6 +879,7 @@ Rectangle {
             sourceItem: appController.lookActive ? lookEffect : null
             hideSource: true
             live: true
+            textureSize: root.stageTextureSize
             smooth: !root.nearest
             // Only the last stage before Detail.frag is shown scaled down, and it needs mips.
             mipmap: !appController.gradeActive
@@ -887,6 +934,7 @@ Rectangle {
             sourceItem: appController.gradeActive ? adjustEffect : null
             hideSource: true
             live: true
+            textureSize: root.stageTextureSize
             smooth: !root.nearest
             // Clarity compares each pixel with a heavily blurred copy of the
             // image, which Detail.frag reads from a high mip level.
@@ -956,7 +1004,7 @@ Rectangle {
             rotation: image.rotation
             scale: image.scale
             transformOrigin: image.transformOrigin
-            property vector2d pixels: Qt.vector2d(image.sourceSize.width, image.sourceSize.height)
+            property vector2d pixels: Qt.vector2d(root.pictureSize.width, root.pictureSize.height)
             property real lineWidth: 1.0 / Math.max(1, image.scale)
             property color lineColor: "#66808080"
             fragmentShader: "qrc:/shaders/PixelGrid.frag.qsb"

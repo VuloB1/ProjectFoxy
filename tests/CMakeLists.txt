@@ -54,6 +54,11 @@ add_executable(test_collage_studio test_collage_studio.cpp)
 target_link_libraries(test_collage_studio PRIVATE imageviewer_app imageviewer_core Qt6::Test)
 add_test(NAME test_collage_studio COMMAND test_collage_studio)
 
+# The picture provider and its display proxy (a reduced copy for the canvas).
+add_executable(test_image_provider test_image_provider.cpp)
+target_link_libraries(test_image_provider PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_image_provider COMMAND test_image_provider)
+
 # The secondary tools' workers: destroying their owner mid-work.
 add_executable(test_worker_lifetime test_worker_lifetime.cpp)
 target_link_libraries(test_worker_lifetime PRIVATE imageviewer_app imageviewer_core Qt6::Test)

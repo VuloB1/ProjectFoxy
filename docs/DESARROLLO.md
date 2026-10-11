@@ -1132,8 +1132,8 @@ modelos externos pequeños).
     escritorio, histograma y «Aplicar» efecto siguen en el hilo de la interfaz.
 16. **Memoria de la GPU**: una foto de 37 MP sin editar ocupa ~235 MB (antes ~950), con un
     ajuste de tono ~620 MB y con filtro y ajustes a la vez sigue en ~950 MB (5.1).
-    `ImageProvider` entrega la imagen a resolución completa; un proxy de pantalla bajaría
-    el peor caso. Pendiente.
+    `ImageProvider` entregaba la imagen a resolución completa. *(Superado en parte: proxy de
+    pantalla, sección 18.)*
 17. HEIC/AVIF/RAW **no entregan sus metadatos** al guardar (se avisa); `MetadataReader` lee
     el archivo entero a memoria y solo vuelca EXIF.
 18. Los `ShaderEffectSource` intermedios son de 8 bits: la deriva GPU↔CPU crece con las
@@ -1370,3 +1370,40 @@ conoce**):
 Pendientes y decisiones abiertas: atajos de teclado (se diseñarán en conjunto, al final), ícono superpuesto en la
 miniatura del Explorador (necesita ser la app predeterminada del tipo), firma de código, actualizador automático,
 Flathub (descartado por ahora).
+
+## 18. Proxy de pantalla (11‑oct‑2026)
+
+Una foto de 37 MP vista ajustada a la ventana se dibuja con unos pocos millones de píxeles, pero la GPU guardaba
+toda la imagen más una textura por etapa de edición. Ahora, mientras la imagen se muestra con **no más de 4096 px de lado
+largo** (y la imagen real tiene más de 5120), `ImageProvider` sirve una copia reducida:
+
+- `image://viewer/current?rev=N&side=S` (y `original?…&side=S`, la de «Comparar») devuelve la imagen con el lado largo en
+  `S` píxeles (`Qt::SmoothTransformation`), **creada una vez por imagen y lado** y guardada (una por cada una de las dos
+  imágenes; `setImage`/`setOriginalImage` la descartan). La imagen completa no se toca: ediciones, lectura de píxeles
+  (`pixelAt`), histograma y guardado siguen usándola. Cuesta 13–60 ms en el hilo de la interfaz, una vez.
+- En `ImageCanvas.qml` el `Image` conserva el **tamaño real** de la imagen (`appController.currentImageSize`, ya no
+  `image.sourceSize`, que pasaría a ser el de la copia), con `fillMode: Stretch`, así zoom, recorte y lecturas no cambian.
+  Las etapas (`lookSource`, `adjustSource`) renderizan a una textura del tamaño de lo que está cargado
+  (`stageTextureSize`). Para que el tamaño llegue antes que la fuente, `AppController` emite `currentImageSizeChanged`
+  **antes** de `currentSourceChanged`/`structuralImageChanged`.
+- Cuándo se usa (`proxyAllowed`, `proxyWanted`): imagen grande, **sin** nitidez, claridad ni grano (ni grano del filtro:
+  su radio es en píxeles de la imagen y sobre la copia darían otro resultado), sin animación, y tamaño en pantalla
+  (`escala × lado largo × devicePixelRatio`) ≤ 4096 (con un 15 % de margen para volver a ella). Al acercarse más se pasa a
+  la imagen completa **de inmediato**; volver a la copia espera 350 ms a que el zoom se asiente. Una imagen nueva decide al
+  instante, una vez ajustada la vista.
+- **Medido** (ventana real, Windows, AMD RX 6750 XT; foto sintética de 7720×4824 con ruido; contadores `GPU Process Memory`):
+
+| Caso | GPU dedicada, antes → ahora | GPU compartida | Memoria del proceso |
+|---|---|---|---|
+| Visor, ajustada | 236 → **93 MB** | 149 → 43 MB | 553 → 382 MB |
+| Ajuste de tono/color | 616 → **196 MB** | 149 → 43 MB | 549 → 380 MB |
+| Girada 90° (edición estructural) | 234 → **93 MB** | 149 → 43 MB | 690 → 525 MB |
+| Con nitidez activa | 616 → 616 MB (resolución completa, a propósito) | — | — |
+
+- **Fidelidad** (capturas de la ventana, proxy contra sin proxy, ignorando el recuadro de lectura de píxel): visor y giro,
+  diferencia máxima ≤ 6 niveles; con ajuste de tono, máxima 11 y media 1,4 sobre una imagen de ruido muy fuerte
+  (σ = 12; en una foto normal será menor); con nitidez, idénticas.
+- **No medido / no probado:** con fotos reales de cámara, en Linux con GPU real, con monitores de alta densidad (se probó
+  con `devicePixelRatio` 1), ni el comportamiento al arrastrar los controles de nitidez/claridad/grano con la imagen
+  alejada (al activarlos pasa a la imagen completa, con un salto de carga único). Tampoco hay una prueba automática de la
+  interfaz: la comparación se hizo con un arnés temporal que no está en el repositorio.

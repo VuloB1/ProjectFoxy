@@ -259,9 +259,10 @@ void AppController::applyNewDocument(const core::ImageDocument &doc)
     ++m_originalRevision;
     m_currentSource = QStringLiteral("image://viewer/current?rev=%1").arg(m_revision);
 
+    // The size first: the canvas lays the picture out from it (not from the loaded texture, which may be a reduced copy).
+    emit currentImageSizeChanged();
     emit currentSourceChanged();
     emit structuralImageChanged();
-    emit currentImageSizeChanged();
     emit metadataChanged();
     emit isLoadingChanged();
     emit errorStringChanged();
@@ -524,10 +525,10 @@ void AppController::republishBaked(bool resetView)
     m_currentImageSize = baked.size();
     ++m_revision;
     m_currentSource = QStringLiteral("image://viewer/current?rev=%1").arg(m_revision);
+    emit currentImageSizeChanged();
     emit currentSourceChanged();
     if (resetView)
         emit structuralImageChanged();
-    emit currentImageSizeChanged();
     emit editStackChanged();
     emit histogramChanged();
     emit adjustedHistogramChanged();
@@ -1254,11 +1255,11 @@ void AppController::publishPicture(const QImage &image)
     const bool resized = image.size() != m_currentImageSize && !image.isNull();
     if (resized)
         m_currentImageSize = image.size();
-    emit currentSourceChanged();
-    if (resized) {
-        emit structuralImageChanged();
+    if (resized)
         emit currentImageSizeChanged();
-    }
+    emit currentSourceChanged();
+    if (resized)
+        emit structuralImageChanged();
 }
 
 void AppController::dropEffectPreview()
@@ -1842,8 +1843,8 @@ bool AppController::deleteCurrentFile()
     m_currentImageSize = QSize();
     ++m_revision;
     m_currentSource = QStringLiteral("image://viewer/current?rev=%1").arg(m_revision);
-    emit currentSourceChanged();
     emit currentImageSizeChanged();
+    emit currentSourceChanged();
     emit metadataChanged();
     emit editStackChanged();
     emit liveAdjustChanged();
