@@ -1250,6 +1250,9 @@ Rectangle {
             root.saveWarned = true;
             root.showNotice(message, 7000);
         }
+        function onWallpaperResult(message) {
+            root.showNotice(message, 3500);
+        }
         function onSaveFinished(ok, path) {
             if (ok && !root.saveWarned)
                 root.showNotice(qsTr("Guardado"), 2500);

@@ -873,3 +873,5 @@ Se aplica al instante, sin reiniciar. «Según el sistema» usa el idioma del si
 Según el sistema	Follow the system	Seguir o sistema	시스템 설정 따르기	跟随系统	システムに合わせる
 El archivo es demasiado grande para abrirlo con seguridad: %1	The file is too large to open safely: %1	O arquivo é grande demais para abrir com segurança: %1	파일이 너무 커서 안전하게 열 수 없습니다: %1	文件太大,无法安全打开:%1	ファイルが大きすぎて安全に開けません: %1
 La imagen es demasiado grande para abrirla con seguridad: %1	The image is too large to open safely: %1	A imagem é grande demais para abrir com segurança: %1	이미지가 너무 커서 안전하게 열 수 없습니다: %1	图片太大,无法安全打开:%1	画像が大きすぎて安全に開けません: %1
+Fondo de escritorio cambiado	Wallpaper changed	Plano de fundo alterado	바탕 화면이 변경되었습니다	桌面壁纸已更改	壁紙を変更しました
+No se pudo cambiar el fondo de escritorio	Could not change the wallpaper	Não foi possível alterar o plano de fundo	바탕 화면을 변경할 수 없습니다	无法更改桌面壁纸	壁紙を変更できませんでした

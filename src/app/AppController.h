@@ -355,10 +355,10 @@ public slots:
     // remaining file in the folder, if any.
     bool deleteCurrentFile();
 
-    // Bakes the current image out to a temp PNG and sets it as the Windows
-    // desktop wallpaper (SPI_SETDESKWALLPAPER). Returns false if there's no
-    // image open or the Windows API call fails.
-    bool setAsWallpaper();
+    // Bakes the current image out to a PNG and sets it as the desktop wallpaper (Windows: SPI_SETDESKWALLPAPER;
+    // Linux: the desktop's own tool, else the Wallpaper portal). Does not block on Linux; the outcome comes as
+    // wallpaperResult().
+    void setAsWallpaper();
 
 signals:
     // Fired alongside currentSourceChanged() whenever the image's actual
@@ -380,6 +380,8 @@ signals:
     // A save that WORKED but could not keep something (the original's metadata, say):
     // a short message for a non-blocking notice, not an error.
     void saveNotice(const QString &message);
+    // The wallpaper request ended (changed, or why not): a short message for a non-blocking notice.
+    void wallpaperResult(const QString &message);
     void editStackChanged();
     void metadataChanged();
     void liveAdjustChanged();
@@ -562,6 +564,12 @@ private:
     // Saving. One at a time; the work runs on m_savePool (which the destructor waits
     // for: the worker posts its result back to `this`).
     QThreadPool m_savePool;
+#ifndef _WIN32
+    // Linux wallpaper: the worker writes the picture and runs the desktop's tool; the result is finished on this thread.
+    QThreadPool m_wallpaperPool;
+    bool m_settingWallpaper = false;
+    void finishWallpaper(const QString &path, bool done);
+#endif
     bool m_saving = false;
     // Which document the running save belongs to: bumped by every applyNewDocument().
     quint64 m_docSerial = 0;
