@@ -3,6 +3,17 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.2.2] — Robustness
+
+- Closing the program while a batch export, an animation or a collage is being written (or while the lens database
+  loads) now waits for that work to stop instead of risking a crash.
+- Previews of animated GIF/APNG/WebP files are made at the size asked for, not from the whole first frame.
+- Linux: the thumbnail store is the one the freedesktop specification names (`XDG_CACHE_HOME`; the host's inside a
+  Flatpak), and a stored thumbnail is checked against the file's URI and size too. Deleting through the portal passes a
+  descriptor it can write to.
+- Releases: building one now fails if the version asked for differs from the one in `CMakeLists.txt`, `vcpkg.json` or
+  `resources/app.rc`. The CI checks the AppStream metadata.
+
 ## [0.2.1] — Faster browsing
 
 - Moving from one picture to the next in a folder no longer lists, sorts and rebuilds the whole folder each time
@@ -59,6 +70,17 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.2.2] — Robustez
+
+- Cerrar el programa mientras se escribe una exportación por lote, una animación o un collage (o mientras carga la base
+  de datos de lentes) ahora espera a que ese trabajo se detenga, en vez de arriesgar un fallo.
+- Las vistas previas de GIF/APNG/WebP animados se hacen al tamaño pedido, no a partir del primer fotograma completo.
+- Linux: el almacén de miniaturas es el que nombra la especificación freedesktop (`XDG_CACHE_HOME`; el del anfitrión
+  dentro de un Flatpak), y una miniatura guardada se comprueba también contra la URI y el tamaño del archivo. Eliminar
+  por el portal pasa un descriptor en el que se puede escribir.
+- Versiones: compilar una release falla si la versión pedida difiere de la de `CMakeLists.txt`, `vcpkg.json` o
+  `resources/app.rc`. El CI revisa los metadatos de AppStream.
 
 ## [0.2.1] — Navegación más rápida
 

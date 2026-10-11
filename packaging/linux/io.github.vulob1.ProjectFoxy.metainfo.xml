@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.2" date="2026-10-11">
+      <description>
+        <p>Robustness: closing the program during an export no longer risks a crash, thumbnails follow the freedesktop specification, and a release can no longer carry a version number different from the program's.</p>
+      </description>
+    </release>
     <release version="0.2.1" date="2026-10-09">
       <description>
         <p>Faster browsing: moving between pictures of a folder no longer rescans it, and the thumbnail strip reuses the thumbnails the system already has.</p>
