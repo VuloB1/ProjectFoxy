@@ -3,6 +3,7 @@
 #include "AnimationPlayback.h"
 #include "DesktopWallpaper.h"
 #include "EffectPreview.h"
+#include "SaveCoordinator.h"
 #include "ImageLoader.h"
 #include "Histogram.h"
 #include "edit/EditStack.h"
@@ -203,7 +204,7 @@ public:
     bool hasEdits() const;
     bool isDirty() const;
     bool canSaveInPlace() const;
-    bool isSaving() const { return m_saving; }
+    bool isSaving() const { return m_save.saving(); }
 
     // The pixel of the picture on screen at (x, y) - { valid, r, g, b, a } - for the
     // pixel-mode read-out. Not valid outside the picture.
@@ -422,17 +423,7 @@ private:
     // The part of saving that needs the live document (the UI thread): validates,
     // commits a pending effect, captures the snapshot and hands it to the worker.
     bool startSave(const QString &path);
-    // What the worker reports back (see finishSave).
-    struct SaveOutcome {
-        quint64 serial = 0;               // the document the save was started for
-        core::edit::EditRecipe recipe;    // what the file holds, if it worked
-        QString path;
-        bool ok = false;
-        QString error;
-        QString warning;
-        QImage structural;                // the structural bake the worker had to compute, if it did...
-        std::vector<core::edit::Operation> ops; // ...and the pixel operations it belongs to
-    };
+    // The save worker reported back: what it meant for the document (see SaveCoordinator.h).
     void finishSave(const SaveOutcome &outcome);
     // Makes a previewed effect a real history step. `republish` false skips rebuilding
     // the picture (the safe-save worker will compute it anyway, off the UI thread).
@@ -539,24 +530,11 @@ private:
     // The recipe when the load in flight started: if it differs when the picture
     // lands, the user kept editing the old one meanwhile.
     core::edit::EditRecipe m_loadStartRecipe;
-    // What openPath()/pasteFromClipboard() would have done if it had not been
-    // blocked by unsaved changes; resolveUnsaved() carries it out.
-    enum class PendingAction { None, OpenPath, Paste };
-    PendingAction m_pendingAction = PendingAction::None;
-    QString m_pendingPath;
-    bool m_discardApproved = false;
-
-    // Saving. One at a time; the work runs on m_savePool (which the destructor waits
-    // for: the worker posts its result back to `this`).
-    QThreadPool m_savePool;
-    bool m_saving = false;
+    // Saving, and the open/paste requests that unsaved changes or a running save hold back (what resolveUnsaved()
+    // carries out). One save at a time, on the coordinator's own pool.
+    SaveCoordinator m_save;
     // Which document the running save belongs to: bumped by every applyNewDocument().
     quint64 m_docSerial = 0;
-    // What to do once the running save has succeeded: opening another picture or
-    // pasting was asked for while it ran (or the "save" answer to the unsaved-changes
-    // question). Dropped if the save fails.
-    PendingAction m_afterSaveAction = PendingAction::None;
-    QString m_afterSavePath;
 
     // Efectos: the picked effect, its sliders and the preview calculations (see EffectPreview.h).
     EffectPreview m_effect;
