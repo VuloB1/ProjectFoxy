@@ -9,6 +9,7 @@
 #include <QMutex>
 #include <QQuickImageProvider>
 #include <QString>
+#include <QThreadPool>
 #include <QUrl>
 #include <QVariantMap>
 #include <atomic>
@@ -154,6 +155,7 @@ private:
     bool m_exporting = false;
     qreal m_progress = 0.0;
     std::shared_ptr<std::atomic<bool>> m_cancel;
+    QThreadPool m_pool; // the export worker holds `this`: its own pool, waited for in the destructor
 };
 
 // "image://animprev/<plan index>?r=<revision>": a frame of the animation as the preview shows it.

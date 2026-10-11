@@ -20,7 +20,15 @@ constexpr auto kPath = "/org/freedesktop/portal/desktop";
 
 // An open descriptor for the file, closed when it goes out of scope.
 struct Fd {
-    explicit Fd(const QString &path) : fd(::open(QFile::encodeName(path).constData(), O_RDONLY | O_CLOEXEC)) {}
+    // `writable`: the Trash portal wants a descriptor the app could also write to; a read-only file falls back to O_RDONLY.
+    explicit Fd(const QString &path, bool writable = false) : fd(-1)
+    {
+        const QByteArray name = QFile::encodeName(path);
+        if (writable)
+            fd = ::open(name.constData(), O_RDWR | O_CLOEXEC);
+        if (fd < 0)
+            fd = ::open(name.constData(), O_RDONLY | O_CLOEXEC);
+    }
     ~Fd() { if (fd >= 0) ::close(fd); }
     int fd;
 };
@@ -34,7 +42,7 @@ bool inFlatpak()
 
 bool trashFile(const QString &path)
 {
-    Fd file(path);
+    Fd file(path, /*writable=*/true);
     if (file.fd < 0)
         return false;
     QDBusMessage call = QDBusMessage::createMethodCall(QLatin1String(kService), QLatin1String(kPath),

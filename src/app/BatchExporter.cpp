@@ -15,6 +15,12 @@ BatchExporter::BatchExporter(QObject *parent)
 {
 }
 
+BatchExporter::~BatchExporter()
+{
+    cancel(); // stops at the next file
+    m_pool.waitForDone();
+}
+
 void BatchExporter::start(const QStringList &sourceFiles, const QUrl &destFolderUrl, const QString &format, int maxDimension, int quality)
 {
     if (m_running || sourceFiles.isEmpty())
@@ -32,7 +38,7 @@ void BatchExporter::start(const QStringList &sourceFiles, const QUrl &destFolder
     auto cancelFlag = std::make_shared<std::atomic<bool>>(false);
     m_cancelRequested = cancelFlag;
 
-    QThreadPool::globalInstance()->start(QRunnable::create(
+    m_pool.start(QRunnable::create(
         [this, sourceFiles, destFolder, format, maxDimension, quality, cancelFlag]() {
             int succeeded = 0;
             int failed = 0;

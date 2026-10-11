@@ -391,6 +391,9 @@ DecodeResult AnimatedDecoder::decode(const QString &filePath, QSize maxSize)
 
     result.image = frames.first();
     result.sourceSize = frames.first().size();
+    // A preview (thumbnail) asks for a size: hand back that, not the whole first frame.
+    if (!wantAllFrames && (result.image.width() > maxSize.width() || result.image.height() > maxSize.height()))
+        result.image = result.image.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     result.ok = true;
     if (wantAllFrames && frames.size() > 1) {
         result.frames = frames;

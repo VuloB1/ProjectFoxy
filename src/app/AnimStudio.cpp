@@ -107,7 +107,7 @@ AnimStudio::~AnimStudio()
 {
     if (m_cancel)
         m_cancel->store(true);
-    QThreadPool::globalInstance()->waitForDone(3000); // an export still running reports back to this object
+    m_pool.waitForDone(); // no timeout: an export still running reports back to this object (it stops at the next frame)
 }
 
 int AnimStudio::rowCount(const QModelIndex &parent) const { return parent.isValid() ? 0 : int(m_entries.size()); }
@@ -617,7 +617,7 @@ bool AnimStudio::exportTo(const QUrl &file)
 
     const auto cancel = m_cancel;
     PaneImageStore *store = m_store;
-    QThreadPool::globalInstance()->start(QRunnable::create([this, snap, path, cancel, store]() {
+    m_pool.start(QRunnable::create([this, snap, path, cancel, store]() {
         StudioFrameSource source(snap, store);
         QSaveFile out(path);
         QString error;

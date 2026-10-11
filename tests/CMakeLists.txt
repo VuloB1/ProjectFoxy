@@ -54,6 +54,11 @@ add_executable(test_collage_studio test_collage_studio.cpp)
 target_link_libraries(test_collage_studio PRIVATE imageviewer_app imageviewer_core Qt6::Test)
 add_test(NAME test_collage_studio COMMAND test_collage_studio)
 
+# The secondary tools' workers: destroying their owner mid-work.
+add_executable(test_worker_lifetime test_worker_lifetime.cpp)
+target_link_libraries(test_worker_lifetime PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_worker_lifetime COMMAND test_worker_lifetime)
+
 # The settings file: Modo pixel's switch and extras, and the migration from the old single switch.
 add_executable(test_app_settings test_app_settings.cpp)
 target_link_libraries(test_app_settings PRIVATE imageviewer_app imageviewer_core Qt6::Test)

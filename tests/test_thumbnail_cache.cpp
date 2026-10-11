@@ -121,6 +121,35 @@ private slots:
         QCOMPARE(got.pixelColor(5, 5).green(), 200);        // and it is the stored picture, not a decode (which is red)
     }
 
+    void aSystemThumbnailOfAnotherUriOrSizeIsIgnored()
+    {
+        QTemporaryDir dir;
+        const QString file = dir.filePath(QStringLiteral("q.solid"));
+        QFile f(file);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.write("abc");
+        f.close();
+        const qint64 mtime = QFileInfo(file).lastModified().toSecsSinceEpoch();
+        QTemporaryDir store;
+        const QString entry = core::detail::freedesktopThumbnailPath(store.path(), QStringLiteral("large"), file);
+        QDir().mkpath(QFileInfo(entry).absolutePath());
+        auto write = [&](const QString &uri, const QString &size) {
+            QImage img(256, 128, QImage::Format_RGBA8888);
+            img.fill(Qt::green);
+            img.setText(QStringLiteral("Thumb::MTime"), QString::number(mtime));
+            if (!uri.isEmpty()) img.setText(QStringLiteral("Thumb::URI"), uri);
+            if (!size.isEmpty()) img.setText(QStringLiteral("Thumb::Size"), size);
+            img.save(entry, "PNG");
+        };
+        const QString uri = QString::fromLatin1(QUrl::fromLocalFile(QFileInfo(file).absoluteFilePath()).toEncoded());
+        write(uri, QStringLiteral("3"));
+        QVERIFY(!core::detail::freedesktopThumbnail(store.path(), file, 160).isNull());
+        write(QStringLiteral("file:///elsewhere.jpg"), QStringLiteral("3"));
+        QVERIFY(core::detail::freedesktopThumbnail(store.path(), file, 160).isNull());
+        write(uri, QStringLiteral("4"));
+        QVERIFY(core::detail::freedesktopThumbnail(store.path(), file, 160).isNull());
+    }
+
     void aStaleOrTooSmallSystemThumbnailIsIgnored()
     {
         QTemporaryDir dir;

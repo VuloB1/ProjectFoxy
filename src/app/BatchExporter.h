@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QStringList>
+#include <QThreadPool>
 #include <QUrl>
 #include <atomic>
 #include <memory>
@@ -20,6 +21,7 @@ class BatchExporter : public QObject {
 
 public:
     explicit BatchExporter(QObject *parent = nullptr);
+    ~BatchExporter() override;
 
     bool running() const { return m_running; }
     int progress() const { return m_progress; }
@@ -44,4 +46,5 @@ private:
     int m_progress = 0;
     int m_total = 0;
     std::shared_ptr<std::atomic<bool>> m_cancelRequested;
+    QThreadPool m_pool; // the worker holds `this`: its own pool, waited for in the destructor
 };

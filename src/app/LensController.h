@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QThreadPool>
 #include <QVariantList>
 #include <QVariantMap>
 
@@ -14,6 +15,7 @@ class LensController : public QObject {
 
 public:
     explicit LensController(QObject *parent = nullptr);
+    ~LensController() override;
 
     bool ready() const { return m_ready; }
 
@@ -43,4 +45,5 @@ signals:
 private:
     bool m_ready = false;
     bool m_started = false;
+    QThreadPool m_pool; // the loader holds `this`: its own pool, waited for in the destructor
 };
