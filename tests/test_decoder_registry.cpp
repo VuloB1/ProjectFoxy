@@ -400,6 +400,61 @@ private slots:
                      && std::abs(qBlue(got) - want[2]) <= 8, qPrintable(msg));
     }
 
+    // A phone's HEIC carries a small thumbnail of its own. A preview request that it satisfies uses it (no full
+    // decode); a bigger request, or a file without one, decodes the picture. Built here with libheif: a 400x300 AVIF
+    // in Display P3, left half one colour and right half another, with a 160 px thumbnail.
+    void aPreviewUsesTheEmbeddedThumbnailWhenItIsBigEnough()
+    {
+        QTemporaryDir dir;
+        const QString path = dir.filePath("thumb.avif");
+        try {
+            heif::Image image;
+            image.create(400, 300, heif_colorspace_RGB, heif_chroma_interleaved_RGB);
+            image.add_plane(heif_channel_interleaved, 400, 300, 8);
+            int stride = 0;
+            uint8_t *plane = image.get_plane(heif_channel_interleaved, &stride);
+            for (int y = 0; y < 300; ++y)
+                for (int x = 0; x < 400; ++x) {
+                    const bool left = x < 200;
+                    plane[y * stride + x * 3] = left ? 200 : 30;
+                    plane[y * stride + x * 3 + 1] = left ? 120 : 30;
+                    plane[y * stride + x * 3 + 2] = left ? 60 : 220;
+                }
+            heif::ColorProfile_nclx nclx;
+            nclx.set_color_primaries(heif_color_primaries_SMPTE_EG_432_1);
+            nclx.set_transfer_characteristics(heif_transfer_characteristic_IEC_61966_2_1);
+            nclx.set_matrix_coefficients(heif_matrix_coefficients_ITU_R_BT_601_6);
+            nclx.set_full_range_flag(true);
+            image.set_nclx_color_profile(nclx);
+
+            heif::Context ctx;
+            heif::Encoder encoder(heif_compression_AV1);
+            encoder.set_lossy_quality(95);
+            const heif::ImageHandle master = ctx.encode_image(image, encoder);
+            ctx.encode_thumbnail(image, master, encoder, heif::Context::EncodingOptions(), 160);
+            ctx.write_to_file(path.toStdString());
+        } catch (const heif::Error &e) {
+            QSKIP(qPrintable(QStringLiteral("this libheif cannot write AVIF thumbnails: %1").arg(QString::fromStdString(e.get_message()))));
+        }
+
+        auto decoder = core::DecoderRegistry::instance().decoderFor(path);
+        const core::DecodeResult small = decoder->decode(path, QSize(120, 120));
+        QVERIFY2(small.ok, qPrintable(small.error));
+        QCOMPARE(small.sourceSize, QSize(400, 300));       // the picture's size, not the thumbnail's
+        QCOMPARE(small.image.size(), QSize(160, 120));      // the embedded thumbnail, not a full decode
+        const colorref::Vec3 want = colorref::referenceToSrgb(colorref::kDisplayP3ToXyz, colorref::srgbToLinear, 200, 120, 60);
+        const QRgb left = small.image.pixel(20, 60);
+        QVERIFY2(std::abs(qRed(left) - want[0]) <= 10 && std::abs(qGreen(left) - want[1]) <= 10
+                     && std::abs(qBlue(left) - want[2]) <= 10, "the thumbnail was not brought into sRGB");
+        QVERIFY(qBlue(small.image.pixel(140, 60)) > qRed(small.image.pixel(140, 60))); // right half still blue: not turned
+
+        const core::DecodeResult big = decoder->decode(path, QSize(300, 300)); // thumbnail too small for this
+        QVERIFY2(big.ok, qPrintable(big.error));
+        QCOMPARE(big.image.size(), QSize(400, 300));
+        const core::DecodeResult full = decoder->decode(path);
+        QCOMPARE(full.image.size(), QSize(400, 300));
+    }
+
     // An RGB profile Qt cannot use (here a damaged one): the pixels are NOT touched and
     // the profile is handed on, so saving can attach it again.
     void anUnusableRgbProfileIsKeptForSaving()

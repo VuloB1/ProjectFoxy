@@ -4,6 +4,7 @@
 #include <libheif/heif_cxx.h>
 #include <QFile>
 #include <cstring>
+#include <optional>
 #include "Translate.h"
 
 namespace core {
@@ -14,13 +15,44 @@ bool HeifDecoder::canDecode(const QString &filePath) const
     return supportedExtensions().contains(ext);
 }
 
+namespace {
+
+// The smallest thumbnail stored in the file that still has `wanted`'s long side and the picture's own proportions.
+// The proportion check is also the guard against a thumbnail stored on its side: its colour profile is read from the
+// main image anyway, so nothing else about it needs to be trusted.
+std::optional<heif::ImageHandle> embeddedThumbnail(const heif::ImageHandle &primary, QSize wanted)
+{
+    const int wantedEdge = qMax(wanted.width(), wanted.height());
+    const double ratio = double(primary.get_width()) / qMax(1, primary.get_height());
+    std::optional<heif::ImageHandle> best;
+    int bestEdge = 0;
+    for (const heif_item_id id : primary.get_list_of_thumbnail_IDs()) {
+        try {
+            heif::ImageHandle thumb = const_cast<heif::ImageHandle &>(primary).get_thumbnail(id);
+            const int w = thumb.get_width(), h = thumb.get_height();
+            const int edge = qMax(w, h);
+            if (w <= 0 || h <= 0 || edge < wantedEdge)
+                continue;
+            if (qAbs(double(w) / h - ratio) > 0.03 * ratio)
+                continue;
+            if (!best || edge < bestEdge) {
+                best = thumb;
+                bestEdge = edge;
+            }
+        } catch (const heif::Error &) {
+            // an unreadable thumbnail is skipped
+        }
+    }
+    return best;
+}
+
+} // namespace
+
 DecodeResult HeifDecoder::decode(const QString &filePath, QSize maxSize)
 {
-    // Unlike libvips (shrink-on-load) or LibRaw (half_size), the plain
-    // libheif C++ API used here has no equally simple native downscale path
-    // - a thumbnail/preview request still decodes at full resolution. Only
-    // matters for filmstrip speed, not correctness.
-    Q_UNUSED(maxSize);
+    // Unlike libvips (shrink-on-load) or LibRaw (half_size), libheif has no native downscale path, so a preview
+    // would decode the whole picture. Phones store a small thumbnail inside the file, though: a preview request uses
+    // it when it is big enough (see embeddedThumbnail()) and only falls back to the full decode when there is none.
 
     DecodeResult result;
 
@@ -48,7 +80,13 @@ DecodeResult HeifDecoder::decode(const QString &filePath, QSize maxSize)
         heif::ImageHandle handle = ctx.get_primary_image_handle();
         result.sourceSize = QSize(handle.get_width(), handle.get_height());
 
-        heif::Image img = handle.decode_image(heif_colorspace_RGB, heif_chroma_interleaved_RGBA);
+        heif::Image img = [&]() {
+            if (maxSize.isValid()) {
+                if (auto thumb = embeddedThumbnail(handle, maxSize))
+                    return thumb->decode_image(heif_colorspace_RGB, heif_chroma_interleaved_RGBA);
+            }
+            return handle.decode_image(heif_colorspace_RGB, heif_chroma_interleaved_RGBA);
+        }();
 
         int stride = 0;
         const uint8_t *plane = img.get_plane(heif_channel_interleaved, &stride);
