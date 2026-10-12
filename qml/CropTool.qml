@@ -130,8 +130,8 @@ Item {
             spacing: 6
             width: parent.width
             readonly property real cell: (width - spacing * 3) / 4
-            AppButton { text: qsTr("Rotar a la izquierda"); iconName: "rotate-left"; iconOnly: true; width: parent.cell; onClicked: root.canvas.playEditTransform("rotateL") }
-            AppButton { text: qsTr("Rotar a la derecha"); iconName: "rotate-right"; iconOnly: true; width: parent.cell; onClicked: root.canvas.playEditTransform("rotate") }
+            AppButton { objectName: "rotateLeftButton"; text: qsTr("Rotar a la izquierda"); iconName: "rotate-left"; iconOnly: true; width: parent.cell; onClicked: root.canvas.playEditTransform("rotateL") }
+            AppButton { objectName: "rotateRightButton"; text: qsTr("Rotar a la derecha"); iconName: "rotate-right"; iconOnly: true; width: parent.cell; onClicked: root.canvas.playEditTransform("rotate") }
             AppButton { text: qsTr("Voltear horizontal"); iconName: "flip-h"; iconOnly: true; width: parent.cell; onClicked: root.canvas.playEditTransform("flipH") }
             AppButton { text: qsTr("Voltear vertical"); iconName: "flip-v"; iconOnly: true; width: parent.cell; onClicked: root.canvas.playEditTransform("flipV") }
         }

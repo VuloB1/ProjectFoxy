@@ -1435,3 +1435,35 @@ proceso: se la pasa al que corre y le trae la ventana al frente.
 - **No probado:** el comportamiento de «traer al frente» con un doble clic real desde el Explorador (la prueba lanzó los
   procesos desde PowerShell: el contenido cambió, pero no se verificó qué ventana quedó al frente), Flatpak/AppImage
   reales, ni dos sesiones de usuario a la vez.
+
+## 20. Pruebas de interfaz (12‑oct‑2026)
+
+Hasta ahora ningún test manejaba la interfaz real: un botón desconectado o un panel que no abre no lo veía nadie.
+`tests/test_ui_flows.cpp` carga el `Main.qml` **real**, sobre el **mismo cableado** que el programa
+(`AppBootstrap::setup`, que ahora comparten `main.cpp` y la prueba), y lo maneja como una persona: eventos de ratón y de
+teclado sintéticos, con la plataforma `offscreen` de Qt y su renderizador por software (sin ventana ni GPU).
+
+- **Los controles se identifican por función, no por posición ni por aspecto**: cada uno que la prueba usa tiene un
+  `objectName` (`nextButton`, `previousButton`, `zoomInButton`, `zoomOutButton`, `fitButton`, `editButton`,
+  `settingsButton`, `saveButton`, `undoButton`, `tool-<id>`, `rotateRightButton`, `applyToolButton`, `cancelToolButton`,
+  `unsavedSaveButton`/`unsavedDiscardButton`/`unsavedCancelButton`, `overwriteConfirmButton`, `imageCanvas`). **Regla para
+  rediseñar la interfaz:** se puede mover, reestilizar o cambiar de contenedor cualquier cosa mientras cada nombre siga
+  significando el mismo control; si un control se reemplaza, el nuevo hereda el nombre.
+- **Recorridos (9):** abrir una imagen y verla en el lienzo; Siguiente/Anterior y las flechas del teclado; los botones de
+  zoom y Ajustar; **editar → Recortar → girar → Aplicar → Guardar → «Sobrescribir»** (el archivo queda girado y nada queda sin
+  guardar); Deshacer; y **la pregunta de «cambios sin guardar»** al cambiar de imagen (Cancelar se queda y conserva la edición,
+  Descartar sigue).
+- **Cómo está montado:** `qt_add_qml_module` solo puede colgar de un ejecutable, así que `test_ui_flows` construye **su propia
+  copia del módulo** (mismos archivos QML, vía `IV_QML_FILES`, y los mismos recursos, vía `iv_add_app_resources`); nada de eso se
+  distribuye. Cada recorrido arranca un motor nuevo; el modo de prueba de `QStandardPaths` evita tocar la configuración de la
+  persona. `click()` espera a que el control esté visible, habilitado **y quieto** (los paneles se deslizan: un clic sobre un
+  objetivo que se mueve cae en el vacío).
+- **Comprobado que atrapa roturas:** con tres mutaciones temporales del QML (Siguiente que retrocede, «Descartar» que en
+  realidad cancela, «Guardar» que no hace nada), la prueba terminó con exactamente 3 fallos.
+- **Encontró un fallo real de apagado.** Al destruir el motor QML, `FolderModel` (y su caché de miniaturas) se destruye
+  **antes** que `ThumbnailImageProvider`, cuyos hilos aún podían estar usando esa caché: corrupción de memoria (en Windows,
+  `0xc0000374`) en ~1 de cada 12 corridas. En el programa real solo ocurría al cerrar, sin que nadie lo notara. Ahora
+  `ThumbnailImageProvider::shutdown()` detiene y espera a sus hilos cuando el motor empieza a destruirse (`AppBootstrap`);
+  tras el arreglo, 0 fallos en 80 corridas seguidas en Windows y 0 en 15 en Linux.
+- **No cubre:** el aspecto (es lo que se verifica con capturas, no con estas pruebas), estudios (GIF, collage), el modo de
+  comparación de varias imágenes, la configuración, ni accesibilidad. Se amplía cuando se rediseñe la interfaz.

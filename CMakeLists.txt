@@ -102,6 +102,8 @@ add_library(imageviewer_app STATIC
     src/app/PictureCache.cpp
     src/app/SingleInstance.h
     src/app/SingleInstance.cpp
+    src/app/AppBootstrap.h
+    src/app/AppBootstrap.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
@@ -159,14 +161,59 @@ target_link_libraries(imageviewer_app PUBLIC
 # The version the program reports (Info panel) is the project's own.
 add_compile_definitions(PROJECTFOXY_VERSION="${PROJECT_VERSION}")
 
+# What the program carries besides its QML: the lens database, the translations and the GPU shaders. A function so that
+# the interface tests' own copy of the module gets exactly the same.
+function(iv_add_app_resources target)
+    # The Lensfun lens database (resources/lensfun, CC BY-SA 3.0 - see docs/LICENCIAS.md), compiled into the
+    # program as Qt resources under :/lensfun so the lens correction works wherever the .exe is copied.
+    file(GLOB _iv_lensfun_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/lensfun/*.xml"
+                                                  "${CMAKE_SOURCE_DIR}/resources/lensfun/timestamp.txt")
+    qt_add_resources(${target} "lensfun_db"
+        PREFIX "/lensfun"
+        BASE "${CMAKE_SOURCE_DIR}/resources/lensfun"
+        FILES ${_iv_lensfun_files}
+    )
+
+    # The translations of the interface (resources/i18n/<language>.json, built from i18n/strings.tsv by tools/i18n_tool.py).
+    file(GLOB _iv_i18n_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/i18n/*.json")
+    qt_add_resources(${target} "i18n"
+        PREFIX "/i18n"
+        BASE "${CMAKE_SOURCE_DIR}/resources/i18n"
+        FILES ${_iv_i18n_files}
+    )
+
+    # Custom fragment shaders for the live GPU preview of the edits
+    # (Grade.frag = tone/color grading, used for both the Filtros look and the
+    # Ajustes sliders; Detail.frag = clarity + sharpen + vignette + grain) -
+    # compiled by qsb into .qsb bytecode bundled as Qt resources.
+    #
+    # GLSL "150,300es": the film grain hashes pixel coordinates with unsigned
+    # integer math (so CPU and GPU produce the very same noise), which the default
+    # legacy targets (GLSL ES 100 / GLSL 120) cannot express. The app renders with
+    # Direct3D 11 anyway; the OpenGL variants only matter if QSG_RHI_BACKEND is
+    # overridden.
+    qt_add_shaders(${target} "imageviewer_shaders"
+        PREFIX "/shaders"
+        GLSL "150,300es"
+        FILES
+            qml/shaders/Grade.frag
+            qml/shaders/Detail.frag
+            qml/shaders/Checker.frag
+            qml/shaders/PixelGrid.frag
+        OUTPUTS
+            Grade.frag.qsb
+            Detail.frag.qsb
+            Checker.frag.qsb
+            PixelGrid.frag.qsb
+    )
+endfunction()
+
 qt_add_executable(ImageViewer
     src/app/main.cpp
 )
 
-qt_add_qml_module(ImageViewer
-    URI ImageViewerApp
-    VERSION 1.0
-    QML_FILES
+# The interface's QML files: the program and the interface tests (tests/test_ui_flows.cpp) both build this module.
+set(IV_QML_FILES
         qml/Main.qml
         qml/ImageCanvas.qml
         qml/ThumbnailStrip.qml
@@ -228,26 +275,14 @@ qt_add_qml_module(ImageViewer
         qml/controls/AppTabButton.qml
         qml/controls/AppScrollBar.qml
         qml/controls/AppWheelScroll.qml
+)
+
+qt_add_qml_module(ImageViewer
+    URI ImageViewerApp
+    VERSION 1.0
+    QML_FILES ${IV_QML_FILES}
     RESOURCES
         resources/icons/icon.png
-)
-
-# The Lensfun lens database (resources/lensfun, CC BY-SA 3.0 - see docs/LICENCIAS.md), compiled into the
-# program as Qt resources under :/lensfun so the lens correction works wherever the .exe is copied.
-file(GLOB _iv_lensfun_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/lensfun/*.xml"
-                                              "${CMAKE_SOURCE_DIR}/resources/lensfun/timestamp.txt")
-qt_add_resources(ImageViewer "lensfun_db"
-    PREFIX "/lensfun"
-    BASE "${CMAKE_SOURCE_DIR}/resources/lensfun"
-    FILES ${_iv_lensfun_files}
-)
-
-# The translations of the interface (resources/i18n/<language>.json, built from i18n/strings.tsv by tools/i18n_tool.py).
-file(GLOB _iv_i18n_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/i18n/*.json")
-qt_add_resources(ImageViewer "i18n"
-    PREFIX "/i18n"
-    BASE "${CMAKE_SOURCE_DIR}/resources/i18n"
-    FILES ${_iv_i18n_files}
 )
 
 target_link_libraries(ImageViewer PRIVATE
@@ -264,30 +299,7 @@ target_link_libraries(ImageViewer PRIVATE
     $<$<PLATFORM_ID:Windows>:User32>
 )
 
-# Custom fragment shaders for the live GPU preview of the edits
-# (Grade.frag = tone/color grading, used for both the Filtros look and the
-# Ajustes sliders; Detail.frag = clarity + sharpen + vignette + grain) -
-# compiled by qsb into .qsb bytecode bundled as Qt resources.
-#
-# GLSL "150,300es": the film grain hashes pixel coordinates with unsigned
-# integer math (so CPU and GPU produce the very same noise), which the default
-# legacy targets (GLSL ES 100 / GLSL 120) cannot express. The app renders with
-# Direct3D 11 anyway; the OpenGL variants only matter if QSG_RHI_BACKEND is
-# overridden.
-qt_add_shaders(ImageViewer "imageviewer_shaders"
-    PREFIX "/shaders"
-    GLSL "150,300es"
-    FILES
-        qml/shaders/Grade.frag
-        qml/shaders/Detail.frag
-        qml/shaders/Checker.frag
-        qml/shaders/PixelGrid.frag
-    OUTPUTS
-        Grade.frag.qsb
-        Detail.frag.qsb
-        Checker.frag.qsb
-        PixelGrid.frag.qsb
-)
+iv_add_app_resources(ImageViewer)
 
 # `import QtQuick.Effects` (MultiEffect, used for the floating toolbar's drop
 # shadow) can't be statically linked like the other QML
@@ -448,4 +460,40 @@ option(IMAGEVIEWER_BUILD_TESTS "Build the tests (the Flatpak and other packages 
 if(IMAGEVIEWER_BUILD_TESTS)
 enable_testing()
 add_subdirectory(tests)
+
+# The interface tests: the real Main.qml driven with synthetic mouse and key events (tests/test_ui_flows.cpp). They need
+# the program's QML module, which belongs to the ImageViewer executable, so this executable builds its own copy of it
+# (same URI, same files). It only exists for the tests: nothing of it is shipped.
+find_package(Qt6 REQUIRED COMPONENTS Test)
+qt_add_executable(test_ui_flows tests/test_ui_flows.cpp)
+qt_add_qml_module(test_ui_flows
+    URI ImageViewerApp
+    VERSION 1.0
+    OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test_ui_module/ImageViewerApp" # Qt: one output folder per module target
+    QML_FILES ${IV_QML_FILES}
+    RESOURCES
+        resources/icons/icon.png
+)
+iv_add_app_resources(test_ui_flows)
+target_link_libraries(test_ui_flows PRIVATE
+    imageviewer_app
+    imageviewer_core
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
+    Qt6::QuickDialogs2
+    Qt6::Svg
+    Qt6::Test
+    $<$<PLATFORM_ID:Windows>:Shell32>
+    $<$<PLATFORM_ID:Windows>:User32>
+)
+# QtQuick.Effects is copied next to the executable by ImageViewer's post-build step (Windows), so that one is built first.
+add_dependencies(test_ui_flows ImageViewer)
+add_test(NAME test_ui_flows COMMAND test_ui_flows)
+# No window and no GPU needed: Qt's "offscreen" platform and its software renderer (as the startup smoke test does).
+set_tests_properties(test_ui_flows PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QSG_RHI_BACKEND=software;QT_PLUGIN_PATH=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS};QT_FORCE_STDERR_LOGGING=1"
+    TIMEOUT 180)
 endif()

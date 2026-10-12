@@ -118,6 +118,7 @@ AppPanelBackground {
             delegate: Rectangle {
                 id: entry
                 required property var modelData
+                objectName: "tool-" + modelData.id
                 width: home.width
                 height: 62
                 radius: themeManager.radiusSmall
@@ -257,12 +258,14 @@ AppPanelBackground {
                 readonly property real cell: (width - spacing) / 2
                 AppButton {
                     text: qsTr("Cancelar")
+                    objectName: "cancelToolButton"
                     iconName: "cancel"
                     width: parent.cell
                     onClicked: root.closeTool(false)
                 }
                 AppButton {
                     text: qsTr("Aplicar")
+                    objectName: "applyToolButton"
                     iconName: "check"
                     width: parent.cell
                     enabled: toolLoader.item ? toolLoader.item.canApply : false

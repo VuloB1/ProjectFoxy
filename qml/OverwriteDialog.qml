@@ -46,6 +46,7 @@ AppDialog {
             spacing: 8
             AppButton {
                 text: qsTr("Sobrescribir")
+                objectName: "overwriteConfirmButton"
                 onClicked: {
                     if (dontAskAgain.checked)
                         appSettings.confirmOverwrite = false;
