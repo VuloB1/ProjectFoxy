@@ -220,7 +220,7 @@ AppDialog {
                 Item {
                     id: pageColumn
                     width: scroller.width - 12
-                    implicitHeight: root.page === 0 ? appearance.implicitHeight + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + 64
+                    implicitHeight: root.page === 0 ? appearance.implicitHeight + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + windowCard.implicitHeight + 80
                                        : root.page === 1 ? slideshow.implicitHeight
                                        : root.page === 2 ? saving.implicitHeight : batch.implicitHeight
 
@@ -491,6 +491,23 @@ AppDialog {
                                 from: 1; to: 4; decimals: 0; dragStep: 1
                                 value: appSettings.stripColumns
                                 onValueEdited: appSettings.stripColumns = Math.round(newValue)
+                            }
+                        }
+                    }
+
+                    // -- Apariencia, 4th card: one window or several -----------------------------
+                    Card {
+                        id: windowCard
+                        width: parent.width
+                        visible: root.page === 0
+                        y: appearance.height + languageCard.height + zoomCard.height + pixelCard.height + stripCard.height + 80
+                        heading: qsTr("Ventanas")
+                        SettingRow {
+                            label: qsTr("Una sola ventana")
+                            hint: qsTr("Al abrir una imagen desde el Explorador se usa la ventana que ya está abierta, en vez de abrir otra. Se aplica la próxima vez que abras el programa.")
+                            AppSwitch {
+                                checked: appSettings.singleInstance
+                                onToggled: appSettings.singleInstance = checked
                             }
                         }
                     }

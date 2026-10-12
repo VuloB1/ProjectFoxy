@@ -39,6 +39,7 @@ AppSettings::AppSettings(QObject *parent)
     m_pixelGrid = m_store.value(QStringLiteral("view/pixelGrid"), wasAllInOne).toBool();
     m_pixelReadout = m_store.value(QStringLiteral("view/pixelReadout"), wasAllInOne).toBool();
     m_pixelSharpEdit = m_store.value(QStringLiteral("view/pixelSharpEdit"), wasAllInOne).toBool();
+    m_singleInstance = m_store.value(QStringLiteral("window/singleInstance"), true).toBool();
 }
 
 void AppSettings::setStripThumbSize(int value)
@@ -132,6 +133,12 @@ void AppSettings::setPixelCheckerboard(bool value)
 {
     if (storeFlag(m_pixelCheckerboard, QStringLiteral("view/pixelCheckerboard"), value))
         emit pixelCheckerboardChanged();
+}
+
+void AppSettings::setSingleInstance(bool value)
+{
+    if (storeFlag(m_singleInstance, QStringLiteral("window/singleInstance"), value))
+        emit singleInstanceChanged();
 }
 
 void AppSettings::setPixelGrid(bool value)

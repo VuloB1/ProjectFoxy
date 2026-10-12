@@ -90,6 +90,11 @@ target_link_libraries(test_app_controller PRIVATE imageviewer_app imageviewer_co
 target_compile_definitions(test_app_controller PRIVATE FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 add_test(NAME test_app_controller COMMAND test_app_controller)
 
+# One window for the program: a second launch hands its file to the first.
+add_executable(test_single_instance test_single_instance.cpp)
+target_link_libraries(test_single_instance PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_single_instance COMMAND test_single_instance)
+
 # What is derived from the picture and cached: structural result, histograms, small copy.
 add_executable(test_picture_cache test_picture_cache.cpp)
 target_link_libraries(test_picture_cache PRIVATE imageviewer_app imageviewer_core Qt6::Test)
