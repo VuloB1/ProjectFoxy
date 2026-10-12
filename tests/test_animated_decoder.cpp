@@ -148,6 +148,23 @@ private slots:
         QVERIFY(!decoder.decode(QStringLiteral(FIXTURES_DIR "/test_animation.png")).ok);
     }
 
+    // Found by fuzzing: 188 bytes of animated WebP whose header declares a 48 x 16 252 703 canvas (3 GB of RGBA). libwebp's
+    // animation decoder allocates two canvases as soon as it is created, so the size has to be refused from the header,
+    // before it is ever created.
+    void aWebpWhoseHeaderClaimsAGiantCanvasIsRefusedUpFront()
+    {
+        core::AnimatedDecoder decoder;
+        const QString file = QStringLiteral(FIXTURES_DIR "/fuzz/webp-huge-canvas.webp");
+        QElapsedTimer clock;
+        clock.start();
+        const core::DecodeResult result = decoder.decode(file);
+        QVERIFY(!result.ok);
+        QVERIFY(!result.error.isEmpty());
+        QVERIFY2(clock.elapsed() < 2000, "it must be refused without trying to build the canvas");
+        // a preview request takes the same road
+        QVERIFY(!decoder.decode(file, QSize(64, 64)).ok);
+    }
+
     void aPreviewIsAlwaysOneFrameWhateverTheLimits()
     {
         LimitsGuard guard;
