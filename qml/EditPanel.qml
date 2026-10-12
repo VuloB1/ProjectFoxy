@@ -282,7 +282,7 @@ AppPanelBackground {
     Component { id: effectsComponent; EffectsTool { canvas: root.canvas } }
     Component { id: lensComponent; LensTool { canvas: root.canvas } }
 
-    // Exposed so FloatingToolbar's edit-mode button row can trigger the same
+    // Exposed so StatusBar's edit-mode button row can trigger the same
     // save-as flow without duplicating the dialog.
     function requestSaveAs() {
         if (appController.isSaving)

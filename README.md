@@ -92,7 +92,7 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
 **Viewer**
 - Opens a file (dialog, drag and drop, "Open with" or the Explorer context menu) and browses its folder in natural
   order.
-- Collapsible side bar with thumbnails (memory and disk cache), GPU zoom/pan, slideshow, before/after compare,
+- Collapsible side bar with thumbnails (memory and disk cache), GPU zoom/pan, before/after compare,
   copy/paste, desktop wallpaper, recycle bin, EXIF information with histogram.
 - **Correct color**: Display P3 (iPhone) or AdobeRGB photos are converted to sRGB when opened instead of looking
   washed out; what you save is tagged as sRGB.
@@ -318,7 +318,7 @@ idioma, un *pull request* es muy bienvenido (ver [`CONTRIBUTING.md`](CONTRIBUTIN
 - Abre un archivo (diálogo, arrastrar y soltar, "Abrir con" o menú contextual del
   Explorador) y recorre su carpeta con orden natural.
 - Barra lateral colapsable con miniaturas (caché en memoria y en disco),
-  zoom/desplazamiento por GPU, presentación, comparar antes/después,
+  zoom/desplazamiento por GPU, comparar antes/después,
   copiar/pegar, fondo de escritorio, papelera, información EXIF con histograma.
 - **Color correcto**: las fotos en Display P3 (iPhone) o AdobeRGB se convierten a sRGB al
   abrirlas, en lugar de verse apagadas; lo que se guarda va etiquetado como sRGB.

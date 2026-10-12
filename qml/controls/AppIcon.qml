@@ -379,10 +379,20 @@ Canvas {
             ctx.beginPath(); ctx.arc(12, 12, 8.5, 0, 2 * Math.PI); ctx.stroke();
             ctx.beginPath(); ctx.arc(12, 12, 8.5, -Math.PI / 2, Math.PI / 2); ctx.closePath(); ctx.fill();
             break;
-        case "slideshow":
-            ctx.beginPath(); ctx.moveTo(4, 5); ctx.lineTo(20, 5); ctx.lineTo(20, 15); ctx.lineTo(4, 15); ctx.closePath(); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(10, 8); ctx.lineTo(14.5, 10); ctx.lineTo(10, 12); ctx.closePath(); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(8, 19); ctx.lineTo(16, 19); ctx.stroke();
+        case "shuffle":
+            ctx.beginPath(); ctx.moveTo(3, 7); ctx.lineTo(7, 7); ctx.bezierCurveTo(13, 7, 11, 17, 17, 17); ctx.lineTo(20, 17); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(17, 14); ctx.lineTo(20, 17); ctx.lineTo(17, 20); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(3, 17); ctx.lineTo(7, 17); ctx.bezierCurveTo(9, 17, 10, 16, 11, 14.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(13, 9.5); ctx.bezierCurveTo(14, 8, 15, 7, 17, 7); ctx.lineTo(20, 7); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(17, 4); ctx.lineTo(20, 7); ctx.lineTo(17, 10); ctx.stroke();
+            break;
+        case "swap":
+            ctx.beginPath(); ctx.moveTo(4, 8); ctx.lineTo(20, 8); ctx.moveTo(16, 4); ctx.lineTo(20, 8); ctx.lineTo(16, 12); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(20, 16); ctx.lineTo(4, 16); ctx.moveTo(8, 12); ctx.lineTo(4, 16); ctx.lineTo(8, 20); ctx.stroke();
+            break;
+        case "front":
+            ctx.beginPath(); ctx.roundedRect(4, 4, 11, 11, 1.5, 1.5); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(9, 9, 11, 11, 1.5, 1.5); ctx.fill();
             break;
         case "folder-batch":
             ctx.beginPath();

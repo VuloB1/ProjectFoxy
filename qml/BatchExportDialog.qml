@@ -41,27 +41,19 @@ AppDialog {
         implicitWidth: root.width
         implicitHeight: root.height
 
-        Label {
-            id: heading
-            x: 28
-            y: 22
-            text: qsTr("Exportar por lote")
-            color: themeManager.textPrimary
-            font.bold: true
-            font.pixelSize: 18
-        }
-        Label {
-            x: 28
-            y: 50
-            text: qsTr("Elige las imágenes de esta carpeta que quieres convertir.")
-            color: themeManager.textSecondary
-            font.pixelSize: 12
+        DialogHeader {
+            id: header
+            iconName: "export-batch"
+            title: qsTr("Exportar por lote")
+            hint: qsTr("Elige las imágenes de esta carpeta que quieres convertir.")
+            closeEnabled: !batchExporter.running
+            onCloseRequested: root.close()
         }
 
         BatchFileList {
             id: files
             anchors.top: parent.top
-            anchors.topMargin: 88
+            anchors.topMargin: 100
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 24
             anchors.left: parent.left
@@ -90,43 +82,49 @@ AppDialog {
             anchors.rightMargin: 28
             spacing: 16
 
-            Column {
-                width: parent.width
-                spacing: 6
-                Label { text: qsTr("Formato"); color: themeManager.textSecondary }
-                AppComboBox { id: formatCombo; width: parent.width; model: ["png", "jpg", "bmp", "tif", "webp"]; enabled: !batchExporter.running }
-            }
-            Column {
-                width: parent.width
-                spacing: 6
-                Label { text: qsTr("Carpeta de destino"); color: themeManager.textSecondary }
-                AppButton {
+            AppCard {
+                heading: qsTr("Conversión")
+                Column {
                     width: parent.width
-                    enabled: !batchExporter.running
-                    text: root.destFolder.toString().length > 0
-                          ? decodeURIComponent(root.destFolder.toString().replace("file:///", ""))
-                          : qsTr("Elegir carpeta…")
-                    onClicked: destDialog.open()
+                    spacing: 6
+                    Label { text: qsTr("Formato"); color: themeManager.textSecondary }
+                    AppComboBox { id: formatCombo; width: parent.width; model: ["png", "jpg", "bmp", "tif", "webp"]; enabled: !batchExporter.running }
+                }
+                Column {
+                    width: parent.width
+                    spacing: 6
+                    Label { text: qsTr("Lado mayor máximo (px)"); color: themeManager.textSecondary }
+                    ScrubNumberField {
+                        id: maxSide
+                        width: parent.width
+                        from: 0; to: 20000; decimals: 0; dragStep: 10; value: 0
+                        enabled: !batchExporter.running
+                    }
+                    Label { text: qsTr("0 = conservar el tamaño original"); color: themeManager.textSecondary; font.pixelSize: 11 }
+                }
+                Label {
+                    width: parent.width
+                    text: qsTr("Calidad JPG y WebP: %1 % (se cambia en Configuración).").arg(appSettings.batchExportQuality)
+                    color: themeManager.textSecondary
+                    font.pixelSize: 11
+                    wrapMode: Text.WordWrap
                 }
             }
-            Column {
-                width: parent.width
-                spacing: 6
-                Label { text: qsTr("Lado mayor máximo (px)"); color: themeManager.textSecondary }
-                ScrubNumberField {
-                    id: maxSide
+            AppCard {
+                heading: qsTr("Destino")
+                Column {
                     width: parent.width
-                    from: 0; to: 20000; decimals: 0; dragStep: 10; value: 0
-                    enabled: !batchExporter.running
+                    spacing: 6
+                    Label { text: qsTr("Carpeta de destino"); color: themeManager.textSecondary }
+                    AppButton {
+                        width: parent.width
+                        enabled: !batchExporter.running
+                        text: root.destFolder.toString().length > 0
+                              ? decodeURIComponent(root.destFolder.toString().replace("file:///", ""))
+                              : qsTr("Elegir carpeta…")
+                        onClicked: destDialog.open()
+                    }
                 }
-                Label { text: qsTr("0 = conservar el tamaño original"); color: themeManager.textSecondary; font.pixelSize: 11 }
-            }
-            Label {
-                width: parent.width
-                text: qsTr("Calidad JPG y WebP: %1 % (se cambia en Configuración).").arg(appSettings.batchExportQuality)
-                color: themeManager.textSecondary
-                font.pixelSize: 11
-                wrapMode: Text.WordWrap
             }
         }
 

@@ -58,7 +58,7 @@ integrado de fotos. Interfaz en español. Tres temas visuales: *Moderno Claro*,
   cualquier idioma (acentos, japonés, cirílico, emoji).
 - Barra lateral izquierda colapsable con miniaturas (caché en memoria + caché en
   disco), navegación con flechas, zoom/desplazamiento por GPU, ajustar a pantalla.
-- Presentación (diaporama), comparar antes/después, copiar/pegar del portapapeles,
+- Comparar antes/después, copiar/pegar del portapapeles,
   fondo de escritorio, papelera, panel de información con EXIF e histograma.
 - **Respeta la orientación EXIF** (fotos de móvil), en tamaño completo y en miniatura.
 - GIF, APNG y WebP animados con reproducción real.
@@ -124,7 +124,7 @@ Tamaño del código (líneas no vacías, aproximado, 5‑oct‑2026): núcleo C+
 
 ```
 ┌──────────────────────────── QML (qml/) ────────────────────────────┐
-│ Main · Toolbar · FloatingToolbar · ThumbnailStrip · ImageCanvas     │
+│ Main · TitleBar · Toolbar · StatusBar · ThumbnailStrip · ImageCanvas│
 │ EditPanel (Recortar/Tamaño/Ajustes/Filtros/Efectos) · Diálogos      │
 │ controls/App*.qml  → envoltorios tematizados de cada control Qt     │
 │ shaders/Grade.frag + Detail.frag  → vista previa en GPU             │
@@ -734,7 +734,7 @@ peor caso.
 **Modo edición bajo demanda (sexta ronda).** El panel de edición (sliders, curvas, niveles,
 38 filtros, efectos) ya no se construye al arrancar: `Main.qml` lo crea con un `Loader` solo
 al pulsar «Editar» y lo destruye al salir. `Main.qml` es dueño de `editMode`
-(`setEditMode(on)`); `Toolbar`, `FloatingToolbar` e `ImageCanvas` reciben `editMode` y emiten
+(`setEditMode(on)`); `Toolbar`, `StatusBar` (antes `FloatingToolbar`) e `ImageCanvas` reciben `editMode` y emiten
 señales (`editModeRequested`, `saveAsRequested`, `closeEditRequested`) en vez de tocar el panel.
 Las ediciones viven en `AppController`, así que salir del modo edición no las pierde. Medido
 solo visualizando una foto pequeña (misma máquina, 7 s tras abrir; el ejecutable «antes» es la
@@ -766,7 +766,7 @@ como parte de la sesión (Cancelar los deshace). 6 pruebas nuevas en `test_app_c
 - *Disposición:* Cancelar / Aplicar (se probó el orden inverso y se volvió a este); «Cantidad» de Filtros fija encima de los botones; el texto de ayuda de Efectos arriba de las categorías; la página de una herramienta entra y sale por la derecha; los parámetros de un efecto largo se desplazan dentro de su zona.
 - *Cursor en zonas no clicables:* causa real: la página de la herramienta no cerraba el ratón a la lista de herramientas que tenía debajo, cuyas entradas (con cursor de mano y clic) seguían «viendo» el ratón a través de las zonas vacías. Ahora la página y la barra flotante son sólidas al ratón. Verificado con un mapa del cursor sobre todo el panel (antes: mano en toda zona vacía; después: ninguna).
 
-**Pulido de barras, menús y diálogos (novena ronda).** Barra superior: se eliminó el menú «⋯»; quedan Editar, Exportar por lote, Renombrar por lote, Información y Configuración, todos con icono (copiar, pegar, fondo y eliminar siguen en el menú contextual). Barras flotantes: todas usan el mismo estilo plano de `AppToolButton` (antes el modo edición mezclaba botones con borde), con más aire horizontal (`hPad`, `outerPad` en los extremos). Menú contextual (`AppMenu`/`AppMenuItem`): tarjeta redondeada con sombra, iconos por opción y variante `danger` para eliminar. Diálogo de confirmación reutilizable `ConfirmDialog` (icono redondo, texto en dos niveles, botón «Eliminar» rojo; `AppButton.primary/danger`) para eliminar archivo. Configuración: tarjetas por tema, interruptores (`AppSwitch`) en lugar de casillas y una línea de ayuda por página. La rueda de carga se sustituyó por `AppLoadingPill`: una píldora que se llena (estimación, el decodificador no informa el avance; aparece pasados 250 ms y se completa al llegar la imagen). `FloatingToolbar.updateEnds()` ahora solo reasigna los bordes que cambian: con el relleno extra, reasignar todos provocaba un bucle de `polish()`.
+**Pulido de barras, menús y diálogos (novena ronda; la barra flotante de esa ronda es hoy `StatusBar`, ver 21).** Barra superior: se eliminó el menú «⋯»; quedan Editar, Exportar por lote, Renombrar por lote, Información y Configuración, todos con icono (copiar, pegar, fondo y eliminar siguen en el menú contextual). Barras flotantes: todas usan el mismo estilo plano de `AppToolButton` (antes el modo edición mezclaba botones con borde), con más aire horizontal (`hPad`, `outerPad` en los extremos). Menú contextual (`AppMenu`/`AppMenuItem`): tarjeta redondeada con sombra, iconos por opción y variante `danger` para eliminar. Diálogo de confirmación reutilizable `ConfirmDialog` (icono redondo, texto en dos niveles, botón «Eliminar» rojo; `AppButton.primary/danger`) para eliminar archivo. Configuración: tarjetas por tema, interruptores (`AppSwitch`) en lugar de casillas y una línea de ayuda por página. La rueda de carga se sustituyó por `AppLoadingPill`: una píldora que se llena (estimación, el decodificador no informa el avance; aparece pasados 250 ms y se completa al llegar la imagen). `FloatingToolbar.updateEnds()` ahora solo reasigna los bordes que cambian: con el relleno extra, reasignar todos provocaba un bucle de `polish()`.
 
 **Exportar y renombrar por lote con selección (décima ronda).** Los dos diálogos abren una ventana con la lista de archivos de la carpeta (`BatchFileList`: casilla, miniatura y nombre; filtro por nombre; Todos / Ninguno / Invertir sobre lo visible; Mayús + clic para un tramo) y las opciones al lado. *Exportar* usa solo lo marcado, muestra el resultado al terminar y `BatchExporter` ya no escribe encima del original ni pisa a otro archivo del mismo lote con el mismo nombre base (añade `_2`, `_3`…). *Renombrar* arranca sin nada marcado, enseña «nombre actual → nombre nuevo» antes de tocar nada y explica por qué se rechazaría (nombre vacío o ilegal, o un nombre ya ocupado por un archivo no elegido): `FolderModel::checkRename` / `renameFiles`, en dos fases y **todo o nada** (si un paso falla se devuelve todo a como estaba; `renameAllInFolder` desapareció). 8 pruebas nuevas (`test_folder_model`).
 **Miniaturas con transparencia.** Causa: la caché de disco guardaba todas las miniaturas como JPEG, que no tiene alfa: al leerlas de nuevo (otra sesión) los recortes con fondo transparente mostraban su color oculto. Ahora las que tienen píxeles translúcidos se guardan como PNG y la clave lleva un prefijo `v2|` que deja sin uso los archivos antiguos (`test_thumbnail_cache`, 2 casos; falló antes del arreglo). Otros cambios: los temas Windows 98 se llaman «Classic Claro» y «Classic Oscuro» (ids internos sin cambio), el marco de selección de las tarjetas de tema se dibuja encima del dibujo (antes lo tapaban sus barras) y se quitó el botón de pausa de los GIF.
@@ -1216,7 +1216,7 @@ src/core  ImageLoader · ImageDocument · DecoderRegistry · ThumbnailCache
           collage/  Collage (dibujo) · Layouts (diseños y líneas divisorias)
 qml/      Main · ImageCanvas (1 100 líneas) · EditPanel (810) · Toolbar · CropTool · FramePanel
           LensTool · MultiView · PaneView · GifStudio · CollageMaker
-          FloatingToolbar · ThumbnailStrip · LookCell · EffectParamRow
+          StatusBar · ThumbnailStrip · LookCell · EffectParamRow
           UnsavedChangesDialog · OverwriteDialog · AdjustRow/Section
           LevelsEditor · CurvesEditor · HistogramView · SettingsDialog …
 qml/controls/  App*.qml (Button, Slider, CheckBox, RadioButton, Menu, Dialog,
@@ -1269,7 +1269,7 @@ reinstale lo afectado en el siguiente `cmake --build`.
 
 **Versión portable.** `src/app/AppPaths.h`: si junto a `ProjectFoxy.exe` existe `portable.txt`, la configuración (`settings.ini`) y la caché de miniaturas van a `datos\` en vez del perfil de Windows. El zip se arma con `cmake --install` (carpeta autocontenida, ver `tools/Test-Install.ps1`) + `portable.txt` + `LEEME.txt` + `licenses\` (avisos y `LICENCIAS.md`); sin firmar (SmartScreen avisa). Probado extrayendo el zip en una carpeta limpia y arrancando con PATH reducido: sin salida de errores, `datos\` creado, el `.ini` real intacto.
 
-**Barra de miniaturas configurable.** `ThumbnailStrip.qml` pasó de `ListView` a `GridView`: `appSettings.stripColumns` (1–4) × `stripThumbSize` (48–200 px, tope: la mitad de la ventana). Arrastrando el borde derecho con el mouse cambia el tamaño en vivo (`liveCell`, sin animación) y al soltar se guarda en `stripThumbSize`. `appSettings.stripMode`: `manual` (la pestaña abre/cierra), `open` y `closed` (sin pestaña) y `auto` (cerrada al editar, durante la presentación —`FloatingToolbar.slideshowRunning`— y con la ventana de menos de 900 px; la pestaña puede invertir la decisión hasta que cambie la situación). Las miniaturas se piden a 160 px, o a 256 si el tamaño pasa de 110. Se configura en Configuración > Apariencia > «Barra de miniaturas». +1 prueba en `test_app_settings`.
+**Barra de miniaturas configurable.** `ThumbnailStrip.qml` pasó de `ListView` a `GridView`: `appSettings.stripColumns` (1–4) × `stripThumbSize` (48–200 px, tope: la mitad de la ventana). Arrastrando el borde derecho con el mouse cambia el tamaño en vivo (`liveCell`, sin animación) y al soltar se guarda en `stripThumbSize`. `appSettings.stripMode`: `manual` (la pestaña abre/cierra), `open` y `closed` (sin pestaña) y `auto` (cerrada al editar y con la ventana de menos de 900 px; la pestaña puede invertir la decisión hasta que cambie la situación). Las miniaturas se piden a 160 px, o a 256 si el tamaño pasa de 110. Se configura en Configuración > Apariencia > «Barra de miniaturas». +1 prueba en `test_app_settings`.
 
 **Nombre e icono: «Project Foxy».** Título de la ventana en `Main.qml`; icono en `resources/icons/icon.png` (ventana, `main.cpp`) y `icon.ico` (el `.exe`, vía `resources/app.rc`). `applicationName`/`organizationName` siguen siendo `ImageViewer` a propósito: de ellos cuelgan las carpetas de configuración y caché, y cambiarlos perdería los ajustes de quien ya lo usa. El ejecutable, el target de CMake y el proyecto aún se llaman `ImageViewer`.
 
@@ -1467,3 +1467,46 @@ teclado sintéticos, con la plataforma `offscreen` de Qt y su renderizador por s
   tras el arreglo, 0 fallos en 80 corridas seguidas en Windows y 0 en 15 en Linux.
 - **No cubre:** el aspecto (es lo que se verifica con capturas, no con estas pruebas), estudios (GIF, collage), el modo de
   comparación de varias imágenes, la configuración, ni accesibilidad. Se amplía cuando se rediseñe la interfaz.
+
+## 21. Rediseño de la interfaz (12‑oct‑2026, versión 0.2.5)
+
+- **Ventana sin marco** (`Main.qml`: `FramelessWindowHint`) con barra de título propia, `TitleBar.qml`: ícono, nombre y
+  minimizar/maximizar/cerrar con el tema. Arrastrar y doble clic usan `startSystemMove()` (el sistema sigue
+  encargándose del ajuste a los bordes) y ocho `MouseArea` en los bordes llaman a `startSystemResize()`. En Windows,
+  `main.cpp` pide a DWM las esquinas redondeadas (`DWMWA_WINDOW_CORNER_PREFERENCE`) y un borde fino con sombra
+  (`DwmExtendFrameIntoClientArea`); se enlaza `dwmapi`. Pendiente conocido: al agrandar rápido se ven franjas negras (es
+  el intercambio de buffers de Direct3D con una ventana sin marco).
+- **Barra inferior** (`StatusBar.qml`, reemplaza a `FloatingToolbar.qml`): a la izquierda la posición y el color del
+  píxel bajo el cursor (`ImageCanvas.pixelInfo`/`pixelCell`; siempre activo, se quitó el ajuste `pixelReadout`), a la
+  derecha tamaño, zoom y el botón de información (el panel de información pasó aquí desde `Toolbar`), y en el medio el
+  «dock»: una pieza más alta, un solo contorno con la barra (`Canvas`; esquinas redondeadas y empalme cóncavo). Lleva
+  todos los botones solo con íconos. El comparador (`MultiView`) ya no tiene píldora flotante: expone `dockContent`
+  (un `Component`) y `StatusBar.customDock` lo muestra en el dock. La imagen se ajusta por encima del dock
+  (`Main.qml`: `bottomMargin: statusBar.rise`). «Copiado» aparece junto al cursor 0,7 s al copiar un color.
+- **Trampas de `Canvas`** (aprendidas dos veces): el contexto 2D conserva su estado entre `onPaint`, hay que empezar con
+  `ctx.reset()` (un `translate` acumulado deformaba la pestaña de la barra de miniaturas cada vez que se repintaba), y
+  `canvasSize` debe seguir al tamaño del ítem o el dibujo se estira.
+- **Pestaña de la barra de miniaturas**: siempre visible; en `open`/`closed`/`auto` invierte lo que dicta el modo
+  (`flipped`); el modo «con pestaña» pasó a llamarse «Manual».
+- **Componentes nuevos**: `DialogHeader.qml` (encabezado de diálogos y paneles), `controls/AppCard.qml` (tarjeta con
+  título), `controls/AppSegmented.qml` (elección única con texto o íconos). Los diálogos de exportar y renombrar por lote
+  usan tarjetas; Configuración es más alta, con la página activa teñida, `AppWheelScroll` (100 px por vuelta) y una
+  página «Acerca de» (`AboutPage.qml`: degradado radial, autor con su foto —`resources/images/creator.png`—, enlaces,
+  agradecimientos con enlace opcional y licencias).
+- **Estudios de GIF y de collage**: el ícono y el título van arriba del panel derecho; ya no hay barra superior ni X: el
+  botón de la barra superior que los abre los cierra. Con algo armado y sin guardar (`hasWork`: `dirty` desde que algo
+  cambia hasta que se guarda) `Main.requestStudio()` pregunta con `ConfirmDialog` y, si se sale, el estudio se vacía
+  (`discard()`). Botones a íconos; «Quitar todas» (GIF) queda lejos y pide confirmación.
+- **Se eliminó la presentación de diapositivas** (botón, ajustes, `FolderModel::advanceSlideshow` y su estado).
+- **PowerShell y archivos fuente**: `Get-Content`/`Set-Content` de Windows PowerShell 5.1 leen en ANSI y escriben con
+  BOM; corrompen las tildes. Los scripts de edición usan Python con UTF‑8 explícito.
+- **Pruebas**: `test_ui_flows` pasó a 12 recorridos (estudios que se abren y cierran con su botón, pregunta al salir con
+  fotogramas, botón de información). Se repiten 15 veces seguidas sin fallos.
+
+### Video (prueba de viabilidad, sin implementar)
+
+Con Qt 6.7.3 Multimedia (motor FFmpeg) se abrieron, reprodujeron a 29–31 fps y se extrajeron fotogramas exactos de MP4
+(H.264), MKV (H.264 y HEVC), WebM (VP9) y MKV (AV1), en Windows (FFmpeg incluido en la instalación de Qt, unos 19 MB) y
+en Linux (el plugin `libffmpegmediaplugin.so` lo lleva enlazado, 19 MB). En Linux no arrancó el motor GStreamer. Sin
+verificar: sonido real, ventana real en Linux, Flatpak/AppImage, videos 4K. Siguiente paso previsto: importar video al
+creador de GIF y, después, un visor de video.

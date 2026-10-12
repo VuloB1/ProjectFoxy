@@ -6,9 +6,6 @@
 #include <algorithm>
 
 namespace {
-constexpr int kDefaultIntervalMs = 3000;
-constexpr bool kDefaultRandom = false;
-constexpr bool kDefaultLoop = true;
 constexpr int kDefaultQuality = 90;
 constexpr int kDefaultPadding = 3;
 }
@@ -18,9 +15,6 @@ AppSettings::AppSettings(QObject *parent)
     , m_store(AppPaths::settingsFile(),
                QSettings::IniFormat)
 {
-    m_slideshowIntervalMs = m_store.value(QStringLiteral("slideshow/intervalMs"), kDefaultIntervalMs).toInt();
-    m_slideshowRandom = m_store.value(QStringLiteral("slideshow/random"), kDefaultRandom).toBool();
-    m_slideshowLoop = m_store.value(QStringLiteral("slideshow/loop"), kDefaultLoop).toBool();
     m_batchExportQuality = m_store.value(QStringLiteral("batch/exportQuality"), kDefaultQuality).toInt();
     m_batchRenamePadding = m_store.value(QStringLiteral("batch/renamePadding"), kDefaultPadding).toInt();
     m_confirmOverwrite = m_store.value(QStringLiteral("save/confirmOverwrite"), true).toBool();
@@ -37,7 +31,6 @@ AppSettings::AppSettings(QObject *parent)
     m_pixelIntegerZoom = m_store.value(QStringLiteral("view/pixelIntegerZoom"), wasAllInOne).toBool();
     m_pixelCheckerboard = m_store.value(QStringLiteral("view/pixelCheckerboard"), wasAllInOne).toBool();
     m_pixelGrid = m_store.value(QStringLiteral("view/pixelGrid"), wasAllInOne).toBool();
-    m_pixelReadout = m_store.value(QStringLiteral("view/pixelReadout"), wasAllInOne).toBool();
     m_pixelSharpEdit = m_store.value(QStringLiteral("view/pixelSharpEdit"), wasAllInOne).toBool();
     m_singleInstance = m_store.value(QStringLiteral("window/singleInstance"), true).toBool();
 }
@@ -81,25 +74,6 @@ bool AppSettings::storeFlag(bool &member, const QString &key, bool value)
     member = value;
     m_store.setValue(key, value);
     return true;
-}
-
-void AppSettings::setSlideshowIntervalMs(int value)
-{
-    value = std::clamp(value, 200, 60000);
-    if (m_slideshowIntervalMs == value)
-        return;
-    m_slideshowIntervalMs = value;
-    m_store.setValue(QStringLiteral("slideshow/intervalMs"), value);
-    emit slideshowIntervalMsChanged();
-}
-
-void AppSettings::setSlideshowRandom(bool value)
-{
-    if (m_slideshowRandom == value)
-        return;
-    m_slideshowRandom = value;
-    m_store.setValue(QStringLiteral("slideshow/random"), value);
-    emit slideshowRandomChanged();
 }
 
 void AppSettings::setLanguage(const QString &value)
@@ -147,25 +121,10 @@ void AppSettings::setPixelGrid(bool value)
         emit pixelGridChanged();
 }
 
-void AppSettings::setPixelReadout(bool value)
-{
-    if (storeFlag(m_pixelReadout, QStringLiteral("view/pixelReadout"), value))
-        emit pixelReadoutChanged();
-}
-
 void AppSettings::setPixelSharpEdit(bool value)
 {
     if (storeFlag(m_pixelSharpEdit, QStringLiteral("view/pixelSharpEdit"), value))
         emit pixelSharpEditChanged();
-}
-
-void AppSettings::setSlideshowLoop(bool value)
-{
-    if (m_slideshowLoop == value)
-        return;
-    m_slideshowLoop = value;
-    m_store.setValue(QStringLiteral("slideshow/loop"), value);
-    emit slideshowLoopChanged();
 }
 
 void AppSettings::setBatchExportQuality(int value)

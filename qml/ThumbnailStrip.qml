@@ -14,12 +14,11 @@ import ImageViewerApp
 // so the folder position isn't lost.
 //
 // When the panel is open is up to appSettings.stripMode: "manual" (the tab decides), "open"
-// (always, no tab), "closed" (never, no tab) or "auto" (closed while editing, during the
-// slideshow and in narrow windows; the tab can still flip it until the situation changes).
+// (always, no tab), "closed" (never, no tab) or "auto" (closed while editing and in narrow windows; the tab can still flip it until the situation changes).
 Item {
     id: root
 
-    // Set by the window: true while editing or running the slideshow.
+    // Set by the window: true while editing.
     property bool busy: false
 
     readonly property string mode: appSettings.stripMode
@@ -41,11 +40,12 @@ Item {
     property bool manualCollapsed: false   // "manual": what the tab says
     property bool flipped: false           // "auto": the tab overrode the automatic choice
     readonly property bool autoSuggestsClosed: busy || (parent ? parent.width < 900 : false)
-    readonly property bool collapsed: mode === "open" ? false
-                                      : mode === "closed" ? true
-                                      : mode === "auto" ? (autoSuggestsClosed !== flipped)
-                                      : manualCollapsed
-    readonly property bool tabShown: mode === "manual" || mode === "auto"
+    // The tab is always there. In "open" / "closed" / "auto" it turns the mode's own choice around until the
+    // situation (or the setting) changes; in "manual" it is the choice.
+    readonly property bool modeCollapsed: mode === "open" ? false
+                                          : mode === "closed" ? true
+                                          : autoSuggestsClosed
+    readonly property bool collapsed: mode === "manual" ? manualCollapsed : (modeCollapsed !== flipped)
     // a new situation (editing starts, the window narrows...) puts the automatic choice back
     onAutoSuggestsClosedChanged: flipped = false
     onModeChanged: flipped = false
@@ -179,51 +179,77 @@ Item {
         onCanceled: finish()
     }
 
-    // The tab: same fill and outline as the panel, rounded only on the outer
-    // side. It starts on the panel's own 1px border column and paints its
-    // left column over it, so the border line is interrupted there and the
-    // tab reads as part of the panel.
-    Rectangle {
+    // The tab: one outline with the panel's right edge. It is rounded on the outer side and, where it meets the
+    // panel's border line, that line curves out into it (a concave fillet, `f`), so tab and panel read as one piece.
+    // Drawn from the panel's own 1px border column: the fill covers that column along the tab, interrupting the line.
+    Canvas {
         id: collapseTab
-        visible: root.tabShown
+        readonly property real f: themeManager.radiusMedium === 0 ? 0 : 6
+        readonly property real r: themeManager.radiusMedium === 0 ? 0 : 6
+        readonly property real bodyW: 15
+        readonly property real bodyH: 40
         x: root.width - 1
-        width: 21
-        height: 52
+        width: f + bodyW
+        height: bodyH + 2 * f
+        canvasSize: Qt.size(width, height) // otherwise the drawing is stretched when the size changes (theme, edit mode...)
         anchors.verticalCenter: parent.verticalCenter
-        topLeftRadius: 0
-        bottomLeftRadius: 0
-        topRightRadius: themeManager.radiusMedium === 0 ? 0 : 8
-        bottomRightRadius: themeManager.radiusMedium === 0 ? 0 : 8
-        color: tabMouse.containsMouse ? Qt.tint(themeManager.surface, Qt.rgba(themeManager.textPrimary.r, themeManager.textPrimary.g, themeManager.textPrimary.b, 0.14)) : themeManager.surface
-        border.color: themeManager.border
-        border.width: 1
-        Behavior on color { ColorAnimation { duration: themeManager.animFast } }
-
-        Rectangle {
-            x: 0
-            y: 1
-            width: 1
-            height: parent.height - 2
-            color: parent.color
+        readonly property color fill: tabMouse.containsMouse
+            ? Qt.tint(themeManager.surface, Qt.rgba(themeManager.textPrimary.r, themeManager.textPrimary.g, themeManager.textPrimary.b, 0.14))
+            : themeManager.surface
+        onFillChanged: requestPaint()
+        onWidthChanged: requestPaint()
+        onHeightChanged: requestPaint()
+        onPaint: {
+            const ctx = getContext("2d");
+            ctx.reset(); // a fresh state each time: the translate below would otherwise pile up
+            function outline() {
+                ctx.moveTo(0, 0);
+                if (f > 0) ctx.arc(f, 0, f, Math.PI, Math.PI / 2, true); else ctx.lineTo(f, 0);
+                ctx.lineTo(f, f);
+                ctx.lineTo(width - r, f);
+                if (r > 0) ctx.arc(width - r, f + r, r, 1.5 * Math.PI, 2 * Math.PI); else ctx.lineTo(width, f);
+                ctx.lineTo(width, f + bodyH - r);
+                if (r > 0) ctx.arc(width - r, f + bodyH - r, r, 0, Math.PI / 2); else ctx.lineTo(width, f + bodyH);
+                ctx.lineTo(f, f + bodyH);
+                if (f > 0) ctx.arc(f, 2 * f + bodyH, f, 1.5 * Math.PI, Math.PI, true); else ctx.lineTo(0, 2 * f + bodyH);
+            }
+            ctx.fillStyle = fill;
+            ctx.beginPath();
+            outline();
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = themeManager.border;
+            ctx.lineWidth = 1;
+            ctx.translate(0.5, 0.5);
+            ctx.beginPath();
+            outline();
+            ctx.stroke();
+        }
+        Connections {
+            target: themeManager
+            function onThemeChanged() { collapseTab.requestPaint(); }
         }
 
         AppIcon {
-            x: 1 + (parent.width - 1 - width) / 2
+            x: collapseTab.f + (collapseTab.bodyW - width) / 2
             anchors.verticalCenter: parent.verticalCenter
             name: root.collapsed ? "next" : "prev"
-            size: 16
+            size: 14
             color: themeManager.textPrimary
         }
 
         MouseArea {
             id: tabMouse
-            anchors.fill: parent
+            x: collapseTab.f
+            width: collapseTab.bodyW
+            y: collapseTab.f
+            height: collapseTab.bodyH
             hoverEnabled: true
             onClicked: {
-                if (root.mode === "auto")
-                    root.flipped = !root.flipped;
-                else
+                if (root.mode === "manual")
                     root.manualCollapsed = !root.manualCollapsed;
+                else
+                    root.flipped = !root.flipped;
             }
         }
     }

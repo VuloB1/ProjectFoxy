@@ -3,16 +3,13 @@
 #include <QObject>
 #include <QSettings>
 
-// User-configurable defaults for the slideshow and batch operations,
+// User-configurable defaults for the batch operations and the interface,
 // persisted to a plain .ini file (QSettings::IniFormat, under the app's
 // standard config location) rather than the Windows registry - deliberately
 // avoiding the registry entirely for this, unlike the Explorer context-menu
 // integration (which the user runs themselves via a .reg file).
 class AppSettings : public QObject {
     Q_OBJECT
-    Q_PROPERTY(int slideshowIntervalMs READ slideshowIntervalMs WRITE setSlideshowIntervalMs NOTIFY slideshowIntervalMsChanged)
-    Q_PROPERTY(bool slideshowRandom READ slideshowRandom WRITE setSlideshowRandom NOTIFY slideshowRandomChanged)
-    Q_PROPERTY(bool slideshowLoop READ slideshowLoop WRITE setSlideshowLoop NOTIFY slideshowLoopChanged)
     // 1-100, applied only where it's meaningful (JPEG/WebP) - see
     // core::saveImage()'s quality parameter.
     Q_PROPERTY(int batchExportQuality READ batchExportQuality WRITE setBatchExportQuality NOTIFY batchExportQualityChanged)
@@ -23,8 +20,8 @@ class AppSettings : public QObject {
     Q_PROPERTY(int batchRenamePadding READ batchRenamePadding WRITE setBatchRenamePadding NOTIFY batchRenamePaddingChanged)
     // The thumbnail bar on the left. Size of one thumbnail in pixels (also changed by dragging the
     // bar's edge), how many columns it has, and when it is shown: "manual" (the tab opens and
-    // closes it), "open" (always), "closed" (never) or "auto" (closes while editing, during the
-    // slideshow and in narrow windows).
+    // closes it), "open" (always), "closed" (never) or "auto" (closes while editing and in
+    // narrow windows).
     Q_PROPERTY(int stripThumbSize READ stripThumbSize WRITE setStripThumbSize NOTIFY stripThumbSizeChanged)
     Q_PROPERTY(int stripColumns READ stripColumns WRITE setStripColumns NOTIFY stripColumnsChanged)
     Q_PROPERTY(QString stripMode READ stripMode WRITE setStripMode NOTIFY stripModeChanged)
@@ -39,7 +36,6 @@ class AppSettings : public QObject {
     Q_PROPERTY(bool pixelIntegerZoom READ pixelIntegerZoom WRITE setPixelIntegerZoom NOTIFY pixelIntegerZoomChanged)
     Q_PROPERTY(bool pixelCheckerboard READ pixelCheckerboard WRITE setPixelCheckerboard NOTIFY pixelCheckerboardChanged)
     Q_PROPERTY(bool pixelGrid READ pixelGrid WRITE setPixelGrid NOTIFY pixelGridChanged)
-    Q_PROPERTY(bool pixelReadout READ pixelReadout WRITE setPixelReadout NOTIFY pixelReadoutChanged)
     Q_PROPERTY(bool pixelSharpEdit READ pixelSharpEdit WRITE setPixelSharpEdit NOTIFY pixelSharpEditChanged)
     // Opening a picture while the program is running uses that window instead of starting another one.
     // Read when the program starts: a change applies the next time it is opened.
@@ -47,15 +43,6 @@ class AppSettings : public QObject {
 
 public:
     explicit AppSettings(QObject *parent = nullptr);
-
-    int slideshowIntervalMs() const { return m_slideshowIntervalMs; }
-    void setSlideshowIntervalMs(int value);
-
-    bool slideshowRandom() const { return m_slideshowRandom; }
-    void setSlideshowRandom(bool value);
-
-    bool slideshowLoop() const { return m_slideshowLoop; }
-    void setSlideshowLoop(bool value);
 
     int batchExportQuality() const { return m_batchExportQuality; }
     void setBatchExportQuality(int value);
@@ -90,8 +77,6 @@ public:
     bool pixelGrid() const { return m_pixelGrid; }
     void setPixelGrid(bool value);
     // Position and colour of the pixel under the cursor.
-    bool pixelReadout() const { return m_pixelReadout; }
-    void setPixelReadout(bool value);
     // "Tamaño" and "Enderezar" resample by nearest neighbour (no new colours).
     bool pixelSharpEdit() const { return m_pixelSharpEdit; }
     void setPixelSharpEdit(bool value);
@@ -100,9 +85,6 @@ public:
     void setConfirmOverwrite(bool value);
 
 signals:
-    void slideshowIntervalMsChanged();
-    void slideshowRandomChanged();
-    void slideshowLoopChanged();
     void batchExportQualityChanged();
     void batchRenamePaddingChanged();
     void confirmOverwriteChanged();
@@ -115,7 +97,6 @@ signals:
     void pixelIntegerZoomChanged();
     void pixelCheckerboardChanged();
     void pixelGridChanged();
-    void pixelReadoutChanged();
     void pixelSharpEditChanged();
     void singleInstanceChanged();
 
@@ -125,9 +106,6 @@ private:
 
     QSettings m_store;
 
-    int m_slideshowIntervalMs;
-    bool m_slideshowRandom;
-    bool m_slideshowLoop;
     int m_batchExportQuality;
     int m_batchRenamePadding;
     bool m_confirmOverwrite;
@@ -140,7 +118,6 @@ private:
     bool m_pixelIntegerZoom = false;
     bool m_pixelCheckerboard = false;
     bool m_pixelGrid = false;
-    bool m_pixelReadout = false;
     bool m_pixelSharpEdit = false;
     bool m_singleInstance = true;
 };

@@ -12,17 +12,17 @@ AppDialog {
     standardButtons: Dialog.NoButton
     anchors.centerIn: Overlay.overlay
     padding: 0
-    width: Math.min(830, (Overlay.overlay ? Overlay.overlay.width : 830) - 40)
-    height: Math.min(460, (Overlay.overlay ? Overlay.overlay.height : 460) - 40)
+    width: Math.min(860, (Overlay.overlay ? Overlay.overlay.width : 860) - 40)
+    height: Math.min(620, (Overlay.overlay ? Overlay.overlay.height : 620) - 40)
 
     property int page: 0
     // Each page starts at its top: the previous page may have been scrolled further than this one is tall.
     onPageChanged: scroller.contentY = 0
     readonly property var pages: [
         { icon: "theme", name: qsTr("Apariencia"), hint: qsTr("Cómo se ve el programa.") },
-        { icon: "slideshow", name: qsTr("Presentación"), hint: qsTr("Cómo avanza la presentación de diapositivas.") },
         { icon: "save", name: qsTr("Guardado"), hint: qsTr("Qué pasa al guardar una imagen editada.") },
-        { icon: "folder-batch", name: qsTr("Procesos por lote"), hint: qsTr("Valores para exportar y renombrar carpetas enteras.") }
+        { icon: "folder-batch", name: qsTr("Procesos por lote"), hint: qsTr("Valores para exportar y renombrar carpetas enteras.") },
+        { icon: "info", name: qsTr("Acerca de"), hint: qsTr("El programa, su autor y las licencias.") }
     ]
 
     // One setting: its name (and a line explaining it) on the left, the control on the right.
@@ -134,11 +134,20 @@ AppDialog {
                         required property int index
                         required property var modelData
                         readonly property bool current: root.page === index
+                        readonly property bool classic: themeManager.skin === "win98"
                         width: parent.width
-                        height: 38
+                        height: 40
                         radius: themeManager.radiusSmall
-                        color: current ? themeManager.accent : (hover.hovered ? themeManager.controlFace : "transparent")
-                        opacity: current ? 1.0 : (hover.hovered ? 0.85 : 1.0)
+                        // the chosen page: a soft accent tint with a bar on its edge (the classic theme keeps its solid block)
+                        color: current ? (classic ? themeManager.accent : Qt.rgba(themeManager.accent.r, themeManager.accent.g, themeManager.accent.b, 0.16))
+                                       : (hover.hovered ? themeManager.controlFace : "transparent")
+
+                        Rectangle {
+                            visible: item.current && !item.classic
+                            x: 0; width: 3; height: 18; radius: 1.5
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: themeManager.accent
+                        }
 
                         Row {
                             anchors.verticalCenter: parent.verticalCenter
@@ -149,12 +158,12 @@ AppDialog {
                                 anchors.verticalCenter: parent.verticalCenter
                                 name: item.modelData.icon
                                 size: 18
-                                color: item.current ? themeManager.accentText : themeManager.textSecondary
+                                color: item.current ? (item.classic ? themeManager.accentText : themeManager.accent) : themeManager.textSecondary
                             }
                             Label {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: item.modelData.name
-                                color: item.current ? themeManager.accentText : themeManager.textPrimary
+                                color: item.current && item.classic ? themeManager.accentText : themeManager.textPrimary
                                 font.bold: item.current
                             }
                         }
@@ -191,6 +200,11 @@ AppDialog {
                 font.pixelSize: 12
             }
 
+            Rectangle { // under the page header
+                x: 28; y: 78; width: parent.width - 28 - 20; height: 1
+                color: themeManager.border; opacity: 0.6
+            }
+
             AppToolButton {
                 anchors.right: parent.right
                 anchors.rightMargin: 12
@@ -204,7 +218,7 @@ AppDialog {
             Flickable {
                 id: scroller
                 anchors.top: parent.top
-                anchors.topMargin: 84
+                anchors.topMargin: 92
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 16
                 anchors.left: parent.left
@@ -216,13 +230,15 @@ AppDialog {
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
                 ScrollBar.vertical: AppScrollBar {}
+                AppWheelScroll { view: scroller; step: 100 } // the same speed as the thumbnail bar
 
                 Item {
                     id: pageColumn
                     width: scroller.width - 12
                     implicitHeight: root.page === 0 ? appearance.implicitHeight + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + windowCard.implicitHeight + 80
-                                       : root.page === 1 ? slideshow.implicitHeight
-                                       : root.page === 2 ? saving.implicitHeight : batch.implicitHeight
+                                       : root.page === 1 ? saving.implicitHeight
+                                       : root.page === 2 ? batch.implicitHeight
+                                       : (about.item ? about.item.implicitHeight : 0)
 
                     // -- Apariencia: one preview card per theme --------------------
                     Card {
@@ -435,15 +451,6 @@ AppDialog {
                             }
                             Divider {}
                             SettingRow {
-                                label: qsTr("Lectura del píxel")
-                                hint: qsTr("Abajo a la izquierda: posición y color del píxel bajo el cursor.")
-                                AppSwitch {
-                                    checked: appSettings.pixelReadout
-                                    onToggled: appSettings.pixelReadout = checked
-                                }
-                            }
-                            Divider {}
-                            SettingRow {
                                 label: qsTr("Editar sin suavizar")
                                 hint: qsTr("«Tamaño» y «Enderezar» copian píxeles (vecino más cercano), así no aparecen colores nuevos.")
                                 AppSwitch {
@@ -463,12 +470,12 @@ AppDialog {
                         heading: qsTr("Barra de miniaturas")
                         SettingRow {
                             label: qsTr("Cuándo se muestra")
-                            hint: qsTr("«Con pestaña» la abres y cierras tú. «Automática» se cierra al editar, en la presentación y en ventanas estrechas.")
+                            hint: qsTr("«Manual» la abres y cierras tú. «Automática» se cierra al editar y en ventanas estrechas. La pestaña del borde siempre puede invertir la decisión.")
                             AppComboBox {
                                 id: stripModeCombo
                                 width: 170
                                 readonly property var modes: ["manual", "open", "closed", "auto"]
-                                model: [qsTr("Con pestaña"), qsTr("Siempre abierta"), qsTr("Siempre cerrada"), qsTr("Automática")]
+                                model: [qsTr("Manual"), qsTr("Siempre abierta"), qsTr("Siempre cerrada"), qsTr("Automática")]
                                 currentIndex: Math.max(0, modes.indexOf(appSettings.stripMode))
                                 onActivated: function (i) { appSettings.stripMode = modes[i]; }
                             }
@@ -512,45 +519,11 @@ AppDialog {
                         }
                     }
 
-                    // -- Presentación -----------------------------------------------
-                    Card {
-                        id: slideshow
-                        width: parent.width
-                        visible: root.page === 1
-                        SettingRow {
-                            label: qsTr("Duración por foto")
-                            hint: qsTr("Cuánto se muestra cada imagen antes de pasar a la siguiente.")
-                            ScrubNumberField {
-                                from: 0.5; to: 30; decimals: 1; dragStep: 0.1; suffix: qsTr(" s")
-                                value: appSettings.slideshowIntervalMs / 1000.0
-                                onValueEdited: appSettings.slideshowIntervalMs = Math.round(newValue * 1000)
-                            }
-                        }
-                        Divider {}
-                        SettingRow {
-                            label: qsTr("Orden aleatorio")
-                            hint: qsTr("Mezcla las imágenes de la carpeta.")
-                            AppSwitch {
-                                checked: appSettings.slideshowRandom
-                                onToggled: appSettings.slideshowRandom = checked
-                            }
-                        }
-                        Divider {}
-                        SettingRow {
-                            label: qsTr("Repetir en bucle")
-                            hint: qsTr("Al llegar a la última vuelve a empezar.")
-                            AppSwitch {
-                                checked: appSettings.slideshowLoop
-                                onToggled: appSettings.slideshowLoop = checked
-                            }
-                        }
-                    }
-
                     // -- Guardado ---------------------------------------------------
                     Card {
                         id: saving
                         width: parent.width
-                        visible: root.page === 2
+                        visible: root.page === 1
                         SettingRow {
                             label: qsTr("Preguntar antes de sobrescribir")
                             hint: qsTr("Pide confirmación al guardar encima del archivo original.")
@@ -561,11 +534,19 @@ AppDialog {
                         }
                     }
 
+                    // -- Acerca de --------------------------------------------------
+                    Loader {
+                        id: about
+                        width: parent.width
+                        active: root.page === 3
+                        source: "AboutPage.qml"
+                    }
+
                     // -- Procesos por lote ------------------------------------------
                     Card {
                         id: batch
                         width: parent.width
-                        visible: root.page === 3
+                        visible: root.page === 2
                         SettingRow {
                             label: qsTr("Calidad de exportación")
                             hint: qsTr("Para JPG y WebP al exportar por lote.")

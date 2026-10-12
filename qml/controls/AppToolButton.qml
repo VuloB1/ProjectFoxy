@@ -4,7 +4,7 @@ import ImageViewerApp
 
 // Themed replacement for the stock ToolButton: transparent at rest, a
 // tinted pill reveals on hover/press, a persistent tint when checked (e.g.
-// the "Editar"/slideshow toggles). Same Loader-per-skin pattern as
+// the "Editar" toggle). Same Loader-per-skin pattern as
 // AppButton.qml.
 ToolButton {
     id: control
@@ -16,7 +16,7 @@ ToolButton {
     property string iconName: ""
 
     // Set by a bar that wants its first (-1) and last (1) button to follow the
-    // bar's own rounded ends (see FloatingToolbar.qml); 0 = an ordinary button.
+    // bar's own rounded ends (see StatusBar.qml); 0 = an ordinary button.
     property int edge: 0
     readonly property real edgeRadius: themeManager.radiusMedium === 0 ? 0 : 26
     readonly property real leftCorner: edge === -1 ? edgeRadius : themeManager.radiusSmall
@@ -33,6 +33,10 @@ ToolButton {
     property bool iconOnly: false
     // Tint of the icon (the label always uses the primary text colour).
     property color iconColor: themeManager.textPrimary
+    // Side of the icon.
+    property int iconSize: 22
+    // Line weight of the icon (px).
+    property real iconStroke: 1.8
 
     // Measures the label text independently of any Item's width/layout.
     // Needed because contentItem's own implicit width can't be used for
@@ -48,7 +52,7 @@ ToolButton {
     // same Label's own natural (pre-elide) width - close enough that without
     // it, the label below ends up very slightly under its actual needed
     // width and silently ellipsizes text that should fit.
-    implicitWidth: (iconOnly ? 22 : labelMetrics.width + 4) + leftPadding + rightPadding
+    implicitWidth: (iconOnly ? iconSize : labelMetrics.width + 4) + leftPadding + rightPadding
 
     AppToolTip {
         visible: control.iconOnly && control.hovered
@@ -105,7 +109,8 @@ ToolButton {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: control.iconName.length > 0
             name: control.iconName
-            size: 22
+            size: control.iconSize
+            strokeWidth: control.iconStroke
             color: control.iconColor
             opacity: control.enabled ? 1.0 : 0.5
         }

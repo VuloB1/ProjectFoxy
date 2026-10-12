@@ -9,6 +9,7 @@ import ImageViewerApp
 // Everything goes through `collageStudio` (src/app/CollageStudio.h); this page shows it and passes the mouse on.
 Item {
     id: root
+    objectName: "collageStudio"
 
     signal closeRequested()
 
@@ -22,6 +23,10 @@ Item {
     property bool resultOk: true
     property string resultText: ""
     property string resultPath: ""
+    // Something made and not saved yet: leaving the studio asks about it (Main.qml).
+    property bool dirty: false
+    readonly property bool hasWork: dirty && cellData.some(cell => !cell.empty)
+    function discard() { collageStudio.clearPictures(); dirty = false; }
     readonly property var formatNames: ["PNG", "JPG", "WebP"]
 
     function sizeText(bytes) {
@@ -34,11 +39,16 @@ Item {
     Connections {
         target: collageStudio
         function onExportFinished(ok, path, bytes, error) {
+            if (ok) root.dirty = false;
             root.resultOk = ok;
             root.resultPath = ok ? path : "";
             root.resultText = ok ? qsTr("Guardado: %1 (%2)").arg(path.replace(/^.*[\\/]/, "")).arg(root.sizeText(bytes))
                                  : (error !== "" ? error : qsTr("No se pudo guardar."));
         }
+    }
+    Connections {
+        target: collageStudio
+        function onChanged() { root.dirty = true; }
     }
     Component.onCompleted: {
         if (collageStudio.selected < 0 && collageStudio.cellCount > 0)
@@ -53,48 +63,11 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: side.left
 
-        Row {
-            id: topBar
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.topMargin: 10
-            anchors.leftMargin: 12
-            spacing: 6
-            height: 34
-            AppIcon { anchors.verticalCenter: parent.verticalCenter; name: "collage"; size: 22; color: themeManager.accent }
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("Crear collage")
-                color: themeManager.textPrimary
-                font.bold: true
-                font.pixelSize: 15
-                rightPadding: 12
-            }
-            AppButton { text: qsTr("Agregar fotos…"); onClicked: addDialog.open() }
-            AppButton {
-                text: qsTr("Toda la carpeta")
-                enabled: folderModel.count > 0
-                onClicked: collageStudio.addPaths(folderModel.filePaths())
-                AppToolTip { visible: parent.hovered; text: qsTr("Agrega las imágenes de la carpeta que está abierta, hasta llenar 12 celdas") }
-            }
-            AppButton { text: qsTr("Mezclar fotos"); onClicked: collageStudio.shufflePictures() }
-            AppButton { text: qsTr("Quitar fotos"); onClicked: collageStudio.clearPictures() }
-        }
-        AppToolButton {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 10
-            anchors.rightMargin: 12
-            text: qsTr("Cerrar el estudio")
-            iconName: "close"
-            iconOnly: true
-            onClicked: root.closeRequested()
-        }
-
+        // the header bar: same surface and line as the bars of the window
         Item {
             id: stage
-            anchors.top: topBar.bottom
-            anchors.topMargin: 10
+            anchors.top: parent.top
+            anchors.topMargin: 14
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: hint.top
@@ -407,6 +380,15 @@ Item {
         color: themeManager.surface
         Rectangle { anchors.left: parent.left; width: 1; height: parent.height; color: themeManager.border }
 
+        DialogHeader {
+            id: sideHeader
+            iconName: "collage"
+            title: qsTr("Crear collage")
+            showClose: false
+            margin: 18
+            height: 60
+        }
+
         component OptSlider: Item {
             property string key: ""
             property string label: ""
@@ -483,13 +465,13 @@ Item {
 
         Flickable {
             id: flick
-            anchors.top: parent.top
+            anchors.top: sideHeader.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: footer.top
             anchors.leftMargin: 14
             anchors.rightMargin: 6
-            anchors.topMargin: 10
+            anchors.topMargin: 8
             contentWidth: width
             contentHeight: col.implicitHeight + 10
             clip: true
@@ -515,20 +497,47 @@ Item {
                         AppToolButton { text: qsTr("Una más"); iconName: "plus"; iconOnly: true; enabled: collageStudio.cellCount < 12; onClicked: collageStudio.setCellCount(collageStudio.cellCount + 1) }
                     }
                     Row {
+                        width: parent.width
                         spacing: 4
-                        AppToolButton {
-                            text: qsTr("Rejilla")
-                            checked: !root.free
-                            onClicked: collageStudio.setOption("free", false)
-                            AppToolTip { visible: parent.hovered; text: qsTr("Celdas que encajan, con líneas divisorias que se arrastran") }
+                        Repeater {
+                            model: [
+                                { icon: "plus", tip: qsTr("Agregar fotos…"), act: 0 },
+                                { icon: "folder-batch", tip: qsTr("Toda la carpeta"), act: 1 },
+                                { icon: "shuffle", tip: qsTr("Mezclar fotos"), act: 2 },
+                                { icon: "trash", tip: qsTr("Quitar fotos"), act: 3 }
+                            ]
+                            delegate: AppToolButton {
+                                required property var modelData
+                                text: modelData.tip
+                                iconName: modelData.icon
+                                iconOnly: true
+                                enabled: modelData.act !== 1 || folderModel.count > 0
+                                onClicked: {
+                                    if (modelData.act === 0) addDialog.open();
+                                    else if (modelData.act === 1) collageStudio.addPaths(folderModel.filePaths());
+                                    else if (modelData.act === 2) collageStudio.shufflePictures();
+                                    else clearDialog.open();
+                                }
+                            }
+                        }
+                    }
+                    Row {
+                        width: parent.width
+                        spacing: 6
+                        AppSegmented {
+                            width: parent.width - 40 - 6
+                            model: [{ text: qsTr("Rejilla"), tip: qsTr("Celdas que encajan, con líneas divisorias que se arrastran") },
+                                    { text: qsTr("Libre"), tip: qsTr("Cada celda se mueve y se redimensiona por su cuenta, y pueden superponerse") }]
+                            currentIndex: root.free ? 1 : 0
+                            onActivated: function (i) { collageStudio.setOption("free", i === 1); }
                         }
                         AppToolButton {
-                            text: qsTr("Libre")
-                            checked: root.free
-                            onClicked: collageStudio.setOption("free", true)
-                            AppToolTip { visible: parent.hovered; text: qsTr("Cada celda se mueve y se redimensiona por su cuenta, y pueden superponerse") }
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: qsTr("Otro mosaico")
+                            iconName: "reset"
+                            iconOnly: true
+                            onClicked: collageStudio.newMosaic()
                         }
-                        AppToolButton { text: qsTr("Otro mosaico"); onClicked: collageStudio.newMosaic() }
                     }
                     Flow {
                         width: parent.width
@@ -683,13 +692,12 @@ Item {
                             onToggled: collageStudio.setCellProperty(root.sel, "overflow", checked)
                             AppToolTip { visible: parent.hovered; text: qsTr("La foto no se corta en el borde de la celda: pasa por encima de las vecinas") }
                         }
-                        Flow {
-                            width: parent.width
+                        Row {
                             spacing: 4
-                            AppButton { text: qsTr("Restablecer"); onClicked: collageStudio.resetPicture(root.sel) }
-                            AppButton { text: qsTr("Cambiar foto…"); onClicked: pickDialog.open() }
-                            AppButton { text: qsTr("Quitar foto"); enabled: root.selCell && !root.selCell.empty; onClicked: collageStudio.clearPicture(root.sel) }
-                            AppButton { text: qsTr("Traer al frente"); visible: root.free; onClicked: collageStudio.bringToFront(root.sel) }
+                            AppToolButton { text: qsTr("Cambiar foto…"); iconName: "open"; iconOnly: true; onClicked: pickDialog.open() }
+                            AppToolButton { text: qsTr("Restablecer"); iconName: "reset"; iconOnly: true; onClicked: collageStudio.resetPicture(root.sel) }
+                            AppToolButton { text: qsTr("Traer al frente"); iconName: "front"; iconOnly: true; visible: root.free; onClicked: collageStudio.bringToFront(root.sel) }
+                            AppToolButton { text: qsTr("Quitar foto"); iconName: "trash"; iconOnly: true; enabled: root.selCell && !root.selCell.empty; onClicked: collageStudio.clearPicture(root.sel) }
                         }
                     }
                 }
@@ -738,18 +746,10 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Fondo")
-                    Row {
-                        spacing: 4
-                        Repeater {
-                            model: [qsTr("Color"), qsTr("Degradado"), qsTr("Foto desenfocada")]
-                            delegate: AppToolButton {
-                                required property int index
-                                required property string modelData
-                                text: modelData
-                                checked: collageStudio.options.background === index
-                                onClicked: collageStudio.setOption("background", index)
-                            }
-                        }
+                    AppSegmented {
+                        model: [qsTr("Color"), qsTr("Degradado"), qsTr("Foto desenfocada")].map(n => ({ text: n }))
+                        currentIndex: collageStudio.options.background
+                        onActivated: function (i) { collageStudio.setOption("background", i); }
                     }
                     Row {
                         width: parent.width
@@ -816,18 +816,10 @@ Item {
                             }
                         }
                     }
-                    Row {
-                        spacing: 4
-                        Repeater {
-                            model: root.formatNames
-                            delegate: AppToolButton {
-                                required property int index
-                                required property string modelData
-                                text: modelData
-                                checked: collageStudio.options.format === index
-                                onClicked: collageStudio.setOption("format", index)
-                            }
-                        }
+                    AppSegmented {
+                        model: root.formatNames.map(n => ({ text: n }))
+                        currentIndex: collageStudio.options.format
+                        onActivated: function (i) { collageStudio.setOption("format", i); }
                     }
                     OptSlider {
                         key: "quality"
@@ -859,6 +851,7 @@ Item {
             AppButton {
                 visible: root.resultOk && root.resultPath !== "" && !collageStudio.exporting
                 width: parent.width
+                iconName: "open"
                 text: qsTr("Mostrar en la carpeta")
                 onClicked: Qt.openUrlExternally("file:///" + root.resultPath.replace(/[\\/][^\\/]*$/, ""))
             }
@@ -880,6 +873,15 @@ Item {
         }
     }
 
+    ConfirmDialog {
+        id: clearDialog
+        symbol: "trash"
+        danger: true
+        heading: qsTr("¿Quitar todas las fotos?")
+        message: qsTr("Las celdas quedan vacías.")
+        confirmText: qsTr("Quitar fotos")
+        onConfirmed: collageStudio.clearPictures()
+    }
     FileDialog {
         id: addDialog
         title: qsTr("Elegí las fotos del collage")

@@ -28,7 +28,7 @@ Button {
     readonly property bool filled: (primary || danger) && themeManager.skin !== "win98"
     readonly property color labelColor: filled ? (danger ? "#ffffff" : themeManager.accentText) : themeManager.textPrimary
     // Set by a bar that wants its first (-1) and last (1) button to follow the
-    // bar's own rounded ends (see FloatingToolbar.qml); 0 = an ordinary button.
+    // bar's own rounded ends (see StatusBar.qml); 0 = an ordinary button.
     property int edge: 0
     readonly property real edgeRadius: themeManager.radiusMedium === 0 ? 0 : 26
     readonly property real leftCorner: edge === -1 ? edgeRadius : themeManager.radiusSmall

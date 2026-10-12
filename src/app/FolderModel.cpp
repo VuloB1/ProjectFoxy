@@ -9,10 +9,8 @@
 #include <QMetaObject>
 #include <QRunnable>
 #include <QUrl>
-#include <QRandomGenerator>
 #include <QSet>
 #include <algorithm>
-#include <numeric>
 #include "Translate.h"
 
 FolderModel::FolderModel(QObject *parent)
@@ -206,46 +204,6 @@ void FolderModel::previous()
     if (m_files.isEmpty())
         return;
     setCurrentIndex((m_currentIndex - 1 + m_files.size()) % m_files.size());
-}
-
-void FolderModel::regenerateShuffleOrder()
-{
-    m_shuffleOrder.resize(m_files.size());
-    std::iota(m_shuffleOrder.begin(), m_shuffleOrder.end(), 0);
-    std::shuffle(m_shuffleOrder.begin(), m_shuffleOrder.end(), *QRandomGenerator::global());
-    m_shufflePos = -1;
-}
-
-bool FolderModel::advanceSlideshow(bool random, bool loop)
-{
-    if (m_files.isEmpty())
-        return false;
-
-    if (!random) {
-        if (m_currentIndex + 1 >= m_files.size()) {
-            if (!loop)
-                return false;
-            setCurrentIndex(0);
-            return true;
-        }
-        setCurrentIndex(m_currentIndex + 1);
-        return true;
-    }
-
-    if (m_shuffleOrder.size() != m_files.size())
-        regenerateShuffleOrder();
-
-    ++m_shufflePos;
-    if (m_shufflePos >= m_shuffleOrder.size()) {
-        if (!loop) {
-            m_shufflePos = m_shuffleOrder.size() - 1;
-            return false;
-        }
-        regenerateShuffleOrder();
-        m_shufflePos = 0;
-    }
-    setCurrentIndex(m_shuffleOrder[m_shufflePos]);
-    return true;
 }
 
 namespace {

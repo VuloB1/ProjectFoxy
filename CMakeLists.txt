@@ -217,8 +217,11 @@ set(IV_QML_FILES
         qml/Main.qml
         qml/ImageCanvas.qml
         qml/ThumbnailStrip.qml
+        qml/TitleBar.qml
         qml/Toolbar.qml
-        qml/FloatingToolbar.qml
+        qml/AboutPage.qml
+        qml/DialogHeader.qml
+        qml/StatusBar.qml
         qml/EditPanel.qml
         qml/CropTool.qml
         qml/ResizeTool.qml
@@ -255,6 +258,8 @@ set(IV_QML_FILES
         qml/controls/AppToolTip.qml
         qml/controls/AppHintBox.qml
         qml/controls/AppButton.qml
+        qml/controls/AppCard.qml
+        qml/controls/AppSegmented.qml
         qml/controls/AppToolButton.qml
         qml/controls/AppSlider.qml
         qml/controls/AppCheckBox.qml
@@ -283,6 +288,7 @@ qt_add_qml_module(ImageViewer
     QML_FILES ${IV_QML_FILES}
     RESOURCES
         resources/icons/icon.png
+        resources/images/creator.png
 )
 
 target_link_libraries(ImageViewer PRIVATE
@@ -346,6 +352,7 @@ set_target_properties(ImageViewer PROPERTIES
 )
 if(WIN32)
     target_sources(ImageViewer PRIVATE resources/app.rc)
+    target_link_libraries(ImageViewer PRIVATE dwmapi) # round corners and shadow of the frameless window (main.cpp)
 endif()
 
 # ---------------------------------------------------------------------------
@@ -473,6 +480,7 @@ qt_add_qml_module(test_ui_flows
     QML_FILES ${IV_QML_FILES}
     RESOURCES
         resources/icons/icon.png
+        resources/images/creator.png
 )
 iv_add_app_resources(test_ui_flows)
 target_link_libraries(test_ui_flows PRIVATE

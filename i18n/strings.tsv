@@ -535,7 +535,6 @@ Deshacer	Undo	Desfazer	실행 취소	撤销	元に戻す
 Girar der.	Rotate right	Girar dir.	오른쪽 회전	右转	右回転
 Girar izq.	Rotate left	Girar esq.	왼쪽 회전	左转	左回転
 Guardar como…	Save as…	Salvar como…	다른 이름으로 저장…	另存为…	名前を付けて保存…
-Presentación	Slideshow	Apresentação	슬라이드쇼	幻灯片放映	スライドショー
 Rehacer	Redo	Refazer	다시 실행	重做	やり直し
 Siguiente	Next	Próxima	다음	下一张	次へ
 El nombre no puede llevar los caracteres  < > : " / \ | ? *	The name cannot contain the characters  < > : " / \ | ? *	O nome não pode conter os caracteres  < > : " / \ | ? *	이름에 다음 문자를 사용할 수 없습니다:  < > : " / \ | ? *	名称不能包含以下字符： < > : " / \ | ? *	名前には次の文字を使えません:  < > : " / \ | ? *
@@ -783,8 +782,6 @@ Tamaño resultante (px)	Resulting size (px)	Tamanho resultante (px)	결과 크�
  px					
  s					
 1×, 2×, 3×, 4×… Las imágenes pequeñas se abren ampliadas.	1×, 2×, 3×, 4×… Small images open enlarged.	1×, 2×, 3×, 4×… As imagens pequenas abrem ampliadas.	1×, 2×, 3×, 4×… 작은 이미지는 확대되어 열립니다.	1×、2×、3×、4×… 小图像会以放大状态打开。	1×、2×、3×、4×… 小さい画像は拡大して開きます。
-Abajo a la izquierda: posición y color del píxel bajo el cursor.	Bottom left: position and color of the pixel under the cursor.	Embaixo à esquerda: posição e cor do pixel sob o cursor.	왼쪽 아래: 커서 아래 픽셀의 위치와 색상.	左下角：光标下像素的位置和颜色。	左下: カーソル下のピクセルの位置と色。
-Al llegar a la última vuelve a empezar.	When it reaches the last one it starts over.	Ao chegar à última, recomeça.	마지막에 도달하면 처음부터 다시 시작합니다.	到达最后一张后重新开始。	最後まで行くと最初に戻ります。
 Al renombrar por lote: 3 da imagen_001, imagen_002…	When batch renaming: 3 gives image_001, image_002…	Ao renomear em lote: 3 gera imagem_001, imagem_002…	일괄 이름 바꾸기 시: 3이면 image_001, image_002…	批量重命名时：3 会得到 image_001、image_002…	一括名前変更時: 3 だと image_001、image_002…
 Aparece al ampliar desde 8×.	Appears when zoomed in from 8×.	Aparece ao ampliar a partir de 8×.	8× 이상 확대하면 나타납니다.	放大到 8× 以上时出现。	8× 以上に拡大すると表示されます。
 Apariencia	Appearance	Aparência	모양	外观	外観
@@ -792,31 +789,24 @@ Automática	Automatic	Automática	자동	自动	自動
 Barra de miniaturas	Thumbnail bar	Barra de miniaturas	미리보기 막대	缩略图栏	サムネイルバー
 Calidad de exportación	Export quality	Qualidade de exportação	내보내기 품질	导出质量	書き出し品質
 Columnas	Columns	Colunas	열	列数	列数
-Con pestaña	With tab	Com aba	탭 사용	带标签	タブ付き
+Manual	Manual	Manual	수동	手动	手動
 Configuración	Settings	Configurações	설정	设置	設定
 Cuadrícula entre píxeles	Grid between pixels	Grade entre pixels	픽셀 사이 격자	像素间网格	ピクセル間のグリッド
 Cuándo se muestra	When it is shown	Quando é exibida	표시 시점	何时显示	表示するタイミング
-Cuánto se muestra cada imagen antes de pasar a la siguiente.	How long each image is shown before moving on to the next.	Por quanto tempo cada imagem é exibida antes de passar para a próxima.	다음 이미지로 넘어가기 전에 각 이미지를 보여 주는 시간입니다.	每张图像显示多长时间后切换到下一张。	次の画像に進むまで各画像を表示する時間です。
-Cómo avanza la presentación de diapositivas.	How the slideshow advances.	Como a apresentação de slides avança.	슬라이드쇼가 진행되는 방식입니다.	幻灯片放映的推进方式。	スライドショーの進み方です。
 Cómo se ve el programa.	How the program looks.	Como o programa se parece.	프로그램의 모양입니다.	程序的外观。	プログラムの見た目です。
 Deja ver las zonas transparentes.	Lets you see the transparent areas.	Permite ver as áreas transparentes.	투명한 영역을 볼 수 있습니다.	可以看到透明区域。	透明な部分が見えるようになります。
-Duración por foto	Time per photo	Duração por foto	사진당 시간	每张照片时长	1 枚あたりの時間
 Dígitos de numeración	Numbering digits	Dígitos de numeração	번호 자릿수	编号位数	番号の桁数
 Editar sin suavizar	Edit without smoothing	Editar sem suavizar	부드럽게 하지 않고 편집	编辑时不平滑	補間せずに編集
 Escalonado	Stepped	Escalonado	단계별	阶梯式	段階的
 Extras del modo pixel	Pixel mode extras	Extras do modo pixel	픽셀 모드 추가 기능	像素模式附加选项	ピクセルモードの追加機能
 Fondo de ajedrez	Checkerboard background	Fundo xadrez	체크무늬 배경	棋盘格背景	市松模様の背景
-Lectura del píxel	Pixel readout	Leitura do pixel	픽셀 정보 표시	像素读数	ピクセル情報
-Mezcla las imágenes de la carpeta.	Shuffles the images in the folder.	Embaralha as imagens da pasta.	폴더의 이미지를 섞습니다.	打乱文件夹中的图像顺序。	フォルダー内の画像をシャッフルします。
 Modo pixel	Pixel mode	Modo pixel	픽셀 모드	像素模式	ピクセルモード
-Orden aleatorio	Random order	Ordem aleatória	무작위 순서	随机顺序	ランダム順
 Para JPG y WebP al exportar por lote.	For JPG and WebP when batch exporting.	Para JPG e WebP ao exportar em lote.	일괄 내보내기 시 JPG와 WebP에 적용됩니다.	用于批量导出 JPG 和 WebP 时。	一括書き出し時の JPG と WebP に適用されます。
 Para sprites, íconos y dibujos hechos de píxeles: se ven nítidos al ampliar, sin borrosidad, y el zoom llega a 64×.	For sprites, icons and drawings made of pixels: they look sharp when enlarged, with no blur, and zoom goes up to 64×.	Para sprites, ícones e desenhos feitos de pixels: ficam nítidos ao ampliar, sem desfoque, e o zoom chega a 64×.	스프라이트, 아이콘, 픽셀로 만든 그림용: 확대해도 흐릿하지 않고 선명하며 최대 64×까지 확대됩니다.	适用于精灵图、图标和像素绘画：放大后清晰不模糊，缩放最高可达 64×。	スプライト、アイコン、ドット絵向け: 拡大してもぼやけず鮮明で、ズームは 64× まで可能です。
 Pide confirmación al guardar encima del archivo original.	Asks for confirmation when saving over the original file.	Pede confirmação ao salvar sobre o arquivo original.	원본 파일 위에 저장할 때 확인을 요청합니다.	覆盖原始文件保存时要求确认。	元のファイルに上書き保存するときに確認します。
 Preguntar antes de sobrescribir	Ask before overwriting	Perguntar antes de sobrescrever	덮어쓰기 전에 확인	覆盖前询问	上書き前に確認する
 Procesos por lote	Batch processes	Processos em lote	일괄 처리	批处理	一括処理
 Qué pasa al guardar una imagen editada.	What happens when saving an edited image.	O que acontece ao salvar uma imagem editada.	편집한 이미지를 저장할 때의 동작입니다.	保存编辑后的图像时的行为。	編集した画像を保存するときの動作です。
-Repetir en bucle	Loop	Repetir em loop	반복 재생	循环播放	ループ再生
 Siempre abierta	Always open	Sempre aberta	항상 열어 두기	始终打开	常に表示
 Siempre cerrada	Always closed	Sempre fechada	항상 닫아 두기	始终关闭	常に非表示
 Suavizado	Smooth	Suave	부드럽게	平滑	なめらか
@@ -826,7 +816,7 @@ Tema	Theme	Tema	테마	主题	テーマ
 Tipo de zoom con la rueda	Wheel zoom type	Tipo de zoom com a roda	휠 확대/축소 방식	滚轮缩放方式	ホイールズームの種類
 Valores para exportar y renombrar carpetas enteras.	Values for exporting and renaming whole folders.	Valores para exportar e renomear pastas inteiras.	폴더 전체를 내보내고 이름을 바꿀 때 쓰는 값입니다.	用于导出和重命名整个文件夹的设置。	フォルダー全体の書き出しと名前変更に使う値です。
 Zoom en números enteros	Whole-number zoom	Zoom em números inteiros	정수 배율 확대/축소	整数倍缩放	整数倍ズーム
-«Con pestaña» la abres y cierras tú. «Automática» se cierra al editar, en la presentación y en ventanas estrechas.	"With tab": you open and close it yourself. "Automatic": it closes when editing, during the slideshow and in narrow windows.	"Com aba": você a abre e fecha. "Automática": fecha ao editar, na apresentação e em janelas estreitas.	"탭 사용": 직접 열고 닫습니다. "자동": 편집 중, 슬라이드쇼 중, 좁은 창에서 닫힙니다.	“带标签”：由你手动打开和关闭。“自动”：编辑时、幻灯片放映时以及窗口较窄时自动关闭。	「タブ付き」: 自分で開閉します。「自動」: 編集中、スライドショー中、狭いウィンドウで閉じます。
+«Manual» la abres y cierras tú. «Automática» se cierra al editar y en ventanas estrechas. La pestaña del borde siempre puede invertir la decisión.	"Manual": you open and close it yourself. "Automatic": it closes when editing and in narrow windows. The tab on its edge can always flip the decision.	"Manual": você a abre e fecha. "Automática": fecha ao editar e em janelas estreitas. A aba da borda sempre pode inverter a decisão.	"수동": 직접 열고 닫습니다. "자동": 편집 중이거나 좁은 창에서 닫힙니다. 가장자리의 탭으로 언제든 결정을 뒤집을 수 있습니다.	“手动”：由你手动打开和关闭。“自动”：编辑时以及窗口较窄时自动关闭。边缘的标签随时可以反转这个决定。	「手動」: 自分で開閉します。「自動」: 編集中や狭いウィンドウで閉じます。端のタブでいつでも切り替えられます。
 «Escalonado» salta de a un paso por vez. «Suavizado» se desliza hacia el nuevo tamaño, con una sensación más fluida.	"Stepped" jumps one step at a time. "Smooth" glides to the new size, for a more fluid feel.	"Escalonado" salta um passo por vez. "Suave" desliza até o novo tamanho, com uma sensação mais fluida.	"단계별"은 한 단계씩 이동합니다. "부드럽게"는 새 크기로 미끄러지듯 이동해 더 매끄럽게 느껴집니다.	“阶梯式”每次跳一档。“平滑”会平滑过渡到新的大小，手感更流畅。	「段階的」は 1 段ずつ切り替わります。「なめらか」は新しいサイズへ滑らかに移り、より流れるような操作感です。
 «Tamaño» y «Enderezar» copian píxeles (vecino más cercano), así no aparecen colores nuevos.	"Size" and "Straighten" copy pixels (nearest neighbor), so no new colors appear.	"Tamanho" e "Endireitar" copiam pixels (vizinho mais próximo), então não surgem cores novas.	"크기"와 "수평 맞추기"는 픽셀을 그대로 복사하므로(최근접 이웃) 새로운 색이 생기지 않습니다.	“大小”和“拉直”会复制像素（最近邻），因此不会出现新的颜色。	「サイズ」と「傾き補正」はピクセルをそのままコピーする（最近傍）ため、新しい色は生まれません。
 Útil con muchas imágenes en la carpeta.	Useful with many images in the folder.	Útil com muitas imagens na pasta.	폴더에 이미지가 많을 때 유용합니다.	文件夹中图像较多时很有用。	フォルダー内の画像が多いときに便利です。
@@ -878,3 +868,34 @@ No se pudo cambiar el fondo de escritorio	Could not change the wallpaper	Não fo
 Ventanas	Windows	Janelas	창	窗口	ウィンドウ
 Una sola ventana	A single window	Uma única janela	창 하나만 사용	只用一个窗口	ウィンドウを1つだけ使う
 Al abrir una imagen desde el Explorador se usa la ventana que ya está abierta, en vez de abrir otra. Se aplica la próxima vez que abras el programa.	When you open an image from the file manager, the window that is already open is used instead of opening another one. It applies the next time you start the program.	Ao abrir uma imagem pelo gerenciador de arquivos, a janela já aberta é usada em vez de abrir outra. Vale na próxima vez que você abrir o programa.	파일 관리자에서 이미지를 열면 새 창을 열지 않고 이미 열려 있는 창을 사용합니다. 프로그램을 다음에 열 때 적용됩니다.	从文件管理器打开图片时,使用已打开的窗口,而不是再开一个。下次启动程序时生效。	ファイルマネージャーから画像を開くとき、新しいウィンドウではなく既に開いているウィンドウを使います。次にプログラムを起動したときに反映されます。
+Minimizar	Minimize	Minimizar	최소화	最小化	最小化
+Maximizar	Maximize	Maximizar	최대화	最大化	最大化
+Restaurar	Restore	Restaurar	복원	还原	元に戻す
+Copiado	Copied	Copiado	복사됨	已复制	コピーしました
+X %1  Y %2	X %1  Y %2	X %1  Y %2	X %1  Y %2	X %1  Y %2	X %1  Y %2
+Acerca de	About	Sobre	정보	关于	このアプリについて
+El programa, su autor y las licencias.	The program, its author and the licences.	O programa, o autor e as licenças.	프로그램, 제작자, 라이선스 정보입니다.	程序、作者和许可证。	アプリ、作者、ライセンスについて。
+Versión %1	Version %1	Versão %1	버전 %1	版本 %1	バージョン %1
+Un visor y editor de imágenes rápido, con tus archivos siempre contigo.	A fast image viewer and editor, with your files always with you.	Um visualizador e editor de imagens rápido, com os seus arquivos sempre com você.	빠른 이미지 뷰어 및 편집기. 파일은 항상 내 컴퓨터에.	快速的图片查看器和编辑器，您的文件始终由您掌控。	高速な画像ビューアー兼エディター。ファイルは常に手元に。
+Creado con	Built with	Criado com	제작 도구	构建于	使用技術
+Desarrollado con la ayuda de Claude, de Anthropic	Developed with the help of Claude, by Anthropic	Desenvolvido com a ajuda do Claude, da Anthropic	Anthropic의 Claude의 도움으로 개발됨	在 Anthropic 的 Claude 帮助下开发	Anthropic の Claude の協力で開発
+Creador y autor	Creator and author	Criador e autor	제작자	创作者与作者	作者
+Sitio web	Website	Site	웹사이트	网站	ウェブサイト
+Si Project Foxy te gusta, puedes apoyar su desarrollo.	If you like Project Foxy, you can support its development.	Se você gosta do Project Foxy, pode apoiar o desenvolvimento.	Project Foxy가 마음에 드신다면 개발을 후원해 주세요.	如果您喜欢 Project Foxy，可以支持它的开发。	Project Foxy を気に入っていただけたら、開発を応援してください。
+Invítame a un café en Ko-fi	Buy me a coffee on Ko-fi	Me pague um café no Ko-fi	Ko-fi에서 커피 한 잔 사주기	在 Ko-fi 请我喝杯咖啡	Ko-fi でコーヒーをおごる
+Agradecimientos	Acknowledgements	Agradecimentos	감사의 말	致谢	謝辞
+Legal	Legal	Legal	법적 고지	法律信息	法的情報
+Licencia (GPL-3.0)	Licence (GPL-3.0)	Licença (GPL-3.0)	라이선스 (GPL-3.0)	许可证 (GPL-3.0)	ライセンス (GPL-3.0)
+Licencias de terceros	Third-party licences	Licenças de terceiros	서드파티 라이선스	第三方许可证	サードパーティライセンス
+Conversión	Conversion	Conversão	변환	转换	変換
+Destino	Destination	Destino	대상	目标	保存先
+Nombre	Name	Nome	이름	名称	名前
+¿Quitar todas las imágenes?	Remove all the images?	Remover todas as imagens?	모든 이미지를 제거할까요?	移除所有图片？	すべての画像を削除しますか？
+Se vacía la tira de fotogramas.	The strip of frames is emptied.	A faixa de quadros fica vazia.	프레임 목록이 비워집니다.	帧列表将被清空。	フレームの一覧が空になります。
+¿Quitar todas las fotos?	Remove all the photos?	Remover todas as fotos?	모든 사진을 제거할까요?	移除所有照片？	すべての写真を削除しますか？
+Las celdas quedan vacías.	The cells are left empty.	As células ficam vazias.	칸이 비워집니다.	单元格将变空。	セルが空になります。
+¿Salir sin guardar?	Leave without saving?	Sair sem salvar?	저장하지 않고 나갈까요?	不保存就退出？	保存せずに終了しますか？
+Lo que armaste en este estudio se va a descartar.	What you made in this studio will be discarded.	O que você montou neste estúdio será descartado.	이 스튜디오에서 만든 내용이 버려집니다.	您在此工作室中制作的内容将被丢弃。	このスタジオで作ったものは破棄されます。
+Si quieres conservarlo, vuelve y usa «Guardar como…».	To keep it, go back and use "Save as…".	Para mantê-lo, volte e use "Salvar como…".	보관하려면 돌아가서 "다른 이름으로 저장…"을 사용하세요.	若要保留，请返回并使用“另存为…”。	残すには、戻って「名前を付けて保存…」を使ってください。
+Seguir aquí	Stay here	Ficar aqui	계속 있기	留在这里	このまま続ける
+Salir sin guardar	Leave without saving	Sair sem salvar	저장 안 하고 나가기	不保存退出	保存せずに終了
