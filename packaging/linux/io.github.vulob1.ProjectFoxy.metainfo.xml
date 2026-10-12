@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.5" date="2026-10-12">
+      <description>
+        <p>A new look: the window has its own title bar, a bottom bar holds the pixel readout and every button, and Settings has an About page. The animated-GIF and collage studios, the batch dialogs and the comparer follow the same design. One window at a time, and several robustness fixes.</p>
+      </description>
+    </release>
     <release version="0.2.4" date="2026-10-11">
       <description>
         <p>Large photos use much less graphics memory: while a big picture is shown fitted to the window, a reduced copy is drawn instead of the whole image.</p>
