@@ -231,101 +231,84 @@ Item {
         }
     }
 
-    // ---- the bar over the panes -----------------------------------------------------------------------
-    Item {
-        id: bar
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 16
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: barRow.implicitWidth + 24
-        height: 48
-        z: 5
+    // ---- the controls ---------------------------------------------------------------------------------
+    // They are shown in the dock of the window's bottom bar (StatusBar.qml) while the comparer is open.
+    readonly property Component dockContent: Component {
+            Row {
+                spacing: 4
 
-        Rectangle {
-            id: pill
-            anchors.fill: parent
-            radius: themeManager.radiusMedium === 0 ? 0 : height / 2
-            color: themeManager.surfaceElevated
-            border.color: themeManager.border
-            border.width: 1
-            MouseArea { anchors.fill: parent; hoverEnabled: true; acceptedButtons: Qt.AllButtons }
-        }
-        MultiEffect {
-            source: pill
-            anchors.fill: pill
-            shadowEnabled: true
-            shadowColor: "#40000000"
-            shadowBlur: 0.6
-            shadowVerticalOffset: 3
-        }
+                AppToolButton {
+                    hPad: 10; iconSize: 22
+                    text: root.linked ? qsTr("Zoom vinculado: activado (Shift mueve solo una)") : qsTr("Zoom vinculado: desactivado")
+                    iconName: root.linked ? "link" : "link-off"
+                    iconOnly: true
+                    checkable: true
+                    checked: root.linked
+                    onClicked: root.setLinked(!root.linked)
+                }
+                AppToolButton {
+                    hPad: 10; iconSize: 22; text: qsTr("Ajustar todas a la ventana"); iconName: "fit"; iconOnly: true; onClicked: root.resetViews() }
+                AppToolButton {
+                    hPad: 10; iconSize: 22; text: qsTr("100 %"); onClicked: root.actualPixels(); AppToolTip { visible: parent.hovered; text: qsTr("Cada imagen en sus píxeles reales") } }
 
-        Row {
-            id: barRow
-            anchors.centerIn: parent
-            spacing: 2
+                Rectangle { width: 1; height: 24; color: themeManager.border; anchors.verticalCenter: parent.verticalCenter }
 
-            AppToolButton {
-                text: root.linked ? qsTr("Zoom vinculado: activado (Shift mueve solo una)") : qsTr("Zoom vinculado: desactivado")
-                iconName: root.linked ? "link" : "link-off"
-                iconOnly: true
-                checkable: true
-                checked: root.linked
-                onClicked: root.setLinked(!root.linked)
+                AppToolButton {
+                    hPad: 10; iconSize: 22; text: qsTr("Una imagen menos"); iconName: "minus"; iconOnly: true; enabled: panes.count > 1; onClicked: root.setCount(panes.count - 1) }
+                Label {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 22
+                    horizontalAlignment: Text.AlignHCenter
+                    text: panes.count
+                    color: themeManager.textPrimary
+                    font.bold: true
+                }
+                AppToolButton {
+                    hPad: 10; iconSize: 22; text: qsTr("Una imagen más"); iconName: "plus"; iconOnly: true; enabled: panes.count < root.maxPanes; onClicked: root.setCount(panes.count + 1) }
+                AppToolButton {
+                    hPad: 10; iconSize: 22
+                    text: qsTr("Automático")
+                    checkable: true
+                    checked: root.layoutMode === 0
+                    enabled: panes.count >= 2
+                    onClicked: root.layoutMode = 0
+                    AppToolTip { visible: parent.hovered; text: qsTr("Se acomodan según el tamaño y la forma de cada imagen") }
+                }
+                AppToolButton {
+                    hPad: 10; iconSize: 22
+                    text: qsTr("Todas en una fila")
+                    iconName: "split-h"
+                    iconOnly: true
+                    checkable: true
+                    checked: root.layoutMode === 1
+                    enabled: panes.count >= 2
+                    onClicked: root.layoutMode = 1
+                }
+                AppToolButton {
+                    hPad: 10; iconSize: 22
+                    text: qsTr("Todas en una columna")
+                    iconName: "split-v"
+                    iconOnly: true
+                    checkable: true
+                    checked: root.layoutMode === 2
+                    enabled: panes.count >= 2
+                    onClicked: root.layoutMode = 2
+                }
+
+                Rectangle { width: 1; height: 24; color: themeManager.border; anchors.verticalCenter: parent.verticalCenter }
+
+                AppToolButton {
+                    hPad: 10; iconSize: 22; text: qsTr("Elegir imágenes…"); iconName: "open"; iconOnly: true; onClicked: pickDialog.open() }
+                AppToolButton {
+                    hPad: 10; iconSize: 22; text: qsTr("Volver a una sola imagen"); iconName: "close"; iconOnly: true; onClicked: root.closeRequested() }
             }
-            AppToolButton { text: qsTr("Ajustar todas a la ventana"); iconName: "fit"; iconOnly: true; onClicked: root.resetViews() }
-            AppToolButton { text: qsTr("100 %"); onClicked: root.actualPixels(); AppToolTip { visible: parent.hovered; text: qsTr("Cada imagen en sus píxeles reales") } }
-
-            Rectangle { width: 1; height: 24; color: themeManager.border; anchors.verticalCenter: parent.verticalCenter }
-
-            AppToolButton { text: qsTr("Una imagen menos"); iconName: "minus"; iconOnly: true; enabled: panes.count > 1; onClicked: root.setCount(panes.count - 1) }
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 22
-                horizontalAlignment: Text.AlignHCenter
-                text: panes.count
-                color: themeManager.textPrimary
-                font.bold: true
-            }
-            AppToolButton { text: qsTr("Una imagen más"); iconName: "plus"; iconOnly: true; enabled: panes.count < root.maxPanes; onClicked: root.setCount(panes.count + 1) }
-            AppToolButton {
-                text: qsTr("Automático")
-                checkable: true
-                checked: root.layoutMode === 0
-                enabled: panes.count >= 2
-                onClicked: root.layoutMode = 0
-                AppToolTip { visible: parent.hovered; text: qsTr("Se acomodan según el tamaño y la forma de cada imagen") }
-            }
-            AppToolButton {
-                text: qsTr("Todas en una fila")
-                iconName: "split-h"
-                iconOnly: true
-                checkable: true
-                checked: root.layoutMode === 1
-                enabled: panes.count >= 2
-                onClicked: root.layoutMode = 1
-            }
-            AppToolButton {
-                text: qsTr("Todas en una columna")
-                iconName: "split-v"
-                iconOnly: true
-                checkable: true
-                checked: root.layoutMode === 2
-                enabled: panes.count >= 2
-                onClicked: root.layoutMode = 2
-            }
-
-            Rectangle { width: 1; height: 24; color: themeManager.border; anchors.verticalCenter: parent.verticalCenter }
-
-            AppToolButton { text: qsTr("Elegir imágenes…"); iconName: "open"; iconOnly: true; onClicked: pickDialog.open() }
-            AppToolButton { text: qsTr("Volver a una sola imagen"); iconName: "close"; iconOnly: true; onClicked: root.closeRequested() }
-        }
     }
 
-    // A one-line hint under the bar, until the first gesture.
+    // A one-line hint over the bottom of the panes, until the first gesture.
     Label {
         id: hint
-        anchors.bottom: bar.top
-        anchors.bottomMargin: 8
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 12
         anchors.horizontalCenter: parent.horizontalCenter
         z: 4
         visible: panes.count > 1 && opacity > 0

@@ -12,6 +12,7 @@
 
 #include <QFileInfo>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include <QQmlProperty>
 #include <QQuickItem>
 #include <QQuickStyle>
@@ -192,6 +193,55 @@ private slots:
         click("unsavedDiscardButton");
         QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("b.png"), 10000);
         QVERIFY(!m_app.controller->isDirty());
+    }
+
+    // ------------------------------------------------------------------------------------------------ the studios
+
+    // The button that opens a studio closes it again; with nothing made there is no question.
+    void theStudioButtonOpensAndClosesItAndAsksNothingWhenEmpty()
+    {
+        click("gifButton");
+        QVERIFY(item("gifStudio")->isVisible());
+        click("gifButton");
+        QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("gifStudio") == nullptr, 5000);
+        QVERIFY(itemOrNull("dialogConfirmButton") == nullptr);
+
+        click("collageButton");
+        QVERIFY(item("collageStudio")->isVisible());
+        click("collageButton");
+        QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("collageStudio") == nullptr, 5000);
+    }
+
+    // With frames in the animation, leaving asks first: "Seguir aquí" stays, "Salir sin guardar" goes and empties it.
+    void leavingTheGifStudioWithWorkAsksAndBothAnswersWork()
+    {
+        const QString a = file("f1.png", picture(60, 40, Qt::red));
+        const QString b = file("f2.png", picture(60, 40, Qt::blue));
+        click("gifButton");
+        QObject *studio = m_engine->rootContext()->contextProperty(QStringLiteral("animStudio")).value<QObject *>();
+        QVERIFY(studio);
+        QVERIFY(QMetaObject::invokeMethod(studio, "addPaths", Q_ARG(QStringList, QStringList({a, b}))));
+        QTRY_COMPARE_WITH_TIMEOUT(studio->property("count").toInt(), 2, 10000);
+
+        click("gifButton");
+        click("dialogCancelButton");
+        QTest::qWait(300);
+        QVERIFY(item("gifStudio")->isVisible()); // stayed
+        QCOMPARE(studio->property("count").toInt(), 2);
+
+        click("gifButton");
+        click("dialogConfirmButton");
+        QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("gifStudio") == nullptr, 5000);
+        QCOMPARE(studio->property("count").toInt(), 0);
+    }
+
+    // The information button in the bottom bar opens the popup with the picture's data.
+    void theInformationButtonOfTheBottomBarOpensThePopup()
+    {
+        m_app.controller->openPath(file("info.png", picture(50, 30, Qt::cyan)));
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("info.png"), 10000);
+        click("infoButton");
+        QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("infoPopupContent") != nullptr, 5000);
     }
 
 private:

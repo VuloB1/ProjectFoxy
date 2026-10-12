@@ -73,14 +73,6 @@ public slots:
     void next();
     void previous();
 
-    // Single entry point for the slideshow timer. Sequential mode just
-    // wraps like next() unless `loop` is false, in which case it stops
-    // advancing (returns false) after the last file. Random mode visits a
-    // shuffled permutation of the whole folder without repeats, reshuffling
-    // once exhausted (or stopping there too if `loop` is false). Returns
-    // false when the slideshow should stop (QML unchecks its own toggle).
-    Q_INVOKABLE bool advanceSlideshow(bool random, bool loop);
-
     // Renames the chosen files (in the order given) to "<baseName><NNN>.<ext>" - original
     // extension kept - numbering from startNumber, zero-padded to `padding` digits.
     //
@@ -106,7 +98,6 @@ private:
     void applyScan(const Scan &scan, const QString &filePath, int fallbackIndex = 0);
     void startScan(const QString &filePath, int fallbackIndex);
     void rescanCurrentFolder();
-    void regenerateShuffleOrder();
 
     QStringList m_files; // absolute paths, naturally sorted
     QString m_scannedDir;          // folder m_files was listed from
@@ -117,8 +108,4 @@ private:
     QThreadPool m_scanPool;        // one listing at a time; waited for in the destructor (its result is posted to this)
     int m_currentIndex = -1;
     core::ThumbnailCache m_thumbnailCache;
-
-    // Slideshow "random, no repeat until exhausted" state.
-    QVector<int> m_shuffleOrder;
-    int m_shufflePos = -1;
 };

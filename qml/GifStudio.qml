@@ -7,6 +7,7 @@ import ImageViewerApp
 // the right. Everything it does goes through `animStudio` (src/app/AnimStudio.h); this page only shows it.
 Item {
     id: root
+    objectName: "gifStudio"
 
     signal closeRequested()
 
@@ -19,6 +20,10 @@ Item {
     property bool resultOk: true
     property string resultText: ""
     property string resultPath: ""
+    // Something made and not saved yet: leaving the studio asks about it (Main.qml).
+    property bool dirty: false
+    readonly property bool hasWork: dirty && count > 0
+    function discard() { animStudio.clear(); dirty = false; currentIndex = -1; }
 
     readonly property var formatNames: ["GIF", "APNG", "WebP"]
     readonly property var formatSuffixes: ["gif", "png", "webp"]
@@ -49,9 +54,10 @@ Item {
 
     Connections {
         target: animStudio
-        function onPlanChanged() { root.showFrame(root.playIndex); }
+        function onPlanChanged() { root.showFrame(root.playIndex); root.dirty = animStudio.count > 0; }
         function onExportFinished(ok, path, bytes, error) {
             root.resultOk = ok;
+            if (ok) root.dirty = false;
             root.resultPath = ok ? path : "";
             root.resultText = ok ? qsTr("Guardado: %1 (%2)").arg(path.replace(/^.*[\\/]/, "")).arg(root.sizeText(bytes))
                                  : (error !== "" ? error : qsTr("No se pudo guardar."));
@@ -98,50 +104,11 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: side.left
 
-        // the top bar
-        Row {
-            id: topBar
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.topMargin: 10
-            anchors.leftMargin: 12
-            spacing: 6
-            height: 34
-            AppIcon { anchors.verticalCenter: parent.verticalCenter; name: "film"; size: 22; color: themeManager.accent }
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("Crear GIF animado")
-                color: themeManager.textPrimary
-                font.bold: true
-                font.pixelSize: 15
-                rightPadding: 12
-            }
-            AppButton { text: qsTr("Agregar imágenes…"); onClicked: addDialog.open() }
-            AppButton {
-                text: qsTr("Toda la carpeta")
-                enabled: folderModel.count > 0
-                onClicked: animStudio.addPaths(folderModel.filePaths())
-                AppToolTip { visible: parent.hovered; text: qsTr("Agrega todas las imágenes de la carpeta que está abierta") }
-            }
-            AppButton { text: qsTr("Invertir orden"); enabled: root.count > 1; onClicked: animStudio.reverseOrder() }
-            AppButton { text: qsTr("Quitar todas"); enabled: root.count > 0; onClicked: { animStudio.clear(); root.currentIndex = -1; } }
-        }
-        AppToolButton {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 10
-            anchors.rightMargin: 12
-            text: qsTr("Cerrar el estudio")
-            iconName: "close"
-            iconOnly: true
-            onClicked: root.closeRequested()
-        }
-
         // the preview
         Item {
             id: stage
-            anchors.top: topBar.bottom
-            anchors.topMargin: 10
+            anchors.top: parent.top
+            anchors.topMargin: 14
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: controls.top
@@ -271,14 +238,66 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            height: 140
+            height: 172
             color: themeManager.surface
             border.width: 0
             Rectangle { anchors.top: parent.top; width: parent.width; height: 1; color: themeManager.border }
 
+            Item {
+                id: stripTools
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 10
+                anchors.rightMargin: 10
+                anchors.topMargin: 4
+                height: 30
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 2
+                    AppToolButton {
+                        text: qsTr("Toda la carpeta")
+                        iconName: "folder-batch"
+                        iconOnly: true
+                        iconSize: 18
+                        iconStroke: 1.4
+                        topPadding: 3; bottomPadding: 3
+                        enabled: folderModel.count > 0
+                        onClicked: animStudio.addPaths(folderModel.filePaths())
+                    }
+                    AppToolButton {
+                        text: qsTr("Invertir orden")
+                        iconName: "swap"
+                        iconOnly: true
+                        iconSize: 18
+                        iconStroke: 1.4
+                        topPadding: 3; bottomPadding: 3
+                        enabled: root.count > 1
+                        onClicked: animStudio.reverseOrder()
+                    }
+                }
+                // far from the rest and asking first: it throws everything away
+                AppToolButton {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Quitar todas")
+                    iconName: "trash"
+                    iconOnly: true
+                    iconSize: 18
+                    iconStroke: 1.4
+                    iconColor: enabled ? "#e5484d" : themeManager.textSecondary
+                    topPadding: 3; bottomPadding: 3
+                    enabled: root.count > 0
+                    onClicked: removeAllDialog.open()
+                }
+            }
+
             ListView {
                 id: list
-                anchors.fill: parent
+                anchors.top: stripTools.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
                 anchors.margins: 8
                 orientation: ListView.Horizontal
                 spacing: 8
@@ -438,6 +457,15 @@ Item {
         color: themeManager.surface
         Rectangle { anchors.left: parent.left; width: 1; height: parent.height; color: themeManager.border }
 
+        DialogHeader {
+            id: sideHeader
+            iconName: "film"
+            title: qsTr("Crear GIF animado")
+            showClose: false
+            margin: 18
+            height: 60
+        }
+
         // a slider with its caption and value
         component OptSlider: Item {
             property string key: ""
@@ -507,13 +535,13 @@ Item {
 
         Flickable {
             id: flick
-            anchors.top: parent.top
+            anchors.top: sideHeader.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: footer.top
             anchors.leftMargin: 14
             anchors.rightMargin: 6
-            anchors.topMargin: 10
+            anchors.topMargin: 8
             contentWidth: width
             contentHeight: col.implicitHeight + 10
             clip: true
@@ -556,14 +584,16 @@ Item {
                     Row {
                         width: parent.width
                         spacing: 6
-                        AppButton {
-                            width: (parent.width - 6) / 2
+                        AppToolButton {
+                            anchors.bottom: parent.bottom
                             text: qsTr("A todos los fotogramas")
+                            iconName: "copy"
+                            iconOnly: true
                             enabled: root.currentIndex >= 0
                             onClicked: animStudio.setAllHold(animStudio.holdAt(root.currentIndex))
                         }
                         Item {
-                            width: (parent.width - 6) / 2
+                            width: parent.width - 40 - 6
                             height: 56
                             Label { text: qsTr("Duración de las nuevas"); color: themeManager.textSecondary; font.pixelSize: 11 }
                             AppSpinBox {
@@ -708,16 +738,17 @@ Item {
                             }
                         }
                         Row {
-                            width: parent.width
-                            spacing: 6
-                            AppButton {
-                                width: (parent.width - 6) / 2
+                            spacing: 4
+                            AppToolButton {
                                 text: qsTr("A todos los fotogramas")
+                                iconName: "copy"
+                                iconOnly: true
                                 onClicked: animStudio.copyStyleToAll(root.currentIndex)
                             }
-                            AppButton {
-                                width: (parent.width - 6) / 2
+                            AppToolButton {
                                 text: qsTr("Quitar")
+                                iconName: "trash"
+                                iconOnly: true
                                 onClicked: animStudio.clearStyle(root.currentIndex)
                             }
                         }
@@ -768,19 +799,11 @@ Item {
                         }
                     }
                     Label { text: qsTr("Cómo entra cada imagen"); color: themeManager.textSecondary }
-                    Flow {
-                        width: parent.width
-                        spacing: 4
-                        Repeater {
-                            model: [qsTr("Entera, con fondo"), qsTr("Llenar y recortar"), qsTr("Estirar")]
-                            delegate: AppToolButton {
-                                required property int index
-                                required property string modelData
-                                text: modelData
-                                checked: root.opts.fit === index
-                                onClicked: animStudio.setOption("fit", index)
-                            }
-                        }
+                    AppSegmented {
+                        model: [{ icon: "fit", tip: qsTr("Entera, con fondo") }, { icon: "crop", tip: qsTr("Llenar y recortar") },
+                                { icon: "resize", tip: qsTr("Estirar") }]
+                        currentIndex: root.opts.fit
+                        onActivated: function (i) { animStudio.setOption("fit", i); }
                     }
                     Row {
                         width: parent.width
@@ -836,18 +859,10 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Formato")
-                    Row {
-                        spacing: 4
-                        Repeater {
-                            model: root.formatNames
-                            delegate: AppToolButton {
-                                required property int index
-                                required property string modelData
-                                text: modelData
-                                checked: root.opts.format === index
-                                onClicked: animStudio.setOption("format", index)
-                            }
-                        }
+                    AppSegmented {
+                        model: root.formatNames.map(n => ({ text: n }))
+                        currentIndex: root.opts.format
+                        onActivated: function (i) { animStudio.setOption("format", i); }
                     }
                     Label {
                         width: parent.width
@@ -899,6 +914,7 @@ Item {
                 visible: root.resultOk && root.resultPath !== "" && !animStudio.exporting
                 width: parent.width
                 text: qsTr("Mostrar en la carpeta")
+                iconName: "open"
                 onClicked: Qt.openUrlExternally("file:///" + root.resultPath.replace(/[\\/][^\\/]*$/, ""))
             }
             AppProgressBar {
@@ -938,6 +954,15 @@ Item {
         }
     }
 
+    ConfirmDialog {
+        id: removeAllDialog
+        symbol: "trash"
+        danger: true
+        heading: qsTr("¿Quitar todas las imágenes?")
+        message: qsTr("Se vacía la tira de fotogramas.")
+        confirmText: qsTr("Quitar todas")
+        onConfirmed: { animStudio.clear(); root.currentIndex = -1; }
+    }
     FileDialog {
         id: addDialog
         title: qsTr("Elegí las imágenes de la animación")

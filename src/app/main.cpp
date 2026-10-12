@@ -12,6 +12,11 @@
 #include <QIcon>
 #include <QStandardPaths>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#include <dwmapi.h>
+#endif
+
 int main(int argc, char *argv[])
 {
     // Render with Direct3D 11 unless the caller already chose a backend, so it
@@ -78,6 +83,18 @@ int main(int argc, char *argv[])
 
     if (engine.rootObjects().isEmpty())
         return -1;
+
+#ifdef Q_OS_WIN
+    // The window has no native frame (Main.qml), so ask Windows for what the frame gave: round corners (Windows 11;
+    // older versions ignore it) and a thin border with a shadow.
+    if (auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first())) {
+        const HWND hwnd = reinterpret_cast<HWND>(window->winId());
+        const DWORD round = 2; // DWMWCP_ROUND
+        DwmSetWindowAttribute(hwnd, 33 /* DWMWA_WINDOW_CORNER_PREFERENCE */, &round, sizeof round);
+        const MARGINS thin = {1, 1, 1, 1};
+        DwmExtendFrameIntoClientArea(hwnd, &thin);
+    }
+#endif
 
     // Open-with / double-click association: the file in the arguments.
     if (!fileArgument.isEmpty())

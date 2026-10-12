@@ -37,26 +37,18 @@ AppDialog {
         implicitWidth: root.width
         implicitHeight: root.height
 
-        Label {
-            x: 28
-            y: 22
-            text: qsTr("Renombrar por lote")
-            color: themeManager.textPrimary
-            font.bold: true
-            font.pixelSize: 18
-        }
-        Label {
-            x: 28
-            y: 50
-            text: qsTr("Elige las imágenes que quieres renombrar; se numeran en el orden de la lista.")
-            color: themeManager.textSecondary
-            font.pixelSize: 12
+        DialogHeader {
+            id: header
+            iconName: "rename-batch"
+            title: qsTr("Renombrar por lote")
+            hint: qsTr("Elige las imágenes que quieres renombrar; se numeran en el orden de la lista.")
+            onCloseRequested: root.close()
         }
 
         BatchFileList {
             id: files
             anchors.top: parent.top
-            anchors.topMargin: 88
+            anchors.topMargin: 100
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 24
             anchors.left: parent.left
@@ -85,58 +77,59 @@ AppDialog {
             anchors.rightMargin: 28
             spacing: 14
 
-            Column {
-                width: parent.width
-                spacing: 6
-                Label { text: qsTr("Nombre base"); color: themeManager.textSecondary }
-                AppTextField {
-                    id: baseField
+            AppCard {
+                heading: qsTr("Nombre")
+                Column {
                     width: parent.width
-                    text: qsTr("imagen_")
-                    onTextChanged: root.refresh()
-                }
-            }
-            Row {
-                spacing: 16
-                width: parent.width
-                Column {
-                    width: (parent.width - 16) / 2
                     spacing: 6
-                    Label { text: qsTr("Empezar en"); color: themeManager.textSecondary }
-                    ScrubNumberField {
-                        id: startField
+                    Label { text: qsTr("Nombre base"); color: themeManager.textSecondary }
+                    AppTextField {
+                        id: baseField
                         width: parent.width
-                        from: 0; to: 999999; decimals: 0; dragStep: 1; value: 1
-                        onValueEdited: root.refresh()
-                        onValueChanged: root.refresh()
+                        text: qsTr("imagen_")
+                        onTextChanged: root.refresh()
                     }
                 }
-                Column {
-                    width: (parent.width - 16) / 2
-                    spacing: 6
-                    Label { text: qsTr("Dígitos"); color: themeManager.textSecondary }
-                    ScrubNumberField {
-                        id: digits
-                        width: parent.width
-                        from: 1; to: 6; decimals: 0; dragStep: 1
-                        value: appSettings.batchRenamePadding
-                        onValueEdited: { appSettings.batchRenamePadding = newValue; root.refresh(); }
-                        onValueChanged: root.refresh()
+                Row {
+                    spacing: 16
+                    width: parent.width
+                    Column {
+                        width: (parent.width - 16) / 2
+                        spacing: 6
+                        Label { text: qsTr("Empezar en"); color: themeManager.textSecondary }
+                        ScrubNumberField {
+                            id: startField
+                            width: parent.width
+                            from: 0; to: 999999; decimals: 0; dragStep: 1; value: 1
+                            onValueEdited: root.refresh()
+                            onValueChanged: root.refresh()
+                        }
+                    }
+                    Column {
+                        width: (parent.width - 16) / 2
+                        spacing: 6
+                        Label { text: qsTr("Dígitos"); color: themeManager.textSecondary }
+                        ScrubNumberField {
+                            id: digits
+                            width: parent.width
+                            from: 1; to: 6; decimals: 0; dragStep: 1
+                            value: appSettings.batchRenamePadding
+                            onValueEdited: { appSettings.batchRenamePadding = newValue; root.refresh(); }
+                            onValueChanged: root.refresh()
+                        }
                     }
                 }
+
             }
 
             // what the names will look like
-            Label {
-                text: qsTr("Así quedarán")
-                color: themeManager.textSecondary
-                topPadding: 4
-            }
-            Rectangle {
+            AppCard {
+              heading: qsTr("Así quedarán")
+              Rectangle {
                 width: parent.width
-                height: 190
+                height: 170
                 radius: themeManager.radiusMedium === 0 ? 0 : 8
-                color: themeManager.surface
+                color: "transparent"
                 border.color: themeManager.border
                 border.width: 1
                 clip: true
@@ -199,6 +192,7 @@ AppDialog {
                         color: files.selectedCount === 0 ? themeManager.textSecondary : "#e5484d"
                     }
                 }
+              }
             }
         }
 

@@ -20,7 +20,7 @@ Rectangle {
     property real maxScale: 16.0
     property bool fitMode: true
     // Set by Main.qml, same property-passing convention as `canvas` on
-    // Toolbar/FloatingToolbar - needed so the right-click context menu below
+    // Toolbar/StatusBar - needed so the right-click context menu below
     // can toggle the edit panel and reuse Toolbar's delete-confirmation
     // dialog instead of duplicating it here.
     property var toolbar: null
@@ -1129,13 +1129,11 @@ Rectangle {
         }
     }
 
-    // The colour readout (Modo pixel > "mostrar posición y color") and the eyedropper: holding Alt shows the
-    // readout whatever the setting says, turns the cursor into an eyedropper, and a click copies the colour
+    // The colour readout (the window's bottom bar shows `pixelInfo` and `pixelCell` while the mouse is over the
+    // picture) and the eyedropper: holding Alt turns the cursor into an eyedropper, and a click copies the colour
     // as #RRGGBB.
-    readonly property bool readoutOn: pixelMode && appSettings.pixelReadout
     property bool altDown: false
     readonly property bool pickerOn: altDown && !cropActive && !editMode
-    readonly property bool readoutVisible: readoutOn || pickerOn
     property string copiedHex: ""
     HoverHandler { id: pixelHover }
     // Alt is polled (pressing it alone sends no mouse event), only while the mouse is over the picture
@@ -1154,7 +1152,7 @@ Rectangle {
         target: pixelHover
         function onHoveredChanged() { colorPicker.setCursor(root.pickerOn && pixelHover.hovered); }
     }
-    Timer { id: copiedTimer; interval: 1600; onTriggered: root.copiedHex = "" }
+    Timer { id: copiedTimer; interval: 700; onTriggered: root.copiedHex = "" }
     function pickColor() {
         const info = appController.pixelAt(pixelCell.x, pixelCell.y);
         if (info.valid !== true)
@@ -1169,59 +1167,29 @@ Rectangle {
         const p = image.mapFromItem(root, pixelHover.point.position.x, pixelHover.point.position.y);
         return Qt.point(Math.floor(p.x), Math.floor(p.y));
     }
-    readonly property var pixelInfo: root.readoutVisible && pixelHover.hovered
+    readonly property var pixelInfo: pixelHover.hovered
         ? appController.pixelAt(pixelCell.x, pixelCell.y) : ({ valid: false })
 
+    // Under the mouse for a moment after a colour is copied: the answer to the click.
+    readonly property bool pixelHovering: pixelHover.hovered
     Rectangle {
-        visible: root.readoutVisible && root.pixelInfo.valid === true
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        anchors.margins: 12
-        z: 25
-        height: 30
-        width: readout.implicitWidth + 50 + (root.pickerOn ? 26 : 0)
-        radius: themeManager.radiusMedium === 0 ? 0 : 8
+        visible: opacity > 0
+        opacity: root.copiedHex !== "" ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 120 } }
+        x: Math.min(root.width - width - 4, pixelHover.point.position.x + 16)
+        y: Math.max(4, pixelHover.point.position.y - height - 10)
+        z: 40
+        width: copiedLabel.implicitWidth + 20
+        height: 26
+        radius: themeManager.radiusMedium === 0 ? 0 : 13
         color: themeManager.surfaceElevated
-        border.color: themeManager.border
-        border.width: 1
-        opacity: 0.94
-
-        Rectangle {
-            id: swatch
-            x: 8
-            anchors.verticalCenter: parent.verticalCenter
-            width: 16
-            height: 16
-            radius: 3
-            border.color: themeManager.border
-            color: root.pixelInfo.valid === true
-                   ? Qt.rgba(root.pixelInfo.r / 255, root.pixelInfo.g / 255, root.pixelInfo.b / 255, root.pixelInfo.a / 255)
-                   : "transparent"
-        }
-        // with Alt held the eyedropper shows next to the colour: a click copies it
-        AppIcon {
-            id: pickerIcon
-            visible: root.pickerOn
-            anchors.left: swatch.right
-            anchors.leftMargin: 6
-            anchors.verticalCenter: parent.verticalCenter
-            name: "eyedropper"
-            size: 20
-            color: themeManager.accent
-        }
+        border.color: themeManager.accent
         Label {
-            id: readout
-            anchors.left: root.pickerOn ? pickerIcon.right : swatch.right
-            anchors.leftMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
+            id: copiedLabel
+            anchors.centerIn: parent
+            text: qsTr("Copiado")
             color: themeManager.textPrimary
             font.pixelSize: 12
-            text: root.pixelInfo.valid === true
-                  ? (root.copiedHex !== ""
-                     ? qsTr("X %1  Y %2   %3   ·   Copiado").arg(root.pixelCell.x).arg(root.pixelCell.y).arg(root.copiedHex)
-                     : qsTr("X %1  Y %2   %3").arg(root.pixelCell.x).arg(root.pixelCell.y)
-                           .arg(colorPicker.hex(root.pixelInfo.r, root.pixelInfo.g, root.pixelInfo.b, root.pixelInfo.a)))
-                  : ""
         }
     }
 

@@ -92,7 +92,6 @@ private slots:
         QVERIFY(!s.pixelIntegerZoom());
         QVERIFY(!s.pixelCheckerboard());
         QVERIFY(!s.pixelGrid());
-        QVERIFY(!s.pixelReadout());
         QVERIFY(!s.pixelSharpEdit());
     }
 
@@ -102,12 +101,10 @@ private slots:
             AppSettings s;
             s.setPixelMode(true);
             s.setPixelGrid(true);
-            s.setPixelReadout(true);
         }
         AppSettings again;
         QVERIFY(again.pixelMode());
         QVERIFY(again.pixelGrid());
-        QVERIFY(again.pixelReadout());
         QVERIFY(!again.pixelIntegerZoom());
         QVERIFY(!again.pixelCheckerboard());
         QVERIFY(!again.pixelSharpEdit());
@@ -145,7 +142,6 @@ private slots:
         QVERIFY(s.pixelIntegerZoom());
         QVERIFY(s.pixelCheckerboard());
         QVERIFY(s.pixelGrid());
-        QVERIFY(s.pixelReadout());
         QVERIFY(s.pixelSharpEdit());
     }
 
@@ -171,7 +167,7 @@ private slots:
         AppSettings s;
         QVERIFY(!s.pixelMode());
         QVERIFY(!s.pixelGrid());
-        QVERIFY(s.pixelReadout()); // never touched: follows the old switch
+        QVERIFY(s.pixelSharpEdit()); // never touched: follows the old switch
     }
 };
 

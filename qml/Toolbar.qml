@@ -35,7 +35,7 @@ AppPanelBackground {
         anchors.leftMargin: 12
         spacing: 8
 
-        // Navigation/zoom/rotate/slideshow all live in FloatingToolbar now -
+        // Navigation/zoom/rotate all live in StatusBar now -
         // this side of the top bar just shows what's currently open.
         Label {
             anchors.verticalCenter: parent.verticalCenter
@@ -57,6 +57,10 @@ AppPanelBackground {
             objectName: "editButton"
             iconName: "edit"
             iconOnly: true
+            iconSize: 20
+            iconStroke: 1.4
+            topPadding: 3
+            bottomPadding: 3
             checkable: true
             // Structural edits/filters bake a single static frame, which
             // doesn't fit a playing animation - see AppController::isAnimated.
@@ -66,24 +70,38 @@ AppPanelBackground {
         }
         AppToolButton {
             text: qsTr("GIF animado")
+            objectName: "gifButton"
             iconName: "film"
             iconOnly: true
+            iconSize: 20
+            iconStroke: 1.4
+            topPadding: 3
+            bottomPadding: 3
             enabled: !root.locked
             checked: root.studio === "gif"
-            onClicked: root.studioRequested("gif")
+            onClicked: root.studioRequested(root.studio === "gif" ? "" : "gif")
         }
         AppToolButton {
             text: qsTr("Collage")
+            objectName: "collageButton"
             iconName: "collage"
             iconOnly: true
+            iconSize: 20
+            iconStroke: 1.4
+            topPadding: 3
+            bottomPadding: 3
             enabled: !root.locked
             checked: root.studio === "collage"
-            onClicked: root.studioRequested("collage")
+            onClicked: root.studioRequested(root.studio === "collage" ? "" : "collage")
         }
         AppToolButton {
             text: qsTr("Comparador (varias imágenes con zoom vinculado)")
             iconName: "multi"
             iconOnly: true
+            iconSize: 20
+            iconStroke: 1.4
+            topPadding: 3
+            bottomPadding: 3
             checkable: true
             enabled: folderModel.count > 0 && !root.locked && root.studio === ""
             checked: root.multiMode
@@ -94,6 +112,10 @@ AppPanelBackground {
             text: qsTr("Más herramientas")
             iconName: "more"
             iconOnly: true
+            iconSize: 20
+            iconStroke: 1.4
+            topPadding: 3
+            bottomPadding: 3
             onClicked: moreMenu.popup(moreButton, moreButton.width - moreMenu.width, moreButton.height + 4)
             AppMenu {
                 id: moreMenu
@@ -112,16 +134,14 @@ AppPanelBackground {
             }
         }
         AppToolButton {
-            text: qsTr("Información")
-            iconName: "info"
-            iconOnly: true
-            onClicked: infoPopup.open()
-        }
-        AppToolButton {
             text: qsTr("Configuración")
             objectName: "settingsButton"
             iconName: "settings"
             iconOnly: true
+            iconSize: 20
+            iconStroke: 1.4
+            topPadding: 3
+            bottomPadding: 3
             onClicked: settingsDialog.open()
         }
     }
@@ -143,110 +163,6 @@ AppPanelBackground {
 
     BatchRenameDialog { id: batchRenameDialog }
     BatchExportDialog { id: batchExportDialog }
-
-    Popup {
-        id: infoPopup
-        x: root.width - width - 12
-        y: root.height + 4
-        modal: false
-        focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        background: AppPanelBackground { color: themeManager.surfaceElevated; radius: themeManager.radiusMedium }
-
-        contentItem: Column {
-            spacing: 6
-            Label {
-                color: themeManager.textPrimary
-                font.bold: true
-                text: folderModel.count > 0
-                      ? qsTr("Imagen %1 de %2").arg(folderModel.currentIndex + 1).arg(folderModel.count)
-                      : qsTr("Sin imagen")
-            }
-            Label {
-                color: themeManager.textSecondary
-                text: qsTr("Dimensiones: %1 x %2")
-                      .arg(appController.currentImageSize.width)
-                      .arg(appController.currentImageSize.height)
-            }
-            Label {
-                color: themeManager.textSecondary
-                visible: root.canvas !== null
-                text: root.canvas ? qsTr("Zoom: %1%").arg(root.canvas.zoomPercent) : ""
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: themeManager.border
-                visible: Object.keys(appController.metadata).length > 0
-            }
-
-            Repeater {
-                model: Object.keys(appController.metadata)
-                delegate: Label {
-                    color: themeManager.textSecondary
-                    text: modelData + ": " + appController.metadata[modelData]
-                }
-            }
-
-            Label {
-                color: themeManager.textSecondary
-                visible: Object.keys(appController.metadata).length === 0
-                text: qsTr("Sin datos EXIF")
-            }
-
-            Rectangle { width: parent.width; height: 1; color: themeManager.border }
-            Label {
-                color: themeManager.textSecondary
-                font.pixelSize: 11
-                text: qsTr("Project Foxy %1").arg(Qt.application.version)
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: themeManager.border
-                visible: appController.histogram.length > 0
-            }
-
-            Label {
-                color: themeManager.textSecondary
-                visible: appController.histogram.length > 0
-                text: qsTr("Histograma")
-            }
-
-            Canvas {
-                id: histogramCanvas
-                width: 256
-                height: 70
-                visible: appController.histogram.length > 0
-                onPaint: {
-                    const ctx = getContext("2d");
-                    ctx.clearRect(0, 0, width, height);
-                    ctx.fillStyle = themeManager.surface;
-                    ctx.fillRect(0, 0, width, height);
-                    const data = appController.histogram;
-                    if (data.length === 0)
-                        return;
-                    ctx.fillStyle = themeManager.textSecondary;
-                    for (let i = 0; i < data.length; i++) {
-                        const barHeight = data[i] * height;
-                        ctx.fillRect(i, height - barHeight, 1, barHeight);
-                    }
-                }
-
-                Connections {
-                    target: appController
-                    function onHistogramChanged() { histogramCanvas.requestPaint(); }
-                }
-                Connections {
-                    target: themeManager
-                    function onThemeChanged() { histogramCanvas.requestPaint(); }
-                }
-                Component.onCompleted: requestPaint()
-            }
-        }
-    }
 
     FileDialog {
         id: openDialog

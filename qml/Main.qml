@@ -10,6 +10,8 @@ ApplicationWindow {
     minimumHeight: 320
     visible: true
     title: "Project Foxy"
+    // The native frame is off: TitleBar.qml is the title bar and the edge handles below resize it.
+    flags: Qt.Window | Qt.FramelessWindowHint
     color: themeManager.background
     font.family: themeManager.fontFamily
 
@@ -86,6 +88,16 @@ ApplicationWindow {
         }
         root.studio = name;
     }
+    // Leaving a studio (or going to the other one) with something made and not saved asks first.
+    property string pendingStudio: ""
+    function requestStudio(name) {
+        if (root.studio !== "" && name !== root.studio && studioLoader.item && studioLoader.item.hasWork) {
+            root.pendingStudio = name;
+            leaveStudioDialog.open();
+            return;
+        }
+        root.setStudio(name);
+    }
     function setMultiMode(on) {
         if (on === root.multiMode)
             return;
@@ -97,16 +109,45 @@ ApplicationWindow {
         root.multiMode = on;
     }
 
-    // Frameless + custom-drawn titlebar comes later (Fase 3 polish); using
-    // the native frame for now keeps window management (snap, move, resize)
-    // free and correct while the core viewer is being built.
 
-    Toolbar {
-        id: toolbar
+    TitleBar {
+        id: titleBar
+        window: root
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 48
+        height: 32
+        z: 10
+    }
+
+    // Grips along the edges and corners (not while maximised).
+    Repeater {
+        model: [
+            { e: Qt.LeftEdge, c: Qt.SizeHorCursor }, { e: Qt.RightEdge, c: Qt.SizeHorCursor },
+            { e: Qt.TopEdge, c: Qt.SizeVerCursor }, { e: Qt.BottomEdge, c: Qt.SizeVerCursor },
+            { e: Qt.LeftEdge | Qt.TopEdge, c: Qt.SizeFDiagCursor }, { e: Qt.RightEdge | Qt.BottomEdge, c: Qt.SizeFDiagCursor },
+            { e: Qt.RightEdge | Qt.TopEdge, c: Qt.SizeBDiagCursor }, { e: Qt.LeftEdge | Qt.BottomEdge, c: Qt.SizeBDiagCursor }
+        ]
+        delegate: MouseArea {
+            required property var modelData
+            readonly property bool corner: (modelData.e & (Qt.LeftEdge | Qt.RightEdge)) && (modelData.e & (Qt.TopEdge | Qt.BottomEdge))
+            enabled: root.visibility !== Window.Maximized
+            z: 20
+            cursorShape: modelData.c
+            width: (modelData.e & Qt.LeftEdge) || (modelData.e & Qt.RightEdge) ? 6 : root.width - 12
+            height: (modelData.e & Qt.TopEdge) || (modelData.e & Qt.BottomEdge) ? 6 : root.height - 12
+            x: (modelData.e & Qt.RightEdge) ? root.width - width : (modelData.e & Qt.LeftEdge) ? 0 : 6
+            y: (modelData.e & Qt.BottomEdge) ? root.height - height : (modelData.e & Qt.TopEdge) ? 0 : 6
+            onPressed: root.startSystemResize(modelData.e)
+        }
+    }
+
+    Toolbar {
+        id: toolbar
+        anchors.top: titleBar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 36
         canvas: canvas
         editMode: root.editMode
         locked: root.toolLocked
@@ -114,16 +155,16 @@ ApplicationWindow {
         studio: root.studio
         onEditModeRequested: function (on) { root.setEditMode(on) }
         onMultiModeRequested: function (on) { root.setMultiMode(on) }
-        onStudioRequested: function (name) { root.setStudio(name) }
+        onStudioRequested: function (name) { root.requestStudio(name) }
     }
 
     ThumbnailStrip {
         id: sidebar
         anchors.top: toolbar.bottom
         anchors.left: parent.left
-        anchors.bottom: parent.bottom
+        anchors.bottom: statusBar.top
         visible: folderModel.count > 1
-        busy: root.editMode || floatingToolbar.slideshowRunning
+        busy: root.editMode
         enabled: !root.toolLocked && !root.multiMode && root.studio === ""
         opacity: enabled ? 1.0 : 0.45
     }
@@ -133,7 +174,8 @@ ApplicationWindow {
         anchors.top: toolbar.bottom
         anchors.left: sidebar.visible ? sidebar.right : parent.left
         anchors.right: root.editMode ? editLoader.left : parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: statusBar.top
+        anchors.bottomMargin: statusBar.dockVisible ? statusBar.rise : 0 // the picture fits above the dock
         toolbar: toolbar
         editMode: root.editMode
         locked: root.toolLocked
@@ -164,7 +206,7 @@ ApplicationWindow {
         anchors.top: toolbar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: statusBar.top
         z: 6
         sourceComponent: root.studio === "gif" ? gifStudioComponent : collageComponent
     }
@@ -174,7 +216,7 @@ ApplicationWindow {
         active: root.editMode
         anchors.top: toolbar.bottom
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: statusBar.top
         width: root.editMode ? 330 : 0
         sourceComponent: EditPanel {
             anchors.fill: parent
@@ -185,22 +227,39 @@ ApplicationWindow {
         onLoaded: item.visible = true
     }
 
-    FloatingToolbar {
-        id: floatingToolbar
+    StatusBar {
+        id: statusBar
         canvas: canvas
         toolbar: toolbar
         editMode: root.editMode
         locked: root.toolLocked
         onSaveAsRequested: root.requestSaveAs()
         onCloseEditRequested: root.setEditMode(false)
-        visible: !root.multiMode && root.studio === ""
-        anchors.bottom: canvas.bottom
-        anchors.bottomMargin: 16
-        anchors.horizontalCenter: canvas.horizontalCenter
+        dockVisible: root.studio === ""
+        customDock: multiLoader.item ? multiLoader.item.dockContent : null
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: 30
         z: 5
         onSaveRequested: root.requestSave()
     }
 
+    ConfirmDialog {
+        id: leaveStudioDialog
+        symbol: "save"
+        danger: true
+        heading: qsTr("¿Salir sin guardar?")
+        message: qsTr("Lo que armaste en este estudio se va a descartar.")
+        detail: qsTr("Si quieres conservarlo, vuelve y usa «Guardar como…».")
+        cancelText: qsTr("Seguir aquí")
+        confirmText: qsTr("Salir sin guardar")
+        onConfirmed: {
+            if (studioLoader.item)
+                studioLoader.item.discard();
+            root.setStudio(root.pendingStudio);
+        }
+    }
     UnsavedChangesDialog {
         id: unsavedDialog
         onCloseConfirmed: {

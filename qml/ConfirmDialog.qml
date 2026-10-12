@@ -15,6 +15,7 @@ AppDialog {
     property string detail: ""
     property string confirmText: qsTr("Aceptar")
     property string confirmIcon: "check"
+    property string cancelText: qsTr("Cancelar")
     property string symbol: "trash"
     property bool danger: false
 
@@ -84,12 +85,14 @@ AppDialog {
             anchors.right: parent.right
 
             AppButton {
-                width: 110
-                text: qsTr("Cancelar")
+                objectName: "dialogCancelButton"
+                width: 130
+                text: root.cancelText
                 onClicked: root.close()
             }
             AppButton {
-                width: 140
+                objectName: "dialogConfirmButton"
+                width: 170
                 text: root.confirmText
                 danger: root.danger
                 primary: !root.danger
