@@ -95,6 +95,8 @@ Mover las 5 cachés derivadas y su invalidación (~110 líneas): `structuralBake
 **Riesgo bajo-medio:** es un interruptor central; el test de la fase 0 sobre "no quedan cachés viejas" es la red.
 **Hecho cuando:** ~110 líneas menos y un test unitario por caché. **Costo:** 1 PR.
 
+> **Resultado (11‑oct‑2026):** hecho en un PR como una clase simple, `PictureCache` (no es `QObject`; el controlador le pasa cómo calcular la imagen estructural). `AppController.cpp` bajó **70 líneas** (1234 → 1164), menos de las ~110 estimadas: la función que calcula la imagen y la publicación (`republishBaked`, `publishPicture`, `currentBaked`) siguen en el controlador porque tocan `ImageProvider` y las señales. Dos invalidaciones explícitas (`invalidatePicture`: cambió la imagen; `invalidateAdjusted`: solo cambió el estado vivo) en lugar de cinco banderas sueltas. 10 tests propios.
+
 ### Fase 3 — `EditSession` (la fase que importa y la que más riesgo tiene)
 
 Mover el historial (`m_editStack`), el estado vivo, la sesión de herramienta, la fusión por tiempo y las recetas (guardada y de inicio de carga). Operaciones que devuelven **qué cambió** (`Nada | Vivo | Píxeles`), para que el controlador decida qué invalidar y qué emitir, en vez de que el historial toque cachés.
@@ -125,7 +127,7 @@ Antes de empezar esta fase se escribe aquí el detalle: la lista de invariantes 
 |---|---|
 | hoy | 1434 |
 | 1 (Ajustes + Filtros) | ~1030 estimado; **real: 1234** |
-| 2 (cachés) | ~920 |
+| 2 (cachés) | ~920 estimado; **real: 1164** |
 | 3 (historial/estado vivo) | ~670 |
 | 4 (documento + escritorio) | ~420 |
 
