@@ -146,6 +146,54 @@ jobs:
           path: dist/ProjectFoxy-*-x86_64.AppImage
           retention-days: 14
 
+  # Fuzzing of the animated-picture reader (GIF, APNG, animated WebP) with AddressSanitizer and UBSan: one minute per
+  # format, starting from the seed corpus. See tests/fuzz/README.md. Not part of the normal build: its own small
+  # project, with Clang.
+  fuzz:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: System packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clang ninja-build pkg-config libwebp-dev libgl1-mesa-dev             libxkbcommon-dev libfontconfig1-dev libfreetype-dev libdbus-1-dev
+          # ASan and recent kernels: high address randomisation makes older sanitizer runtimes crash at start-up.
+          sudo sysctl -w vm.mmap_rnd_bits=28 || true
+
+      - name: Qt 6.7.3
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: 6.7.3
+          arch: linux_gcc_64
+
+      - name: Build the fuzzers
+        run: |
+          cmake -S tests/fuzz -B build/fuzz -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR"
+          cmake --build build/fuzz
+
+      - name: Fuzz
+        env:
+          ASAN_OPTIONS: detect_leaks=0
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: |
+          status=0
+          for fmt in gif apng webp; do
+            mkdir -p "$RUNNER_TEMP/work/$fmt" "$RUNNER_TEMP/crashes"
+            cp tests/fuzz/corpus/$fmt/* "$RUNNER_TEMP/work/$fmt/"
+            build/fuzz/fuzz_animated_$fmt -max_total_time=60 -rss_limit_mb=2048 -timeout=10 -max_len=65536               -artifact_prefix="$RUNNER_TEMP/crashes/$fmt-" "$RUNNER_TEMP/work/$fmt" || status=1
+          done
+          exit $status
+
+      - name: What the fuzzers found
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes
+          path: ${{ runner.temp }}/crashes/
+          retention-days: 14
+
   # The Flatpak, built in the official image of the KDE 6.10 runtime (its flatpak-builder is a current one, so the
   # AppStream metadata is composed and checked too). Slower than the other jobs: libvips, LibRaw and exiv2 are built.
   flatpak:

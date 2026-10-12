@@ -372,6 +372,18 @@ bool decodeWebpFrames(const QString &filePath, bool wantAllFrames,
         return false;
     }
     const QByteArray bytes = file.readAll();
+    // The canvas size is in the file's header, and libwebp's animation decoder allocates TWO full canvases the moment it
+    // is created: a few hundred hostile bytes can ask for gigabytes. So the size is checked first, from the header alone
+    // (found by fuzzing: a 188-byte file asked for 3 GB).
+    WebPBitstreamFeatures features;
+    if (WebPGetFeatures(reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size()), &features) != VP8_STATUS_OK) {
+        error = core::tr("No se pudo leer el WebP animado.");
+        return false;
+    }
+    if (!canvasAllowed(features.width, features.height)) {
+        error = core::tr("La imagen es demasiado grande para abrirla con seguridad: %1").arg(filePath);
+        return false;
+    }
     WebPData data{reinterpret_cast<const uint8_t *>(bytes.constData()), size_t(bytes.size())};
     WebPAnimDecoderOptions options;
     if (!WebPAnimDecoderOptionsInit(&options)) {
