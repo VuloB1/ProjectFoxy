@@ -41,9 +41,15 @@ public:
 
     QQuickImageResponse *requestImageResponse(const QString &id, const QSize &requestedSize) override;
 
+    // Stops the workers and waits for them. The thumbnails are read through a cache that belongs to FolderModel, which
+    // the QML engine destroys BEFORE its image providers: a worker still running then would use a dead cache. Called
+    // when the engine starts to go (see AppBootstrap.cpp); requests that arrive afterwards get nothing.
+    void shutdown();
+
 private:
     core::ThumbnailCache *m_cache;
     // Its own pool, at low priority and with fewer threads than the machine has, so a folder full
     // of thumbnails never competes with opening the picture the user is waiting for.
     QThreadPool m_pool;
+    std::atomic<bool> m_closed{false};
 };
