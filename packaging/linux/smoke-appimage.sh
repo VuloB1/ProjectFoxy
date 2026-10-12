@@ -16,7 +16,9 @@ export QT_QPA_PLATFORM=xcb
 export LIBGL_ALWAYS_SOFTWARE=1         # no GPU on a build server
 export QT_FORCE_STDERR_LOGGING=1
 
-timeout 6 xvfb-run -a -s "-screen 0 1280x1024x24" "$APPIMAGE" "$IMAGE" 2> "$LOG"
+# --new-window: another copy left running (the build tree's smoke test, killed by its timeout) would otherwise take the
+# picture and this one would hand it over and exit at once with code 0 (one window per user).
+timeout 6 xvfb-run -a -s "-screen 0 1280x1024x24" "$APPIMAGE" --new-window "$IMAGE" 2> "$LOG"
 code=$?
 # 124 = the timeout stopped it: it was still running, which is what a healthy start looks like.
 if [ "$code" -ne 124 ]; then

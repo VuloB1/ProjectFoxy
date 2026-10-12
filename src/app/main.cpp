@@ -13,11 +13,13 @@
 #include "ColorPicker.h"
 #include "Translations.h"
 #include "FontSubstitutions.h"
+#include "SingleInstance.h"
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQuickStyle>
+#include <QQuickWindow>
 #include <QIcon>
 #include <QStandardPaths>
 
@@ -49,6 +51,30 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/qt/qml/ImageViewerApp/resources/icons/icon.png"));
 
     QQuickStyle::setStyle("Basic"); // fully themable base for the custom Fluent-ish look
+
+    // The file to open, if any: the first argument that is not an option. (QCoreApplication::arguments() is built
+    // from the UTF-16 command line, so a name with characters outside the ANSI code page - Japanese, Cyrillic,
+    // emoji... - arrives intact; argv[] would already have turned them into '?'.)
+    QString fileArgument;
+    bool newWindow = false;
+    for (const QString &argument : app.arguments().mid(1)) {
+        if (argument == QLatin1String("--new-window"))
+            newWindow = true;
+        else if (!argument.startsWith(QLatin1String("--")) && fileArgument.isEmpty())
+            fileArgument = argument;
+    }
+
+    // One window: when Project Foxy is already running, hand it the file and leave. `--new-window` (or turning the
+    // setting off) skips this. If the running one does not answer, this one runs on its own.
+    SingleInstance single;
+    if (!newWindow && AppSettings().singleInstance()) {
+        const QStringList files = fileArgument.isEmpty() ? QStringList() : QStringList{fileArgument};
+        const auto result = SingleInstance::sendToRunning(SingleInstance::defaultName(), files);
+        if (result == SingleInstance::Result::Delivered)
+            return 0;
+        if (result == SingleInstance::Result::NobodyThere)
+            single.listen();
+    }
 
     QQmlApplicationEngine engine;
 
@@ -119,13 +145,22 @@ int main(int argc, char *argv[])
     if (engine.rootObjects().isEmpty())
         return -1;
 
-    // Open-with / double-click association: the first argument is the file path.
-    // QCoreApplication::arguments() is built from the UTF-16 command line, so a
-    // name with characters outside the ANSI code page (Japanese, Cyrillic,
-    // emoji...) arrives intact; argv[] would already have turned them into '?'.
-    const QStringList arguments = app.arguments();
-    if (arguments.size() > 1)
-        controller->openPath(arguments.at(1));
+    // Open-with / double-click association: the file in the arguments.
+    if (!fileArgument.isEmpty())
+        controller->openPath(fileArgument);
+
+    // Another launch handed us a file, or just wants this window: open it (an unsaved edit raises the usual question)
+    // and bring the window forward.
+    QObject::connect(&single, &SingleInstance::openRequested, controller, &AppController::openPath);
+    QObject::connect(&single, &SingleInstance::activateRequested, &app, [&engine]() {
+        auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first());
+        if (!window)
+            return;
+        if (window->windowStates() & Qt::WindowMinimized)
+            window->showNormal();
+        window->raise();
+        window->requestActivate();
+    });
 
     return app.exec();
 }

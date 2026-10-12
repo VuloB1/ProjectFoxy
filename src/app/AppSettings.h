@@ -41,6 +41,9 @@ class AppSettings : public QObject {
     Q_PROPERTY(bool pixelGrid READ pixelGrid WRITE setPixelGrid NOTIFY pixelGridChanged)
     Q_PROPERTY(bool pixelReadout READ pixelReadout WRITE setPixelReadout NOTIFY pixelReadoutChanged)
     Q_PROPERTY(bool pixelSharpEdit READ pixelSharpEdit WRITE setPixelSharpEdit NOTIFY pixelSharpEditChanged)
+    // Opening a picture while the program is running uses that window instead of starting another one.
+    // Read when the program starts: a change applies the next time it is opened.
+    Q_PROPERTY(bool singleInstance READ singleInstance WRITE setSingleInstance NOTIFY singleInstanceChanged)
 
 public:
     explicit AppSettings(QObject *parent = nullptr);
@@ -81,6 +84,8 @@ public:
     // A checkerboard behind the transparent parts.
     bool pixelCheckerboard() const { return m_pixelCheckerboard; }
     void setPixelCheckerboard(bool value);
+    bool singleInstance() const { return m_singleInstance; }
+    void setSingleInstance(bool value);
     // A grid between the picture's own pixels from 8x.
     bool pixelGrid() const { return m_pixelGrid; }
     void setPixelGrid(bool value);
@@ -112,6 +117,7 @@ signals:
     void pixelGridChanged();
     void pixelReadoutChanged();
     void pixelSharpEditChanged();
+    void singleInstanceChanged();
 
 private:
     // Stores `value` under `key` and reports whether it was a change.
@@ -136,4 +142,5 @@ private:
     bool m_pixelGrid = false;
     bool m_pixelReadout = false;
     bool m_pixelSharpEdit = false;
+    bool m_singleInstance = true;
 };

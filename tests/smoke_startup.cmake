@@ -21,7 +21,9 @@ set(ENV{QSG_RHI_BACKEND} "software")          # no GPU needed (works on a build 
 set(ENV{QT_FORCE_STDERR_LOGGING} "1")         # a GUI (WIN32) app otherwise hides Qt's messages
 
 execute_process(
-    COMMAND "${EXE}" "${IMAGE}"
+    # --new-window: a copy of the program left running by an earlier test would otherwise take the picture and this
+    # one would hand it over and exit at once (one window per user, see SingleInstance.h).
+    COMMAND "${EXE}" --new-window "${IMAGE}"
     TIMEOUT 6
     RESULT_VARIABLE result
     OUTPUT_VARIABLE out

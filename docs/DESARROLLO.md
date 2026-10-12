@@ -1407,3 +1407,31 @@ largo** (y la imagen real tiene más de 5120), `ImageProvider` sirve una copia r
   con `devicePixelRatio` 1), ni el comportamiento al arrastrar los controles de nitidez/claridad/grano con la imagen
   alejada (al activarlos pasa a la imagen completa, con un salto de carga único). Tampoco hay una prueba automática de la
   interfaz: la comparación se hizo con un arnés temporal que no está en el repositorio.
+
+## 19. Una sola ventana (11‑oct‑2026)
+
+Abrir una imagen mientras Project Foxy ya está abierto (doble clic en el Explorador, «Abrir con») ya no arranca otro
+proceso: se la pasa al que corre y le trae la ventana al frente.
+
+- **`SingleInstance`** (`src/app/SingleInstance.{h,cpp}`). La primera instancia escucha en un `QLocalServer` **del usuario**
+  (`UserAccessOption`): una tubería con nombre en Windows (`ProjectFoxy-<usuario>`) y, en Linux, un socket en la carpeta de
+  ejecución (`XDG_RUNTIME_DIR`, que Flatpak comparte entre ejecuciones de la misma aplicación; `/tmp` si falta). Las siguientes
+  se conectan, mandan **una línea JSON** `{"files": [...]}` (rutas **absolutas**, resueltas contra la carpeta del que envía),
+  esperan `ok` y salen con código 0. Solo se abre el primer archivo. Línea de más de 64 KB o que no sea JSON con `files`: se
+  descarta. Un cliente que conecta y calla se suelta a los 5 s.
+- **Resultados** (`sendToRunning`): `Delivered` (salir), `NobodyThere` (no hay nadie: este proceso escucha y sigue) y
+  `NoAnswer` (algo aceptó la conexión pero no contestó, p. ej. una instancia colgada: este proceso corre **solo y sin
+  escuchar**, para no pisarle el nombre). `listen()` primero prueba conectarse: **no le quita el nombre a quien contesta**;
+  si nadie contesta, borra el socket viejo (un cierre brusco lo deja en Linux) y escucha.
+- En Windows el cliente llama a `AllowSetForegroundWindow` (acaba de nacer de un clic de la persona), y la instancia que
+  recibe hace `showNormal` si estaba minimizada, `raise` y `requestActivate`.
+- **Opt‑out:** `--new-window` en la línea de comandos, o el interruptor «Una sola ventana» (Ajustes → Apariencia →
+  Ventanas; clave `window/singleInstance`, activado por defecto; se lee al arrancar, así que aplica la próxima vez).
+- **Pruebas:** `test_single_instance` (11 en Windows, 12 en Linux): sin nadie, ruta absoluta, nombres Unicode, sin
+  archivo, varios lanzamientos seguidos, un segundo `listen()` no roba el nombre, **socket viejo** (solo Linux), oyente mudo
+  → `NoAnswer`, mensaje mal formado y mensaje enorme. Además se comprobó con el programa real: el segundo lanzamiento sale en
+  ~90 ms con código 0, queda un único proceso, la ventana pasa de la imagen A a la B (comparando capturas), `--new-window`
+  crea otro proceso, y tras matar el proceso todo vuelve a funcionar.
+- **No probado:** el comportamiento de «traer al frente» con un doble clic real desde el Explorador (la prueba lanzó los
+  procesos desde PowerShell: el contenido cambió, pero no se verificó qué ventana quedó al frente), Flatpak/AppImage
+  reales, ni dos sesiones de usuario a la vez.

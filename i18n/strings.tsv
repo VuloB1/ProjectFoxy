@@ -875,3 +875,6 @@ El archivo es demasiado grande para abrirlo con seguridad: %1	The file is too la
 La imagen es demasiado grande para abrirla con seguridad: %1	The image is too large to open safely: %1	A imagem é grande demais para abrir com segurança: %1	이미지가 너무 커서 안전하게 열 수 없습니다: %1	图片太大,无法安全打开:%1	画像が大きすぎて安全に開けません: %1
 Fondo de escritorio cambiado	Wallpaper changed	Plano de fundo alterado	바탕 화면이 변경되었습니다	桌面壁纸已更改	壁紙を変更しました
 No se pudo cambiar el fondo de escritorio	Could not change the wallpaper	Não foi possível alterar o plano de fundo	바탕 화면을 변경할 수 없습니다	无法更改桌面壁纸	壁紙を変更できませんでした
+Ventanas	Windows	Janelas	창	窗口	ウィンドウ
+Una sola ventana	A single window	Uma única janela	창 하나만 사용	只用一个窗口	ウィンドウを1つだけ使う
+Al abrir una imagen desde el Explorador se usa la ventana que ya está abierta, en vez de abrir otra. Se aplica la próxima vez que abras el programa.	When you open an image from the file manager, the window that is already open is used instead of opening another one. It applies the next time you start the program.	Ao abrir uma imagem pelo gerenciador de arquivos, a janela já aberta é usada em vez de abrir outra. Vale na próxima vez que você abrir o programa.	파일 관리자에서 이미지를 열면 새 창을 열지 않고 이미 열려 있는 창을 사용합니다. 프로그램을 다음에 열 때 적용됩니다.	从文件管理器打开图片时,使用已打开的窗口,而不是再开一个。下次启动程序时生效。	ファイルマネージャーから画像を開くとき、新しいウィンドウではなく既に開いているウィンドウを使います。次にプログラムを起動したときに反映されます。

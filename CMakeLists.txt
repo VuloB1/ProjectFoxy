@@ -100,6 +100,8 @@ add_library(imageviewer_app STATIC
     src/app/LookModel.cpp
     src/app/PictureCache.h
     src/app/PictureCache.cpp
+    src/app/SingleInstance.h
+    src/app/SingleInstance.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
