@@ -1,4 +1,6 @@
 #include "AppController.h"
+#include "AdjustModel.h"
+#include "LookModel.h"
 #include "ImageProvider.h"
 #include "FolderModel.h"
 #include "DecoderRegistry.h"
@@ -671,57 +673,7 @@ QVariantMap AppController::pixelAt(int x, int y) const
 
 QVariantMap AppController::adjustMap() const
 {
-    const AdjustOp &op = m_liveAdjust;
-    QVariantMap map;
-    map.insert(QStringLiteral("exposure"), op.exposure);
-    map.insert(QStringLiteral("brightness"), op.brightness);
-    map.insert(QStringLiteral("contrast"), op.contrast);
-    map.insert(QStringLiteral("highlights"), op.highlights);
-    map.insert(QStringLiteral("shadows"), op.shadows);
-    map.insert(QStringLiteral("whites"), op.whites);
-    map.insert(QStringLiteral("blacks"), op.blacks);
-    map.insert(QStringLiteral("gamma"), op.gamma);
-    map.insert(QStringLiteral("temperature"), op.temperature);
-    map.insert(QStringLiteral("tint"), op.tint);
-    map.insert(QStringLiteral("saturation"), op.saturation);
-    map.insert(QStringLiteral("vibrance"), op.vibrance);
-    map.insert(QStringLiteral("hue"), op.hue);
-    map.insert(QStringLiteral("clarity"), op.clarity);
-    map.insert(QStringLiteral("sharpness"), op.sharpness);
-    map.insert(QStringLiteral("vignette"), op.vignette);
-    map.insert(QStringLiteral("grain"), op.grain);
-    map.insert(QStringLiteral("grainType"), op.grainType);
-    map.insert(QStringLiteral("grainMono"), op.grainMono);
-    map.insert(QStringLiteral("negative"), op.negative);
-    map.insert(QStringLiteral("outBlack"), op.outBlack);
-    map.insert(QStringLiteral("outWhite"), op.outWhite);
-
-    QVariantList levels;
-    for (const auto &lv : op.levels) {
-        QVariantMap m;
-        m.insert(QStringLiteral("inBlack"), lv.inBlack);
-        m.insert(QStringLiteral("gamma"), lv.gamma);
-        m.insert(QStringLiteral("inWhite"), lv.inWhite);
-        levels.append(m);
-    }
-    map.insert(QStringLiteral("levels"), levels);
-
-    QVariantList curves;
-    for (const auto &curve : op.curves) {
-        QVariantList pts;
-        for (const QPointF &p : curve) {
-            QVariantMap m;
-            m.insert(QStringLiteral("x"), p.x());
-            m.insert(QStringLiteral("y"), p.y());
-            pts.append(m);
-        }
-        // fromValue on purpose: QVariantList::append(QVariantList) would
-        // CONCATENATE the points into `curves` instead of nesting one list
-        // per channel, and the editor would read a single point back.
-        curves.append(QVariant::fromValue(pts));
-    }
-    map.insert(QStringLiteral("curves"), curves);
-    return map;
+    return AdjustModel::toMap(m_liveAdjust);
 }
 
 QString AppController::adjustLutSource() const
@@ -748,179 +700,74 @@ void AppController::setLiveAdjust(const AdjustOp &op, const QString &coalesceKey
     emit editStackChanged();
 }
 
+void AppController::applyAdjust(const std::optional<AdjustModel::Change> &change)
+{
+    if (change)
+        setLiveAdjust(change->op, change->key);
+}
+
 void AppController::setAdjustParam(const QString &name, qreal value)
 {
     if (m_originalImage.isNull())
         return;
-
-    struct Param {
-        const char *name;
-        double AdjustOp::*field;
-        double lo;
-        double hi;
-    };
-    static const Param kParams[] = {
-        {"exposure", &AdjustOp::exposure, -1.0, 1.0},
-        {"brightness", &AdjustOp::brightness, -1.0, 1.0},
-        {"contrast", &AdjustOp::contrast, -1.0, 1.0},
-        {"highlights", &AdjustOp::highlights, -1.0, 1.0},
-        {"shadows", &AdjustOp::shadows, -1.0, 1.0},
-        {"whites", &AdjustOp::whites, -1.0, 1.0},
-        {"blacks", &AdjustOp::blacks, -1.0, 1.0},
-        {"gamma", &AdjustOp::gamma, -1.0, 1.0},
-        {"temperature", &AdjustOp::temperature, -1.0, 1.0},
-        {"tint", &AdjustOp::tint, -1.0, 1.0},
-        {"saturation", &AdjustOp::saturation, -1.0, 1.0},
-        {"vibrance", &AdjustOp::vibrance, -1.0, 1.0},
-        {"hue", &AdjustOp::hue, -1.0, 1.0},
-        {"clarity", &AdjustOp::clarity, -1.0, 1.0},
-        {"sharpness", &AdjustOp::sharpness, 0.0, 1.0},
-        {"vignette", &AdjustOp::vignette, -1.0, 1.0},
-        {"grain", &AdjustOp::grain, 0.0, 1.0},
-    };
-    for (const Param &p : kParams) {
-        if (name != QLatin1String(p.name))
-            continue;
-        const double clamped = std::clamp(double(value), p.lo, p.hi);
-        if (m_liveAdjust.*(p.field) == clamped)
-            return;
-        AdjustOp op = m_liveAdjust;
-        op.*(p.field) = clamped;
-        setLiveAdjust(op, QStringLiteral("p:") + name);
-        return;
-    }
+    applyAdjust(AdjustModel::setParam(m_liveAdjust, name, value));
 }
 
 void AppController::setGrainType(int type)
 {
-    type = std::clamp(type, 0, 3);
-    if (m_originalImage.isNull() || m_liveAdjust.grainType == type)
+    if (m_originalImage.isNull())
         return;
-    AdjustOp op = m_liveAdjust;
-    op.grainType = type;
-    setLiveAdjust(op, QStringLiteral("grainType"));
+    applyAdjust(AdjustModel::setGrainType(m_liveAdjust, type));
 }
 
 void AppController::setGrainMono(bool mono)
 {
-    if (m_originalImage.isNull() || m_liveAdjust.grainMono == mono)
+    if (m_originalImage.isNull())
         return;
-    AdjustOp op = m_liveAdjust;
-    op.grainMono = mono;
-    setLiveAdjust(op, QStringLiteral("grainMono"));
+    applyAdjust(AdjustModel::setGrainMono(m_liveAdjust, mono));
 }
 
 void AppController::setNegative(bool on)
 {
-    if (m_originalImage.isNull() || m_liveAdjust.negative == on)
+    if (m_originalImage.isNull())
         return;
-    AdjustOp op = m_liveAdjust;
-    op.negative = on;
-    setLiveAdjust(op, QStringLiteral("negative"));
+    applyAdjust(AdjustModel::setNegative(m_liveAdjust, on));
 }
 
 void AppController::setLevels(int channel, qreal inBlack, qreal gamma, qreal inWhite)
 {
-    if (m_originalImage.isNull() || channel < 0 || channel > 3)
+    if (m_originalImage.isNull())
         return;
-    core::edit::LevelsChannel lv;
-    lv.inBlack = std::clamp(double(inBlack), 0.0, 0.98);
-    lv.inWhite = std::clamp(double(inWhite), lv.inBlack + 0.02, 1.0);
-    lv.gamma = std::clamp(double(gamma), 0.1, 9.99);
-    const auto &cur = m_liveAdjust.levels[channel];
-    if (cur.inBlack == lv.inBlack && cur.gamma == lv.gamma && cur.inWhite == lv.inWhite)
-        return;
-    AdjustOp op = m_liveAdjust;
-    op.levels[channel] = lv;
-    setLiveAdjust(op, QStringLiteral("levels:%1").arg(channel));
+    applyAdjust(AdjustModel::setLevels(m_liveAdjust, channel, inBlack, gamma, inWhite));
 }
 
 void AppController::setOutputLevels(qreal black, qreal white)
 {
     if (m_originalImage.isNull())
         return;
-    const double b = std::clamp(double(black), 0.0, 0.98);
-    const double w = std::clamp(double(white), b + 0.02, 1.0);
-    if (m_liveAdjust.outBlack == b && m_liveAdjust.outWhite == w)
-        return;
-    AdjustOp op = m_liveAdjust;
-    op.outBlack = b;
-    op.outWhite = w;
-    setLiveAdjust(op, QStringLiteral("outputLevels"));
+    applyAdjust(AdjustModel::setOutputLevels(m_liveAdjust, black, white));
 }
-
-namespace {
-
-// Accepts what QML hands over for a point: a {x, y} object or a Qt.point().
-bool pointFromVariant(const QVariant &v, QPointF *out)
-{
-    if (v.typeId() == QMetaType::QVariantMap) {
-        const QVariantMap m = v.toMap();
-        *out = QPointF(m.value(QStringLiteral("x")).toDouble(), m.value(QStringLiteral("y")).toDouble());
-        return true;
-    }
-    if (v.canConvert<QPointF>()) {
-        *out = v.toPointF();
-        return true;
-    }
-    return false;
-}
-
-} // namespace
 
 void AppController::setCurvePoints(int channel, const QVariantList &points)
 {
-    if (m_originalImage.isNull() || channel < 0 || channel > 3)
+    if (m_originalImage.isNull())
         return;
-
-    core::edit::CurvePoints curve;
-    for (const QVariant &v : points) {
-        QPointF p;
-        if (!pointFromVariant(v, &p))
-            continue;
-        curve.emplace_back(std::clamp(p.x(), 0.0, 1.0), std::clamp(p.y(), 0.0, 1.0));
-        if (curve.size() >= 16)
-            break;
-    }
-    std::sort(curve.begin(), curve.end(), [](const QPointF &a, const QPointF &b) { return a.x() < b.x(); });
-    if (core::edit::isIdentityCurve(curve))
-        curve.clear();
-
-    if (m_liveAdjust.curves[channel] == curve)
-        return;
-    AdjustOp op = m_liveAdjust;
-    op.curves[channel] = curve;
-    setLiveAdjust(op, QStringLiteral("curves:%1").arg(channel));
+    applyAdjust(AdjustModel::setCurvePoints(m_liveAdjust, channel, points));
 }
 
 QVariantList AppController::curveSamples(const QVariantList &points) const
 {
-    core::edit::CurvePoints curve;
-    for (const QVariant &v : points) {
-        QPointF p;
-        if (pointFromVariant(v, &p))
-            curve.push_back(p);
-    }
-    const auto samples = core::edit::sampleCurve(curve);
-    QVariantList list;
-    list.reserve(256);
-    for (double s : samples)
-        list.append(s);
-    return list;
+    return AdjustModel::curveSamples(points);
 }
 
 void AppController::autoAdjust(const QString &kind)
 {
     if (m_originalImage.isNull())
         return;
-    core::edit::AutoAdjustKind k = core::edit::AutoAdjustKind::Contrast;
-    if (kind == QLatin1String("levels"))
-        k = core::edit::AutoAdjustKind::Levels;
-    else if (kind == QLatin1String("color"))
-        k = core::edit::AutoAdjustKind::Color;
-    else if (kind != QLatin1String("contrast"))
+    const auto adjustKind = AdjustModel::autoKind(kind);
+    if (!adjustKind)
         return;
-    setLiveAdjust(core::edit::autoAdjusted(m_liveAdjust, structuralBaked(), k));
+    setLiveAdjust(core::edit::autoAdjusted(m_liveAdjust, structuralBaked(), *adjustKind));
 }
 
 void AppController::resetAdjust()
@@ -934,17 +781,13 @@ void AppController::resetLevels()
 {
     if (m_originalImage.isNull())
         return;
-    AdjustOp op = m_liveAdjust;
-    op.levels = {};
-    op.outBlack = 0.0;
-    op.outWhite = 1.0;
-    setLiveAdjust(op);
+    const AdjustModel::Change reset = AdjustModel::resetLevels(m_liveAdjust);
+    setLiveAdjust(reset.op, reset.key);
 }
 
 void AppController::refreshLookLut()
 {
-    const core::edit::LookSpec *spec = core::edit::findLook(m_liveFilterPreset);
-    m_provider->setLookLut(core::edit::lutToImage(core::edit::buildAdjustLut(spec ? spec->tone : AdjustOp())));
+    m_provider->setLookLut(core::edit::lutToImage(core::edit::buildAdjustLut(LookModel::tone(m_liveFilterPreset))));
     ++m_lookLutRevision;
 }
 
@@ -955,71 +798,27 @@ QString AppController::lookLutSource() const
 
 bool AppController::lookActive() const
 {
-    return core::edit::findLook(m_liveFilterPreset) != nullptr && m_liveFilterIntensity > 0.0;
+    return LookModel::active(m_liveFilterPreset, m_liveFilterIntensity);
 }
 
 bool AppController::gradeActive() const
 {
-    // Clarity, sharpness, vignette and grain belong to the Detail stage, which always runs.
-    AdjustOp grade = m_liveAdjust;
-    grade.clarity = 0.0;
-    grade.sharpness = 0.0;
-    grade.vignette = 0.0;
-    grade.grain = 0.0;
-    return !grade.isIdentity();
+    return AdjustModel::gradeActive(m_liveAdjust);
 }
 
 QVariantMap AppController::lookMap() const
 {
-    const core::edit::LookSpec *spec = core::edit::findLook(m_liveFilterPreset);
-    const AdjustOp tone = spec ? spec->tone : AdjustOp();
-    const core::edit::GradeExtras extras = spec ? spec->extras : core::edit::GradeExtras();
-    auto vec = [](const std::array<double, 3> &a) { return QVector3D(float(a[0]), float(a[1]), float(a[2])); };
-
-    QVariantMap map;
-    map.insert(QStringLiteral("id"), m_liveFilterPreset);
-    map.insert(QStringLiteral("amount"), spec ? m_liveFilterIntensity : 0.0);
-    map.insert(QStringLiteral("shadows"), tone.shadows);
-    map.insert(QStringLiteral("highlights"), tone.highlights);
-    map.insert(QStringLiteral("saturation"), tone.saturation);
-    map.insert(QStringLiteral("vibrance"), tone.vibrance);
-    map.insert(QStringLiteral("hue"), tone.hue);
-    map.insert(QStringLiteral("gradientOn"), extras.gradient ? 1.0 : 0.0);
-    map.insert(QStringLiteral("gradient0"), vec(extras.stops[0]));
-    map.insert(QStringLiteral("gradient1"), vec(extras.stops[1]));
-    map.insert(QStringLiteral("gradient2"), vec(extras.stops[2]));
-    map.insert(QStringLiteral("shadowOffset"), vec(extras.shadowOffset));
-    map.insert(QStringLiteral("highlightOffset"), vec(extras.highlightOffset));
-    map.insert(QStringLiteral("vignette"), extras.vignette);
-    map.insert(QStringLiteral("grain"), extras.grain);
-    map.insert(QStringLiteral("grainType"), extras.grainType);
-    map.insert(QStringLiteral("grainMono"), extras.grainMono ? 1.0 : 0.0);
-    return map;
+    return LookModel::toMap(m_liveFilterPreset, m_liveFilterIntensity);
 }
 
 QVariantList AppController::lookList() const
 {
-    QVariantList list;
-    for (const core::edit::LookSpec &look : core::edit::allLooks()) {
-        QVariantMap m;
-        m.insert(QStringLiteral("id"), look.id);
-        m.insert(QStringLiteral("name"), core::tr(look.name));
-        m.insert(QStringLiteral("group"), look.group);
-        list.append(m);
-    }
-    return list;
+    return LookModel::list();
 }
 
 QVariantList AppController::lookGroups() const
 {
-    QVariantList list;
-    for (const core::edit::LookGroup &group : core::edit::lookGroups()) {
-        QVariantMap m;
-        m.insert(QStringLiteral("id"), group.id);
-        m.insert(QStringLiteral("name"), core::tr(group.name));
-        list.append(m);
-    }
-    return list;
+    return LookModel::groups();
 }
 
 void AppController::ensureLookThumbnails()
@@ -1048,8 +847,9 @@ void AppController::applyFilterPreset(const QString &presetId, qreal intensity)
 {
     if (m_originalImage.isNull())
         return;
-    m_liveFilterPreset = core::edit::findLook(presetId) ? presetId : QString();
-    m_liveFilterIntensity = std::clamp(double(intensity), 0.0, 1.0);
+    const LookModel::Picked picked = LookModel::pick(presetId, intensity);
+    m_liveFilterPreset = picked.id;
+    m_liveFilterIntensity = picked.amount;
     refreshLookLut();
     m_adjustedDirty = true;
     recordLiveChange(QStringLiteral("look"));

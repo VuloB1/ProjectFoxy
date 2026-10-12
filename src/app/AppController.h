@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AdjustModel.h"
 #include "AnimationPlayback.h"
 #include "DesktopWallpaper.h"
 #include "EffectPreview.h"
@@ -20,6 +21,7 @@
 #include <array>
 #include <atomic>
 #include <memory>
+#include <optional>
 
 class ImageProvider;
 class FolderModel;
@@ -468,6 +470,8 @@ private:
     // Sets the live overlay to what the undo history says it is at the current
     // position (after undo/redo), refreshing the GPU tables and telling QML.
     void syncLiveFromStack();
+    // Applies what AdjustModel decided (nothing when the request changed nothing) as the new live Ajustes state.
+    void applyAdjust(const std::optional<AdjustModel::Change> &change);
     // Rebuilds and republishes the tone LUT for m_liveAdjust (no signals).
     void refreshAdjustLut();
     // Same for the active look's tone table.

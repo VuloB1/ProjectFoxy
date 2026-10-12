@@ -86,6 +86,8 @@ Interfaz (esbozo): cada modelo recibe el estado vivo por referencia a un pequeñ
 **Riesgos:** la paridad GPU↔CPU (`test_gpu_parity` y `test_edit_stack` la vigilan) y el orden de señales de `liveAdjustChanged`/`liveFilterChanged`.
 **Hecho cuando:** `AppController.cpp` baja ~400 líneas; los modelos tienen tests unitarios sin QML. **Costo:** 1–2 PR.
 
+> **Resultado (11‑oct‑2026):** hecho en un PR, pero como **funciones sin estado** (`AdjustModel`, `LookModel`: reciben el `AdjustOp` actual y devuelven el siguiente), no como clases con estado. `AppController.cpp` bajó **200 líneas, no 400**: la estimación contaba también la LUT, el estado vivo y las señales, que se quedaron en el controlador a propósito (es lo que la fase 3 mueve). Los 27 tests de la fase 0 pasaron sin cambios y se agregaron 19 de los módulos.
+
 ### Fase 2 — `PictureCache`
 
 Mover las 5 cachés derivadas y su invalidación (~110 líneas): `structuralBaked`, histograma, copia reducida, histograma ajustado. `markStructuralDirty()` pasa a llamar a `cache.invalidate()` además de lo suyo. Entrada: imagen original + operaciones activas del historial (ya hay `activePixelOps()`).
@@ -122,7 +124,7 @@ Antes de empezar esta fase se escribe aquí el detalle: la lista de invariantes 
 | Tras la fase | `AppController.cpp` aprox. |
 |---|---|
 | hoy | 1434 |
-| 1 (Ajustes + Filtros) | ~1030 |
+| 1 (Ajustes + Filtros) | ~1030 estimado; **real: 1234** |
 | 2 (cachés) | ~920 |
 | 3 (historial/estado vivo) | ~670 |
 | 4 (documento + escritorio) | ~420 |
