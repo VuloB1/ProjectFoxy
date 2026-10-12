@@ -112,6 +112,7 @@ Item {
         AppToolButton {
             hPad: 12
             text: qsTr("Anterior")
+            objectName: "previousButton"
             iconName: "prev"
             visible: !root.editMode
             enabled: folderModel.count > 1
@@ -120,6 +121,7 @@ Item {
         AppToolButton {
             hPad: 12
             text: qsTr("Siguiente")
+            objectName: "nextButton"
             iconName: "next"
             visible: !root.editMode
             enabled: folderModel.count > 1
@@ -129,6 +131,7 @@ Item {
             hPad: 12
             text: qsTr("Zoom")
             iconName: "zoom-out"
+            objectName: "zoomOutButton"
             visible: !root.editMode
             onClicked: if (root.canvas) root.canvas.zoomOut()
         }
@@ -136,6 +139,7 @@ Item {
             hPad: 12
             text: qsTr("Zoom")
             iconName: "zoom-in"
+            objectName: "zoomInButton"
             visible: !root.editMode
             onClicked: if (root.canvas) root.canvas.zoomIn()
         }
@@ -156,6 +160,7 @@ Item {
         AppToolButton {
             hPad: 12
             text: qsTr("Ajustar")
+            objectName: "fitButton"
             iconName: "fit"
             visible: !root.editMode
             onClicked: if (root.canvas) root.canvas.fitToWindow()
@@ -188,6 +193,7 @@ Item {
         AppToolButton {
             hPad: 12
             text: qsTr("Deshacer")
+            objectName: "undoButton"
             iconName: "undo"
             visible: root.editMode
             enabled: appController.canUndoEdit
@@ -213,6 +219,7 @@ Item {
         AppToolButton {
             hPad: 12
             text: qsTr("Guardar")
+            objectName: "saveButton"
             iconName: "save"
             visible: root.editMode && !root.locked
             // Also when the screen differs from the file without any active edit

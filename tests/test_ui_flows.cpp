@@ -1,0 +1,277 @@
+// A few journeys through the real interface, driven the way a person drives it: the real Main.qml, on the same wiring
+// as the program (AppBootstrap), with synthetic mouse and key events. They are the net under any redesign of the
+// interface, so they are written by FUNCTION, not by position or look: every control is found by its objectName
+// ("nextButton", "editButton"...), never by where it sits or what it says. A redesign can move and restyle things
+// freely as long as those names keep meaning the same control.
+//
+// No window and no GPU needed: Qt's offscreen platform and its software renderer (see CMakeLists.txt).
+#include "AppBootstrap.h"
+#include "AppController.h"
+#include "AppSettings.h"
+#include "FolderModel.h"
+
+#include <QFileInfo>
+#include <QQmlApplicationEngine>
+#include <QQmlProperty>
+#include <QQuickItem>
+#include <QQuickStyle>
+#include <QQuickWindow>
+#include <QStandardPaths>
+#include <QTemporaryDir>
+#include <QtTest>
+
+namespace {
+
+QImage picture(int w, int h, QColor c)
+{
+    QImage img(w, h, QImage::Format_RGBA8888);
+    img.fill(c);
+    return img;
+}
+
+} // namespace
+
+class TestUiFlows : public QObject {
+    Q_OBJECT
+
+private slots:
+    void initTestCase()
+    {
+        QStandardPaths::setTestModeEnabled(true); // the settings and the cache of the tests are not the person's own
+        QQuickStyle::setStyle("Basic");
+    }
+
+    // A fresh program for every journey: nothing carries over from the one before.
+    void init()
+    {
+        QVERIFY(m_dir.isValid());
+        m_engine = new QQmlApplicationEngine;
+        m_app = AppBootstrap::setup(*m_engine);
+        m_app.settings->setSingleInstance(true);
+        m_engine->loadFromModule("ImageViewerApp", "Main");
+        QVERIFY(!m_engine->rootObjects().isEmpty());
+        m_window = qobject_cast<QQuickWindow *>(m_engine->rootObjects().first());
+        QVERIFY(m_window);
+        m_window->show();
+        QVERIFY(QTest::qWaitForWindowExposed(m_window));
+    }
+
+    void cleanup()
+    {
+        delete m_engine; // (waits for what is still running)
+        m_engine = nullptr;
+        for (const QString &name : QDir(m_dir.path()).entryList(QDir::Files))
+            QFile::remove(m_dir.filePath(name));
+    }
+
+    // ------------------------------------------------------------------------------------------------ opening a picture
+
+    void aPictureOpenedAtStartIsShownInTheCanvas()
+    {
+        const QString a = file("a.png", picture(120, 80, Qt::red));
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("a.png"), 10000);
+        QTRY_VERIFY_WITH_TIMEOUT(!m_app.controller->currentSource().isEmpty(), 5000);
+        QQuickItem *canvas = item("imageCanvas");
+        QVERIFY(canvas->isVisible());
+        QCOMPARE(m_app.controller->currentImageSize(), QSize(120, 80));
+    }
+
+    // ------------------------------------------------------------------------------------------------ browsing
+
+    void theNextAndPreviousButtonsWalkTheFolder()
+    {
+        openFolder({"a.png", "b.png", "c.png"});
+        QCOMPARE(m_app.folderModel->count(), 3);
+
+        click("nextButton");
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("b.png"), 10000);
+        click("nextButton");
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("c.png"), 10000);
+        click("previousButton");
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("b.png"), 10000);
+    }
+
+    void theArrowKeysWalkTheFolderToo()
+    {
+        openFolder({"a.png", "b.png", "c.png"});
+        QTest::keyClick(m_window, Qt::Key_Right);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("b.png"), 10000);
+        QTest::keyClick(m_window, Qt::Key_Left);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("a.png"), 10000);
+    }
+
+    // ------------------------------------------------------------------------------------------------ zoom
+
+    void theZoomButtonsChangeTheZoomAndFitBringsItBack()
+    {
+        const QString a = file("big.png", picture(2400, 1600, Qt::blue)); // much bigger than the window: fits below 100 %
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("big.png"), 15000);
+        QQuickItem *canvas = item("imageCanvas");
+        QTRY_VERIFY_WITH_TIMEOUT(zoom(canvas) > 0 && zoom(canvas) < 100, 5000);
+        const int fitted = zoom(canvas);
+
+        click("zoomInButton");
+        QTRY_VERIFY_WITH_TIMEOUT(zoom(canvas) > fitted, 3000);
+        const int once = zoom(canvas);
+        click("zoomInButton");
+        QTRY_VERIFY_WITH_TIMEOUT(zoom(canvas) > once, 3000);
+        const int twice = zoom(canvas);
+        click("zoomOutButton");
+        QTRY_VERIFY_WITH_TIMEOUT(zoom(canvas) < twice, 3000);
+
+        click("fitButton");
+        QTRY_COMPARE_WITH_TIMEOUT(zoom(canvas), fitted, 3000);
+    }
+
+    // ------------------------------------------------------------------------------------------------ editing and saving
+
+    // Edit mode, the crop tool, a quarter turn, Aplicar, Guardar and the overwrite question: the file on disk ends up
+    // turned, and nothing is left unsaved.
+    void aQuarterTurnIsAppliedAndSavedOverTheFile()
+    {
+        const QString a = file("turn.png", picture(80, 40, Qt::green));
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("turn.png"), 10000);
+        QVERIFY(!m_app.controller->isDirty());
+
+        click("editButton");
+        click("tool-crop");
+        click("rotateRightButton"); // animated, then baked
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(40, 80), 10000);
+        QVERIFY(m_app.controller->hasEdits());
+        click("applyToolButton");
+        QTRY_VERIFY_WITH_TIMEOUT(!m_app.controller->toolSessionActive(), 5000);
+        QVERIFY(m_app.controller->isDirty());
+
+        QSignalSpy saved(m_app.controller, &AppController::saveFinished);
+        click("saveButton");
+        // "«turn.png» se va a reemplazar por la imagen editada": confirm it (unless the person asked not to be asked)
+        if (QTest::qWaitFor([&]() { return itemOrNull("overwriteConfirmButton") != nullptr; }, 2000))
+            click("overwriteConfirmButton");
+        QTRY_VERIFY_WITH_TIMEOUT(saved.count() == 1, 15000);
+        QVERIFY(saved.first().first().toBool());
+        QVERIFY(!m_app.controller->isDirty());
+        QCOMPARE(QImage(a).size(), QSize(40, 80));
+    }
+
+    void undoTakesTheTurnBack()
+    {
+        const QString a = file("undo.png", picture(80, 40, Qt::yellow));
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("undo.png"), 10000);
+        click("editButton");
+        click("tool-crop");
+        click("rotateRightButton");
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(40, 80), 10000);
+        click("applyToolButton");
+        QTRY_VERIFY_WITH_TIMEOUT(!m_app.controller->toolSessionActive(), 5000);
+        click("undoButton");
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(80, 40), 5000);
+        QVERIFY(!m_app.controller->isDirty());
+    }
+
+    // ------------------------------------------------------------------------------------------------ the unsaved question
+
+    // Another picture while this one has unsaved edits: the question comes up. "Cancelar" stays; "Descartar" goes on.
+    void aNavigationWithUnsavedEditsAsksAndBothAnswersWork()
+    {
+        openFolder({"a.png", "b.png"});
+        m_app.controller->rotateEdit90(); // an edit, made without the panel (it is the question that is tested here)
+        QVERIFY(m_app.controller->isDirty());
+
+        click("nextButton");
+        click("unsavedCancelButton"); // appears when the controller holds the request back
+        QTest::qWait(300);
+        QCOMPARE(m_app.controller->currentFileName(), QStringLiteral("a.png")); // stayed
+        QVERIFY(m_app.controller->isDirty());                                   // and the edit is still there
+        QCOMPARE(m_app.folderModel->currentIndex(), 0);                         // the strip is back on the open picture
+
+        click("nextButton");
+        click("unsavedDiscardButton");
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("b.png"), 10000);
+        QVERIFY(!m_app.controller->isDirty());
+    }
+
+private:
+    QString file(const QString &name, const QImage &image)
+    {
+        const QString path = m_dir.filePath(name);
+        [&] { QVERIFY(image.save(path)); }();
+        return path;
+    }
+
+    // Three or two small pictures in the folder, the first one open.
+    void openFolder(const QStringList &names)
+    {
+        QString first;
+        int shade = 40;
+        for (const QString &name : names) {
+            const QString path = file(name, picture(100, 60, QColor(shade, 120, 200 - shade)));
+            shade += 60;
+            if (first.isEmpty())
+                first = path;
+        }
+        m_app.controller->openPath(first);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), names.first(), 15000);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.folderModel->count(), int(names.size()), 10000);
+    }
+
+    // ---- finding and clicking controls by name
+    static QQuickItem *findIn(QQuickItem *root, const QString &name)
+    {
+        if (root->objectName() == name)
+            return root;
+        for (QQuickItem *child : root->childItems())
+            if (QQuickItem *found = findIn(child, name))
+                return found;
+        return nullptr;
+    }
+
+    // The visible control with that name (popups and dialogs live under the window's overlay, which is in the tree).
+    QQuickItem *itemOrNull(const QString &name) const
+    {
+        QQuickItem *found = findIn(m_window->contentItem(), name);
+        return found && found->isVisible() && found->window() == m_window ? found : nullptr;
+    }
+
+    QQuickItem *item(const QString &name)
+    {
+        QQuickItem *found = nullptr;
+        [&] { QTRY_VERIFY2_WITH_TIMEOUT((found = itemOrNull(name)) != nullptr, qPrintable("no visible control named " + name), 10000); }();
+        return found;
+    }
+
+    // A click in the middle of the control, once it is there, enabled and standing still (panels slide in and out: a
+    // click on a moving target lands on nothing).
+    void click(const QString &name)
+    {
+        QQuickItem *control = item(name);
+        QTRY_VERIFY_WITH_TIMEOUT(control->isEnabled(), 5000);
+        auto center = [control]() {
+            return control->mapToScene(QPointF(control->width() / 2, control->height() / 2)).toPoint();
+        };
+        QPoint at = center();
+        for (int i = 0; i < 50; ++i) { // up to ~3 s
+            QTest::qWait(60);
+            const QPoint now = center();
+            if (now == at)
+                break;
+            at = now;
+        }
+        QTest::mouseMove(m_window, at);
+        QTest::mouseClick(m_window, Qt::LeftButton, Qt::NoModifier, at);
+        QTest::qWait(60); // let the click's consequences start
+    }
+
+    static int zoom(QQuickItem *canvas) { return QQmlProperty::read(canvas, "zoomPercent").toInt(); }
+
+    QTemporaryDir m_dir;
+    QQmlApplicationEngine *m_engine = nullptr;
+    AppBootstrap::Objects m_app;
+    QQuickWindow *m_window = nullptr;
+};
+
+QTEST_MAIN(TestUiFlows)
+#include "test_ui_flows.moc"

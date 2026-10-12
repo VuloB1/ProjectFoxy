@@ -74,12 +74,13 @@ AppDialog {
         Row {
             spacing: 8
             AppButton {
+                objectName: "unsavedSaveButton"
                 text: qsTr("Guardar")
                 visible: appController.canSaveInPlace
                 onClicked: root.answer("save")
             }
-            AppButton { text: qsTr("Descartar"); onClicked: root.answer("discard") }
-            AppButton { text: qsTr("Cancelar"); onClicked: root.answer("cancel") }
+            AppButton { objectName: "unsavedDiscardButton"; text: qsTr("Descartar"); onClicked: root.answer("discard") }
+            AppButton { objectName: "unsavedCancelButton"; text: qsTr("Cancelar"); onClicked: root.answer("cancel") }
         }
     }
 }

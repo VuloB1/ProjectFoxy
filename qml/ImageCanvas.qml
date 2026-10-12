@@ -12,6 +12,7 @@ import ImageViewerApp
 // manual mode; "Ajustar" or a double-click back returns to fit mode.
 Rectangle {
     id: root
+    objectName: "imageCanvas"
     color: themeManager.background
 
     property alias source: image.source

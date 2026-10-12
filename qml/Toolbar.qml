@@ -54,6 +54,7 @@ AppPanelBackground {
 
         AppToolButton {
             text: qsTr("Editar")
+            objectName: "editButton"
             iconName: "edit"
             iconOnly: true
             checkable: true
@@ -118,6 +119,7 @@ AppPanelBackground {
         }
         AppToolButton {
             text: qsTr("Configuración")
+            objectName: "settingsButton"
             iconName: "settings"
             iconOnly: true
             onClicked: settingsDialog.open()

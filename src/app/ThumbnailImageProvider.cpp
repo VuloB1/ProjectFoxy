@@ -45,6 +45,15 @@ QQuickImageResponse *ThumbnailImageProvider::requestImageResponse(const QString 
         : kDefaultEdgeLength;
 
     auto *response = new ThumbnailImageResponse(m_cache, filePath, edge);
+    if (m_closed.load())
+        response->cancel(); // still started: it finishes (empty) and the engine can free it
     m_pool.start(response);
     return response;
+}
+
+void ThumbnailImageProvider::shutdown()
+{
+    m_closed.store(true);
+    m_pool.clear();       // what has not started never will (its response is cancelled when the engine drops it)
+    m_pool.waitForDone(); // what is running finishes first
 }

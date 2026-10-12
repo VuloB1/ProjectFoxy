@@ -1,17 +1,6 @@
-#include "AppPaths.h"
+#include "AppBootstrap.h"
 #include "AppController.h"
-#include "ThemeManager.h"
 #include "AppSettings.h"
-#include "ImageProvider.h"
-#include "FolderModel.h"
-#include "ThumbnailImageProvider.h"
-#include "BatchExporter.h"
-#include "LensController.h"
-#include "PaneImageProvider.h"
-#include "AnimStudio.h"
-#include "CollageStudio.h"
-#include "ColorPicker.h"
-#include "Translations.h"
 #include "FontSubstitutions.h"
 #include "SingleInstance.h"
 
@@ -78,63 +67,8 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    // All of the below are owned by the engine (parented to it) or by each
-    // other; nothing here needs manual cleanup.
-    auto *imageProvider = new ImageProvider();
-    engine.addImageProvider(QLatin1String("viewer"), imageProvider);
-
-    auto *folderModel = new FolderModel(&engine);
-    engine.rootContext()->setContextProperty("folderModel", folderModel);
-    folderModel->thumbnailCache()->setDiskLocation(
-        AppPaths::cacheDir() + QStringLiteral("/thumbnails"));
-
-    auto *thumbnailProvider = new ThumbnailImageProvider(folderModel->thumbnailCache());
-    engine.addImageProvider(QLatin1String("thumb"), thumbnailProvider);
-
-    // The pictures of the "Varias imágenes" view: one per pane, each at the resolution it needs.
-    auto *paneStore = new PaneImageStore(&engine);
-    engine.addImageProvider(QLatin1String("pane"), new PaneImageProvider(paneStore));
-    engine.rootContext()->setContextProperty("paneImages", paneStore);
-
-    // The animation studio (Crear > GIF animado): the list of pictures and options, and the pictures it shows.
-    auto *animStudio = new AnimStudio(paneStore, &engine);
-    engine.rootContext()->setContextProperty("animStudio", animStudio);
-    engine.addImageProvider(QLatin1String("animprev"), new AnimPreviewProvider(animStudio));
-    engine.addImageProvider(QLatin1String("animsrc"), new AnimThumbnailProvider(animStudio));
-
-    // The collage maker (Crear > Collage).
-    auto *collageStudio = new CollageStudio(paneStore, &engine);
-    engine.rootContext()->setContextProperty("collageStudio", collageStudio);
-    engine.addImageProvider(QLatin1String("collageprev"), new CollagePreviewProvider(collageStudio));
-
-    auto *controller = new AppController(imageProvider, folderModel, &engine);
-    engine.rootContext()->setContextProperty("appController", controller);
-
-    auto *themeManager = new ThemeManager(&engine);
-    engine.rootContext()->setContextProperty("themeManager", themeManager);
-
-    auto *appSettings = new AppSettings(&engine);
-    engine.rootContext()->setContextProperty("appSettings", appSettings);
-
-    // The language: installed before any text is built (Main.qml's qsTr() are evaluated when it loads).
-    auto *translations = new Translations(&engine, appSettings, &engine);
-    engine.rootContext()->setContextProperty("translations", translations);
-
-    auto *batchExporter = new BatchExporter(&engine);
-    engine.rootContext()->setContextProperty("batchExporter", batchExporter);
-
-    auto *colorPicker = new ColorPicker(&engine);
-    engine.rootContext()->setContextProperty("colorPicker", colorPicker);
-
-    auto *lensController = new LensController(&engine);
-    engine.rootContext()->setContextProperty("lensController", lensController);
-
-    QObject::connect(translations, &Translations::activeChanged, controller, &AppController::retranslate);
-
-    // Filmstrip navigation (arrow keys, click, Toolbar prev/next) reports a
-    // new current file here; AppController decodes and displays it.
-    QObject::connect(folderModel, &FolderModel::currentFilePathChanged,
-                      controller, &AppController::openPath);
+    // Everything the QML needs, owned by the engine (see AppBootstrap.h).
+    AppController *controller = AppBootstrap::setup(engine).controller;
 
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreationFailed,
