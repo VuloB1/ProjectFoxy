@@ -6,6 +6,7 @@
 #include "EffectPreview.h"
 #include "SaveCoordinator.h"
 #include "ImageLoader.h"
+#include "PictureCache.h"
 #include "Histogram.h"
 #include "edit/EditStack.h"
 #include "edit/Operations.h"
@@ -453,11 +454,7 @@ private:
         m_effect.drop(); // an uncommitted effect was computed from the old picture (the canvas is not touched here)
         m_liveCoalesce.stop(); // the next slider move starts a new history entry
         m_effect.invalidateProxy();
-        m_structuralDirty = true;
-        m_histogramDirty = true;
-        m_proxyDirty = true;
-        m_adjustedDirty = true;
-        m_lookProxyDirty = true;
+        m_cache.invalidatePicture();
     }
     // Assigns the Ajustes state, refreshes the GPU lookup table and tells QML, and
     // records the change in the undo history. `coalesceKey` names the control that
@@ -511,18 +508,11 @@ private:
     QString m_liveFilterPreset;
     qreal m_liveFilterIntensity = 1.0;
 
-    mutable QImage m_structuralBaked;
-    mutable bool m_structuralDirty = true;
-    mutable core::Histogram m_histogramCache;
-    mutable bool m_histogramDirty = true;
-    mutable QImage m_proxyCache;
-    mutable bool m_proxyDirty = true;
-    mutable QVariantMap m_adjustedCache;
-    mutable bool m_adjustedDirty = true;
+    // The structural picture and what is derived from it (histograms, small copy, look previews' freshness).
+    PictureCache m_cache;
     int m_lutRevision = 0;
     int m_lookLutRevision = 0;
     int m_lookThumbRevision = 0;
-    bool m_lookProxyDirty = true;
 
     // The undo history entry the last Ajustes/Filtros change went into, and for how
     // long further changes of the same control keep merging into it.

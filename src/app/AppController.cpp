@@ -58,6 +58,7 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
     : QObject(parent)
     , m_provider(provider)
     , m_folderModel(folderModel)
+    , m_cache([this]() { return m_editStack.bake(m_originalImage); })
     , m_effect([this]() { return structuralBaked(); })
 {
     connect(&m_save, &SaveCoordinator::finished, this, &AppController::finishSave);
@@ -366,96 +367,27 @@ bool AppController::saveBlocked()
 
 QImage AppController::structuralBaked() const
 {
-    if (m_structuralDirty) {
-        m_structuralBaked = m_editStack.bake(m_originalImage);
-        m_structuralDirty = false;
-    }
-    return m_structuralBaked;
+    return m_cache.structural();
 }
-
-namespace {
-
-// 256 heights normalized against the tallest bucket that is not one of the two
-// end ones: a photo with clipped shadows/highlights has a giant spike at 0
-// and/or 255 that would otherwise flatten the rest of the graph to a line.
-QVariantList normalizedBins(const std::array<int, 256> &bins)
-{
-    int peak = 0;
-    for (int i = 1; i < 255; ++i)
-        peak = std::max(peak, bins[i]);
-    if (peak == 0)
-        peak = std::max({1, bins[0], bins[255]});
-
-    QVariantList list;
-    list.reserve(256);
-    for (int n : bins)
-        list.append(std::min(1.0, double(n) / double(peak)));
-    return list;
-}
-
-QVariantMap channelHistogramMap(const core::Histogram &h)
-{
-    QVariantMap map;
-    map.insert(QStringLiteral("luma"), normalizedBins(h.luma));
-    map.insert(QStringLiteral("r"), normalizedBins(h.r));
-    map.insert(QStringLiteral("g"), normalizedBins(h.g));
-    map.insert(QStringLiteral("b"), normalizedBins(h.b));
-    return map;
-}
-
-} // namespace
 
 QVariantList AppController::histogram() const
 {
-    if (m_histogramDirty) {
-        m_histogramCache = core::computeHistogram(structuralBaked());
-        m_histogramDirty = false;
-    }
-    QVariantList list;
-    list.reserve(256);
-    for (int count : m_histogramCache.luma)
-        list.append(double(count) / double(m_histogramCache.maxCount));
-    return list;
+    return m_cache.histogram();
 }
 
 QVariantMap AppController::histogramChannels() const
 {
-    if (m_histogramDirty) {
-        m_histogramCache = core::computeHistogram(structuralBaked());
-        m_histogramDirty = false;
-    }
-    return channelHistogramMap(m_histogramCache);
+    return m_cache.histogramChannels();
 }
 
 QImage AppController::histogramProxy() const
 {
-    if (m_proxyDirty) {
-        const QImage baked = structuralBaked();
-        constexpr int kLongSide = 384;
-        if (baked.isNull())
-            m_proxyCache = QImage();
-        else if (std::max(baked.width(), baked.height()) > kLongSide)
-            m_proxyCache = baked.scaled(kLongSide, kLongSide, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        else
-            m_proxyCache = baked;
-        m_proxyDirty = false;
-    }
-    return m_proxyCache;
+    return m_cache.proxy();
 }
 
 QVariantMap AppController::adjustedHistogram() const
 {
-    if (m_adjustedDirty) {
-        QImage img = histogramProxy();
-        if (!img.isNull()) {
-            if (!m_liveFilterPreset.isEmpty())
-                img = core::edit::applyOperation(img, FilterPresetOp{m_liveFilterPreset, m_liveFilterIntensity});
-            img = core::edit::applyOperation(img, m_liveAdjust);
-        }
-        m_adjustedCache = channelHistogramMap(core::computeHistogram(img));
-        m_adjustedDirty = false;
-    }
-    return m_adjustedCache;
+    return m_cache.adjustedHistogram(m_liveAdjust, m_liveFilterPreset, m_liveFilterIntensity);
 }
 
 QImage AppController::currentBaked() const
@@ -639,7 +571,7 @@ void AppController::syncLiveFromStack()
     m_liveFilterPreset = look;
     m_liveFilterIntensity = amount;
     refreshLookLut();
-    m_adjustedDirty = true;
+    m_cache.invalidateAdjusted();
     emit liveAdjustChanged();
     emit liveFilterChanged();
     emit adjustedHistogramChanged();
@@ -691,7 +623,7 @@ void AppController::setLiveAdjust(const AdjustOp &op, const QString &coalesceKey
 {
     m_liveAdjust = op;
     refreshAdjustLut();
-    m_adjustedDirty = true;
+    m_cache.invalidateAdjusted();
     recordLiveChange(coalesceKey);
     // No CPU re-bake here: ImageCanvas.qml's Adjust/Detail ShaderEffects read
     // these straight off this signal and apply them live on the GPU.
@@ -823,7 +755,7 @@ QVariantList AppController::lookGroups() const
 
 void AppController::ensureLookThumbnails()
 {
-    if (!m_lookProxyDirty || m_originalImage.isNull())
+    if (!m_cache.lookThumbsStale() || m_originalImage.isNull())
         return;
 
     // A small centered square of the photo (as it is before any look or
@@ -838,7 +770,7 @@ void AppController::ensureLookThumbnails()
                      .convertToFormat(QImage::Format_RGBA8888);
     }
     m_provider->setLookProxy(square);
-    m_lookProxyDirty = false;
+    m_cache.lookThumbsMade();
     ++m_lookThumbRevision;
     emit lookThumbsChanged();
 }
@@ -851,7 +783,7 @@ void AppController::applyFilterPreset(const QString &presetId, qreal intensity)
     m_liveFilterPreset = picked.id;
     m_liveFilterIntensity = picked.amount;
     refreshLookLut();
-    m_adjustedDirty = true;
+    m_cache.invalidateAdjusted();
     recordLiveChange(QStringLiteral("look"));
     // No CPU re-bake here either: ImageCanvas.qml's first Grade ShaderEffect
     // reads `look` and `lookLutSource` and applies the look live.
@@ -923,8 +855,7 @@ void AppController::commitPendingEffect(bool republish)
     m_editStack.push(op);
     markStructuralDirty(); // also drops the preview state
     if (exact) {
-        m_structuralBaked = full;
-        m_structuralDirty = false;
+        m_cache.setStructural(full);
         m_editStack.storeCheckpoint(m_originalImage, full); // so Undo then Redo does not recalculate it
     }
     // Without the exact result the picture would have to be calculated right here, on the
@@ -996,7 +927,7 @@ bool AppController::startSave(const QString &path)
     SaveJob job;
     job.original = m_originalImage;
     job.ops = m_editStack.activePixelOps();
-    job.structural = m_structuralDirty ? QImage() : m_structuralBaked; // null: the worker replays `ops`
+    job.structural = m_cache.structuralIfReady(); // null: the worker replays `ops`
     job.adjust = m_liveAdjust;
     job.lookId = m_liveFilterPreset;
     job.lookAmount = m_liveFilterIntensity;
@@ -1045,9 +976,8 @@ void AppController::finishSave(const SaveOutcome &outcome)
         m_savedRecipe = outcome.recipe;
         // The worker had to calculate the structural picture (an effect committed by the
         // save, say): keep it, if the document still wants exactly that.
-        if (!outcome.structural.isNull() && m_structuralDirty && m_editStack.activePixelOps() == outcome.ops) {
-            m_structuralBaked = outcome.structural;
-            m_structuralDirty = false;
+        if (!outcome.structural.isNull() && !m_cache.structuralIsReady() && m_editStack.activePixelOps() == outcome.ops) {
+            m_cache.setStructural(outcome.structural);
             republishBaked(false);
         }
         emit editStackChanged();

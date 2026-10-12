@@ -90,6 +90,11 @@ target_link_libraries(test_app_controller PRIVATE imageviewer_app imageviewer_co
 target_compile_definitions(test_app_controller PRIVATE FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 add_test(NAME test_app_controller COMMAND test_app_controller)
 
+# What is derived from the picture and cached: structural result, histograms, small copy.
+add_executable(test_picture_cache test_picture_cache.cpp)
+target_link_libraries(test_picture_cache PRIVATE imageviewer_app imageviewer_core Qt6::Test)
+add_test(NAME test_picture_cache COMMAND test_picture_cache)
+
 # The Ajustes and Filtros vocabulary: sliders, levels, curves and looks, as plain functions.
 add_executable(test_adjust_model test_adjust_model.cpp)
 target_link_libraries(test_adjust_model PRIVATE imageviewer_app imageviewer_core Qt6::Test)
