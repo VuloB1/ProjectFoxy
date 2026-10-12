@@ -3,6 +3,28 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.2.5] — A new look
+
+- The window has its own title bar, in the program's theme (rounded corners and a shadow on Windows).
+- A bottom bar: the position and colour of the pixel under the mouse (a click with Alt copies the colour and says
+  "Copied" next to the cursor), the picture's size and zoom, the information button, and in the middle a raised piece
+  fused with the bar that holds every browse and edit button, as icons. The comparer puts its controls there too, and
+  the picture fits above it.
+- The tab of the thumbnail bar is always there, with a rounded join to the bar; the "With tab" mode is now "Manual".
+- Settings: taller, the chosen page tinted, the same wheel speed as the thumbnail bar, and a new **About** page (the
+  program, its author, links, acknowledgements and licences). The top bar's icons have thinner lines.
+- The animated-GIF and collage studios: title and icon on top of the right panel, buttons as icons, and the button that
+  opens a studio closes it. If something made has not been saved, it asks before leaving. In the GIF studio, reversing
+  the order and adding the whole folder moved to the strip of frames, and "Remove all" sits apart and asks first.
+- Batch export and batch rename follow the same design (header and cards).
+- **One window**: opening a picture from Explorer uses the window that is already open (it can be switched off in
+  Settings).
+- Removed: the slideshow, and the "pixel readout" setting (the readout is always in the bottom bar).
+- Fixed: a WebP animation whose header claimed a gigantic canvas could ask for gigabytes of memory; closing the program
+  while thumbnails were loading could crash.
+- Under the hood: the controller of the interface was split into smaller pieces, GIF/APNG/WebP decoding is fuzz-tested
+  in CI, and 12 tests drive the real interface.
+
 ## [0.2.4] — Lighter on large photos
 
 - Large photos (about 21 megapixels and up) use much less graphics memory: while one is shown fitted to the window,
@@ -89,6 +111,30 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.2.5] — Una nueva imagen
+
+- La ventana tiene su propia barra de título, con el tema del programa (esquinas redondeadas y sombra en Windows).
+- Una barra inferior: la posición y el color del píxel bajo el mouse (un clic con Alt copia el color y dice «Copiado»
+  junto al cursor), el tamaño y el zoom de la imagen, el botón de información y, en el medio, una pieza más alta fusionada
+  con la barra que lleva todos los botones de ver y de editar, como íconos. El comparador pone sus controles ahí también
+  y la imagen se ajusta por encima.
+- La pestaña de la barra de miniaturas está siempre; se une a la barra con un empalme redondeado y el modo «Con pestaña»
+  ahora es «Manual».
+- Configuración: más alta, la página elegida teñida, la misma velocidad de rueda que la barra de miniaturas y una página
+  nueva, **Acerca de** (el programa, su autor, enlaces, agradecimientos y licencias). Los íconos de la barra superior
+  tienen líneas más finas.
+- Los estudios de GIF animado y de collage: el título y el ícono arriba del panel derecho, botones como íconos, y el botón
+  que abre un estudio lo cierra. Si hay algo armado sin guardar, pregunta antes de salir. En el estudio de GIF, invertir
+  el orden y agregar toda la carpeta pasaron a la tira de fotogramas, y «Quitar todas» queda aparte y pregunta antes.
+- Exportar por lote y renombrar por lote siguen el mismo diseño (encabezado y tarjetas).
+- **Una sola ventana**: al abrir una imagen desde el Explorador se usa la ventana que ya está abierta (se puede apagar en
+  Configuración).
+- Se quitó la presentación de diapositivas y el ajuste «Lectura del píxel» (la lectura está siempre en la barra inferior).
+- Arreglado: una animación WebP cuyo encabezado decía tener un lienzo gigantesco podía pedir gigabytes de memoria; cerrar
+  el programa mientras se cargaban miniaturas podía hacerlo caer.
+- Por dentro: el controlador de la interfaz se dividió en piezas más chicas, la lectura de GIF/APNG/WebP se prueba con
+  fuzzing en el CI y 12 pruebas manejan la interfaz real.
 
 ## [0.2.4] — Más liviano con fotos grandes
 
