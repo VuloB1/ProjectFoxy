@@ -53,19 +53,21 @@ AppPanelBackground {
         component CaptionButton: Rectangle {
             id: btn
             property bool danger: false
+            property bool nativeHover: false // Windows owns the maximise button's mouse (WindowsFrame.cpp)
             property alias glyph: glyphItem.sourceComponent
             property string label: ""
             signal clicked
             width: 46
             height: parent.height
-            color: hover.hovered ? (danger ? "#e81123" : Qt.rgba(themeManager.textPrimary.r, themeManager.textPrimary.g, themeManager.textPrimary.b, 0.14)) : "transparent"
-            readonly property color ink: danger && hover.hovered ? "white" : themeManager.textPrimary
+            readonly property bool over: hover.hovered || nativeHover
+            color: over ? (danger ? "#e81123" : Qt.rgba(themeManager.textPrimary.r, themeManager.textPrimary.g, themeManager.textPrimary.b, 0.14)) : "transparent"
+            readonly property color ink: danger && over ? "white" : themeManager.textPrimary
             Accessible.role: Accessible.Button
             Accessible.name: label
             Loader { id: glyphItem; anchors.centerIn: parent }
             HoverHandler { id: hover }
             TapHandler { onTapped: btn.clicked() }
-            AppToolTip { visible: hover.hovered; text: btn.label }
+            AppToolTip { visible: btn.over; text: btn.label }
         }
 
         CaptionButton {

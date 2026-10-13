@@ -112,6 +112,7 @@ ApplicationWindow {
 
     TitleBar {
         id: titleBar
+        objectName: "titleBar"
         window: root
         anchors.top: parent.top
         anchors.left: parent.left

@@ -517,6 +517,15 @@ AppDialog {
                                 onToggled: appSettings.singleInstance = checked
                             }
                         }
+                        Divider {}
+                        SettingRow {
+                            label: qsTr("Sincronizar con la pantalla (V-Sync)")
+                            hint: qsTr("Evita cortes en la imagen. Si la ventana se traba al cambiarle el tamaño (pasa con algunas tarjetas AMD), prueba a apagarla. Se aplica la próxima vez que abras el programa.")
+                            AppSwitch {
+                                checked: appSettings.verticalSync
+                                onToggled: appSettings.verticalSync = checked
+                            }
+                        }
                     }
 
                     // -- Guardado ---------------------------------------------------

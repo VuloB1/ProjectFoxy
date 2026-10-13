@@ -40,6 +40,10 @@ class AppSettings : public QObject {
     // Opening a picture while the program is running uses that window instead of starting another one.
     // Read when the program starts: a change applies the next time it is opened.
     Q_PROPERTY(bool singleInstance READ singleInstance WRITE setSingleInstance NOTIFY singleInstanceChanged)
+    // Presenting each frame in step with the screen's refresh (on by default). Some AMD cards stall for hundreds of
+    // milliseconds in Direct3D 11 while the window is resized with it on; off avoids that and may tear on screens
+    // without FreeSync / G-Sync. Read when the program starts: a change applies the next time it is opened.
+    Q_PROPERTY(bool verticalSync READ verticalSync WRITE setVerticalSync NOTIFY verticalSyncChanged)
 
 public:
     explicit AppSettings(QObject *parent = nullptr);
@@ -73,6 +77,8 @@ public:
     void setPixelCheckerboard(bool value);
     bool singleInstance() const { return m_singleInstance; }
     void setSingleInstance(bool value);
+    bool verticalSync() const { return m_verticalSync; }
+    void setVerticalSync(bool value);
     // A grid between the picture's own pixels from 8x.
     bool pixelGrid() const { return m_pixelGrid; }
     void setPixelGrid(bool value);
@@ -99,6 +105,7 @@ signals:
     void pixelGridChanged();
     void pixelSharpEditChanged();
     void singleInstanceChanged();
+    void verticalSyncChanged();
 
 private:
     // Stores `value` under `key` and reports whether it was a change.
@@ -120,4 +127,5 @@ private:
     bool m_pixelGrid = false;
     bool m_pixelSharpEdit = false;
     bool m_singleInstance = true;
+    bool m_verticalSync = true;
 };

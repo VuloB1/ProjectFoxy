@@ -1474,8 +1474,16 @@ teclado sintéticos, con la plataforma `offscreen` de Qt y su renderizador por s
   minimizar/maximizar/cerrar con el tema. Arrastrar y doble clic usan `startSystemMove()` (el sistema sigue
   encargándose del ajuste a los bordes) y ocho `MouseArea` en los bordes llaman a `startSystemResize()`. En Windows,
   `main.cpp` pide a DWM las esquinas redondeadas (`DWMWA_WINDOW_CORNER_PREFERENCE`) y un borde fino con sombra
-  (`DwmExtendFrameIntoClientArea`); se enlaza `dwmapi`. Pendiente conocido: al agrandar rápido se ven franjas negras (es
-  el intercambio de buffers de Direct3D con una ventana sin marco).
+  (`DwmExtendFrameIntoClientArea`); se enlaza `dwmapi`. Al agrandar rápido la zona nueva se ve negra un instante (el swapchain de Direct3D 11 de Qt;
+  `tools/Test-ResizeStrips.ps1` lo mide); `QT_D3D_NO_FLIP=1` no sirve: sale blanca. **Congelamientos al redimensionar
+  (12‑oct‑2026):** en una Radeon RX 6750 XT con Direct3D 11 la interfaz se congela de 100 ms a 2 s al agrandar la ventana
+  con el mouse; no pasa en la GTX 1050 Ti del mismo equipo, ni con Direct3D 12, Vulkan u OpenGL, y una ventana Qt Quick
+  mínima también lo sufre (menos), así que no es de Project Foxy. Las pilas muestreadas dejan al hilo de dibujo esperando
+  dentro de `dxgi.dll` / `amdxx64.dll` (el `Present`). **Desactivar el V-Sync lo arregla** (`QSG_NO_VSYNC=1`: `Present(0,
+  ALLOW_TEARING)`; la CPU en reposo no sube). Por eso existe el ajuste «Sincronizar con la pantalla (V-Sync)»
+  (`AppSettings::verticalSync`, `window/verticalSync`, activado por defecto): `main.cpp` pone `QSG_NO_VSYNC=1` antes de
+  crear la ventana si está apagado. Sin probar: tearing en monitores sin FreeSync/G‑Sync, consumo con animaciones, la
+  causa exacta en el driver. Todo el análisis y los datos: `revision-chatgpt/redimensionado/` (no versionado).
 - **Barra inferior** (`StatusBar.qml`, reemplaza a `FloatingToolbar.qml`): a la izquierda la posición y el color del
   píxel bajo el cursor (`ImageCanvas.pixelInfo`/`pixelCell`; siempre activo, se quitó el ajuste `pixelReadout`), a la
   derecha tamaño, zoom y el botón de información (el panel de información pasó aquí desde `Toolbar`), y en el medio el
@@ -1510,3 +1518,18 @@ Con Qt 6.7.3 Multimedia (motor FFmpeg) se abrieron, reprodujeron a 29–31 fps y
 en Linux (el plugin `libffmpegmediaplugin.so` lo lleva enlazado, 19 MB). En Linux no arrancó el motor GStreamer. Sin
 verificar: sonido real, ventana real en Linux, Flatpak/AppImage, videos 4K. Siguiente paso previsto: importar video al
 creador de GIF y, después, un visor de video.
+
+## 22. Canal de control para desarrollo (`DevServer`)
+
+Solo para mirar y manejar la ventana real desde un script; no existe en las versiones publicadas. Se compila con
+`-DPROJECTFOXY_DEV_SERVER=ON` (apagado por defecto, `CMakeLists.txt`) y aun así no hace nada salvo que se arranque con la
+variable `PROJECTFOXY_DEV_PORT` (por ejemplo 47800). Escucha en `127.0.0.1` un protocolo de texto de una línea por
+comando (`src/app/DevServer.cpp`); el cliente es `tools/devctl.py`:
+
+- `items`: cada ítem con `objectName` (posición, tamaño, visible, habilitado, texto).
+- `get <nombre> <propiedad>`: una propiedad del ítem.
+- `click <nombre>`: un clic izquierdo en el centro del ítem.
+- `grab <archivo.png>`: la ventana como PNG.
+
+No sustituye a lo que depende del sistema (ajuste a los bordes, DWM, redimensionado nativo), que sigue pidiendo ratón
+y pantalla reales. Los estudios se cargan bajo demanda: `gifStudio` solo existe mientras está abierto.
