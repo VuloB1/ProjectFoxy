@@ -3,6 +3,18 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.2.6] — Window edges and V-Sync
+
+- Windows: the window with its own title bar snaps to the screen edges again. Drag it to the top to maximise it, or to
+  the sides to tile it; Windows 11's snap layouts appear on the maximise button; the system does the resizing from the
+  edges and corners. Maximised, it fills the work area without covering the taskbar.
+- New setting **Sync with the screen (V-Sync)** (Settings, Appearance, Windows), on by default. On some AMD graphics
+  cards (seen on a Radeon RX 6750 XT) the window froze for 100 ms to 2 s while it was resized with the Direct3D 11
+  renderer; turning V-Sync off avoids that. It may show tearing on screens without FreeSync or G-Sync. It applies the next
+  time the program is opened.
+- For developers: a local control channel and tools to measure what happens while a window is resized (off by default
+  and not part of the releases), and the findings in `docs/DESARROLLO.md`.
+
 ## [0.2.5] — A new look
 
 - The window has its own title bar, in the program's theme (rounded corners and a shadow on Windows).
@@ -111,6 +123,19 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.2.6] — Bordes de la ventana y V-Sync
+
+- Windows: la ventana con barra de título propia vuelve a ajustarse a los bordes de la pantalla. Arrastrala arriba para
+  maximizarla o a los costados para acomodarla; los diseños de ajuste de Windows 11 aparecen en el botón de maximizar; y
+  el sistema se encarga de redimensionar desde los bordes y las esquinas. Maximizada, ocupa el área de trabajo sin tapar
+  la barra de tareas.
+- Ajuste nuevo: **Sincronizar con la pantalla (V-Sync)** (Configuración, Apariencia, Ventanas), activado por defecto. En
+  algunas tarjetas AMD (visto en una Radeon RX 6750 XT) la ventana se congelaba de 100 ms a 2 s al redimensionarla con el
+  motor Direct3D 11; apagar el V-Sync lo evita. Puede mostrar cortes en la imagen en pantallas sin FreeSync ni G-Sync. Se
+  aplica la próxima vez que abras el programa.
+- Para desarrolladores: un canal de control local y herramientas para medir qué pasa al redimensionar la ventana
+  (apagados por defecto y fuera de las versiones publicadas), y lo que se encontró en `docs/DESARROLLO.md`.
 
 ## [0.2.5] — Una nueva imagen
 

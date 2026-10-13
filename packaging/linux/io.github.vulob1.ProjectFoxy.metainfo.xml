@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.6" date="2026-10-13">
+      <description>
+        <p>On Windows the window snaps to the screen edges again (drag it to the top or the sides, snap layouts on the maximise button), and a new setting, "Sync with the screen (V-Sync)", lets you turn off V-Sync if the window stutters while you resize it on some AMD graphics cards.</p>
+      </description>
+    </release>
     <release version="0.2.5" date="2026-10-12">
       <description>
         <p>A new look: the window has its own title bar, a bottom bar holds the pixel readout and every button, and Settings has an About page. The animated-GIF and collage studios, the batch dialogs and the comparer follow the same design. One window at a time, and several robustness fixes.</p>
