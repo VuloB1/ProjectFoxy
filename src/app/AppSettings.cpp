@@ -33,6 +33,7 @@ AppSettings::AppSettings(QObject *parent)
     m_pixelGrid = m_store.value(QStringLiteral("view/pixelGrid"), wasAllInOne).toBool();
     m_pixelSharpEdit = m_store.value(QStringLiteral("view/pixelSharpEdit"), wasAllInOne).toBool();
     m_singleInstance = m_store.value(QStringLiteral("window/singleInstance"), true).toBool();
+    m_verticalSync = m_store.value(QStringLiteral("window/verticalSync"), true).toBool();
 }
 
 void AppSettings::setStripThumbSize(int value)
@@ -113,6 +114,12 @@ void AppSettings::setSingleInstance(bool value)
 {
     if (storeFlag(m_singleInstance, QStringLiteral("window/singleInstance"), value))
         emit singleInstanceChanged();
+}
+
+void AppSettings::setVerticalSync(bool value)
+{
+    if (storeFlag(m_verticalSync, QStringLiteral("window/verticalSync"), value))
+        emit verticalSyncChanged();
 }
 
 void AppSettings::setPixelGrid(bool value)

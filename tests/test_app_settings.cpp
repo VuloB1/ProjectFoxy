@@ -95,6 +95,17 @@ private slots:
         QVERIFY(!s.pixelSharpEdit());
     }
 
+    void verticalSyncIsOnUntilTurnedOff()
+    {
+        {
+            AppSettings s;
+            QVERIFY(s.verticalSync());
+            s.setVerticalSync(false);
+        }
+        AppSettings again;
+        QVERIFY(!again.verticalSync());
+    }
+
     void eachSwitchIsRememberedOnItsOwn()
     {
         {

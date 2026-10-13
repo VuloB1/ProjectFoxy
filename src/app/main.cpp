@@ -12,9 +12,12 @@
 #include <QIcon>
 #include <QStandardPaths>
 
+#ifdef PROJECTFOXY_DEV_SERVER
+#include "DevServer.h"
+#endif
+
 #ifdef Q_OS_WIN
-#include <windows.h>
-#include <dwmapi.h>
+#include "WindowsFrame.h"
 #endif
 
 int main(int argc, char *argv[])
@@ -70,6 +73,10 @@ int main(int argc, char *argv[])
             single.listen();
     }
 
+    // Qt Quick reads this when the window is created: without V-Sync a frame is presented as soon as it is ready.
+    if (!qEnvironmentVariableIsSet("QSG_NO_VSYNC") && !AppSettings().verticalSync())
+        qputenv("QSG_NO_VSYNC", "1");
+
     QQmlApplicationEngine engine;
 
     // Everything the QML needs, owned by the engine (see AppBootstrap.h).
@@ -85,15 +92,19 @@ int main(int argc, char *argv[])
         return -1;
 
 #ifdef Q_OS_WIN
-    // The window has no native frame (Main.qml), so ask Windows for what the frame gave: round corners (Windows 11;
-    // older versions ignore it) and a thin border with a shadow.
-    if (auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first())) {
-        const HWND hwnd = reinterpret_cast<HWND>(window->winId());
-        const DWORD round = 2; // DWMWCP_ROUND
-        DwmSetWindowAttribute(hwnd, 33 /* DWMWA_WINDOW_CORNER_PREFERENCE */, &round, sizeof round);
-        const MARGINS thin = {1, 1, 1, 1};
-        DwmExtendFrameIntoClientArea(hwnd, &thin);
-    }
+    // The window has no native frame (Main.qml), so give back what the frame gave: round corners, a shadow, snapping
+    // to the screen edges, the Windows 11 snap layouts and the system resize (WindowsFrame.cpp).
+#ifdef PROJECTFOXY_DEV_SERVER
+    if (!qEnvironmentVariableIsSet("PROJECTFOXY_NO_NATIVE_FRAME")) // to compare against the plain frameless window
+#endif
+    if (auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first()))
+        installWindowsFrame(window);
+#endif
+
+#ifdef PROJECTFOXY_DEV_SERVER
+    if (qEnvironmentVariableIsSet("PROJECTFOXY_DEV_PORT"))
+        if (auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first()))
+            new DevServer(window, qEnvironmentVariableIntValue("PROJECTFOXY_DEV_PORT"), &app);
 #endif
 
     // Open-with / double-click association: the file in the arguments.

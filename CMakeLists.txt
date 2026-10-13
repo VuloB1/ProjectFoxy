@@ -20,7 +20,7 @@ endif()
 # ---------------------------------------------------------------------------
 # Dependencies
 # ---------------------------------------------------------------------------
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools)
 
 # Qt is the one dependency vcpkg does not pin (it comes from the Qt online
 # installer / aqtinstall), so the exact version the project is validated with is
@@ -212,6 +212,15 @@ qt_add_executable(ImageViewer
     src/app/main.cpp
 )
 
+# A local channel to look at and drive the running window from a script (tools/devctl.py). For development only:
+# off by default, and even when built it does nothing unless PROJECTFOXY_DEV_PORT is set. Never in a release.
+option(PROJECTFOXY_DEV_SERVER "Build the development-only control channel (src/app/DevServer.cpp)" OFF)
+if(PROJECTFOXY_DEV_SERVER)
+    target_sources(ImageViewer PRIVATE src/app/DevServer.h src/app/DevServer.cpp)
+    target_compile_definitions(ImageViewer PRIVATE PROJECTFOXY_DEV_SERVER)
+    target_link_libraries(ImageViewer PRIVATE Qt6::Network $<$<PLATFORM_ID:Windows>:dbghelp>)
+endif()
+
 # The interface's QML files: the program and the interface tests (tests/test_ui_flows.cpp) both build this module.
 set(IV_QML_FILES
         qml/Main.qml
@@ -351,7 +360,7 @@ set_target_properties(ImageViewer PROPERTIES
     OUTPUT_NAME "ProjectFoxy"
 )
 if(WIN32)
-    target_sources(ImageViewer PRIVATE resources/app.rc)
+    target_sources(ImageViewer PRIVATE resources/app.rc src/app/WindowsFrame.h src/app/WindowsFrame.cpp)
     target_link_libraries(ImageViewer PRIVATE dwmapi) # round corners and shadow of the frameless window (main.cpp)
 endif()
 
