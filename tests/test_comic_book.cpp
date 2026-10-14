@@ -5,6 +5,8 @@
 
 #include <QBuffer>
 #include <QImage>
+#include <QPainter>
+#include <QPdfWriter>
 #include <QTemporaryDir>
 #include <QtTest>
 #include <zlib.h>
@@ -148,8 +150,8 @@ private slots:
                                                {"__MACOSX/cap/._2.png", "junk", false},
                                                {"cap/notes.txt", "hello", false},
                                                {"cap/1.png", p1, true}}));
-        QVERIFY(core::ComicBook::isArchivePath(zip));
-        QVERIFY(!core::ComicBook::isArchivePath(dir.filePath("photo.jpg")));
+        QVERIFY(core::ComicBook::isBookFile(zip));
+        QVERIFY(!core::ComicBook::isBookFile(dir.filePath("photo.jpg")));
 
         core::ComicBook book;
         QVERIFY2(book.open(zip, dir.filePath("cache")), qPrintable(book.error()));
@@ -186,6 +188,40 @@ private slots:
         QVERIFY(QFile::exists(dir.filePath("page 1.png"))); // closing a folder book touches nothing
     }
 
+    // A PDF is a book of its pages: their shape is known without drawing them, and each one is drawn to a picture file
+    // the ordinary decoders can read. (Only when the build has Qt PDF.)
+    void aPdfIsABookOfItsPages()
+    {
+        if (!core::ComicBook::canReadPdf())
+            QSKIP("this build has no Qt PDF");
+        QTemporaryDir dir;
+        const QString pdf = dir.filePath("Mi libro.pdf");
+        {
+            QPdfWriter writer(pdf);
+            writer.setPageSize(QPageSize(QPageSize::A5));
+            QPainter painter(&writer);
+            for (int i = 0; i < 3; ++i) {
+                if (i > 0)
+                    writer.newPage();
+                painter.drawText(200, 400, QString("pagina %1").arg(i + 1));
+            }
+        }
+        QVERIFY(core::ComicBook::isBookFile(pdf));
+        core::ComicBook book;
+        QVERIFY2(book.open(pdf, dir.filePath("cache")), qPrintable(book.error()));
+        QCOMPARE(book.pageCount(), 3);
+        QCOMPARE(book.title(), QString("Mi libro"));
+        const QSize shape = book.pageSize(1);
+        QVERIFY(shape.height() > shape.width()); // A5 portrait
+        const QString file = book.pageFile(1);
+        QVERIFY(QFile::exists(file));
+        const QImage drawn(file);
+        QCOMPARE(drawn.height(), 2400); // the long side
+        QVERIFY(drawn.width() < drawn.height());
+        book.close();
+        QVERIFY(!QDir(dir.filePath("cache")).exists());
+    }
+
     void whatCannotBeReadIsReportedNotCrashed()
     {
         QTemporaryDir dir;
@@ -196,6 +232,9 @@ private slots:
         QVERIFY(!book.error().isEmpty());
         // an archive with no pictures
         QVERIFY(!book.open(writeFile(dir.filePath("text.zip"), makeZip({{"a.txt", "hi", false}})), dir.filePath("c")));
+        // a PDF that is not one (or, without Qt PDF, any PDF) is an error too
+        QVERIFY(!book.open(writeFile(dir.filePath("fake.pdf"), "%not really"), dir.filePath("c")));
+        QVERIFY(!book.error().isEmpty());
         // an entry cut short is an error, not garbage
         core::ZipArchive zip;
         const QString damaged = writeFile(dir.filePath("damaged.zip"), makeZip({{"a.bin", QByteArray(5000, 'x'), true}}).left(60));

@@ -40,7 +40,7 @@ Item {
     FileDialog {
         id: openDialog
         title: qsTr("Abrir imagen")
-        nameFilters: [qsTr("Imágenes y cómics (%1)").arg(appController.supportedExtensions.concat(["*.cbz", "*.zip"]).join(" "))]
+        nameFilters: [qsTr("Imágenes y cómics (%1)").arg(appController.supportedExtensions.concat(["*.cbz", "*.zip", "*.pdf"]).join(" "))]
         onAccepted: appController.openFile(selectedFile)
     }
 
@@ -48,7 +48,7 @@ Item {
     FileDialog {
         id: readDialog
         title: qsTr("Leer un cómic o manga")
-        nameFilters: [qsTr("Cómics (%1)").arg("*.cbz *.zip"), qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
+        nameFilters: [qsTr("Cómics (%1)").arg("*.cbz *.zip *.pdf"), qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
         onAccepted: root.readChosen(selectedFile)
     }
 }

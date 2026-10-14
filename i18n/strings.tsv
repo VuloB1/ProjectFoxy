@@ -923,3 +923,6 @@ No se pudo abrir el archivo: %1	The file could not be opened: %1	Não foi possí
 No se pudo abrir para leer	It could not be opened to read	Não foi possível abrir para leitura	읽기 위해 열 수 없습니다	无法打开阅读	読むために開けませんでした
 No se pudo guardar la página: %1	The page could not be saved: %1	Não foi possível salvar a página: %1	페이지를 저장할 수 없습니다: %1	无法保存该页：%1	ページを保存できませんでした: %1
 Página doble (D)	Double page (D)	Página dupla (D)	두 쪽 보기 (D)	双页 (D)	見開き (D)
+El PDF está protegido con contraseña.	The PDF is password protected.	O PDF está protegido por senha.	PDF가 암호로 보호되어 있습니다.	PDF 受密码保护。	PDFはパスワードで保護されています。
+No se pudo abrir el PDF.	The PDF could not be opened.	Não foi possível abrir o PDF.	PDF를 열 수 없습니다.	无法打开 PDF。	PDFを開けませんでした。
+Esta versión no puede abrir PDF.	This version cannot open PDF files.	Esta versão não consegue abrir PDF.	이 버전은 PDF를 열 수 없습니다.	此版本无法打开 PDF。	このバージョンはPDFを開けません。

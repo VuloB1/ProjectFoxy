@@ -143,7 +143,7 @@ void AppController::openPath(const QString &filePath)
 void AppController::loadPath(const QString &path)
 {
     // A comic is read, not shown: the picture that is open stays as it is, edits included.
-    if (core::ComicBook::isArchivePath(path)) {
+    if (core::ComicBook::isBookFile(path)) {
         emit comicRequested(path);
         return;
     }

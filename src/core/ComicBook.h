@@ -3,21 +3,29 @@
 #include "ZipArchive.h"
 
 #include <QMutex>
+#include <memory>
 #include <QSize>
 #include <QString>
 #include <QStringList>
 #include <QVector>
 
+class QPdfDocument;
+
 namespace core {
 
-// A book made of pictures: the images of a folder, or of a .cbz/.zip, in natural order (page2 before page10). The
-// reader works with pages by number and asks for a real file for each one: for a folder that is the picture itself,
-// for an archive the page is unpacked into `cacheDir` the first time it is wanted (so the ordinary decoders can read
-// it). Safe to use from several threads.
+// A book made of pictures: the images of a folder, of a .cbz/.zip (in natural order: page2 before page10) or the pages
+// of a PDF. The reader works with pages by number and asks for a real file for each one: for a folder that is the
+// picture itself, for an archive the page is unpacked into `cacheDir` the first time it is wanted, and for a PDF it is
+// drawn there as a JPEG (so the ordinary decoders can read all of them). Safe to use from several threads.
 class ComicBook {
 public:
-    // A folder or an archive that can be opened as a book (decided by its name only).
-    static bool isArchivePath(const QString &path);
+    ComicBook(); // (out of line: QPdfDocument is only declared here)
+    ~ComicBook();
+
+    // A file that is a book by itself (.cbz, .zip or .pdf; decided by its name only).
+    static bool isBookFile(const QString &path);
+    // This build can read PDF files (Qt PDF was found when it was compiled).
+    static bool canReadPdf();
 
     // `path` is a folder, an archive or a picture (its folder is the book). `cacheDir` is where an archive's pages
     // are unpacked; it is created when needed and removed by close(). False (error() says why) when there is no
@@ -46,6 +54,7 @@ private:
 
     QMutex m_mutex;
     ZipArchive m_zip;
+    std::unique_ptr<QPdfDocument> m_pdf; // set when the book is a PDF
     QVector<Page> m_pages;
     QString m_title;
     QString m_cacheDir;

@@ -1573,8 +1573,13 @@ la pila de edición ni el documento abierto.
   carpeta de la imagen abierta; el instalador registra `.cbz` y el `.desktop` su tipo MIME.
 - **Pruebas:** `test_comic_book` (8: tamaños de cabecera, dobles, `.cbz` hecho a mano con entradas guardadas y
   comprimidas, carpeta, errores) y `theReaderTurnsPagesInTheDirectionOfReading` en `test_ui_flows`.
+- **PDF** (Qt PDF, módulo opcional: `find_package(Qt6 OPTIONAL_COMPONENTS Pdf)`; sin él se compila con `PROJECTFOXY_PDF` sin definir y
+  abrir un PDF da un aviso): `ComicBook` carga el documento con `QPdfDocument`, da la forma de cada página sin dibujarla
+  (`pagePointSize`) y la dibuja a un JPEG (lado largo 2400 px, calidad 95) en la misma caché que las páginas de un `.cbz`.
+  Los CI instalan el módulo (`modules: qtshadertools qtpdf`); en Windows `windeployqt` lo recoge solo. **No probado:**
+  el Flatpak (hace falta Qt PDF en el runtime de KDE) ni PDF con contraseña (solo avisa).
 - **Pendiente (fases 2 y 3):** modo *webtoon* continuo, página doble con corrección manual por página, lupa, recorte de
-  márgenes, capítulo siguiente al llegar al final, pantalla completa, RAR/7z/PDF (libarchive; la licencia del RAR
+  márgenes, capítulo siguiente al llegar al final, pantalla completa, RAR/7z (libarchive; la licencia del RAR
   exige revisar `docs/LICENCIAS.md`), biblioteca con portadas y `ComicInfo.xml`. **No probado:** Flatpak/AppImage,
   `.cbz` de varios GB (el soporte ZIP64 está escrito pero ninguna prueba lo ejercita), páginas AVIF/TIFF sin forma conocida.
 

@@ -41,7 +41,7 @@ MangaReader::~MangaReader()
 
 bool MangaReader::isArchive(const QString &path)
 {
-    return core::ComicBook::isArchivePath(path);
+    return core::ComicBook::isBookFile(path);
 }
 
 QString MangaReader::bookKey() const

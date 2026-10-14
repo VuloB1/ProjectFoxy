@@ -8,6 +8,9 @@
 #include <QFile>
 #include <QFileInfo>
 #include <algorithm>
+#ifdef PROJECTFOXY_PDF
+#include <QPdfDocument>
+#endif
 
 namespace core {
 
@@ -27,10 +30,22 @@ bool isJunk(const QString &name)
 
 } // namespace
 
-bool ComicBook::isArchivePath(const QString &path)
+ComicBook::ComicBook() = default;
+ComicBook::~ComicBook() = default;
+
+bool ComicBook::isBookFile(const QString &path)
 {
     const QString suffix = QFileInfo(path).suffix().toLower();
-    return suffix == QLatin1String("cbz") || suffix == QLatin1String("zip");
+    return suffix == QLatin1String("cbz") || suffix == QLatin1String("zip") || suffix == QLatin1String("pdf");
+}
+
+bool ComicBook::canReadPdf()
+{
+#ifdef PROJECTFOXY_PDF
+    return true;
+#else
+    return false;
+#endif
 }
 
 bool ComicBook::open(const QString &path, const QString &cacheDir)
@@ -45,7 +60,26 @@ bool ComicBook::open(const QString &path, const QString &cacheDir)
     collator.setNumericMode(true);
     collator.setCaseSensitivity(Qt::CaseInsensitive);
 
-    if (info.isFile() && isArchivePath(path)) {
+    if (info.isFile() && info.suffix().compare(QLatin1String("pdf"), Qt::CaseInsensitive) == 0) {
+#ifdef PROJECTFOXY_PDF
+        m_pdf = std::make_unique<QPdfDocument>();
+        const QPdfDocument::Error error = m_pdf->load(path);
+        if (error != QPdfDocument::Error::None) {
+            m_error = error == QPdfDocument::Error::IncorrectPassword
+                          ? core::tr("El PDF está protegido con contraseña.")
+                          : core::tr("No se pudo abrir el PDF.");
+            m_pdf.reset();
+            return false;
+        }
+        for (int i = 0; i < m_pdf->pageCount(); ++i)
+            m_pages.append({QString::number(i + 1), QString(), -1});
+        m_title = info.completeBaseName();
+        m_cacheDir = cacheDir;
+#else
+        m_error = core::tr("Esta versión no puede abrir PDF.");
+        return false;
+#endif
+    } else if (info.isFile() && isBookFile(path)) {
         if (!m_zip.open(path)) {
             m_error = m_zip.error();
             return false;
@@ -82,6 +116,7 @@ void ComicBook::close()
     QMutexLocker lock(&m_mutex);
     m_pages.clear();
     m_zip.close();
+    m_pdf.reset();
     if (!m_cacheDir.isEmpty())
         QDir(m_cacheDir).removeRecursively();
     m_cacheDir.clear();
@@ -108,8 +143,29 @@ QString ComicBook::pageFile(int page)
     if (page < 0 || page >= m_pages.size())
         return {};
     Page &p = m_pages[page];
-    if (!p.file.isEmpty() || p.zipIndex < 0)
+    if (!p.file.isEmpty() || (p.zipIndex < 0 && !m_pdf))
         return p.file;
+#ifdef PROJECTFOXY_PDF
+    if (m_pdf) {
+        // A PDF page is drawn at a fixed size (2400 px on its long side: sharp on a 1440p screen, and a few hundred
+        // KB as a JPEG), whatever the view asks for.
+        const QSizeF points = m_pdf->pagePointSize(page);
+        if (points.isEmpty()) {
+            m_error = core::tr("No se pudo abrir el PDF.");
+            return {};
+        }
+        const double scale = 2400.0 / qMax(points.width(), points.height());
+        const QImage image = m_pdf->render(page, QSize(qMax(1, qRound(points.width() * scale)), qMax(1, qRound(points.height() * scale))));
+        QDir().mkpath(m_cacheDir);
+        const QString file = QStringLiteral("%1/%2.jpg").arg(m_cacheDir).arg(page, 5, 10, QLatin1Char('0'));
+        if (image.isNull() || !image.convertToFormat(QImage::Format_RGB32).save(file, "JPEG", 95)) {
+            m_error = core::tr("No se pudo guardar la página: %1").arg(file);
+            return {};
+        }
+        p.file = file;
+        return file;
+    }
+#endif
 
     const QByteArray data = m_zip.read(p.zipIndex);
     if (data.isEmpty()) {
@@ -134,6 +190,13 @@ QString ComicBook::pageFile(int page)
 
 QSize ComicBook::pageSize(int page)
 {
+#ifdef PROJECTFOXY_PDF
+    if (m_pdf) { // from the page's own size in points: no need to draw it
+        QMutexLocker lock(&m_mutex);
+        const QSizeF points = m_pdf->pagePointSize(page);
+        return {qRound(points.width() * 10), qRound(points.height() * 10)};
+    }
+#endif
     const QString file = pageFile(page);
     if (file.isEmpty())
         return {};

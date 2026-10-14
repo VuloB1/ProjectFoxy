@@ -81,6 +81,11 @@ if(WIN32)
     target_link_libraries(imageviewer_core PUBLIC shell32 ole32 shlwapi)
 endif()
 
+if(TARGET Qt6::Pdf)
+    target_link_libraries(imageviewer_core PUBLIC Qt6::Pdf)
+    target_compile_definitions(imageviewer_core PUBLIC PROJECTFOXY_PDF)
+endif()
+
 target_link_libraries(imageviewer_core PUBLIC
     Qt6::Core
     Qt6::Gui

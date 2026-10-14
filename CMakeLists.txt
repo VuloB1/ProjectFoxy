@@ -21,6 +21,9 @@ endif()
 # Dependencies
 # ---------------------------------------------------------------------------
 find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools)
+# The comic reader draws PDF pages with Qt PDF when it is there (a Qt installed without it builds, and says so when a
+# PDF is opened).
+find_package(Qt6 6.6 OPTIONAL_COMPONENTS Pdf)
 
 # Qt is the one dependency vcpkg does not pin (it comes from the Qt online
 # installer / aqtinstall), so the exact version the project is validated with is
