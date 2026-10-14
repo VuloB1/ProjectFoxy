@@ -3,6 +3,11 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased]
+
+- The Spanish text of the interface no longer uses the Argentine *voseo* («elegí», «arrastrá»…): it is now neutral
+  Spanish addressing the user as *tú* («elige», «arrastra»…). The other languages are unchanged.
+
 ## [0.2.6] — Window edges and V-Sync
 
 - Windows: the window with its own title bar snaps to the screen edges again. Drag it to the top to maximise it, or to
@@ -124,9 +129,14 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [Sin publicar]
+
+- Los textos de la interfaz en español dejan de usar voseo («elegí», «arrastrá»…): ahora están en español neutro,
+  tuteando («elige», «arrastra»…). Los demás idiomas no cambian.
+
 ## [0.2.6] — Bordes de la ventana y V-Sync
 
-- Windows: la ventana con barra de título propia vuelve a ajustarse a los bordes de la pantalla. Arrastrala arriba para
+- Windows: la ventana con barra de título propia vuelve a ajustarse a los bordes de la pantalla. Arrástrala arriba para
   maximizarla o a los costados para acomodarla; los diseños de ajuste de Windows 11 aparecen en el botón de maximizar; y
   el sistema se encarga de redimensionar desde los bordes y las esquinas. Maximizada, ocupa el área de trabajo sin tapar
   la barra de tareas.
@@ -167,7 +177,7 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   la ventana, o con solo ediciones de tono y color, se dibuja una copia reducida en vez de la imagen entera (con una foto
   de prueba de 37 megapíxeles, la memoria gráfica en el visor pasó de 236 MB a 93 MB, y con un ajuste de tono de 616 MB a
   196 MB). Al acercar el zoom o usar nitidez, claridad o grano se pasa a la imagen completa, así que lo que ves es lo que
-  guardás.
+  guardas.
 
 ## [0.2.3] — Más seguro y fluido
 

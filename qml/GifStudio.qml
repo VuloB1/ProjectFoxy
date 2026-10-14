@@ -170,13 +170,13 @@ Item {
                 visible: root.count === 0
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Agregá las imágenes con las que armar la animación")
+                    text: qsTr("Agrega las imágenes con las que armar la animación")
                     color: themeManager.textPrimary
                     font.pixelSize: 15
                 }
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Podés soltarlas acá, elegirlas o usar todas las de la carpeta. Un GIF, APNG o WebP animado que agregues se desarma en sus fotogramas.")
+                    text: qsTr("Puedes soltarlas aquí, elegirlas o usar todas las de la carpeta. Un GIF, APNG o WebP animado que agregues se desarma en sus fotogramas.")
                     color: themeManager.textSecondary
                     width: 460
                     wrapMode: Text.WordWrap
@@ -560,7 +560,7 @@ Item {
                     title: qsTr("Duración de los fotogramas")
                     Label {
                         width: parent.width
-                        text: root.currentIndex >= 0 ? qsTr("Fotograma %1").arg(root.currentIndex + 1) : qsTr("Elegí un fotograma de la tira para cambiarle la duración.")
+                        text: root.currentIndex >= 0 ? qsTr("Fotograma %1").arg(root.currentIndex + 1) : qsTr("Elige un fotograma de la tira para cambiarle la duración.")
                         color: themeManager.textSecondary
                         wrapMode: Text.WordWrap
                         font.pixelSize: 11
@@ -630,7 +630,7 @@ Item {
                     Label {
                         width: parent.width
                         visible: !styleSection.has
-                        text: qsTr("Elegí un fotograma de la tira para ponerle un efecto o un texto.")
+                        text: qsTr("Elige un fotograma de la tira para ponerle un efecto o un texto.")
                         color: themeManager.textSecondary
                         wrapMode: Text.WordWrap
                         font.pixelSize: 11
@@ -670,7 +670,7 @@ Item {
                         }
                         AppTextField {
                             width: parent.width
-                            placeholderText: qsTr("Escribí el texto del fotograma")
+                            placeholderText: qsTr("Escribe el texto del fotograma")
                             text: styleSection.st.text ?? ""
                             onTextEdited: animStudio.setStyleValue(root.currentIndex, "text", text)
                         }
@@ -965,7 +965,7 @@ Item {
     }
     FileDialog {
         id: addDialog
-        title: qsTr("Elegí las imágenes de la animación")
+        title: qsTr("Elige las imágenes de la animación")
         fileMode: FileDialog.OpenFiles
         nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
         onAccepted: animStudio.addUrls(Array.from(selectedFiles, u => u.toString()))

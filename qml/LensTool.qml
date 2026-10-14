@@ -205,7 +205,7 @@ Item {
                         id: lensCombo
                         width: parent.width
                         model: root.lensNames
-                        displayText: root.lensIndex >= 0 && root.info.name ? root.info.name : qsTr("Elegí un objetivo…")
+                        displayText: root.lensIndex >= 0 && root.info.name ? root.info.name : qsTr("Elige un objetivo…")
                         onActivated: function (i) { root.selectLens(root.lensList[i].index); }
                     }
                     Label {
@@ -302,7 +302,7 @@ Item {
 
                 Label {
                     width: parent.width
-                    text: qsTr("Para objetivos que no están en la base: ajustá cada cosa mirando la imagen.")
+                    text: qsTr("Para objetivos que no están en la base: ajusta cada cosa mirando la imagen.")
                     color: themeManager.textSecondary
                     font.pixelSize: 11
                     wrapMode: Text.WordWrap

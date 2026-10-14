@@ -223,7 +223,7 @@ AppPanelBackground {
             }
             Label {
                 width: parent.width
-                text: qsTr("Aplicá o cancelá para volver")
+                text: qsTr("Aplica o cancela para volver")
                 color: themeManager.textSecondary
                 font.pixelSize: 11
             }

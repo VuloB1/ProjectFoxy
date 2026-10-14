@@ -143,7 +143,7 @@ Item {
     Label {
         anchors.centerIn: parent
         visible: pane.path === ""
-        text: qsTr("Soltá una imagen acá")
+        text: qsTr("Suelta una imagen aquí")
         color: themeManager.textSecondary
     }
     Label {
