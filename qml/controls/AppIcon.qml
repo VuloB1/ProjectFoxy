@@ -422,6 +422,11 @@ Canvas {
             for (const y of [6.5, 10.5, 14.5, 18])
                 ctx.fillRect(5.1, y - 0.9, 1.8, 1.8), ctx.fillRect(17.1, y - 0.9, 1.8, 1.8);
             break;
+        case "sharpen":
+            // A triangle, soft on the left (an outline) and crisp on the right (filled): the sharpening.
+            ctx.beginPath(); ctx.moveTo(12, 4); ctx.lineTo(21, 19); ctx.lineTo(3, 19); ctx.closePath(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(12, 4); ctx.lineTo(21, 19); ctx.lineTo(12, 19); ctx.closePath(); ctx.fill();
+            break;
         case "book":
             // An open book (the comic / manga reader).
             ctx.beginPath(); ctx.moveTo(12, 6.5);

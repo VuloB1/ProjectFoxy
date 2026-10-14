@@ -65,8 +65,8 @@ Item {
     }
     Label {
         visible: mangaReader.active
-        anchors.right: parent.right
-        anchors.rightMargin: 12
+        anchors.right: sharpenButton.left
+        anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         color: themeManager.textSecondary
         font.pixelSize: 12
@@ -118,8 +118,27 @@ Item {
         bottomPadding: 2
         onClicked: infoPopup.open()
     }
+    // The viewer's sharpening: a small menu with a 0..100 % bar (FidelityFX CAS, applied to what is on screen).
+    AppToolButton {
+        id: sharpenButton
+        objectName: "sharpenButton"
+        visible: root.dockVisible
+        anchors.right: infoButton.visible ? infoButton.left : parent.right
+        anchors.rightMargin: infoButton.visible ? 2 : 6
+        anchors.verticalCenter: parent.verticalCenter
+        text: appSettings.viewSharpen > 0 ? qsTr("Nitidez de la vista: %1 %").arg(appSettings.viewSharpen) : qsTr("Nitidez de la vista")
+        iconName: "sharpen"
+        iconOnly: true
+        iconSize: 18
+        iconStroke: 1.4
+        topPadding: 2
+        bottomPadding: 2
+        // lit while the sharpening is on
+        iconColor: appSettings.viewSharpen > 0 ? themeManager.accent : themeManager.textPrimary
+        onClicked: sharpenPopup.opened ? sharpenPopup.close() : sharpenPopup.open()
+    }
     Label {
-        anchors.right: infoButton.left
+        anchors.right: sharpenButton.left
         anchors.rightMargin: 6
         anchors.verticalCenter: parent.verticalCenter
         color: themeManager.textSecondary
@@ -359,6 +378,55 @@ Item {
             iconName: "close"
             visible: root.editMode && !root.locked
             onClicked: root.closeEditRequested()
+        }
+    }
+
+    Popup {
+        id: sharpenPopup
+        objectName: "sharpenPopup"
+        x: root.width - width - 12
+        y: -height - 6
+        modal: false
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        background: AppPanelBackground { color: themeManager.surfaceElevated; radius: themeManager.radiusMedium }
+
+        contentItem: Column {
+            spacing: 8
+            Label {
+                color: themeManager.textPrimary
+                font.bold: true
+                text: qsTr("Nitidez de la vista")
+            }
+            Row {
+                spacing: 10
+                width: 260
+                AppSlider {
+                    id: sharpenSlider
+                    objectName: "sharpenSlider"
+                    width: parent.width - sharpenValue.width - parent.spacing
+                    from: 0
+                    to: 100
+                    stepSize: 1
+                    value: appSettings.viewSharpen
+                    onMoved: appSettings.viewSharpen = Math.round(value)
+                }
+                Label {
+                    id: sharpenValue
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 44
+                    horizontalAlignment: Text.AlignRight
+                    color: appSettings.viewSharpen > 0 ? themeManager.textPrimary : themeManager.textSecondary
+                    text: appSettings.viewSharpen > 0 ? appSettings.viewSharpen + " %" : qsTr("Apagada")
+                }
+            }
+            Label {
+                width: 260
+                wrapMode: Text.WordWrap
+                color: themeManager.textSecondary
+                font.pixelSize: 11
+                text: qsTr("Afila lo que ves en pantalla con FSR CAS, de AMD. No cambia el archivo.")
+            }
         }
     }
 

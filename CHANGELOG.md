@@ -14,6 +14,12 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   **C** cover alone, **1 2 3** fit, **Home/End** first/last page, **Esc** closes it. Next and previous pages are
   unpacked and decoded ahead, so turning the page does not wait. First version: CBZ, PDF and folders (RAR and 7z
   later).
+- **FSR CAS sharpening.** The sharpening is now AMD's FidelityFX CAS (the pass FSR 1 uses): it adapts to the local
+  contrast, so it adds crispness where there is room for it and leaves flat areas and noise alone, with far fewer
+  halos than the old unsharp mask. It replaces the *Sharpness* slider of Adjustments (same preview and saved file) and
+  the sharpening after enlarging a picture in *Size*. New button at the bottom right of the window (a small triangle,
+  lit while it is on): a menu with a 0-100 % bar that sharpens what you see on screen, in the viewer and in the comic
+  reader. 0 % is off; it never changes the file. Remembered between runs.
 
 ## [0.2.8] — The title bar is the toolbar
 
@@ -162,6 +168,12 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   que te quedaste. Teclas: **D** página doble, **R** dirección, **C** portada sola, **1 2 3** ajuste, **Inicio/Fin**
   primera y última página, **Esc** lo cierra. Las páginas siguientes y la anterior se descomprimen y decodifican por
   adelantado, así que pasar de página no espera. Primera versión: CBZ, PDF y carpetas (RAR y 7z después).
+- **Nitidez FSR CAS.** El enfoque ahora es el CAS de AMD FidelityFX (el paso que usa FSR 1): se adapta al contraste
+  local, así que aporta nitidez donde hay margen y deja en paz las zonas planas y el ruido, con muchos menos halos que
+  la máscara de enfoque de antes. Sustituye al control *Nitidez* de Ajustes (misma vista previa y mismo archivo
+  guardado) y al enfoque tras ampliar una imagen en *Tamaño*. Botón nuevo abajo a la derecha de la ventana (un
+  triángulo pequeño, encendido mientras está activa): un menú con una barra de 0 a 100 % que afila lo que ves en pantalla,
+  en el visor y en el lector de cómics. 0 % es apagado; nunca cambia el archivo. Se recuerda entre sesiones.
 
 ## [0.2.8] — La barra de título es la barra de herramientas
 

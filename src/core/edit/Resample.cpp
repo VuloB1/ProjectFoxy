@@ -1,4 +1,5 @@
 #include "Resample.h"
+#include "Cas.h"
 #include "ParallelRows.h"
 
 #include <algorithm>
@@ -80,76 +81,33 @@ Taps buildTaps(int srcLen, int dstLen)
     return taps;
 }
 
-// Sharpens the luminance of the rows [firstOut, lastOut) of `v` (a band of
-// premultiplied RGBA floats, 0..255, `rows` rows of `width` pixels). Rows
-// outside that range are context only: the blur and the neighborhood limit
-// need them, and they belong to the neighboring bands.
-void enhanceBand(std::vector<float> &v, int rows, int width, int firstOut, int lastOut, const EnhanceParams &params)
+// Sharpens the rows [firstOut, lastOut) of `v` (a band of premultiplied RGBA floats, 0..255, `rows` rows of `width`
+// pixels) with FidelityFX CAS (Cas.h) - the pass FSR 1 itself puts after its upscaler. Rows outside that range are
+// context only: the filter needs the row above and below, and they belong to the neighbouring bands.
+void casBand(std::vector<float> &v, int rows, int width, int firstOut, int lastOut, float strength)
 {
-    const int radius = std::max(1, static_cast<int>(std::ceil(3.0 * params.sigma)));
-    std::vector<float> kernel(2 * radius + 1);
-    float kernelSum = 0.0f;
-    for (int k = -radius; k <= radius; ++k) {
-        kernel[k + radius] = static_cast<float>(std::exp(-(k * k) / (2.0 * params.sigma * params.sigma)));
-        kernelSum += kernel[k + radius];
-    }
-    for (float &k : kernel)
-        k /= kernelSum;
-
-    const size_t plane = size_t(rows) * width;
-    std::vector<float> luma(plane);
-    std::vector<float> blurH(plane);
-    for (size_t i = 0; i < plane; ++i) {
-        const float *p = &v[i * 4];
-        luma[i] = 0.299f * p[0] + 0.587f * p[1] + 0.114f * p[2];
-    }
-
-    for (int row = 0; row < rows; ++row) {
-        const float *src = &luma[size_t(row) * width];
-        float *dst = &blurH[size_t(row) * width];
-        for (int x = 0; x < width; ++x) {
-            float sum = 0.0f;
-            for (int k = -radius; k <= radius; ++k)
-                sum += kernel[k + radius] * src[std::clamp(x + k, 0, width - 1)];
-            dst[x] = sum;
-        }
-    }
-
+    std::vector<float> sharpened(size_t(lastOut - firstOut) * width * 4);
     for (int row = firstOut; row < lastOut; ++row) {
-        const int rowUp = std::max(0, row - 1);
-        const int rowDown = std::min(rows - 1, row + 1);
+        const float *lines[3] = {&v[size_t(std::max(0, row - 1)) * width * 4], &v[size_t(row) * width * 4],
+                                 &v[size_t(std::min(rows - 1, row + 1)) * width * 4]};
+        float *out = &sharpened[size_t(row - firstOut) * width * 4];
         for (int x = 0; x < width; ++x) {
-            float blur = 0.0f;
-            for (int k = -radius; k <= radius; ++k)
-                blur += kernel[k + radius] * blurH[size_t(std::clamp(row + k, 0, rows - 1)) * width + x];
-
-            const float y = luma[size_t(row) * width + x];
-            // Ignore the tiniest differences (interpolation noise) and let the
-            // real edges through almost untouched.
-            float d = y - blur;
-            d *= std::abs(d) / (std::abs(d) + 1.5f);
-            float sharpened = y + float(params.amount) * d;
-
-            // Never leave the range of the 3x3 neighborhood: that is what
-            // keeps the sharpening from drawing halos next to an edge.
-            float lo = y;
-            float hi = y;
-            const int xl = std::max(0, x - 1);
-            const int xr = std::min(width - 1, x + 1);
-            for (int r : {rowUp, row, rowDown}) {
-                const float *line = &luma[size_t(r) * width];
-                lo = std::min({lo, line[xl], line[x], line[xr]});
-                hi = std::max({hi, line[xl], line[x], line[xr]});
+            const int xl = std::max(0, x - 1) * 4, xc = x * 4, xr = std::min(width - 1, x + 1) * 4;
+            const float alpha = lines[1][xc + 3];
+            for (int c = 0; c < 3; ++c) {
+                const float n[9] = {lines[0][xl + c] / 255.0f, lines[0][xc + c] / 255.0f, lines[0][xr + c] / 255.0f,
+                                    lines[1][xl + c] / 255.0f, lines[1][xc + c] / 255.0f, lines[1][xr + c] / 255.0f,
+                                    lines[2][xl + c] / 255.0f, lines[2][xc + c] / 255.0f, lines[2][xr + c] / 255.0f};
+                // CAS may step a little past the neighbourhood at an edge; after an enlargement that is a halo, so
+                // the result stays within the range of the 3x3 it came from.
+                const float lo = std::min({n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8]});
+                const float hi = std::max({n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7], n[8]});
+                out[xc + c] = std::clamp(std::clamp(casChannel(n, strength), lo, hi) * 255.0f, 0.0f, alpha);
             }
-            sharpened = std::clamp(sharpened, lo, hi);
-
-            const float delta = sharpened - y;
-            float *p = &v[(size_t(row) * width + x) * 4];
-            const float alpha = p[3];
-            for (int c = 0; c < 3; ++c)
-                p[c] = std::clamp(p[c] + delta, 0.0f, alpha);
+            out[xc + 3] = alpha;
         }
     }
+    std::copy(sharpened.begin(), sharpened.end(), v.begin() + size_t(firstOut) * width * 4);
 }
 
 } // namespace
@@ -157,12 +115,9 @@ void enhanceBand(std::vector<float> &v, int rows, int width, int firstOut, int l
 EnhanceParams enhanceParamsFor(double enlargement)
 {
     EnhanceParams p;
-    // Fitted by enlarging photos that had been shrunk on purpose and
-    // measuring which settings land closest to the originals: the more the
-    // picture grows, the wider the blur that is sharpened and the stronger the
-    // boost (the neighborhood limit below keeps a strong boost from ringing).
-    p.sigma = std::clamp(0.35 + 0.30 * enlargement, 0.8, 2.0);
-    p.amount = std::clamp(0.6 + 0.4 * enlargement, 0.8, 2.2);
+    // The more the picture grows, the softer the interpolation leaves its edges and the more CAS is used (CAS adapts to
+    // the local contrast by itself, so it does not ring where there is no room).
+    p.strength = std::clamp(0.35 + 0.35 * enlargement, 0.5, 1.0);
     return p;
 }
 
@@ -218,7 +173,7 @@ QImage resizeHighQuality(const QImage &source, QSize targetSize, bool keepAspect
     const double enlargement = std::sqrt((double(dw) / sw) * (double(dh) / sh));
     const bool enhance = enhanceDetail && enlargement > 1.05;
     const EnhanceParams params = enhanceParamsFor(enlargement);
-    const int halo = enhance ? static_cast<int>(std::ceil(3.0 * params.sigma)) + 2 : 0;
+    const int halo = enhance ? 1 : 0; // the filter looks one row up and down
 
     const Taps tapsX = buildTaps(sw, dw);
     const Taps tapsY = buildTaps(sh, dh);
@@ -282,7 +237,7 @@ QImage resizeHighQuality(const QImage &source, QSize targetSize, bool keepAspect
         }
 
         if (enhance)
-            enhanceBand(v, rows, dw, y0 - ya, y1 - ya, params);
+            casBand(v, rows, dw, y0 - ya, y1 - ya, float(params.strength));
 
         for (int y = y0; y < y1; ++y) {
             const float *from = &v[size_t(y - ya) * dw * 4];

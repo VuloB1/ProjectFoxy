@@ -1583,3 +1583,21 @@ la pila de edición ni el documento abierto.
   exige revisar `docs/LICENCIAS.md`), biblioteca con portadas y `ComicInfo.xml`. **No probado:** Flatpak/AppImage,
   `.cbz` de varios GB (el soporte ZIP64 está escrito pero ninguna prueba lo ejercita), páginas AVIF/TIFF sin forma conocida.
 
+## 24. Nitidez FSR CAS (14‑oct‑2026)
+
+El enfoque del programa es ahora **FidelityFX CAS** de AMD (MIT), el paso de nitidez de FSR 1. `core/edit/Cas.h` (`casChannel`)
+tiene la fórmula por canal sobre el 3×3 de un píxel: mínimo/máximo suaves (la cruz más todo el 3×3), `amp = √(min(mn, 2−mx)/mx)`
+(0 si el máximo es 0), pesos `w = −amp / lerp(8, 5, s)` y `(Σ vecinos·w + e) / (1 + 4w)`. La fuerza `s` (0..1) es la del
+control y además reparte el resultado: `e + s·(cas − e)`, para que arranque suave y 0 sea exactamente «apagado».
+
+- **Ajustes › Nitidez** (`applyDetail` en `AdjustMath.cpp` y `Detail.frag`): sustituye a la máscara de 5 puntos; se calcula sobre
+  color premultiplicado como el resto del paso C y se le suma el término de claridad. La paridad CPU/GPU (`test_gpu_parity`) pasa.
+- **Tamaño › «Mejorar nitidez al ampliar»** (`Resample.cpp`, `casBand`): sustituye al enfoque de luminancia ajustado a mano; la
+  fuerza sube con la ampliación (0,5–1) y el resultado se limita al rango del 3×3 para no dejar halos (lo exige
+  `enlargingBeatsPlainStretchingAndDoesNotRing`).
+- **Nitidez de la vista** (botón de la barra inferior, `AppSettings::viewSharpen`, `view/sharpen`): `qml/shaders/Cas.frag` aplicado
+  como `layer.effect` (`qml/CasEffect.qml`) del `Flickable` del lienzo y del lector, es decir, **sobre los píxeles de pantalla** al
+  zoom actual, no sobre los de la imagen; no toca el archivo ni la pila de edición. Con 0 % la capa ni se crea.
+- **Pruebas:** `test_cas` (4: apagado/plano/negro, más contraste con más fuerza, siempre en 0..1 y sin NaN, sin hueco no añade).
+  **No probado:** el rendimiento con ventanas 4K y el menú con los temas Classic.
+

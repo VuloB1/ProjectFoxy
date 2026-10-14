@@ -205,11 +205,13 @@ function(iv_add_app_resources target)
         FILES
             qml/shaders/Grade.frag
             qml/shaders/Detail.frag
+            qml/shaders/Cas.frag
             qml/shaders/Checker.frag
             qml/shaders/PixelGrid.frag
         OUTPUTS
             Grade.frag.qsb
             Detail.frag.qsb
+            Cas.frag.qsb
             Checker.frag.qsb
             PixelGrid.frag.qsb
     )
@@ -260,6 +262,7 @@ set(IV_QML_FILES
         qml/PaneView.qml
         qml/MultiView.qml
         qml/ReaderView.qml
+        qml/CasEffect.qml
         qml/GifStudio.qml
         qml/CollageMaker.qml
         qml/FrameCornerPicker.qml

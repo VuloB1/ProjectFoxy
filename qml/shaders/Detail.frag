@@ -6,11 +6,10 @@ layout(location = 0) out vec4 fragColor;
 // Stage C of the Ajustes pipeline: clarity + sharpen + finishing, mirroring applyDetail()
 // in AdjustMath.cpp (the version that runs when the file is saved).
 //
-// Both effects are computed from the SAME adjusted pixels and added together:
-//  - sharpen: 5-tap unsharp mask (center*4 minus its 4 neighbors), scaled by
-//    `amount`. texelSize is 1/width, 1/height of the source in pixels, needed
-//    to offset the 4 taps by exactly one texel regardless of the item's
-//    on-screen (scaled) size.
+// Both effects are computed from the SAME adjusted pixels (the sharpened pixel plus the clarity term):
+//  - sharpen: FidelityFX CAS (AMD, MIT) on the 3x3 neighbourhood, with `amount` as the strength - see
+//    core/edit/Cas.h, which this copies line for line. texelSize is 1/width, 1/height of the source in pixels,
+//    needed to offset the taps by exactly one texel regardless of the item's on-screen (scaled) size.
 //  - clarity: local contrast. The pixel is compared with a big-radius blur
 //    (a high mip level of this very texture - the source ShaderEffectSource
 //    has mipmap: true) and the difference is added back, weighted so the
@@ -87,6 +86,24 @@ vec3 applyNoise(vec3 c, vec2 px, float amount, float scale, int type, bool mono)
                     noiseSample(type, noiseHash(p, 2u))) * sigma;
 }
 
+// FidelityFX CAS for one pixel: `a..i` is the 3x3 neighbourhood (premultiplied rgb) in reading order. Same maths
+// as casChannel() in core/edit/Cas.h, per channel.
+vec3 cas(vec3 a, vec3 b, vec3 c, vec3 d, vec3 e, vec3 f, vec3 g, vec3 h, vec3 i, float strength)
+{
+    vec3 mn = min(min(min(d, e), f), min(b, h));
+    mn += min(min(min(mn, a), c), min(g, i));
+    vec3 mx = max(max(max(d, e), f), max(b, h));
+    mx += max(max(max(mx, a), c), max(g, i));
+    vec3 amp = vec3(0.0);
+    for (int k = 0; k < 3; ++k)
+        if (mx[k] > 0.0)
+            amp[k] = clamp(min(mn[k], 2.0 - mx[k]) / mx[k], 0.0, 1.0);
+    amp = sqrt(amp);
+    vec3 w = -amp / (8.0 + (5.0 - 8.0) * strength);
+    vec3 sharpened = clamp(((b + d + f + h) * w + e) / (1.0 + 4.0 * w), 0.0, 1.0);
+    return e + strength * (sharpened - e);
+}
+
 void main()
 {
     // Qt Quick hands every texture over PREMULTIPLIED (rgb already multiplied by the
@@ -109,11 +126,12 @@ void main()
     vec3 result = c;
 
     if (sharpen) {
-        vec3 up = texture(source, qt_TexCoord0 + vec2(0.0, -texelSize.y)).rgb;
-        vec3 down = texture(source, qt_TexCoord0 + vec2(0.0, texelSize.y)).rgb;
-        vec3 left = texture(source, qt_TexCoord0 + vec2(-texelSize.x, 0.0)).rgb;
-        vec3 right = texture(source, qt_TexCoord0 + vec2(texelSize.x, 0.0)).rgb;
-        result += amount * (c * 4.0 - (up + down + left + right));
+        vec2 t = texelSize;
+        result = cas(texture(source, qt_TexCoord0 + vec2(-t.x, -t.y)).rgb, texture(source, qt_TexCoord0 + vec2(0.0, -t.y)).rgb,
+                     texture(source, qt_TexCoord0 + vec2(t.x, -t.y)).rgb,  texture(source, qt_TexCoord0 + vec2(-t.x, 0.0)).rgb,
+                     c,                                                    texture(source, qt_TexCoord0 + vec2(t.x, 0.0)).rgb,
+                     texture(source, qt_TexCoord0 + vec2(-t.x, t.y)).rgb,  texture(source, qt_TexCoord0 + vec2(0.0, t.y)).rgb,
+                     texture(source, qt_TexCoord0 + vec2(t.x, t.y)).rgb, clamp(amount, 0.0, 1.0));
     }
 
     if (clarify) {

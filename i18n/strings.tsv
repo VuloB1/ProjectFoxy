@@ -926,3 +926,7 @@ Página doble (D)	Double page (D)	Página dupla (D)	두 쪽 보기 (D)	双页 (D
 El PDF está protegido con contraseña.	The PDF is password protected.	O PDF está protegido por senha.	PDF가 암호로 보호되어 있습니다.	PDF 受密码保护。	PDFはパスワードで保護されています。
 No se pudo abrir el PDF.	The PDF could not be opened.	Não foi possível abrir o PDF.	PDF를 열 수 없습니다.	无法打开 PDF。	PDFを開けませんでした。
 Esta versión no puede abrir PDF.	This version cannot open PDF files.	Esta versão não consegue abrir PDF.	이 버전은 PDF를 열 수 없습니다.	此版本无法打开 PDF。	このバージョンはPDFを開けません。
+Nitidez de la vista	View sharpening	Nitidez da visualização	보기 선명도	视图锐化	ビューのシャープ化
+Nitidez de la vista: %1 %	View sharpening: %1 %	Nitidez da visualização: %1 %	보기 선명도: %1 %	视图锐化：%1 %	ビューのシャープ化: %1 %
+Apagada	Off	Desativada	꺼짐	关闭	オフ
+Afila lo que ves en pantalla con FSR CAS, de AMD. No cambia el archivo.	Sharpens what you see on screen with FSR CAS, from AMD. It does not change the file.	Aumenta a nitidez do que você vê na tela com o FSR CAS, da AMD. Não altera o arquivo.	AMD의 FSR CAS로 화면에 보이는 것을 선명하게 합니다. 파일은 바뀌지 않습니다.	使用 AMD 的 FSR CAS 锐化屏幕上显示的内容，不会更改文件。	AMDのFSR CASで画面に表示されるものをシャープにします。ファイルは変更されません。
