@@ -3,7 +3,7 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
-## [Unreleased]
+## [0.2.7] — Neutral Spanish
 
 - The Spanish text of the interface no longer uses the Argentine *voseo* («elegí», «arrastrá»…): it is now neutral
   Spanish addressing the user as *tú* («elige», «arrastra»…). The other languages are unchanged.
@@ -129,7 +129,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Sin publicar]
+## [0.2.7] — Español neutro
 
 - Los textos de la interfaz en español dejan de usar voseo («elegí», «arrastrá»…): ahora están en español neutro,
   tuteando («elige», «arrastra»…). Los demás idiomas no cambian.

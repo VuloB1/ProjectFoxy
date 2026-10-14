@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.7" date="2026-10-14">
+      <description>
+        <p>The Spanish text of the interface is now neutral Spanish (addressing the user as "tú") instead of the Argentine voseo. The other languages are unchanged.</p>
+      </description>
+    </release>
     <release version="0.2.6" date="2026-10-13">
       <description>
         <p>On Windows the window snaps to the screen edges again (drag it to the top or the sides, snap layouts on the maximise button), and a new setting, "Sync with the screen (V-Sync)", lets you turn off V-Sync if the window stutters while you resize it on some AMD graphics cards.</p>
