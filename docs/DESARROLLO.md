@@ -1490,7 +1490,19 @@ teclado sintéticos, con la plataforma `offscreen` de Qt y su renderizador por s
   «dock»: una pieza más alta, un solo contorno con la barra (`Canvas`; esquinas redondeadas y empalme cóncavo). Lleva
   todos los botones solo con íconos. El comparador (`MultiView`) ya no tiene píldora flotante: expone `dockContent`
   (un `Component`) y `StatusBar.customDock` lo muestra en el dock. La imagen se ajusta por encima del dock
-  (`Main.qml`: `bottomMargin: statusBar.rise`). «Copiado» aparece junto al cursor 0,7 s al copiar un color.
+  (`ImageCanvas.bottomInset`, que `Main.qml` pone en `statusBar.rise`): el ajuste y el centrado usan `viewHeight` (la vista
+  menos ese margen) y el `Flickable` llega hasta la barra, con `bottomMargin: bottomInset`; así una imagen con zoom se
+  ve también a los lados del dock. «Copiado» aparece junto al cursor 0,7 s al copiar un color.
+- **La barra de título es también la barra de herramientas** (`TitleBar.qml`): icono y nombre del programa, nombre del
+  archivo, Editar, GIF animado, Collage, Comparador, «Más herramientas» y Configuración, y los botones de ventana.
+  `Toolbar.qml` ya no dibuja nada: solo guarda los diálogos que esos botones abren (`requestOpen`, `openSettings`...).
+  Todo lo que no es un botón es zona de arrastre (`objectName: "titleDrag"`), que nunca baja de `minDrag` (96 px): el
+  nombre del archivo ocupa como mucho la mitad de la barra y, al estrecharse la ventana, GIF animado, Collage y
+  Comparador (el último primero) pasan al menú «⋯»; Editar y Configuración siempre quedan a la vista. En Windows
+  `WindowsFrame.cpp` devuelve `HTCLIENT` sobre los botones (cualquier `QQuickAbstractButton` o ítem con
+  `captionInteractive`) y `HTCAPTION` en el resto. La ventana lleva `WS_CAPTION` (sin él Windows no anima minimizar y
+  restaurar desde la barra de tareas); maximizada, `WM_NCCALCSIZE` pone el área de cliente igual al área de trabajo del
+  monitor, porque con `WS_CAPTION` Windows deja el marco asomando 8 px por los bordes.
 - **Trampas de `Canvas`** (aprendidas dos veces): el contexto 2D conserva su estado entre `onPaint`, hay que empezar con
   `ctx.reset()` (un `translate` acumulado deformaba la pestaña de la barra de miniaturas cada vez que se repintaba), y
   `canvasSize` debe seguir al tamaño del ítem o el dibujo se estira.

@@ -3,6 +3,16 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased]
+
+- The toolbar is now part of the title bar: the file name and the tools (Edit, Animated GIF, Collage, Compare, More tools,
+  Settings) sit next to the window buttons, and everything that is not a button is still grab-and-drag space. As the
+  window narrows, Animated GIF, Collage and Compare move into the "More tools" menu (Edit and Settings always stay in
+  the bar), and the file name never takes more than half of the bar.
+- Windows: minimising and restoring from the taskbar play the system animation again.
+- The picture still opens fitted above the bottom bar, but zoomed in it now also shows beside the bar instead of leaving
+  dark gaps there.
+
 ## [0.2.7] — Neutral Spanish
 
 - The Spanish text of the interface no longer uses the Argentine *voseo* («elegí», «arrastrá»…): it is now neutral
@@ -128,6 +138,17 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar]
+
+- La barra de herramientas pasa a formar parte de la barra de título: el nombre del archivo y las herramientas (Editar,
+  GIF animado, Collage, Comparar, Más herramientas, Configuración) quedan junto a los botones de la ventana, y todo lo
+  que no es un botón sigue siendo zona para arrastrar. Al estrecharse la ventana, GIF animado, Collage y Comparar pasan
+  al menú «Más herramientas» (Editar y Configuración siempre quedan a la vista) y el nombre del archivo nunca ocupa más
+  de la mitad de la barra.
+- Windows: minimizar y restaurar desde la barra de tareas vuelven a mostrar la animación del sistema.
+- La imagen se sigue abriendo ajustada por encima de la barra inferior, pero con zoom también se ve a los lados de la
+  barra, en lugar de dejar huecos oscuros.
 
 ## [0.2.7] — Español neutro
 
