@@ -24,6 +24,11 @@ Rectangle {
     // can toggle the edit panel and reuse Toolbar's delete-confirmation
     // dialog instead of duplicating it here.
     property var toolbar: null
+    // Room at the bottom that the picture keeps out of when it is fitted or centred (the dock stands there). The
+    // view itself reaches the bottom edge, so a zoomed picture shows beside the dock too.
+    property int bottomInset: 0
+    // The part of the view the picture is fitted into.
+    readonly property real viewHeight: Math.max(0, flick.height - bottomInset)
     // Edit mode lives in Main.qml; the context menu asks it to switch.
     property bool editMode: false
     // A tool is open in the edit panel (see Main.qml): no leaving edit mode, no deleting the file.
@@ -91,7 +96,7 @@ Rectangle {
         if (size.width <= 0 || size.height <= 0)
             return 1.0;
         const ratio = Math.min(flick.width / size.width,
-                                flick.height / size.height);
+                                viewHeight / size.height);
         // With whole-number zoom, a small picture opens as big as a whole number allows.
         if (integerZoom && ratio >= 1.0)
             return Math.min(Math.floor(ratio), topScale);
@@ -134,7 +139,7 @@ Rectangle {
 
     function centerContent() {
         flick.contentX = (flick.contentWidth - flick.width) / 2;
-        flick.contentY = (flick.contentHeight - flick.height) / 2;
+        flick.contentY = (flick.contentHeight - viewHeight) / 2;
     }
 
     function zoomToFit() {
@@ -246,7 +251,7 @@ Rectangle {
             // snap to the new scale the moment the edit is baked.
             const pictureNow = appController.currentImageSize;
             const swappedFit = Math.min(flick.width / pictureNow.height,
-                                        flick.height / pictureNow.width, 1.0);
+                                        viewHeight / pictureNow.width, 1.0);
             rotateAngleAnim.to = image.rotation + (kind === "rotateL" ? -90 : 90);
             rotateScaleAnim.to = swappedFit;
             rotateAnim.start();
@@ -363,7 +368,7 @@ Rectangle {
         return (w - image.width * scale) / 2;
     }
     function contentImageY(scale) {
-        const h = Math.max(flick.height, image.height * scale);
+        const h = Math.max(viewHeight, image.height * scale);
         return (h - image.height * scale) / 2;
     }
 
@@ -395,7 +400,7 @@ Rectangle {
         const s = image.scale;
         const w = image.width * s;
         const h = image.height * s;
-        return Qt.rect((flick.width - w) / 2, (flick.height - h) / 2, w, h);
+        return Qt.rect((flick.width - w) / 2, (viewHeight - h) / 2, w, h);
     }
 
     // Re-syncs cropBounds to the image's actual current on-screen rect, and
@@ -703,21 +708,23 @@ Rectangle {
         const newCy = uy * newScale + newImgY;
 
         const newContentWidth = Math.max(flick.width, image.width * newScale);
-        const newContentHeight = Math.max(flick.height, image.height * newScale);
+        const newContentHeight = Math.max(viewHeight, image.height * newScale);
         flick.contentX = clamp(newCx - viewportX, 0, newContentWidth - flick.width);
-        flick.contentY = clamp(newCy - viewportY, 0, newContentHeight - flick.height);
+        flick.contentY = clamp(newCy - viewportY, 0, newContentHeight - viewHeight);
     }
 
     // The viewport was resized (window resize, panel toggled, etc.) - keep
     // following the viewport when in fit mode instead of leaving stale zoom.
     onWidthChanged: { if (fitMode) zoomToFit(); if (cropActive) Qt.callLater(refreshCropBounds); }
     onHeightChanged: { if (fitMode) zoomToFit(); if (cropActive) Qt.callLater(refreshCropBounds); }
+    onBottomInsetChanged: { if (fitMode) zoomToFit(); if (cropActive) Qt.callLater(refreshCropBounds); }
 
     Flickable {
         id: flick
         anchors.fill: parent
         contentWidth: Math.max(width, image.width * image.scale)
-        contentHeight: Math.max(height, image.height * image.scale)
+        contentHeight: Math.max(root.viewHeight, image.height * image.scale)
+        bottomMargin: root.bottomInset // the content may be scrolled up out of the dock's way
         boundsBehavior: Flickable.StopAtBounds
         clip: true
 
@@ -743,7 +750,7 @@ Rectangle {
             // that is the Flickable's content item, whose size is contentWidth/
             // Height - and those depend on this width/height: a binding loop.)
             width: root.pictureSize.width > 0 ? root.pictureSize.width : flick.width
-            height: root.pictureSize.height > 0 ? root.pictureSize.height : flick.height
+            height: root.pictureSize.height > 0 ? root.pictureSize.height : root.viewHeight
             smooth: !root.nearest
             mipmap: true
             // The Ajustes sliders are applied live by the shader chain below

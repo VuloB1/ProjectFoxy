@@ -75,7 +75,7 @@ ApplicationWindow {
     // "Varias imágenes": several pictures side by side with linked zoom (MultiView.qml). It takes the
     // canvas's place; editing and browsing wait until it is closed.
     property bool multiMode: false
-    // A creation studio ("gif") covers the window below the toolbar.
+    // A creation studio ("gif") covers the window below the title bar.
     property string studio: ""
     function setStudio(name) {
         if (name === root.studio)
@@ -110,14 +110,25 @@ ApplicationWindow {
     }
 
 
+    // The title bar is also the toolbar (TitleBar.qml); Toolbar.qml only owns the dialogs its buttons open.
+    Toolbar { id: toolbar }
+
     TitleBar {
         id: titleBar
         objectName: "titleBar"
         window: root
+        toolbar: toolbar
+        editMode: root.editMode
+        locked: root.toolLocked
+        multiMode: root.multiMode
+        studio: root.studio
+        onEditModeRequested: function (on) { root.setEditMode(on) }
+        onMultiModeRequested: function (on) { root.setMultiMode(on) }
+        onStudioRequested: function (name) { root.requestStudio(name) }
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 32
+        height: 36
         z: 10
     }
 
@@ -143,25 +154,9 @@ ApplicationWindow {
         }
     }
 
-    Toolbar {
-        id: toolbar
-        anchors.top: titleBar.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 36
-        canvas: canvas
-        editMode: root.editMode
-        locked: root.toolLocked
-        multiMode: root.multiMode
-        studio: root.studio
-        onEditModeRequested: function (on) { root.setEditMode(on) }
-        onMultiModeRequested: function (on) { root.setMultiMode(on) }
-        onStudioRequested: function (name) { root.requestStudio(name) }
-    }
-
     ThumbnailStrip {
         id: sidebar
-        anchors.top: toolbar.bottom
+        anchors.top: titleBar.bottom
         anchors.left: parent.left
         anchors.bottom: statusBar.top
         visible: folderModel.count > 1
@@ -172,11 +167,12 @@ ApplicationWindow {
 
     ImageCanvas {
         id: canvas
-        anchors.top: toolbar.bottom
+        anchors.top: titleBar.bottom
         anchors.left: sidebar.visible ? sidebar.right : parent.left
         anchors.right: root.editMode ? editLoader.left : parent.right
         anchors.bottom: statusBar.top
-        anchors.bottomMargin: statusBar.dockVisible ? statusBar.rise : 0 // the picture fits above the dock
+        // The picture opens (and stays centred) above the dock, but zoomed it may run on behind the sides of it.
+        bottomInset: statusBar.dockVisible ? statusBar.rise : 0
         toolbar: toolbar
         editMode: root.editMode
         locked: root.toolLocked
@@ -190,6 +186,7 @@ ApplicationWindow {
         active: root.multiMode
         anchors.top: canvas.top
         anchors.bottom: canvas.bottom
+        anchors.bottomMargin: canvas.bottomInset // the comparer keeps clear of the dock, as it always did
         anchors.left: canvas.left
         anchors.right: canvas.right
         sourceComponent: MultiView {
@@ -204,7 +201,7 @@ ApplicationWindow {
     Loader {
         id: studioLoader
         active: root.studio !== ""
-        anchors.top: toolbar.bottom
+        anchors.top: titleBar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: statusBar.top
@@ -215,7 +212,7 @@ ApplicationWindow {
     Loader {
         id: editLoader
         active: root.editMode
-        anchors.top: toolbar.bottom
+        anchors.top: titleBar.bottom
         anchors.right: parent.right
         anchors.bottom: statusBar.top
         width: root.editMode ? 330 : 0

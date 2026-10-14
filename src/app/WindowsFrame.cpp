@@ -22,6 +22,28 @@ QQuickItem *itemNamed(QQuickItem *root, const char *name)
     return nullptr;
 }
 
+// The deepest visible item under `scenePoint` (window coordinates, in Qt's units).
+QQuickItem *deepestAt(QQuickItem *root, QPointF scenePoint)
+{
+    QQuickItem *item = root;
+    QPointF local = root->mapFromScene(scenePoint);
+    while (QQuickItem *child = item->childAt(local.x(), local.y())) {
+        local = item->mapToItem(child, local);
+        item = child;
+    }
+    return item;
+}
+
+// A button (or anything that says `captionInteractive: true`) inside the title bar: Windows must leave the mouse to Qt
+// there instead of treating it as caption, or a click would start a window drag.
+bool interactiveInBar(QQuickItem *bar, QPointF scenePoint)
+{
+    for (QQuickItem *item = deepestAt(bar, scenePoint); item && item != bar; item = item->parentItem())
+        if (item->inherits("QQuickAbstractButton") || item->property("captionInteractive").toBool())
+            return true;
+    return false;
+}
+
 class Filter : public QAbstractNativeEventFilter
 {
 public:
@@ -40,7 +62,18 @@ public:
         case WM_NCCALCSIZE:
             if (!msg->wParam)
                 return false;
-            // The client area is the whole window (maximised too, see WM_GETMINMAXINFO).
+            // The client area is the whole window. Maximised, a window that has a caption (see installWindowsFrame) is
+            // laid out by Windows with its frame hanging over the screen edges; the client is the monitor's work area
+            // instead (and, as in WM_GETMINMAXINFO, an auto-hiding taskbar keeps one pixel free at the bottom).
+            if (IsZoomed(m_hwnd)) {
+                MONITORINFO monitor = {sizeof monitor};
+                if (GetMonitorInfo(MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST), &monitor)) {
+                    auto *params = reinterpret_cast<NCCALCSIZE_PARAMS *>(msg->lParam);
+                    params->rgrc[0] = monitor.rcWork;
+                    if (EqualRect(&monitor.rcWork, &monitor.rcMonitor))
+                        params->rgrc[0].bottom -= 1;
+                }
+            }
             *result = 0;
             return true;
 
@@ -137,6 +170,8 @@ private:
                     if (qx >= at.x() - max->width() && qx < at.x() + max->width() * 2)
                         return HTCLIENT; // minimise / close: Qt delivers them to the QML buttons
                 }
+                if (interactiveInBar(const_cast<QQuickItem *>(bar), QPointF(qx, qy)))
+                    return HTCLIENT; // a tool button: Qt delivers it to the QML
                 return HTCAPTION;
             }
         }
@@ -180,7 +215,7 @@ void installWindowsFrame(QQuickWindow *window)
 
     LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
     if (!skip.contains("style"))
-        style |= WS_THICKFRAME | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU;
+        style |= WS_CAPTION | WS_THICKFRAME | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU; // WS_CAPTION: Windows animates minimise and restore only for windows that have a caption
     SetWindowLongPtr(hwnd, GWL_STYLE, style);
     // Make Windows ask for the client area again (WM_NCCALCSIZE).
     SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);

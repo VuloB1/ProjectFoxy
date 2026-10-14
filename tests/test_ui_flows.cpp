@@ -126,6 +126,27 @@ private slots:
         QTRY_COMPARE_WITH_TIMEOUT(zoom(canvas), fitted, 3000);
     }
 
+    // ------------------------------------------------------------------------------------------------ the title bar
+
+    // The title bar is the toolbar. As the window narrows the optional tools move into the "Más herramientas" menu,
+    // but Editar and Configuración never leave the bar.
+    void theToolsMoveIntoTheMenuAsTheWindowNarrowsButEditAndSettingsStay()
+    {
+        // (a file name long enough that, at the narrowest, it keeps its share of the bar)
+        m_app.controller->openPath(file("a-picture-with-a-fairly-long-name.png", picture(120, 80, Qt::red)));
+        QTRY_VERIFY_WITH_TIMEOUT(!m_app.controller->currentFileName().isEmpty(), 10000);
+        m_window->resize(1280, 700);
+        QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("gifButton") && itemOrNull("collageButton"), 3000);
+        QVERIFY(itemOrNull("editButton") && itemOrNull("settingsButton"));
+
+        m_window->resize(m_window->minimumWidth(), 700);
+        QTRY_VERIFY_WITH_TIMEOUT(!itemOrNull("gifButton") && !itemOrNull("collageButton"), 3000);
+        QVERIFY(itemOrNull("editButton"));
+        QVERIFY(itemOrNull("settingsButton"));
+        // Whatever the size, the bar keeps room to grab and drag.
+        QVERIFY(item("titleDrag")->width() > 96);
+    }
+
     // ------------------------------------------------------------------------------------------------ editing and saving
 
     // Edit mode, the crop tool, a quarter turn, Aplicar, Guardar and the overwrite question: the file on disk ends up
