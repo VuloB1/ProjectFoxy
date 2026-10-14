@@ -70,7 +70,7 @@ Item {
 
             Label {
                 width: parent.width
-                text: qsTr("Cortá la foto con la forma que quieras y rodeala de contorno, sombra y fondo. La imagen crece para que todo entre; si querés mantener el tamaño, activalo abajo.")
+                text: qsTr("Corta la foto con la forma que quieras y rodéala de contorno, sombra y fondo. La imagen crece para que todo entre; si quieres mantener el tamaño, actívalo abajo.")
                 color: themeManager.textSecondary
                 wrapMode: Text.WordWrap
                 font.pixelSize: 11
@@ -114,7 +114,7 @@ Item {
             Label {
                 width: parent.width
                 visible: root.shape !== 0
-                text: qsTr("La forma llena toda la foto: si querés un círculo o un hexágono parejo, recortala antes en 1:1.")
+                text: qsTr("La forma llena toda la foto: si quieres un círculo o un hexágono parejo, recórtala antes en 1:1.")
                 color: themeManager.textSecondary
                 font.pixelSize: 11
                 wrapMode: Text.WordWrap
@@ -158,7 +158,7 @@ Item {
                     Label {
                         anchors.verticalCenter: parent.verticalCenter
                         width: column.width - 78 - 12
-                        text: qsTr("Tocá cada esquina para redondearla o dejarla recta.")
+                        text: qsTr("Toca cada esquina para redondearla o dejarla recta.")
                         color: themeManager.textSecondary
                         font.pixelSize: 11
                         wrapMode: Text.WordWrap

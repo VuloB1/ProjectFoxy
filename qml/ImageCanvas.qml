@@ -1301,7 +1301,7 @@ Rectangle {
         z: 20
         visible: root.cropActive && !root.cropHasSelection && !root.cropDrawing && !root.transforming
         maxTextWidth: Math.min(root.width - 80, 420)
-        text: qsTr("Arrastrá sobre la imagen para seleccionar el área a recortar")
+        text: qsTr("Arrastra sobre la imagen para seleccionar el área a recortar")
     }
 
     // Zoom % / "3 / 12" readout: same box as the crop hint above and in the
@@ -1350,7 +1350,7 @@ Rectangle {
         anchors.centerIn: parent
         visible: !appController.isLoading && appController.errorString.length === 0
                  && image.status !== Image.Ready
-        text: qsTr("Arrastrá una imagen o usá Abrir")
+        text: qsTr("Arrastra una imagen o usa Abrir")
         color: themeManager.textSecondary
     }
 

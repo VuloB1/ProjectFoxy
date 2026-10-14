@@ -61,7 +61,7 @@ Item {
             Label {
                 visible: appController.effectId === ""
                 width: parent.width
-                text: qsTr("Elegí un efecto para ver cómo queda en toda la imagen. Hasta que lo apliques, no cambia nada.")
+                text: qsTr("Elige un efecto para ver cómo queda en toda la imagen. Hasta que lo apliques, no cambia nada.")
                 color: themeManager.textSecondary
                 wrapMode: Text.WordWrap
             }
@@ -201,7 +201,7 @@ Item {
                         anchors.fill: parent
                         wrapMode: TextEdit.Wrap
                         color: themeManager.textPrimary
-                        placeholderText: qsTr("Escribí el texto de la leyenda")
+                        placeholderText: qsTr("Escribe el texto de la leyenda")
                         placeholderTextColor: themeManager.textSecondary
                         selectionColor: themeManager.accent
                         selectedTextColor: themeManager.accentText

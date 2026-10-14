@@ -365,8 +365,8 @@ Item {
             color: themeManager.textSecondary
             font.pixelSize: 11
             text: root.free
-                  ? qsTr("Arrastrá una celda para moverla y sus puntos para cambiarle el tamaño. Shift o botón derecho: mover la foto dentro. Rueda: acercar la foto. Doble clic: restablecerla.")
-                  : qsTr("Arrastrá una foto para moverla dentro de su celda y usá la rueda para acercarla (sin límites: puede quedar más chica que la celda). Arrastrá las líneas para cambiar el tamaño de las celdas.")
+                  ? qsTr("Arrastra una celda para moverla y sus puntos para cambiarle el tamaño. Shift o botón derecho: mover la foto dentro. Rueda: acercar la foto. Doble clic: restablecerla.")
+                  : qsTr("Arrastra una foto para moverla dentro de su celda y usa la rueda para acercarla (sin límites: puede quedar más chica que la celda). Arrastra las líneas para cambiar el tamaño de las celdas.")
         }
     }
 
@@ -633,7 +633,7 @@ Item {
                     Label {
                         width: parent.width
                         visible: root.selCell === null
-                        text: qsTr("Tocá una celda para ajustar su foto.")
+                        text: qsTr("Toca una celda para ajustar su foto.")
                         color: themeManager.textSecondary
                         font.pixelSize: 11
                     }
@@ -884,14 +884,14 @@ Item {
     }
     FileDialog {
         id: addDialog
-        title: qsTr("Elegí las fotos del collage")
+        title: qsTr("Elige las fotos del collage")
         fileMode: FileDialog.OpenFiles
         nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
         onAccepted: collageStudio.addUrls(Array.from(selectedFiles, u => u.toString()))
     }
     FileDialog {
         id: pickDialog
-        title: qsTr("Elegí la foto de esta celda")
+        title: qsTr("Elige la foto de esta celda")
         fileMode: FileDialog.OpenFile
         nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
         onAccepted: collageStudio.setPicture(root.sel, selectedFile.toString())

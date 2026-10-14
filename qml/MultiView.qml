@@ -314,7 +314,7 @@ Item {
         visible: panes.count > 1 && opacity > 0
         opacity: hintShown ? 1 : 0
         property bool hintShown: true
-        text: root.linked ? qsTr("Rueda para acercar, arrastrá para mover: todas se mueven juntas. Shift mueve solo una.")
+        text: root.linked ? qsTr("Rueda para acercar, arrastra para mover: todas se mueven juntas. Shift mueve solo una.")
                           : qsTr("El zoom no está vinculado: cada imagen se mueve por su cuenta. Shift mueve todas.")
         color: "#ffffff"
         font.pixelSize: 12
@@ -329,7 +329,7 @@ Item {
 
     FileDialog {
         id: pickDialog
-        title: qsTr("Elegí las imágenes que querés comparar")
+        title: qsTr("Elige las imágenes que quieres comparar")
         fileMode: FileDialog.OpenFiles
         nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
         onAccepted: {

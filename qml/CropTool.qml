@@ -100,7 +100,7 @@ Item {
         spacing: 10
         visible: root.mode === "crop"
 
-        Label { text: qsTr("Recorte - arrastrá el rectángulo o sus bordes/esquinas sobre la imagen"); color: themeManager.textSecondary; wrapMode: Text.WordWrap; width: parent.width }
+        Label { text: qsTr("Recorte - arrastra el rectángulo o sus bordes/esquinas sobre la imagen"); color: themeManager.textSecondary; wrapMode: Text.WordWrap; width: parent.width }
         // Icon-only (the text becomes the hover tooltip): each frame
         // is drawn at its own proportions, so the shape says which ratio
         // it is.

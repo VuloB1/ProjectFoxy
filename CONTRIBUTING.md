@@ -37,7 +37,7 @@ ctest --preset windows-release        # they all have to pass
 
 ## Texts and translations
 
-The program's texts are written in **Spanish** (Rioplatense *voseo*: «elegí», «tocá», «arrastrá») and the Spanish text
+The program's texts are written in **Spanish** (neutral Spanish, addressing the user as *tú*: «elige», «toca», «arrastra») and the Spanish text
 is the key of the translations: `qsTr("…")` in QML, `core::tr("…")` in C++. The translations (English, Portuguese,
 Korean, Chinese, Japanese) are in [`i18n/strings.tsv`](i18n/strings.tsv), one row per text.
 
@@ -88,7 +88,7 @@ ctest --preset windows-release        # tienen que pasar todas
 
 - C++20, `src/core` **sin** dependencias de QML (se prueba de forma aislada); la capa QML solo habla con `src/app`.
 - Imita lo que hay alrededor: nombres, comentarios (en inglés en el código, explicando el *porqué*), nivel de detalle.
-- Los textos de la interfaz se escriben **en español** (voseo rioplatense: «elegí», «tocá», «arrastrá») dentro de `qsTr(...)` /
+- Los textos de la interfaz se escriben **en español** (español neutro, tuteando: «elige», «toca», «arrastra») dentro de `qsTr(...)` /
   `core::tr(...)`, y después se traducen en [`i18n/strings.tsv`](i18n/strings.tsv) (ver `python tools/i18n_tool.py check`).
 - Toda función nueva lleva pruebas (`tests/`, QtTest). Un error corregido lleva una prueba que antes fallaba.
 - Los efectos de imagen miden las distancias como **porcentaje** de la imagen (nunca píxeles), para que la vista previa y
