@@ -1,6 +1,6 @@
 import QtQuick
 
-// The viewer's sharpening (StatusBar.qml's button): FidelityFX CAS (Cas.frag) used as the `layer.effect` of whatever
+// The reader's sharpening (StatusBar.qml's button, shown while a book is open): FidelityFX CAS (Cas.frag) used as the `layer.effect` of whatever
 // shows the picture, so it works on the pixels that are really on the screen. `strength` is the 0..100 % setting.
 // Sits at 0 (and costs nothing: the layer is not even made) while the setting is off.
 ShaderEffect {

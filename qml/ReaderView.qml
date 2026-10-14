@@ -94,7 +94,7 @@ FocusScope {
         contentWidth: Math.max(root.spreadW, width)
         bottomMargin: root.bottomInset
         contentHeight: Math.max(root.spreadH, root.viewH)
-        // The viewer's sharpening (the button in the bottom bar) works on the pages too.
+        // The sharpening (the button in the bottom bar, shown while reading): on the pages as they are drawn.
         layer.enabled: appSettings.viewSharpen > 0
         layer.effect: CasEffect {}
 

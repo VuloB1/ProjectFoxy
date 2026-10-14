@@ -122,7 +122,7 @@ Item {
     AppToolButton {
         id: sharpenButton
         objectName: "sharpenButton"
-        visible: root.dockVisible
+        visible: mangaReader.active // the sharpening is for reading: the viewer keeps the picture as it is
         anchors.right: infoButton.visible ? infoButton.left : parent.right
         anchors.rightMargin: infoButton.visible ? 2 : 6
         anchors.verticalCenter: parent.verticalCenter
@@ -138,7 +138,7 @@ Item {
         onClicked: sharpenPopup.opened ? sharpenPopup.close() : sharpenPopup.open()
     }
     Label {
-        anchors.right: sharpenButton.left
+        anchors.right: infoButton.left
         anchors.rightMargin: 6
         anchors.verticalCenter: parent.verticalCenter
         color: themeManager.textSecondary

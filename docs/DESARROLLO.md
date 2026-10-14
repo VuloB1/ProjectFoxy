@@ -1595,8 +1595,8 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
 - **Tamaño › «Mejorar nitidez al ampliar»** (`Resample.cpp`, `casBand`): sustituye al enfoque de luminancia ajustado a mano; la
   fuerza sube con la ampliación (0,5–1) y el resultado se limita al rango del 3×3 para no dejar halos (lo exige
   `enlargingBeatsPlainStretchingAndDoesNotRing`).
-- **Nitidez de la vista** (botón de la barra inferior, `AppSettings::viewSharpen`, `view/sharpen`): `qml/shaders/Cas.frag` aplicado
-  como `layer.effect` (`qml/CasEffect.qml`) del `Flickable` del lienzo y del lector, es decir, **sobre los píxeles de pantalla** al
+- **Nitidez de la vista** (botón de la barra inferior, solo con el lector abierto; `AppSettings::viewSharpen`, `view/sharpen`):
+  `qml/shaders/Cas.frag` aplicado como `layer.effect` (`qml/CasEffect.qml`) del `Flickable` del lector, es decir, **sobre los píxeles de pantalla** al
   zoom actual, no sobre los de la imagen; no toca el archivo ni la pila de edición. Con 0 % la capa ni se crea.
 - **Pruebas:** `test_cas` (4: apagado/plano/negro, más contraste con más fuerza, siempre en 0..1 y sin NaN, sin hueco no añade).
   **No probado:** el rendimiento con ventanas 4K y el menú con los temas Classic.

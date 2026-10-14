@@ -724,9 +724,6 @@ Rectangle {
         anchors.fill: parent
         contentWidth: Math.max(width, image.width * image.scale)
         contentHeight: Math.max(root.viewHeight, image.height * image.scale)
-        // The viewer's sharpening (the button in the bottom bar): on what is drawn, at the zoom it is drawn at.
-        layer.enabled: appSettings.viewSharpen > 0
-        layer.effect: CasEffect {}
         bottomMargin: root.bottomInset // the content may be scrolled up out of the dock's way
         boundsBehavior: Flickable.StopAtBounds
         clip: true

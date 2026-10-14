@@ -32,8 +32,8 @@ class AppSettings : public QObject {
     // The language of the interface: "system" (follows Windows) or es / en / pt / ko / zh / ja.
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
     Q_PROPERTY(bool smoothZoom READ smoothZoom WRITE setSmoothZoom NOTIFY smoothZoomChanged)
-    // The viewer's own sharpening (the button at the bottom right of the window): FidelityFX CAS applied to what is
-    // on screen, 0..100 %, 0 = off. It changes how the picture looks, never the file.
+    // The comic reader's sharpening (the button at the bottom right of the window while reading): FidelityFX CAS
+    // applied to what is on screen, 0..100 %, 0 = off. It changes how the page looks, never the file.
     Q_PROPERTY(int viewSharpen READ viewSharpen WRITE setViewSharpen NOTIFY viewSharpenChanged)
     Q_PROPERTY(bool pixelMode READ pixelMode WRITE setPixelMode NOTIFY pixelModeChanged)
     Q_PROPERTY(bool pixelIntegerZoom READ pixelIntegerZoom WRITE setPixelIntegerZoom NOTIFY pixelIntegerZoomChanged)

@@ -18,8 +18,8 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   contrast, so it adds crispness where there is room for it and leaves flat areas and noise alone, with far fewer
   halos than the old unsharp mask. It replaces the *Sharpness* slider of Adjustments (same preview and saved file) and
   the sharpening after enlarging a picture in *Size*. New button at the bottom right of the window (a small triangle,
-  lit while it is on): a menu with a 0-100 % bar that sharpens what you see on screen, in the viewer and in the comic
-  reader. 0 % is off; it never changes the file. Remembered between runs.
+  lit while it is on): a menu with a 0-100 % bar that sharpens what you see on screen while you read a comic or manga (the button
+  appears only then). 0 % is off; it never changes the file. Remembered between runs.
 
 ## [0.2.8] — The title bar is the toolbar
 
@@ -172,8 +172,8 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   local, así que aporta nitidez donde hay margen y deja en paz las zonas planas y el ruido, con muchos menos halos que
   la máscara de enfoque de antes. Sustituye al control *Nitidez* de Ajustes (misma vista previa y mismo archivo
   guardado) y al enfoque tras ampliar una imagen en *Tamaño*. Botón nuevo abajo a la derecha de la ventana (un
-  triángulo pequeño, encendido mientras está activa): un menú con una barra de 0 a 100 % que afila lo que ves en pantalla,
-  en el visor y en el lector de cómics. 0 % es apagado; nunca cambia el archivo. Se recuerda entre sesiones.
+  triángulo pequeño, encendido mientras está activa): un menú con una barra de 0 a 100 % que afila lo que ves en pantalla
+  mientras lees un cómic o manga (el botón solo aparece entonces). 0 % es apagado; nunca cambia el archivo. Se recuerda entre sesiones.
 
 ## [0.2.8] — La barra de título es la barra de herramientas
 
