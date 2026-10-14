@@ -53,6 +53,8 @@ if(NOT PKG_CONFIG_EXECUTABLE AND DEFINED VCPKG_INSTALLED_DIR)
 endif()
 
 find_package(PkgConfig REQUIRED)
+# The comic reader unpacks .cbz files itself (src/core/ZipArchive.cpp).
+find_package(ZLIB REQUIRED)
 pkg_check_modules(VIPS REQUIRED IMPORTED_TARGET vips-cpp)
 # libraw_r (not plain libraw): the reentrant/thread-safe build, matching
 # IImageDecoder's "must be safe to call from a worker thread" contract -
@@ -127,6 +129,8 @@ add_library(imageviewer_app STATIC
     src/app/BatchExporter.cpp
     src/app/LensController.h
     src/app/LensController.cpp
+    src/app/MangaReader.h
+    src/app/MangaReader.cpp
     src/app/PaneImageProvider.h
     src/app/PaneImageProvider.cpp
     src/app/AnimStudio.h
@@ -252,6 +256,7 @@ set(IV_QML_FILES
         qml/FramePanel.qml
         qml/PaneView.qml
         qml/MultiView.qml
+        qml/ReaderView.qml
         qml/GifStudio.qml
         qml/CollageMaker.qml
         qml/FrameCornerPicker.qml

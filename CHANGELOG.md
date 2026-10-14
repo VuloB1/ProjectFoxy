@@ -3,6 +3,18 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased]
+
+- **Comic and manga reader.** Open a `.cbz` (or `.zip`) file like any picture, or press the new book button in the
+  title bar to read the folder of the picture you have open. Pages are read right to left by default (the manga way) or
+  left to right, one at a time or two side by side, with the cover standing alone and landscape pages (already a spread)
+  shown by themselves. Left and right (or the click zones at both sides) turn the page, the wheel scrolls what does not
+  fit and then turns it, and a floating bar has a page slider and the switches for direction, double page, cover and
+  fit (screen, height or width). The book remembers the page you were on. Keys: **D** double page, **R** direction,
+  **C** cover alone, **1 2 3** fit, **Home/End** first/last page, **Esc** closes it. Next and previous pages are
+  unpacked and decoded ahead, so turning the page does not wait. First version: CBZ and folders (RAR, 7z and PDF
+  later).
+
 ## [0.2.8] — The title bar is the toolbar
 
 - The toolbar is now part of the title bar: the file name and the tools (Edit, Animated GIF, Collage, Compare, More tools,
@@ -138,6 +150,18 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar]
+
+- **Lector de cómics y manga.** Abre un archivo `.cbz` (o `.zip`) como cualquier imagen, o pulsa el nuevo botón del libro
+  en la barra de título para leer la carpeta de la imagen que tienes abierta. Las páginas se leen de derecha a izquierda
+  por defecto (como el manga) o de izquierda a derecha, de una en una o de dos en dos, con la portada sola y las
+  páginas apaisadas (que ya son una doble) a solas. Izquierda y derecha (o las zonas de clic de los lados) pasan la
+  página, la rueda desplaza lo que no cabe y luego la pasa, y una barra flotante trae el deslizador de páginas y los
+  interruptores de dirección, página doble, portada y ajuste (pantalla, alto o ancho). El libro recuerda la página en
+  que te quedaste. Teclas: **D** página doble, **R** dirección, **C** portada sola, **1 2 3** ajuste, **Inicio/Fin**
+  primera y última página, **Esc** lo cierra. Las páginas siguientes y la anterior se descomprimen y decodifican por
+  adelantado, así que pasar de página no espera. Primera versión: CBZ y carpetas (RAR, 7z y PDF después).
 
 ## [0.2.8] — La barra de título es la barra de herramientas
 

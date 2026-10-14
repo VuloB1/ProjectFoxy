@@ -422,6 +422,39 @@ Canvas {
             for (const y of [6.5, 10.5, 14.5, 18])
                 ctx.fillRect(5.1, y - 0.9, 1.8, 1.8), ctx.fillRect(17.1, y - 0.9, 1.8, 1.8);
             break;
+        case "book":
+            // An open book (the comic / manga reader).
+            ctx.beginPath(); ctx.moveTo(12, 6.5);
+            ctx.bezierCurveTo(9.5, 4.6, 6, 4.4, 3, 5.2); ctx.lineTo(3, 18.4);
+            ctx.bezierCurveTo(6, 17.6, 9.5, 17.8, 12, 19.7);
+            ctx.bezierCurveTo(14.5, 17.8, 18, 17.6, 21, 18.4); ctx.lineTo(21, 5.2);
+            ctx.bezierCurveTo(18, 4.4, 14.5, 4.6, 12, 6.5); ctx.lineTo(12, 19.7); ctx.stroke();
+            break;
+        case "page":
+            // A single page.
+            ctx.beginPath(); ctx.roundedRect(6, 3, 12, 18, 1.8, 1.8); ctx.stroke();
+            break;
+        case "fit-height":
+            // A page between two lines, top and bottom: it is as tall as the view.
+            ctx.beginPath(); ctx.moveTo(4, 3.5); ctx.lineTo(20, 3.5); ctx.moveTo(4, 20.5); ctx.lineTo(20, 20.5); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(8, 6.5, 8, 11, 1.4, 1.4); ctx.stroke();
+            break;
+        case "fit-width":
+            // A page between two lines, left and right: it is as wide as the view.
+            ctx.beginPath(); ctx.moveTo(3.5, 4); ctx.lineTo(3.5, 20); ctx.moveTo(20.5, 4); ctx.lineTo(20.5, 20); ctx.stroke();
+            ctx.beginPath(); ctx.roundedRect(6.5, 8, 11, 8, 1.4, 1.4); ctx.stroke();
+            break;
+        case "dir-rtl":
+        case "dir-ltr": {
+            // An arrow along the line of reading.
+            const toLeft = root.name === "dir-rtl";
+            ctx.beginPath(); ctx.moveTo(4, 12); ctx.lineTo(20, 12); ctx.stroke();
+            ctx.beginPath();
+            if (toLeft) { ctx.moveTo(10, 6); ctx.lineTo(4, 12); ctx.lineTo(10, 18); }
+            else { ctx.moveTo(14, 6); ctx.lineTo(20, 12); ctx.lineTo(14, 18); }
+            ctx.stroke();
+            break;
+        }
         case "multi":
             // Two pictures side by side (the "Varias imágenes" view).
             ctx.beginPath(); ctx.roundedRect(3, 5, 8, 14, 1.8, 1.8); ctx.stroke();

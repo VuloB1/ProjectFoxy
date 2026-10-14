@@ -9,11 +9,15 @@ import ImageViewerApp
 Item {
     id: root
 
+    // The file chosen in "Leer un cómic o manga"; Main.qml opens the reader on it.
+    signal readChosen(string file)
+
     function requestOpen() { openDialog.open() }
     function requestDelete() { deleteConfirmDialog.open() }
     function openSettings() { settingsDialog.open() }
     function openBatchExport() { batchExportDialog.open() }
     function openBatchRename() { batchRenameDialog.open() }
+    function requestReadComic() { readDialog.open() }
 
     SettingsDialog {
         id: settingsDialog
@@ -36,7 +40,15 @@ Item {
     FileDialog {
         id: openDialog
         title: qsTr("Abrir imagen")
-        nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
+        nameFilters: [qsTr("Imágenes y cómics (%1)").arg(appController.supportedExtensions.concat(["*.cbz", "*.zip"]).join(" "))]
         onAccepted: appController.openFile(selectedFile)
+    }
+
+    // "Leer": a comic file (.cbz) or any picture of a folder to read that folder as a book.
+    FileDialog {
+        id: readDialog
+        title: qsTr("Leer un cómic o manga")
+        nameFilters: [qsTr("Cómics (%1)").arg("*.cbz *.zip"), qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
+        onAccepted: root.readChosen(selectedFile)
     }
 }

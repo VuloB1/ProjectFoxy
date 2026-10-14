@@ -1545,3 +1545,36 @@ comando (`src/app/DevServer.cpp`); el cliente es `tools/devctl.py`:
 
 No sustituye a lo que depende del sistema (ajuste a los bordes, DWM, redimensionado nativo), que sigue pidiendo ratón
 y pantalla reales. Los estudios se cargan bajo demanda: `gifStudio` solo existe mientras está abierto.
+
+## 23. Lector de cómics y manga (14‑oct‑2026)
+
+Fase 1: leer `.cbz`/`.zip` y carpetas de imágenes como un libro. **No** pasa por el visor ni por el editor: es un modo
+aparte (`qml/ReaderView.qml`, un `Loader` en `Main.qml` por encima del lienzo y de los estudios, `z: 7`), así que no toca
+la pila de edición ni el documento abierto.
+
+- **`core/ZipArchive`**: lector de ZIP propio (directorio central, ZIP64, nombres UTF‑8/Latin‑1, entradas guardadas y
+  *deflate* con zlib). No usa `QZipReader` (API privada de Qt) para no depender de que el SDK de Flatpak la incluya;
+  zlib ya viene con las dependencias de libvips. Sin contraseña, sin otros métodos.
+- **`core/ComicBook`**: la lista de páginas (carpeta o archivo, orden natural, sin `__MACOSX` ni ocultos) y, para un
+  archivo, **desempaqueta cada página a un fichero** en `cacheDir()/comics/<uuid>/NNNNN.ext` la primera vez que se
+  pide. Así los decodificadores de siempre (libvips, color, orientación) leen la página como cualquier imagen y no hay
+  un segundo camino de decodificación. `close()` borra esa carpeta; al arrancar se borra lo que dejó una caída.
+- **`core/ImageHeader.h`**: tamaño de PNG/JPEG/WebP a partir de los primeros bytes. **`core/SpreadLayout.h`**: función
+  pura que da las «dobles» (portada sola opcional, las páginas apaisadas van solas y el emparejado se reanuda tras ellas).
+- **`app/MangaReader`** (contexto QML `mangaReader`): posición, dirección (derecha a izquierda por defecto), página doble,
+  portada sola y ajuste (pantalla/alto/ancho), todo recordado en `settings.ini` (`reader/*`) y la página de cada libro
+  (`reader/pos/<sha1 de la ruta>`, 200 libros). La forma de cada página se lee **en segundo plano** (solo si la página
+  doble está activa) y la maquetación se rehace cuando llegan; `m_page` es la página **pedida**, no la primera de su
+  doble, para que al moverse los pares el lector siga en la página que se pidió. Las imágenes las sirve el proveedor
+  `image://pane/` del comparador, con `pageSide` fijado por la vista; el lector precarga las dobles siguientes y la
+  anterior con ese mismo tamaño.
+- **Entrada**: `AppController::loadPath` desvía los `.cbz`/`.zip` a la señal `comicRequested` (Abrir, soltar, «Abrir
+  con», línea de comandos); el botón del libro (`readButton`, cuarta herramienta opcional de la barra de título) lee la
+  carpeta de la imagen abierta; el instalador registra `.cbz` y el `.desktop` su tipo MIME.
+- **Pruebas:** `test_comic_book` (8: tamaños de cabecera, dobles, `.cbz` hecho a mano con entradas guardadas y
+  comprimidas, carpeta, errores) y `theReaderTurnsPagesInTheDirectionOfReading` en `test_ui_flows`.
+- **Pendiente (fases 2 y 3):** modo *webtoon* continuo, página doble con corrección manual por página, lupa, recorte de
+  márgenes, capítulo siguiente al llegar al final, pantalla completa, RAR/7z/PDF (libarchive; la licencia del RAR
+  exige revisar `docs/LICENCIAS.md`), biblioteca con portadas y `ComicInfo.xml`. **No probado:** Flatpak/AppImage,
+  `.cbz` de varios GB (el soporte ZIP64 está escrito pero ninguna prueba lo ejercita), páginas AVIF/TIFF sin forma conocida.
+

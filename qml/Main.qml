@@ -67,6 +67,18 @@ ApplicationWindow {
         }
         root.editMode = on;
     }
+    // The reading button: the folder of the picture that is open (from that picture), or a file to choose.
+    function readCurrentFolder() {
+        if (mangaReader.active) {
+            mangaReader.close();
+            return;
+        }
+        const paths = folderModel.count > 0 ? folderModel.filePaths() : [];
+        if (paths.length > 0 && folderModel.currentIndex >= 0)
+            root.readBook(paths[folderModel.currentIndex]);
+        else
+            toolbar.requestReadComic();
+    }
     function requestSaveAs() {
         if (editLoader.item)
             editLoader.item.requestSaveAs();
@@ -111,7 +123,7 @@ ApplicationWindow {
 
 
     // The title bar is also the toolbar (TitleBar.qml); Toolbar.qml only owns the dialogs its buttons open.
-    Toolbar { id: toolbar }
+    Toolbar { id: toolbar; onReadChosen: function (file) { root.readBook(file) } }
 
     TitleBar {
         id: titleBar
@@ -122,6 +134,8 @@ ApplicationWindow {
         locked: root.toolLocked
         multiMode: root.multiMode
         studio: root.studio
+        reading: mangaReader.active
+        onReadRequested: root.readCurrentFolder()
         onEditModeRequested: function (on) { root.setEditMode(on) }
         onMultiModeRequested: function (on) { root.setMultiMode(on) }
         onStudioRequested: function (name) { root.requestStudio(name) }
@@ -207,6 +221,42 @@ ApplicationWindow {
         anchors.bottom: statusBar.top
         z: 6
         sourceComponent: root.studio === "gif" ? gifStudioComponent : collageComponent
+    }
+
+    // The comic / manga reader (ReaderView.qml) takes the whole window below the title bar while a book is open.
+    Loader {
+        id: readerLoader
+        active: mangaReader.active
+        anchors.top: titleBar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        z: 7
+        sourceComponent: ReaderView { onCloseRequested: mangaReader.close() }
+        onLoaded: item.forceActiveFocus()
+    }
+    // A .cbz opened like any other file (Abrir, drag and drop, "Open with") is read, not shown.
+    Connections {
+        target: appController
+        function onComicRequested(path) { root.readBook(path) }
+    }
+    function readBook(path) {
+        if (root.toolLocked)
+            return;
+        root.setEditMode(false);
+        root.setMultiMode(false);
+        root.setStudio("");
+        if (!mangaReader.open(path))
+            readerErrorDialog.open();
+    }
+    ConfirmDialog {
+        id: readerErrorDialog
+        symbol: "info"
+        danger: true
+        heading: qsTr("No se pudo abrir para leer")
+        message: mangaReader.error
+        cancelText: qsTr("Cerrar")
+        confirmText: qsTr("Aceptar")
     }
 
     Loader {
@@ -310,9 +360,9 @@ ApplicationWindow {
         }
     }
 
-    Shortcut { sequence: StandardKey.MoveToPreviousChar; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: folderModel.previous() }
-    Shortcut { sequence: StandardKey.MoveToNextChar; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: folderModel.next() }
-    Shortcut { sequences: [StandardKey.Open]; enabled: !root.toolLocked && !root.multiMode && root.studio === ""; onActivated: toolbar.requestOpen() }
+    Shortcut { sequence: StandardKey.MoveToPreviousChar; enabled: !root.toolLocked && !root.multiMode && root.studio === "" && !mangaReader.active; onActivated: folderModel.previous() }
+    Shortcut { sequence: StandardKey.MoveToNextChar; enabled: !root.toolLocked && !root.multiMode && root.studio === "" && !mangaReader.active; onActivated: folderModel.next() }
+    Shortcut { sequences: [StandardKey.Open]; enabled: !root.toolLocked && !root.multiMode && root.studio === "" && !mangaReader.active; onActivated: toolbar.requestOpen() }
     // Disabled while editing (so it doesn't replace the image mid-edit) and
     // while a text field has focus (so Ctrl+V pastes text there as normal,
     // e.g. the batch rename/export dialogs) - "cursorPosition" is a cheap
@@ -322,7 +372,7 @@ ApplicationWindow {
     // only the first of them.
     Shortcut {
         sequences: [StandardKey.Paste]
-        enabled: !root.editMode && !(root.activeFocusItem && "cursorPosition" in root.activeFocusItem)
+        enabled: !root.editMode && !mangaReader.active && !(root.activeFocusItem && "cursorPosition" in root.activeFocusItem)
         onActivated: appController.pasteFromClipboard()
     }
 }

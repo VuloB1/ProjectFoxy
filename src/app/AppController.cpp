@@ -3,6 +3,7 @@
 #include "LookModel.h"
 #include "ImageProvider.h"
 #include "FolderModel.h"
+#include "ComicBook.h"
 #include "DecoderRegistry.h"
 #include "ImageWriter.h"
 #include "Histogram.h"
@@ -141,6 +142,12 @@ void AppController::openPath(const QString &filePath)
 
 void AppController::loadPath(const QString &path)
 {
+    // A comic is read, not shown: the picture that is open stays as it is, edits included.
+    if (core::ComicBook::isArchivePath(path)) {
+        emit comicRequested(path);
+        return;
+    }
+
     // A save is still writing this picture's file: wait for it, then go (the picture is
     // clean by then unless it was edited meanwhile, and the usual question follows).
     if (m_save.saving()) {

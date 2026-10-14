@@ -107,6 +107,7 @@ Root: HKA; Subkey: "Software\Classes\.bmp\OpenWithProgids"; ValueType: string; V
 Root: HKA; Subkey: "Software\Classes\.gif\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.ico\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.heic\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
+Root: HKA; Subkey: "Software\Classes\.cbz\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.heif\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.avif\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.cr2\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
@@ -133,6 +134,7 @@ Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueTy
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".gif"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".ico"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".heic"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
+Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".cbz"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".heif"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".avif"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".cr2"; ValueData: "ProjectFoxy.Image"; Tasks: assoc

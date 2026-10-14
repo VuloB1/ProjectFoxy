@@ -1,6 +1,12 @@
 add_library(imageviewer_core STATIC
     ImageDocument.h
     ImageDocument.cpp
+    ZipArchive.h
+    ZipArchive.cpp
+    ComicBook.h
+    ComicBook.cpp
+    ImageHeader.h
+    SpreadLayout.h
     ImageLoader.h
     ImageLoader.cpp
     DecoderRegistry.h
@@ -78,6 +84,7 @@ endif()
 target_link_libraries(imageviewer_core PUBLIC
     Qt6::Core
     Qt6::Gui
+    ZLIB::ZLIB
     PkgConfig::VIPS
     PkgConfig::LIBRAW
     PkgConfig::LIBHEIF
