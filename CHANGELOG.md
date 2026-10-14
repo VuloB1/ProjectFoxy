@@ -3,7 +3,7 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
-## [Unreleased]
+## [0.2.8] — The title bar is the toolbar
 
 - The toolbar is now part of the title bar: the file name and the tools (Edit, Animated GIF, Collage, Compare, More tools,
   Settings) sit next to the window buttons, and everything that is not a button is still grab-and-drag space. As the
@@ -139,7 +139,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Sin publicar]
+## [0.2.8] — La barra de título es la barra de herramientas
 
 - La barra de herramientas pasa a formar parte de la barra de título: el nombre del archivo y las herramientas (Editar,
   GIF animado, Collage, Comparar, Más herramientas, Configuración) quedan junto a los botones de la ventana, y todo lo
