@@ -22,19 +22,38 @@ English · [Español](#español)
 ---
 
 <p align="center">
-  <img src="docs/screenshots/visor.png" alt="The viewer, with the thumbnail bar" width="49%">
-  <img src="docs/screenshots/editor-efectos.png" alt="The editor: light effects" width="49%">
+  <img src="docs/screenshots/visor.webp" alt="The viewer, with the thumbnail bar" width="49%">
+  <img src="docs/screenshots/editar.webp" alt="The editor: every tool one click away" width="49%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/editor-leyenda.png" alt="Meme caption" width="32%">
-  <img src="docs/screenshots/gif.png" alt="Animated GIF maker" width="32%">
-  <img src="docs/screenshots/collage.png" alt="Collage" width="32%">
+  <img src="docs/screenshots/ajustes.webp" alt="Adjustments: sliders, levels, curves and histogram" width="32%">
+  <img src="docs/screenshots/filtros.webp" alt="Filters: looks previewed on your own photo" width="32%">
+  <img src="docs/screenshots/efectos.webp" alt="Effects, with a preview over the whole image" width="32%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/gif.webp" alt="Animated GIF maker" width="32%">
+  <img src="docs/screenshots/collage.webp" alt="Collage maker" width="32%">
+  <img src="docs/screenshots/comparador.webp" alt="Compare view with linked zoom" width="32%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/recortar.webp" alt="Crop, rotate and straighten" width="32%">
+  <img src="docs/screenshots/lente.webp" alt="Lens correction" width="32%">
+  <img src="docs/screenshots/temas.webp" alt="Settings and the Classic theme" width="32%">
 </p>
 
 Open any photo instantly (JPEG, PNG, WebP, TIFF, HEIC, AVIF, camera RAW, animated GIFs…), browse its folder, and when
 you want to touch it up there is a **complete editor**, an **animated GIF/APNG/WebP maker**, an **unlimited
 collage maker**, a **compare view** for up to 10 images with linked zoom, and more. The interface speaks **six
 languages** and comes with four themes: *Modern Light*, *Modern Dark* and two *Classic* ones (Windows 98 style).
+
+### The window
+
+The title bar is also the toolbar: the file name, **Edit**, **Animated GIF**, **Collage**, **Compare**, **More tools**
+(batch export and rename) and **Settings** live in it, and everything that is not a button drags the window. As the
+window gets narrower the tools tuck into the **⋯** menu one by one, but Edit and Settings always stay in sight and the
+file name never takes more than half of the bar, so there is always room to grab and move the window. The floating dock
+at the bottom (open, previous/next, zoom, rotate) gives way to the picture: it opens above the dock, and zoomed in it
+runs on behind the sides.
 
 ## Download
 
@@ -127,7 +146,7 @@ does not match the file" (also after Save and Undo).
 | Filters | 38 "looks" with thumbnails of your own photo, amount, vignette and grain |
 | Effects | 43 effects in 7 groups (blur, style, color, drawing, light, distortion and finish: black and white, haze removal, cellophane, print halftone, lines, flares, bokeh, stretch, perspective…) with a preview over the whole image, their own sliders, presets and mix; "Apply" makes them an undoable step |
 | Lens | Fixes the distortion, color fringes and dark corners of your lens with the Lensfun profile database (it recognizes the camera and lens from the EXIF), or by hand |
-| Create (top bar) | **Animated GIF** (images with their own duration, effect and text, transitions, GIF/APNG/WebP) and **Collage** (1 to 12 photos, adjustable divider lines or free layout, photos that move and zoom without limits inside their cell, your own saved templates) |
+| Create (title bar) | **Animated GIF** (images with their own duration, effect and text, transitions, GIF/APNG/WebP) and **Collage** (1 to 12 photos, adjustable divider lines or free layout, photos that move and zoom without limits inside their cell, your own saved templates) |
 
 The Adjustments and Filters preview is computed on the GPU and the saved file is generated on the CPU with the same
 math, **also with semi-transparent images**; an automatic test (`test_gpu_parity`) compares them with Direct3D 11 (see
@@ -245,19 +264,38 @@ Bugs and ideas are welcome: open an *issue* (there are templates) or read [`CONT
 </div>
 
 <p align="center">
-  <img src="docs/screenshots/es/visor.png" alt="El visor, con la barra de miniaturas" width="49%">
-  <img src="docs/screenshots/es/editor-efectos.png" alt="El editor: efectos de luz" width="49%">
+  <img src="docs/screenshots/es/visor.webp" alt="El visor, con la barra de miniaturas" width="49%">
+  <img src="docs/screenshots/es/editar.webp" alt="El editor: cada herramienta a un clic" width="49%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/es/editor-leyenda.png" alt="Leyenda de meme" width="32%">
-  <img src="docs/screenshots/es/gif.png" alt="Creador de GIF animado" width="32%">
-  <img src="docs/screenshots/es/collage.png" alt="Collage" width="32%">
+  <img src="docs/screenshots/es/ajustes.webp" alt="Ajustes: controles, niveles, curvas e histograma" width="32%">
+  <img src="docs/screenshots/es/filtros.webp" alt="Filtros: «looks» con la vista previa de tu propia foto" width="32%">
+  <img src="docs/screenshots/es/efectos.webp" alt="Efectos, con vista previa sobre toda la imagen" width="32%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/es/gif.webp" alt="Creador de GIF animado" width="32%">
+  <img src="docs/screenshots/es/collage.webp" alt="Creador de collage" width="32%">
+  <img src="docs/screenshots/es/comparador.webp" alt="Comparador con zoom vinculado" width="32%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/es/recortar.webp" alt="Recortar, girar y enderezar" width="32%">
+  <img src="docs/screenshots/es/lente.webp" alt="Corrección de lente" width="32%">
+  <img src="docs/screenshots/es/temas.webp" alt="Configuración y el tema Classic" width="32%">
 </p>
 
 Abre cualquier foto al instante (JPEG, PNG, WebP, TIFF, HEIC, AVIF, RAW de cámara, GIF animados…), la recorre con
 su carpeta, y cuando quieres tocarla trae un **editor completo**, un **creador de GIF/APNG/WebP animados**, un
 **collage sin límites**, un **comparador** de hasta 10 imágenes con zoom vinculado y más. La interfaz está en **seis idiomas** y trae cuatro temas: *Moderno Claro*, *Moderno Oscuro* y dos *Classic*
 (estilo Windows 98).
+
+### La ventana
+
+La barra de título es también la barra de herramientas: el nombre del archivo, **Editar**, **GIF animado**, **Collage**,
+**Comparar**, **Más herramientas** (exportar y renombrar por lote) y **Configuración** están en ella, y todo lo que no
+es un botón sirve para arrastrar la ventana. Al estrechar la ventana las herramientas pasan una a una al menú **⋯**,
+pero Editar y Configuración siempre quedan a la vista y el nombre del archivo nunca ocupa más de la mitad de la barra,
+así que siempre hay sitio para agarrar y mover la ventana. El dock flotante de abajo (abrir, anterior/siguiente, zoom,
+girar) le cede el sitio a la imagen: se abre por encima del dock y, con zoom, pasa por detrás de sus lados.
 
 ## Descargar
 
@@ -354,7 +392,7 @@ tras Guardar y Deshacer).
 | Filtros | 38 "looks" con miniaturas de la propia foto, cantidad, viñeta y grano |
 | Efectos | 43 efectos en 7 grupos (desenfoque, estilo, color, dibujo, luz, distorsión y acabado: blanco y negro, borrar niebla, celofán, semitono de imprenta, líneas, destellos, bokeh, estirar, perspectiva…) con vista previa en toda la imagen, sliders propios, preajustes y mezcla; "Aplicar" los deja como un paso deshacible |
 | Lente | Corrige la distorsión, las franjas de color y las esquinas oscuras de tu objetivo con la base de perfiles de Lensfun (reconoce la cámara y el objetivo por el EXIF), o a mano |
-| Crear (barra superior) | **GIF animado** (imágenes con duración, efecto y texto propios, transiciones, GIF/APNG/WebP) y **Collage** (1 a 12 fotos, líneas divisorias ajustables o diseño libre, fotos que se mueven y se acercan sin límites dentro de su celda, plantillas propias guardables) |
+| Crear (barra de título) | **GIF animado** (imágenes con duración, efecto y texto propios, transiciones, GIF/APNG/WebP) y **Collage** (1 a 12 fotos, líneas divisorias ajustables o diseño libre, fotos que se mueven y se acercan sin límites dentro de su celda, plantillas propias guardables) |
 
 La vista previa de Ajustes y Filtros se calcula en la GPU y el archivo guardado
 se genera en CPU con la misma matemática, **también con imágenes semitransparentes**; una
