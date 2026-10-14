@@ -1503,6 +1503,14 @@ teclado sintéticos, con la plataforma `offscreen` de Qt y su renderizador por s
   `captionInteractive`) y `HTCAPTION` en el resto. La ventana lleva `WS_CAPTION` (sin él Windows no anima minimizar y
   restaurar desde la barra de tareas); maximizada, `WM_NCCALCSIZE` pone el área de cliente igual al área de trabajo del
   monitor, porque con `WS_CAPTION` Windows deja el marco asomando 8 px por los bordes.
+- **El filtro nativo de `WindowsFrame.cpp` nunca escribe `*result` sin comprobarlo**: Qt pasa `result == nullptr` a los
+  mensajes que llegan por la cola del hilo (el `WM_NCLBUTTONUP` del botón de maximizar), y escribirlo cerraba el programa
+  (0.2.8). Todo pasa por `setResult`.
+- **La ventana recuerda su tamaño** (`window/x|y|width|height|maximized`, `AppSettings::windowRect/saveWindowState`): `main.cpp`
+  lo lee antes de crear la ventana, lo pasa por `fitWindowToScreens` (`WindowGeometry.h`: nunca más grande que la pantalla
+  donde cae ni fuera de ella; si esa pantalla ya no existe, centrada en la principal) y lo entrega con
+  `setInitialProperties`. Se guarda al salir; el rectángulo normal solo se anota con la ventana en estado normal y
+  quieta 200 ms, para que el tamaño maximizado nunca cuente.
 - **Trampas de `Canvas`** (aprendidas dos veces): el contexto 2D conserva su estado entre `onPaint`, hay que empezar con
   `ctx.reset()` (un `translate` acumulado deformaba la pestaña de la barra de miniaturas cada vez que se repintaba), y
   `canvasSize` debe seguir al tamaño del ítem o el dibujo se estira.

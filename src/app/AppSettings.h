@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QRect>
 #include <QSettings>
 
 // User-configurable defaults for the batch operations and the interface,
@@ -77,6 +78,12 @@ public:
     void setPixelCheckerboard(bool value);
     bool singleInstance() const { return m_singleInstance; }
     void setSingleInstance(bool value);
+    // Where the window was the last time (its normal, not maximised, rectangle; null when never saved) and whether it
+    // was maximised. Read once at startup and written when the program closes (main.cpp).
+    QRect windowRect() const;
+    bool windowMaximized() const { return m_windowMaximized; }
+    void saveWindowState(const QRect &normalRect, bool maximized);
+
     bool verticalSync() const { return m_verticalSync; }
     void setVerticalSync(bool value);
     // A grid between the picture's own pixels from 8x.
@@ -115,6 +122,7 @@ private:
 
     int m_batchExportQuality;
     int m_batchRenamePadding;
+    bool m_windowMaximized = false;
     bool m_confirmOverwrite;
     int m_stripThumbSize = 88;
     int m_stripColumns = 1;

@@ -3,6 +3,14 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased]
+
+- Windows: fixed a crash when clicking the maximise button (0.2.8). The program wrote to a null pointer that Windows
+  passes for that click.
+- The window now remembers its size, position and whether it was maximised, and opens the same way next time. If the
+  saved size is larger than the screen now connected (for example it was saved on a 1440p monitor and you open it on a
+  1080p one), it is brought down to fit, and it is never left off-screen.
+
 ## [0.2.8] — The title bar is the toolbar
 
 - The toolbar is now part of the title bar: the file name and the tools (Edit, Animated GIF, Collage, Compare, More tools,
@@ -138,6 +146,14 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar]
+
+- Windows: arreglado un cierre inesperado al hacer clic en el botón de maximizar (0.2.8). El programa escribía en un
+  puntero nulo que Windows entrega en ese clic.
+- La ventana recuerda su tamaño, su posición y si estaba maximizada, y se abre igual la próxima vez. Si el tamaño
+  guardado es mayor que la pantalla conectada ahora (por ejemplo, se guardó en un monitor de 1440p y la abres en uno de
+  1080p), se reduce para que quepa y nunca queda fuera de la pantalla.
 
 ## [0.2.8] — La barra de título es la barra de herramientas
 
