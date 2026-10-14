@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.2.8" date="2026-10-14">
+      <description>
+        <p>The toolbar is now part of the title bar: the file name and the tools sit next to the window buttons, and the tools fold into the "More tools" menu as the window narrows. On Windows, minimising and restoring from the taskbar animate again. Zoomed in, the picture also shows beside the bottom bar.</p>
+      </description>
+    </release>
     <release version="0.2.7" date="2026-10-14">
       <description>
         <p>The Spanish text of the interface is now neutral Spanish (addressing the user as "tú") instead of the Argentine voseo. The other languages are unchanged.</p>
