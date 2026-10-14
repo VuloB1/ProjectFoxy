@@ -50,6 +50,30 @@ Item {
         MouseArea { anchors.fill: parent; hoverEnabled: true; acceptedButtons: Qt.AllButtons }
     }
 
+    // ---- while a book is open: its name on the left and the page on the right (the picture's own numbers are not
+    // the ones that matter then)
+    Label {
+        visible: mangaReader.active
+        anchors.left: parent.left
+        anchors.leftMargin: 12
+        anchors.verticalCenter: parent.verticalCenter
+        width: Math.min(implicitWidth, Math.max(0, dock.x - 24))
+        elide: Text.ElideRight
+        color: themeManager.textSecondary
+        font.pixelSize: 12
+        text: mangaReader.title
+    }
+    Label {
+        visible: mangaReader.active
+        anchors.right: parent.right
+        anchors.rightMargin: 12
+        anchors.verticalCenter: parent.verticalCenter
+        color: themeManager.textSecondary
+        font.pixelSize: 12
+        text: (mangaReader.currentPage + 1) + (mangaReader.lastPage > mangaReader.currentPage ? "\u2013" + (mangaReader.lastPage + 1) : "")
+              + " / " + mangaReader.pageCount
+    }
+
     // ---- left: the pixel under the mouse
     readonly property var px: root.canvas && root.canvas.pixelHovering ? root.canvas.pixelInfo : ({ valid: false })
     Row {
@@ -81,6 +105,7 @@ Item {
     AppToolButton {
         id: infoButton
         objectName: "infoButton"
+        visible: !mangaReader.active
         anchors.right: parent.right
         anchors.rightMargin: 6
         anchors.verticalCenter: parent.verticalCenter
@@ -99,7 +124,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         color: themeManager.textSecondary
         font.pixelSize: 12
-        visible: appController.currentImageSize.width > 0 && root.canvas !== null
+        visible: appController.currentImageSize.width > 0 && root.canvas !== null && !mangaReader.active
         text: root.canvas ? appController.currentImageSize.width + " × " + appController.currentImageSize.height
                             + "   " + root.canvas.zoomPercent + "%" : ""
     }

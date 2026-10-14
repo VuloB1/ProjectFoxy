@@ -9,7 +9,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   title bar to read the folder of the picture you have open. Pages are read right to left by default (the manga way) or
   left to right, one at a time or two side by side, with the cover standing alone and landscape pages (already a spread)
   shown by themselves. Left and right (or the click zones at both sides) turn the page, the wheel scrolls what does not
-  fit and then turns it, and a floating bar has a page slider and the switches for direction, double page, cover and
+  fit and then turns it, and the dock of the bottom bar has a page slider and the switches for direction, double page, cover and
   fit (screen, height or width). The book remembers the page you were on. Keys: **D** double page, **R** direction,
   **C** cover alone, **1 2 3** fit, **Home/End** first/last page, **Esc** closes it. Next and previous pages are
   unpacked and decoded ahead, so turning the page does not wait. First version: CBZ and folders (RAR, 7z and PDF
@@ -157,7 +157,7 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   en la barra de título para leer la carpeta de la imagen que tienes abierta. Las páginas se leen de derecha a izquierda
   por defecto (como el manga) o de izquierda a derecha, de una en una o de dos en dos, con la portada sola y las
   páginas apaisadas (que ya son una doble) a solas. Izquierda y derecha (o las zonas de clic de los lados) pasan la
-  página, la rueda desplaza lo que no cabe y luego la pasa, y una barra flotante trae el deslizador de páginas y los
+  página, la rueda desplaza lo que no cabe y luego la pasa, y el dock de la barra inferior trae el deslizador de páginas y los
   interruptores de dirección, página doble, portada y ajuste (pantalla, alto o ancho). El libro recuerda la página en
   que te quedaste. Teclas: **D** página doble, **R** dirección, **C** portada sola, **1 2 3** ajuste, **Inicio/Fin**
   primera y última página, **Esc** lo cierra. Las páginas siguientes y la anterior se descomprimen y decodifican por

@@ -230,9 +230,12 @@ ApplicationWindow {
         anchors.top: titleBar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        z: 7
-        sourceComponent: ReaderView { onCloseRequested: mangaReader.close() }
+        anchors.bottom: statusBar.top
+        z: 3 // under the bottom bar, whose dock rises over the page
+        sourceComponent: ReaderView {
+            bottomInset: statusBar.rise
+            onCloseRequested: mangaReader.close()
+        }
         onLoaded: item.forceActiveFocus()
     }
     // A .cbz opened like any other file (Abrir, drag and drop, "Open with") is read, not shown.
@@ -284,7 +287,8 @@ ApplicationWindow {
         onSaveAsRequested: root.requestSaveAs()
         onCloseEditRequested: root.setEditMode(false)
         dockVisible: root.studio === ""
-        customDock: multiLoader.item ? multiLoader.item.dockContent : null
+        customDock: readerLoader.item ? readerLoader.item.dockContent
+                                      : (multiLoader.item ? multiLoader.item.dockContent : null)
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
