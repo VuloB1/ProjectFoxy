@@ -3,7 +3,9 @@
 #include <QAbstractNativeEventFilter>
 #include <QGuiApplication>
 #include <QPointer>
+#include <QTimer>
 #include <QQuickItem>
+#include <QQuickWindow>
 
 #include <windows.h>
 #include <windowsx.h>
@@ -218,6 +220,26 @@ void installWindowsFrame(QQuickWindow *window)
     const DWORD round = 2; // DWMWCP_ROUND
     if (!skip.contains("round"))
         DwmSetWindowAttribute(hwnd, 33 /* DWMWA_WINDOW_CORNER_PREFERENCE */, &round, sizeof round);
+    // Until the first frame is drawn Windows paints the window with the class background, white: paint it
+    // the theme's colour instead (the window's own colour is that, see Main.qml).
+    const QColor background = window->color();
+    SetClassLongPtrW(hwnd, GCLP_HBRBACKGROUND,
+                     reinterpret_cast<LONG_PTR>(CreateSolidBrush(RGB(background.red(), background.green(), background.blue()))));
+    // Keep the window out of sight (cloaked: it is still there and still renders) until its first frame has been
+    // drawn: before that Windows shows it white for a moment.
+    const BOOL cloak = TRUE;
+    DwmSetWindowAttribute(hwnd, 13 /* DWMWA_CLOAK */, &cloak, sizeof cloak);
+    auto reveal = [hwnd]() {
+        const BOOL off = FALSE;
+        DwmSetWindowAttribute(hwnd, 13 /* DWMWA_CLOAK */, &off, sizeof off);
+    };
+    auto *once = new QMetaObject::Connection;
+    *once = QObject::connect(window, &QQuickWindow::frameSwapped, window, [reveal, once]() {
+        QObject::disconnect(*once);
+        delete once;
+        reveal();
+    });
+    QTimer::singleShot(2000, window, reveal); // never leave it hidden if no frame ever comes
     const MARGINS thin = {1, 1, 1, 1};
     if (!skip.contains("dwm"))
         DwmExtendFrameIntoClientArea(hwnd, &thin);

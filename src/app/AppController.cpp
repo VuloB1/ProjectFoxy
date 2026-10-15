@@ -63,6 +63,8 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
     , m_effect([this]() { return structuralBaked(); })
 {
     connect(&m_save, &SaveCoordinator::finished, this, &AppController::finishSave);
+    // The folder strip learns where the open picture sits a moment after it has been opened.
+    connect(m_folderModel, &FolderModel::currentIndexChanged, this, &AppController::prefetchNeighbors);
     connect(&m_animation, &AnimationPlayback::frameChanged, this, &AppController::showAnimationFrame);
     connect(&m_animation, &AnimationPlayback::playingChanged, this, &AppController::animationPlayingChanged);
     connect(&m_wallpaper, &DesktopWallpaper::finished, this, &AppController::wallpaperResult);
@@ -81,6 +83,12 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
     connect(this, &AppController::isLoadingChanged, this, &AppController::canSaveInPlaceChanged);
     connect(this, &AppController::isSavingChanged, this, &AppController::canSaveInPlaceChanged);
 
+    connect(&m_loader, &core::ImageLoader::previewLoaded, this,
+            [this](const QString &requestId, core::ImageDocument preview) {
+                if (requestId == QLatin1String(kCurrentRequestId) && m_isLoading)
+                    showQuickPreview(preview);
+            });
+
     connect(&m_loader, &core::ImageLoader::loaded, this,
             [this](const QString &requestId, core::ImageDocument doc) {
                 if (requestId != QLatin1String(kCurrentRequestId))
@@ -92,6 +100,8 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
                 // from disk if they answer "save" or "discard").
                 if (currentRecipe() != m_loadStartRecipe && isDirty()) {
                     m_isLoading = false;
+                    if (m_previewShown)
+                        restoreAfterPreview();
                     m_save.blockOnUnsaved(PendingAction::OpenPath, doc.filePath);
                     if (!m_currentFilePath.isEmpty())
                         m_folderModel->openFolderForFileAsync(m_currentFilePath);
@@ -108,6 +118,8 @@ AppController::AppController(ImageProvider *provider, FolderModel *folderModel, 
                     return;
 
                 m_isLoading = false;
+                if (m_previewShown)
+                    restoreAfterPreview();
                 m_errorString = error;
                 emit isLoadingChanged();
                 emit errorStringChanged();
@@ -227,7 +239,7 @@ void AppController::applyNewDocument(const core::ImageDocument &doc)
     m_savedRecipe = currentRecipe(); // a freshly opened picture has nothing to lose
     m_liveCoalesceKey.clear();
 
-    m_provider->setImage(doc.pixels);
+    m_provider->setImage(doc.pixels, doc.displayProxy, core::kDisplayProxySide);
     m_provider->setOriginalImage(doc.pixels);
     m_currentImageSize = doc.sourceSize;
     m_metadata = buildMetadataDisplay(doc.metadata);
@@ -238,6 +250,7 @@ void AppController::applyNewDocument(const core::ImageDocument &doc)
                               {QStringLiteral("aperture"), doc.metadata.apertureF},
                               {QStringLiteral("distance"), doc.metadata.subjectDistanceM}};
     m_isLoading = false;
+    m_previewShown = false;
     m_errorString.clear();
 
     m_animation.setAnimation(doc.animationFrames, doc.animationDelaysMs); // stops the old animation first
@@ -263,6 +276,52 @@ void AppController::applyNewDocument(const core::ImageDocument &doc)
     emit adjustedHistogramChanged();
     emit animationPlayingChanged();
     emit newImageLoaded();
+    prefetchNeighbors();
+}
+
+void AppController::showQuickPreview(const core::ImageDocument &preview)
+{
+    // Only what is drawn changes: the document (file, edits, history) stays the open one until the whole picture is here.
+    m_provider->setImage(preview.pixels);
+    m_currentImageSize = preview.sourceSize; // the canvas lays out the real size, not the reduced texture's
+    ++m_revision;
+    m_currentSource = QStringLiteral("image://viewer/current?rev=%1").arg(m_revision);
+    m_previewShown = true;
+    emit currentImageSizeChanged();
+    emit currentSourceChanged();
+    emit structuralImageChanged();
+}
+
+void AppController::restoreAfterPreview()
+{
+    m_previewShown = false;
+    if (m_originalImage.isNull()) {
+        m_provider->setImage(QImage());
+        m_currentImageSize = QSize();
+        m_currentSource.clear();
+        emit currentImageSizeChanged();
+        emit currentSourceChanged();
+    } else {
+        republishBaked(true);
+    }
+}
+
+void AppController::prefetchNeighbors()
+{
+    // Not while the picture that was asked for is still being decoded: that one goes first.
+    if (m_isLoading || m_currentFilePath.isEmpty())
+        return;
+    const QStringList files = m_folderModel->filePaths();
+    const int at = m_folderModel->currentIndex();
+    if (at < 0 || at >= files.size() || QFileInfo(files.at(at)) != QFileInfo(m_currentFilePath))
+        return; // the strip is still showing the previous folder
+    QStringList around;
+    for (int step : {1, -1}) { // the way people usually go first
+        const QString path = files.at((at + step + files.size()) % files.size());
+        if (path != files.at(at) && !around.contains(path))
+            around << path;
+    }
+    m_loader.prefetch(around);
 }
 
 void AppController::showAnimationFrame(const QImage &frame)

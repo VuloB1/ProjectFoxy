@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.1" date="2026-10-15">
+      <description>
+        <p>Pictures open faster: the neighbouring pictures are decoded ahead so the arrow keys are instant, big JPEGs show a reduced look at once while the whole picture finishes, and the window no longer flashes white when it opens. The installer has no licence page and has new pictures.</p>
+      </description>
+    </release>
     <release version="0.3.0" date="2026-10-14">
       <description>
         <p>New comic and manga reader: open a .cbz, .zip or .pdf file (or read the folder of the open picture) right to left or left to right, one page or two, with a page slider, fit modes and click zones, remembering the page. FSR CAS sharpening replaces the old sharpening in Adjustments and Size, with a 0-100% sharpening button for reading. Fixes a crash when maximising the window, which now also remembers its size and position.</p>

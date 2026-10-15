@@ -29,7 +29,8 @@ public:
 
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
 
-    void setImage(const QImage &image);
+    // `proxy`: the same picture already reduced to `proxySide` (kDisplayProxySide), if the caller has one.
+    void setImage(const QImage &image, const QImage &proxy = QImage(), int proxySide = 0);
     // The pixel of the current picture at (x, y) as straight colour; invalid outside it.
     QColor pixelAt(int x, int y) const;
     void setOriginalImage(const QImage &image);

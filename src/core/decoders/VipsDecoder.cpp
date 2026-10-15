@@ -180,10 +180,11 @@ DecodeResult VipsDecoder::decode(const QString &filePath, QSize maxSize)
             return result;
         }
 
-        QImage qimg(width, height, QImage::Format_RGBA8888);
-        const size_t expected = static_cast<size_t>(qimg.sizeInBytes());
+        const size_t expected = static_cast<size_t>(width) * height * 4;
         if (expected == rawSize) {
-            std::memcpy(qimg.bits(), data, rawSize);
+            // The QImage takes over libvips' buffer (no copy of tens of megabytes) and frees it when it goes.
+            QImage qimg(static_cast<uchar *>(data), width, height, width * 4, QImage::Format_RGBA8888, g_free, data);
+            data = nullptr;
 
             // Colour: bring the picture into sRGB, the one space the editor works in. The
             // profile is read from the file's header (libvips attaches it even without a

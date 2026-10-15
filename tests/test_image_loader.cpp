@@ -1,6 +1,9 @@
 #include "DecoderRegistry.h"
 #include "ImageLoader.h"
+#include <QFile>
 #include <QFileInfo>
+#include <QRandomGenerator>
+#include <QTemporaryDir>
 #include <QtTest>
 #include <atomic>
 
@@ -151,6 +154,79 @@ private slots:
         // Without the early-out every single request would have been decoded.
         const int decoded = m_decoder->decodes - before;
         QVERIFY2(decoded < requests + 1, qPrintable(QStringLiteral("%1 decodes for %2 requests").arg(decoded).arg(requests + 1)));
+    }
+
+    // A picture prefetched is decoded once: opening it afterwards is answered from the cache, and a file that was
+    // written over since is decoded again.
+    void prefetchedPicturesAreNotDecodedAgain()
+    {
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        const QString path = dir.filePath(QStringLiteral("fast_cached.fake"));
+        auto write = [&](const QByteArray &bytes) {
+            QFile f(path);
+            QVERIFY(f.open(QIODevice::WriteOnly));
+            f.write(bytes);
+        };
+        write("one");
+
+        core::ImageLoader loader;
+        int loadedCount = 0;
+        connect(&loader, &core::ImageLoader::loaded, this, [&](const QString &, core::ImageDocument) { ++loadedCount; });
+        const int before = m_decoder->decodes;
+
+        loader.prefetch({path});
+        QTest::qWait(300);
+        loader.requestLoad(QStringLiteral("current"), path);
+        QTRY_COMPARE(loadedCount, 1);
+        loader.requestLoad(QStringLiteral("current"), path);
+        QTRY_COMPARE(loadedCount, 2);
+        QCOMPARE(m_decoder->decodes - before, 1); // prefetch decoded it; both opens came from the cache
+
+        write("a different, longer file"); // size changed: the cached picture is stale
+        loader.requestLoad(QStringLiteral("current"), path);
+        QTRY_COMPARE(loadedCount, 3);
+        QCOMPARE(m_decoder->decodes - before, 2);
+    }
+
+    // A big JPEG is first shown reduced (previewLoaded), then whole (loaded), in that order; once it is in the cache
+    // there is no reduced look any more, the whole picture comes at once.
+    void bigJpegShowsAReducedLookFirst()
+    {
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        QImage noise(3000, 2200, QImage::Format_RGB32);
+        for (int y = 0; y < noise.height(); ++y)
+            for (int x = 0; x < noise.width(); ++x)
+                noise.setPixel(x, y, qRgb(QRandomGenerator::global()->bounded(256), (x * 7 + y) & 255, y & 255));
+        const QString path = dir.filePath(QStringLiteral("big.jpg"));
+        QVERIFY(noise.save(path, "JPG", 95));
+        QVERIFY(QFileInfo(path).size() > (1 << 20));
+
+        core::ImageLoader loader;
+        QStringList order;
+        QSize previewSize, previewSource, fullSize;
+        connect(&loader, &core::ImageLoader::previewLoaded, this, [&](const QString &, core::ImageDocument d) {
+            order << QStringLiteral("preview");
+            previewSize = d.pixels.size();
+            previewSource = d.sourceSize;
+            QVERIFY(d.isPreview);
+        });
+        connect(&loader, &core::ImageLoader::loaded, this, [&](const QString &, core::ImageDocument d) {
+            order << QStringLiteral("loaded");
+            fullSize = d.pixels.size();
+        });
+
+        loader.requestLoad(QStringLiteral("current"), path);
+        QTRY_COMPARE_WITH_TIMEOUT(order.size(), 2, 10000);
+        QCOMPARE(order, (QStringList{QStringLiteral("preview"), QStringLiteral("loaded")}));
+        QCOMPARE(fullSize, noise.size());
+        QCOMPARE(previewSource, noise.size());
+        QVERIFY(qMax(previewSize.width(), previewSize.height()) <= core::kQuickPreviewSide);
+
+        order.clear(); // now cached
+        loader.requestLoad(QStringLiteral("current"), path);
+        QTRY_COMPARE(order, (QStringList{QStringLiteral("loaded")}));
     }
 
 private:

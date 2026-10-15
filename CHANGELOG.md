@@ -3,6 +3,24 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.1] — Faster opening
+
+- **Next and previous pictures open instantly.** While you look at a picture, the ones before and after it are decoded
+  in the background (up to 4 pictures or half a gigabyte), so the arrow keys no longer wait for the decoder: about
+  20 ms instead of 300 ms with 24-megapixel photos. A file that changes on disk is read again.
+- **A reduced look at big JPEGs, at once.** A JPEG of a megabyte or more shows a reduced version (up to 2560 pixels)
+  while the whole picture finishes decoding; the open document does not change until the whole one is there, and if it
+  fails to load the screen goes back to what it was.
+- **The picture on the command line starts decoding earlier**, while the window is still being built, and libvips is
+  warmed up in the background. Opening a 24-megapixel PNG from Explorer went from 660 ms to 340 ms.
+- Big pictures are reduced for display off the interface thread, and libvips' buffer is used as it is (no copy of
+  tens of megabytes).
+- **No more white flash when the window opens** (Windows paints a new window white until its first frame is ready):
+  the window stays hidden until that frame exists and its background is the theme's colour.
+- **Installer:** no licence page, the Project Foxy logo in the wizard and its own picture on the "installation complete"
+  page (made by `tools/make_installer_images.py`).
+- Developer tool `bench_load` times each stage of opening a picture.
+
 ## [0.3.0] — Comic and manga reader
 
 - **Comic and manga reader.** Open a `.cbz`, `.zip` or `.pdf` file like any picture, or press the new book button in the
@@ -163,6 +181,24 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.1] — Apertura más rápida
+
+- **La imagen anterior y la siguiente se abren al instante.** Mientras miras una imagen, las de antes y después se
+  decodifican en segundo plano (hasta 4 imágenes o medio gigabyte), así que las flechas ya no esperan al decodificador:
+  unos 20 ms en lugar de 300 ms con fotos de 24 megapíxeles. Si un archivo cambia en el disco, se vuelve a leer.
+- **Un primer vistazo reducido de los JPEG grandes, al momento.** Un JPEG de un megabyte o más muestra una versión
+  reducida (hasta 2560 píxeles) mientras termina de decodificarse la imagen completa; el documento abierto no cambia
+  hasta que llega la completa, y si falla al cargar, la pantalla vuelve a lo que había.
+- **La imagen de la línea de órdenes empieza a decodificarse antes**, mientras se construye la ventana, y libvips se
+  prepara en segundo plano. Abrir un PNG de 24 megapíxeles desde el Explorador pasó de 660 ms a 340 ms.
+- Las imágenes grandes se reducen para mostrarlas fuera del hilo de la interfaz, y el búfer de libvips se usa tal cual
+  (sin copiar decenas de megabytes).
+- **Se acabó el destello blanco al abrir la ventana** (Windows pinta de blanco una ventana nueva hasta que su primer
+  fotograma está listo): la ventana permanece oculta hasta que ese fotograma existe y su fondo es el color del tema.
+- **Instalador:** sin página de licencia, con el logo de Project Foxy en el asistente y una imagen propia en la página
+  de «instalación completada» (la genera `tools/make_installer_images.py`).
+- La herramienta de desarrollo `bench_load` mide cada fase de la apertura de una imagen.
 
 ## [0.3.0] — Lector de cómics y manga
 

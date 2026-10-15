@@ -86,12 +86,17 @@ QImage ImageProvider::reducedTo(const QImage &image, int side)
     return image.scaled(side, side, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
-void ImageProvider::setImage(const QImage &image)
+void ImageProvider::setImage(const QImage &image, const QImage &proxy, int proxySide)
 {
     QMutexLocker lock(&m_mutex);
     m_current = image;
     ++m_currentSerial;
     m_currentProxy = Proxy(); // belonged to the previous picture
+    if (!proxy.isNull()) {
+        m_currentProxy.image = proxy;
+        m_currentProxy.side = proxySide;
+        m_currentProxy.serial = m_currentSerial;
+    }
 }
 
 QColor ImageProvider::pixelAt(int x, int y) const
