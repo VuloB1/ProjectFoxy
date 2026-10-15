@@ -16,12 +16,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "Vulito\0"
             VALUE "FileDescription",  "Project Foxy\0"
-            VALUE "FileVersion",      "0.1.0\0"
+            VALUE "FileVersion",      "0.3.1\0"
             VALUE "InternalName",     "ProjectFoxy\0"
             VALUE "LegalCopyright",   "Copyright (C) 2026 Vulito. GPL-3.0-or-later.\0"
             VALUE "OriginalFilename", "ProjectFoxy.exe\0"
             VALUE "ProductName",      "Project Foxy\0"
-            VALUE "ProductVersion",   "0.1.0\0"
+            VALUE "ProductVersion",   "0.3.1\0"
         END
     END
     BLOCK "VarFileInfo"
