@@ -1,5 +1,6 @@
 #include "ComicBook.h"
 #include "ImageHeader.h"
+#include "NaturalSort.h"
 #include "SpreadLayout.h"
 #include "ZipArchive.h"
 
@@ -94,6 +95,20 @@ private slots:
         QCOMPARE(core::imageSizeFromHeader(extended), QSize(1024, 1000));
         QVERIFY(!core::imageSizeFromHeader("not a picture at all, just some bytes").isValid());
         QVERIFY(!core::imageSizeFromHeader(QByteArray()).isValid());
+    }
+
+    void namesAreSortedTheWayPeopleExpect()
+    {
+        const auto before = [](const char *a, const char *b) { return core::naturalCompare(a, b) < 0; };
+        QVERIFY(before("page2.png", "page10.png"));
+        QVERIFY(!before("page10.png", "page2.png"));
+        QVERIFY(before("A.png", "b.png")); // case ignored
+        QVERIFY(before("1.jpg", "01.jpg")); // the same number: the shorter spelling first
+        QVERIFY(before("01.jpg", "2.jpg"));
+        QVERIFY(before("cap 1/9.png", "cap 1/10.png"));
+        QVERIFY(before("a", "a1"));
+        QCOMPARE(core::naturalCompare("same", "SAME"), 0);
+        QVERIFY(before("x9y", "x10y") && before("x10a", "x10b"));
     }
 
     void singlePagesAreOneByOne()

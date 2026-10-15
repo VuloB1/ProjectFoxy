@@ -1,9 +1,9 @@
 #include "ComicBook.h"
 #include "DecoderRegistry.h"
 #include "ImageHeader.h"
+#include "NaturalSort.h"
 #include "Translate.h"
 
-#include <QCollator>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -56,10 +56,6 @@ bool ComicBook::open(const QString &path, const QString &cacheDir)
     const QStringList extensions = DecoderRegistry::instance().allSupportedExtensions();
     const QFileInfo info(path);
 
-    QCollator collator;
-    collator.setNumericMode(true);
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-
     if (info.isFile() && info.suffix().compare(QLatin1String("pdf"), Qt::CaseInsensitive) == 0) {
 #ifdef PROJECTFOXY_PDF
         m_pdf = std::make_unique<QPdfDocument>();
@@ -89,7 +85,7 @@ bool ComicBook::open(const QString &path, const QString &cacheDir)
             if (!entries[i].isDirectory && !isJunk(entries[i].name) && isPicture(entries[i].name, extensions))
                 m_pages.append({entries[i].name, QString(), i});
         std::sort(m_pages.begin(), m_pages.end(),
-                  [&collator](const Page &a, const Page &b) { return collator.compare(a.name, b.name) < 0; });
+                  [](const Page &a, const Page &b) { return naturalCompare(a.name, b.name) < 0; });
         m_title = info.completeBaseName();
         m_cacheDir = cacheDir;
     } else {
@@ -101,7 +97,7 @@ bool ComicBook::open(const QString &path, const QString &cacheDir)
         for (const QString &name : names)
             m_pages.append({name, dir.absoluteFilePath(name), -1});
         std::sort(m_pages.begin(), m_pages.end(),
-                  [&collator](const Page &a, const Page &b) { return collator.compare(a.name, b.name) < 0; });
+                  [](const Page &a, const Page &b) { return naturalCompare(a.name, b.name) < 0; });
         m_title = dir.dirName();
     }
     if (m_pages.isEmpty()) {

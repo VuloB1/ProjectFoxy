@@ -1,11 +1,11 @@
 #include "FolderModel.h"
 #include "DecoderRegistry.h"
+#include "NaturalSort.h"
 #include "AppPaths.h"
 
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QCollator>
 #include <QMetaObject>
 #include <QRunnable>
 #include <QUrl>
@@ -86,11 +86,8 @@ FolderModel::Scan scanFolder(const QString &filePath)
                   entries.end());
 
     // Natural sort (img2 before img10) instead of plain lexicographic order.
-    QCollator collator;
-    collator.setNumericMode(true);
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-    std::sort(entries.begin(), entries.end(), [&collator](const QFileInfo &a, const QFileInfo &b) {
-        return collator.compare(a.fileName(), b.fileName()) < 0;
+    std::sort(entries.begin(), entries.end(), [](const QFileInfo &a, const QFileInfo &b) {
+        return core::naturalCompare(a.fileName(), b.fileName()) < 0;
     });
 
     scan.files.reserve(entries.size());
