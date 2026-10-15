@@ -144,6 +144,11 @@ add_executable(bench_effects bench_effects.cpp)
 target_link_libraries(bench_effects PRIVATE imageviewer_core Qt6::Core)
 target_include_directories(bench_effects PRIVATE ${CMAKE_SOURCE_DIR}/src/core)
 
+# Developer tool: time of each stage of opening a picture (bench_load file...).
+add_executable(bench_load bench_load.cpp)
+target_link_libraries(bench_load PRIVATE imageviewer_core Qt6::Core)
+target_include_directories(bench_load PRIVATE ${CMAKE_SOURCE_DIR}/src/core)
+
 # The language of the interface and its catalogues (resources/i18n).
 add_executable(test_translations test_translations.cpp)
 target_link_libraries(test_translations PRIVATE imageviewer_app imageviewer_core Qt6::Test)

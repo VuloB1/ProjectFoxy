@@ -252,6 +252,9 @@ public slots:
     void setAnimationPlaying(bool playing) { m_animation.setPlaying(playing); }
     void openFile(const QUrl &fileUrl);
     void openPath(const QString &filePath);
+    // Starts decoding `filePath` in the background so a later openPath() of it is quick (the file named on the command
+    // line, while the window is still being built).
+    void prefetch(const QString &filePath) { m_loader.prefetch({filePath}); }
 
     // Structural edits - go through m_editStack, so undo/redo covers them.
     void cropNormalized(qreal x, qreal y, qreal w, qreal h);
@@ -481,6 +484,12 @@ private:
     // both the async loader's `loaded` handler and pasteFromClipboard(),
     // which has no file to hand the loader in the first place).
     void applyNewDocument(const core::ImageDocument &doc);
+    // Decodes the pictures before and after the open one while the user looks at it, so the arrow keys are instant.
+    void prefetchNeighbors();
+    // The reduced first look at the picture being opened, shown while the whole one still decodes.
+    void showQuickPreview(const core::ImageDocument &preview);
+    // The whole picture failed (or was refused): back to what the open document shows.
+    void restoreAfterPreview();
     // m_animation's next frame is due: publishes it through ImageProvider.
     void showAnimationFrame(const QImage &frame);
 
@@ -497,6 +506,7 @@ private:
     QVariantMap m_metadata;
     QVariantMap m_lensHints;
     bool m_isLoading = false;
+    bool m_previewShown = false; // the canvas shows a reduced look at a picture that is not the document yet
     QString m_errorString;
     int m_revision = 0;
     int m_originalRevision = 0;

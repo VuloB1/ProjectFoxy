@@ -84,6 +84,9 @@ int main(int argc, char *argv[])
 
     // Everything the QML needs, owned by the engine (see AppBootstrap.h).
     AppController *controller = AppBootstrap::setup(engine).controller;
+    // Building the window takes a while: decode the picture meanwhile instead of after it.
+    if (!fileArgument.isEmpty())
+        controller->prefetch(fileArgument);
 
     QObject::connect(
         &engine, &QQmlApplicationEngine::objectCreationFailed,

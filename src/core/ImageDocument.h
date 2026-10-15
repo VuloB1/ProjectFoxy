@@ -8,6 +8,9 @@
 
 namespace core {
 
+constexpr int kDisplayProxySide = 4096; // qml/ImageCanvas.qml proxyMax
+constexpr int kQuickPreviewSide = 2560; // the first, reduced look at a big JPEG (ImageLoader::previewLoaded)
+
 // A single loaded image plus the metadata the UI needs. Immutable snapshot
 // produced by ImageLoader; edits are applied on top via EditStack, never by
 // mutating this in place.
@@ -19,6 +22,9 @@ struct ImageDocument {
     qint64 fileSizeBytes = 0;
     ImageMetadata metadata; // EXIF/IPTC/XMP, read alongside the decode (see ImageLoader)
     QByteArray iccProfile;  // see DecodeResult::iccProfile: only when the pixels are NOT sRGB
+    // A big picture reduced to kDisplayProxySide on its long side, made here so the window does not have to (null
+    // for a picture that is not much bigger than that). The canvas shows this one while the picture is fitted.
+    QImage displayProxy;
 
     // Populated only for a genuinely animated GIF/APNG full (non-preview)
     // load - see AnimatedDecoder. Empty or size-1 means "not animated";

@@ -1,7 +1,7 @@
 ﻿; Project Foxy - installer (Inno Setup 6).
 ;
 ; Build it with tools\Build-Release.ps1 (which installs the program into dist\ProjectFoxy first), or by hand:
-;     ISCC.exe /DAppVersion=0.3.0 installer\ProjectFoxy.iss
+;     ISCC.exe /DAppVersion=0.3.1 installer\ProjectFoxy.iss
 ;
 ; What it does:
 ;   - installs the folder that `cmake --install` produces (the program, Qt, the libraries and the licences);
@@ -11,7 +11,7 @@
 ;     files. Windows does not let a program make itself the default, so the last step is the person's.
 
 #ifndef AppVersion
-  #define AppVersion "0.3.0"
+  #define AppVersion "0.3.1"
 #endif
 #define AppName "Project Foxy"
 #define AppExe "ProjectFoxy.exe"
@@ -29,7 +29,10 @@ DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 UninstallDisplayIcon={app}\{#AppExe}
 UninstallDisplayName={#AppName}
-LicenseFile=..\LICENSE
+; No licence page: the programme is free software and its licence (GPL-3.0-or-later) is in the installed folder.
+; The pictures of the wizard (made by tools\make_installer_images.py), one size per screen scaling.
+WizardImageFile=art\welcome-100.bmp,art\welcome-125.bmp,art\welcome-150.bmp,art\welcome-175.bmp,art\welcome-200.bmp
+WizardSmallImageFile=art\small-100.bmp,art\small-125.bmp,art\small-150.bmp,art\small-175.bmp,art\small-200.bmp
 SetupIconFile=..\resources\icons\icon.ico
 OutputDir=..\dist\installer
 OutputBaseFilename=ProjectFoxy-Setup-{#AppVersion}
@@ -86,6 +89,9 @@ Name: "assoc"; Description: "{cm:TaskAssoc}"; GroupDescription: "{cm:TaskAssocGr
 [Files]
 ; the folder produced by `cmake --install` (see tools\Build-Release.ps1)
 Source: "..\dist\ProjectFoxy\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; the picture of the last page, which is not the one of the first
+Source: "art\finish.bmp"; Flags: dontcopy
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"
@@ -153,3 +159,15 @@ Root: HKA; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueNa
 [Run]
 Filename: "ms-settings:defaultapps"; Description: "{cm:RunDefaultApps}"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+// The welcome page and the "installation complete" page show the same picture by default: give the last one its own.
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  if CurPageID = wpFinished then
+  begin
+    ExtractTemporaryFile('finish.bmp');
+    WizardForm.WizardBitmapImage2.Stretch := True;
+    WizardForm.WizardBitmapImage2.Bitmap.LoadFromFile(ExpandConstant('{tmp}\finish.bmp'));
+  end;
+end;
