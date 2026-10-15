@@ -35,6 +35,28 @@ AppSettings::AppSettings(QObject *parent)
     m_pixelSharpEdit = m_store.value(QStringLiteral("view/pixelSharpEdit"), wasAllInOne).toBool();
     m_singleInstance = m_store.value(QStringLiteral("window/singleInstance"), true).toBool();
     m_verticalSync = m_store.value(QStringLiteral("window/verticalSync"), true).toBool();
+    m_windowMaximized = m_store.value(QStringLiteral("window/maximized"), false).toBool();
+}
+
+QRect AppSettings::windowRect() const
+{
+    const int w = m_store.value(QStringLiteral("window/width"), 0).toInt();
+    const int h = m_store.value(QStringLiteral("window/height"), 0).toInt();
+    if (w <= 0 || h <= 0)
+        return {};
+    return {m_store.value(QStringLiteral("window/x"), 0).toInt(), m_store.value(QStringLiteral("window/y"), 0).toInt(), w, h};
+}
+
+void AppSettings::saveWindowState(const QRect &normalRect, bool maximized)
+{
+    if (!normalRect.isNull()) {
+        m_store.setValue(QStringLiteral("window/x"), normalRect.x());
+        m_store.setValue(QStringLiteral("window/y"), normalRect.y());
+        m_store.setValue(QStringLiteral("window/width"), normalRect.width());
+        m_store.setValue(QStringLiteral("window/height"), normalRect.height());
+    }
+    m_store.setValue(QStringLiteral("window/maximized"), maximized);
+    m_windowMaximized = maximized;
 }
 
 void AppSettings::setViewSharpen(int percent)

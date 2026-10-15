@@ -3,7 +3,7 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
-## [Unreleased]
+## [0.3.0] — Comic and manga reader
 
 - **Comic and manga reader.** Open a `.cbz`, `.zip` or `.pdf` file like any picture, or press the new book button in the
   title bar to read the folder of the picture you have open. Pages are read right to left by default (the manga way) or
@@ -20,6 +20,13 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   the sharpening after enlarging a picture in *Size*. New button at the bottom right of the window (a small triangle,
   lit while it is on): a menu with a 0-100 % bar that sharpens what you see on screen while you read a comic or manga (the button
   appears only then). 0 % is off; it never changes the file. Remembered between runs.
+- Windows: fixed a crash when clicking the maximise button (0.2.8). The program wrote to a null pointer that Windows
+  passes for that click.
+- The window now remembers its size, position and whether it was maximised, and opens the same way next time. If the
+  saved size is larger than the screen now connected (for example it was saved on a 1440p monitor and you open it on a
+  1080p one), it is brought down to fit, and it is never left off-screen.
+- Long file names (without spaces) now wrap inside the "unsaved changes", "replace file" and delete dialogs instead of
+  running out of the box.
 
 ## [0.2.8] — The title bar is the toolbar
 
@@ -157,7 +164,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Sin publicar]
+## [0.3.0] — Lector de cómics y manga
 
 - **Lector de cómics y manga.** Abre un archivo `.cbz`, `.zip` o `.pdf` como cualquier imagen, o pulsa el nuevo botón del libro
   en la barra de título para leer la carpeta de la imagen que tienes abierta. Las páginas se leen de derecha a izquierda
@@ -174,6 +181,13 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   guardado) y al enfoque tras ampliar una imagen en *Tamaño*. Botón nuevo abajo a la derecha de la ventana (un
   triángulo pequeño, encendido mientras está activa): un menú con una barra de 0 a 100 % que afila lo que ves en pantalla
   mientras lees un cómic o manga (el botón solo aparece entonces). 0 % es apagado; nunca cambia el archivo. Se recuerda entre sesiones.
+- Windows: arreglado un cierre inesperado al hacer clic en el botón de maximizar (0.2.8). El programa escribía en un
+  puntero nulo que Windows entrega en ese clic.
+- La ventana recuerda su tamaño, su posición y si estaba maximizada, y se abre igual la próxima vez. Si el tamaño
+  guardado es mayor que la pantalla conectada ahora (por ejemplo, se guardó en un monitor de 1440p y la abres en uno de
+  1080p), se reduce para que quepa y nunca queda fuera de la pantalla.
+- Los nombres de archivo largos (sin espacios) ahora se parten dentro de los diálogos de «cambios sin guardar»,
+  «reemplazar archivo» y eliminar, en lugar de salirse del cuadro.
 
 ## [0.2.8] — La barra de título es la barra de herramientas
 
