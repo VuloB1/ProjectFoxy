@@ -52,7 +52,7 @@ AppDialog {
 
         Label {
             width: parent.width
-            wrapMode: Text.WordWrap
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere // a long file name has no spaces to break at
             color: themeManager.textPrimary
             text: qsTr("«%1» tiene cambios que no se han guardado.").arg(appController.currentFileName)
         }

@@ -1,5 +1,6 @@
 #include "AppPaths.h"
 #include "AppSettings.h"
+#include "WindowGeometry.h"
 #include <QtTest>
 
 // "Modo pixel": the switch and its five extras are remembered one by one, and whoever had the
@@ -179,6 +180,39 @@ private slots:
         QVERIFY(!s.pixelMode());
         QVERIFY(!s.pixelGrid());
         QVERIFY(s.pixelSharpEdit()); // never touched: follows the old switch
+    }
+
+    // The window opens where it was, and what was saved on a bigger screen is brought down to the one connected now.
+    void theWindowIsBroughtDownToTheScreensThereAre()
+    {
+        const QSize minimum(480, 320);
+        const QList<QRect> big{{0, 0, 2560, 1400}};
+        const QList<QRect> small{{0, 0, 1920, 1040}};
+        // It fits: untouched.
+        QCOMPARE(fitWindowToScreens({100, 80, 1280, 800}, big, minimum), QRect(100, 80, 1280, 800));
+        // Saved at nearly 1440p, now on a 1080p screen: no larger than the screen and not hanging off it.
+        QCOMPARE(fitWindowToScreens({200, 100, 2400, 1300}, small, minimum), QRect(0, 0, 1920, 1040));
+        QCOMPARE(fitWindowToScreens({1000, 500, 1200, 800}, small, minimum), QRect(720, 240, 1200, 800));
+        // Its screen is gone (second monitor unplugged): centred on the primary one.
+        QCOMPARE(fitWindowToScreens({3000, 200, 800, 600}, small, minimum), QRect(560, 220, 800, 600));
+        // Found on the second screen: stays there.
+        const QList<QRect> two{{0, 0, 1920, 1040}, {1920, 0, 1920, 1080}};
+        QCOMPARE(fitWindowToScreens({2000, 50, 900, 700}, two, minimum), QRect(2000, 50, 900, 700));
+        // Nothing saved: nothing to apply.
+        QVERIFY(fitWindowToScreens({}, small, minimum).isNull());
+    }
+
+    void theWindowStateIsRemembered()
+    {
+        {
+            AppSettings s;
+            QVERIFY(s.windowRect().isNull());
+            QVERIFY(!s.windowMaximized());
+            s.saveWindowState({40, 30, 1000, 700}, true);
+        }
+        AppSettings s;
+        QCOMPARE(s.windowRect(), QRect(40, 30, 1000, 700));
+        QVERIFY(s.windowMaximized());
     }
 };
 

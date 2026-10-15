@@ -1503,6 +1503,14 @@ teclado sintéticos, con la plataforma `offscreen` de Qt y su renderizador por s
   `captionInteractive`) y `HTCAPTION` en el resto. La ventana lleva `WS_CAPTION` (sin él Windows no anima minimizar y
   restaurar desde la barra de tareas); maximizada, `WM_NCCALCSIZE` pone el área de cliente igual al área de trabajo del
   monitor, porque con `WS_CAPTION` Windows deja el marco asomando 8 px por los bordes.
+- **El filtro nativo de `WindowsFrame.cpp` nunca escribe `*result` sin comprobarlo**: Qt pasa `result == nullptr` a los
+  mensajes que llegan por la cola del hilo (el `WM_NCLBUTTONUP` del botón de maximizar), y escribirlo cerraba el programa
+  (0.2.8). Todo pasa por `setResult`.
+- **La ventana recuerda su tamaño** (`window/x|y|width|height|maximized`, `AppSettings::windowRect/saveWindowState`): `main.cpp`
+  lo lee antes de crear la ventana, lo pasa por `fitWindowToScreens` (`WindowGeometry.h`: nunca más grande que la pantalla
+  donde cae ni fuera de ella; si esa pantalla ya no existe, centrada en la principal) y lo entrega con
+  `setInitialProperties`. Se guarda al salir; el rectángulo normal solo se anota con la ventana en estado normal y
+  quieta 200 ms, para que el tamaño maximizado nunca cuente.
 - **Trampas de `Canvas`** (aprendidas dos veces): el contexto 2D conserva su estado entre `onPaint`, hay que empezar con
   `ctx.reset()` (un `translate` acumulado deformaba la pestaña de la barra de miniaturas cada vez que se repintaba), y
   `canvasSize` debe seguir al tamaño del ítem o el dibujo se estira.
@@ -1545,3 +1553,59 @@ comando (`src/app/DevServer.cpp`); el cliente es `tools/devctl.py`:
 
 No sustituye a lo que depende del sistema (ajuste a los bordes, DWM, redimensionado nativo), que sigue pidiendo ratón
 y pantalla reales. Los estudios se cargan bajo demanda: `gifStudio` solo existe mientras está abierto.
+
+## 23. Lector de cómics y manga (14‑oct‑2026)
+
+Fase 1: leer `.cbz`/`.zip` y carpetas de imágenes como un libro. **No** pasa por el visor ni por el editor: es un modo
+aparte (`qml/ReaderView.qml`, un `Loader` en `Main.qml` por encima del lienzo y de los estudios, `z: 7`), así que no toca
+la pila de edición ni el documento abierto.
+
+- **`core/ZipArchive`**: lector de ZIP propio (directorio central, ZIP64, nombres UTF‑8/Latin‑1, entradas guardadas y
+  *deflate* con zlib). No usa `QZipReader` (API privada de Qt) para no depender de que el SDK de Flatpak la incluya;
+  zlib ya viene con las dependencias de libvips. Sin contraseña, sin otros métodos.
+- **`core/ComicBook`**: la lista de páginas (carpeta o archivo, orden natural, sin `__MACOSX` ni ocultos) y, para un
+  archivo, **desempaqueta cada página a un fichero** en `cacheDir()/comics/<uuid>/NNNNN.ext` la primera vez que se
+  pide. Así los decodificadores de siempre (libvips, color, orientación) leen la página como cualquier imagen y no hay
+  un segundo camino de decodificación. `close()` borra esa carpeta; al arrancar se borra lo que dejó una caída.
+- **`core/ImageHeader.h`**: tamaño de PNG/JPEG/WebP a partir de los primeros bytes. **`core/SpreadLayout.h`**: función
+  pura que da las «dobles» (portada sola opcional, las páginas apaisadas van solas y el emparejado se reanuda tras ellas).
+- **`app/MangaReader`** (contexto QML `mangaReader`): posición, dirección (derecha a izquierda por defecto), página doble,
+  portada sola y ajuste (pantalla/alto/ancho), todo recordado en `settings.ini` (`reader/*`) y la página de cada libro
+  (`reader/pos/<sha1 de la ruta>`, 200 libros). La forma de cada página se lee **en segundo plano** (solo si la página
+  doble está activa) y la maquetación se rehace cuando llegan; `m_page` es la página **pedida**, no la primera de su
+  doble, para que al moverse los pares el lector siga en la página que se pidió. Las imágenes las sirve el proveedor
+  `image://pane/` del comparador, con `pageSide` fijado por la vista; el lector precarga las dobles siguientes y la
+  anterior con ese mismo tamaño.
+- **Entrada**: `AppController::loadPath` desvía los `.cbz`/`.zip` a la señal `comicRequested` (Abrir, soltar, «Abrir
+  con», línea de comandos); el botón del libro (`readButton`, cuarta herramienta opcional de la barra de título) lee la
+  carpeta de la imagen abierta; el instalador registra `.cbz` y el `.desktop` su tipo MIME.
+- **Pruebas:** `test_comic_book` (8: tamaños de cabecera, dobles, `.cbz` hecho a mano con entradas guardadas y
+  comprimidas, carpeta, errores) y `theReaderTurnsPagesInTheDirectionOfReading` en `test_ui_flows`.
+- **PDF** (Qt PDF, módulo opcional: `find_package(Qt6 OPTIONAL_COMPONENTS Pdf)`; sin él se compila con `PROJECTFOXY_PDF` sin definir y
+  abrir un PDF da un aviso): `ComicBook` carga el documento con `QPdfDocument`, da la forma de cada página sin dibujarla
+  (`pagePointSize`) y la dibuja a un JPEG (lado largo 2400 px, calidad 95) en la misma caché que las páginas de un `.cbz`.
+  Los CI instalan el módulo (`modules: qtshadertools qtpdf`); en Windows `windeployqt` lo recoge solo. **No probado:**
+  el Flatpak (hace falta Qt PDF en el runtime de KDE) ni PDF con contraseña (solo avisa).
+- **Pendiente (fases 2 y 3):** modo *webtoon* continuo, página doble con corrección manual por página, lupa, recorte de
+  márgenes, capítulo siguiente al llegar al final, pantalla completa, RAR/7z (libarchive; la licencia del RAR
+  exige revisar `docs/LICENCIAS.md`), biblioteca con portadas y `ComicInfo.xml`. **No probado:** Flatpak/AppImage,
+  `.cbz` de varios GB (el soporte ZIP64 está escrito pero ninguna prueba lo ejercita), páginas AVIF/TIFF sin forma conocida.
+
+## 24. Nitidez FSR CAS (14‑oct‑2026)
+
+El enfoque del programa es ahora **FidelityFX CAS** de AMD (MIT), el paso de nitidez de FSR 1. `core/edit/Cas.h` (`casChannel`)
+tiene la fórmula por canal sobre el 3×3 de un píxel: mínimo/máximo suaves (la cruz más todo el 3×3), `amp = √(min(mn, 2−mx)/mx)`
+(0 si el máximo es 0), pesos `w = −amp / lerp(8, 5, s)` y `(Σ vecinos·w + e) / (1 + 4w)`. La fuerza `s` (0..1) es la del
+control y además reparte el resultado: `e + s·(cas − e)`, para que arranque suave y 0 sea exactamente «apagado».
+
+- **Ajustes › Nitidez** (`applyDetail` en `AdjustMath.cpp` y `Detail.frag`): sustituye a la máscara de 5 puntos; se calcula sobre
+  color premultiplicado como el resto del paso C y se le suma el término de claridad. La paridad CPU/GPU (`test_gpu_parity`) pasa.
+- **Tamaño › «Mejorar nitidez al ampliar»** (`Resample.cpp`, `casBand`): sustituye al enfoque de luminancia ajustado a mano; la
+  fuerza sube con la ampliación (0,5–1) y el resultado se limita al rango del 3×3 para no dejar halos (lo exige
+  `enlargingBeatsPlainStretchingAndDoesNotRing`).
+- **Nitidez de la vista** (botón de la barra inferior, solo con el lector abierto; `AppSettings::viewSharpen`, `view/sharpen`):
+  `qml/shaders/Cas.frag` aplicado como `layer.effect` (`qml/CasEffect.qml`) del `Flickable` del lector, es decir, **sobre los píxeles de pantalla** al
+  zoom actual, no sobre los de la imagen; no toca el archivo ni la pila de edición. Con 0 % la capa ni se crea.
+- **Pruebas:** `test_cas` (4: apagado/plano/negro, más contraste con más fuerza, siempre en 0..1 y sin NaN, sin hueco no añade).
+  **No probado:** el rendimiento con ventanas 4K y el menú con los temas Classic.
+

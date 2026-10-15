@@ -3,6 +3,31 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.0] — Comic and manga reader
+
+- **Comic and manga reader.** Open a `.cbz`, `.zip` or `.pdf` file like any picture, or press the new book button in the
+  title bar to read the folder of the picture you have open. Pages are read right to left by default (the manga way) or
+  left to right, one at a time or two side by side, with the cover standing alone and landscape pages (already a spread)
+  shown by themselves. Left and right (or the click zones at both sides) turn the page, the wheel scrolls what does not
+  fit and then turns it, and the dock of the bottom bar has a page slider and the switches for direction, double page, cover and
+  fit (screen, height or width). The book remembers the page you were on. Keys: **D** double page, **R** direction,
+  **C** cover alone, **1 2 3** fit, **Home/End** first/last page, **Esc** closes it. Next and previous pages are
+  unpacked and decoded ahead, so turning the page does not wait. First version: CBZ, PDF and folders (RAR and 7z
+  later).
+- **FSR CAS sharpening.** The sharpening is now AMD's FidelityFX CAS (the pass FSR 1 uses): it adapts to the local
+  contrast, so it adds crispness where there is room for it and leaves flat areas and noise alone, with far fewer
+  halos than the old unsharp mask. It replaces the *Sharpness* slider of Adjustments (same preview and saved file) and
+  the sharpening after enlarging a picture in *Size*. New button at the bottom right of the window (a small triangle,
+  lit while it is on): a menu with a 0-100 % bar that sharpens what you see on screen while you read a comic or manga (the button
+  appears only then). 0 % is off; it never changes the file. Remembered between runs.
+- Windows: fixed a crash when clicking the maximise button (0.2.8). The program wrote to a null pointer that Windows
+  passes for that click.
+- The window now remembers its size, position and whether it was maximised, and opens the same way next time. If the
+  saved size is larger than the screen now connected (for example it was saved on a 1440p monitor and you open it on a
+  1080p one), it is brought down to fit, and it is never left off-screen.
+- Long file names (without spaces) now wrap inside the "unsaved changes", "replace file" and delete dialogs instead of
+  running out of the box.
+
 ## [0.2.8] — The title bar is the toolbar
 
 - The toolbar is now part of the title bar: the file name and the tools (Edit, Animated GIF, Collage, Compare, More tools,
@@ -138,6 +163,31 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.0] — Lector de cómics y manga
+
+- **Lector de cómics y manga.** Abre un archivo `.cbz`, `.zip` o `.pdf` como cualquier imagen, o pulsa el nuevo botón del libro
+  en la barra de título para leer la carpeta de la imagen que tienes abierta. Las páginas se leen de derecha a izquierda
+  por defecto (como el manga) o de izquierda a derecha, de una en una o de dos en dos, con la portada sola y las
+  páginas apaisadas (que ya son una doble) a solas. Izquierda y derecha (o las zonas de clic de los lados) pasan la
+  página, la rueda desplaza lo que no cabe y luego la pasa, y el dock de la barra inferior trae el deslizador de páginas y los
+  interruptores de dirección, página doble, portada y ajuste (pantalla, alto o ancho). El libro recuerda la página en
+  que te quedaste. Teclas: **D** página doble, **R** dirección, **C** portada sola, **1 2 3** ajuste, **Inicio/Fin**
+  primera y última página, **Esc** lo cierra. Las páginas siguientes y la anterior se descomprimen y decodifican por
+  adelantado, así que pasar de página no espera. Primera versión: CBZ, PDF y carpetas (RAR y 7z después).
+- **Nitidez FSR CAS.** El enfoque ahora es el CAS de AMD FidelityFX (el paso que usa FSR 1): se adapta al contraste
+  local, así que aporta nitidez donde hay margen y deja en paz las zonas planas y el ruido, con muchos menos halos que
+  la máscara de enfoque de antes. Sustituye al control *Nitidez* de Ajustes (misma vista previa y mismo archivo
+  guardado) y al enfoque tras ampliar una imagen en *Tamaño*. Botón nuevo abajo a la derecha de la ventana (un
+  triángulo pequeño, encendido mientras está activa): un menú con una barra de 0 a 100 % que afila lo que ves en pantalla
+  mientras lees un cómic o manga (el botón solo aparece entonces). 0 % es apagado; nunca cambia el archivo. Se recuerda entre sesiones.
+- Windows: arreglado un cierre inesperado al hacer clic en el botón de maximizar (0.2.8). El programa escribía en un
+  puntero nulo que Windows entrega en ese clic.
+- La ventana recuerda su tamaño, su posición y si estaba maximizada, y se abre igual la próxima vez. Si el tamaño
+  guardado es mayor que la pantalla conectada ahora (por ejemplo, se guardó en un monitor de 1440p y la abres en uno de
+  1080p), se reduce para que quepa y nunca queda fuera de la pantalla.
+- Los nombres de archivo largos (sin espacios) ahora se parten dentro de los diálogos de «cambios sin guardar»,
+  «reemplazar archivo» y eliminar, en lugar de salirse del cuadro.
 
 ## [0.2.8] — La barra de título es la barra de herramientas
 

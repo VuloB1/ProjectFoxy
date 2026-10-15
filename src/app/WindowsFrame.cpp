@@ -50,6 +50,14 @@ public:
     explicit Filter(QQuickWindow *window)
         : m_window(window), m_hwnd(reinterpret_cast<HWND>(window->winId())) {}
 
+    // Qt passes a null `result` for messages that come through the thread's message queue (a posted mouse-up of the
+    // caption buttons does) instead of the window procedure, so it must be checked before it is written.
+    static void setResult(qintptr *result, qintptr value)
+    {
+        if (result)
+            *result = value;
+    }
+
     bool nativeEventFilter(const QByteArray &type, void *message, qintptr *result) override
     {
         if (type != "windows_generic_MSG" || !m_window)
@@ -74,7 +82,7 @@ public:
                         params->rgrc[0].bottom -= 1;
                 }
             }
-            *result = 0;
+            setResult(result, 0);
             return true;
 
         // Maximised, the window is the monitor's work area (by default it would overhang the screen by its frame and
@@ -93,13 +101,14 @@ public:
             }
             const double scale = m_window->devicePixelRatio();
             info->ptMinTrackSize = {qRound(m_window->minimumWidth() * scale), qRound(m_window->minimumHeight() * scale)};
-            *result = 0;
+            setResult(result, 0);
             return true;
         }
 
         case WM_NCHITTEST: {
-            *result = hitTest(GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam));
-            setMaximizeHover(*result == HTMAXBUTTON);
+            const LRESULT hit = hitTest(GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam));
+            setResult(result, hit);
+            setMaximizeHover(hit == HTMAXBUTTON);
             return true;
         }
 
@@ -117,14 +126,14 @@ public:
         // The maximise button is not "client" for Qt, so its click arrives here.
         case WM_NCLBUTTONDOWN:
             if (msg->wParam == HTMAXBUTTON) {
-                *result = 0;
+                setResult(result, 0);
                 return true;
             }
             return false;
         case WM_NCLBUTTONUP:
             if (msg->wParam == HTMAXBUTTON) {
                 ShowWindow(m_hwnd, IsZoomed(m_hwnd) ? SW_RESTORE : SW_MAXIMIZE);
-                *result = 0;
+                setResult(result, 0);
                 return true;
             }
             return false;

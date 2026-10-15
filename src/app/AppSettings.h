@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QRect>
 #include <QSettings>
 
 // User-configurable defaults for the batch operations and the interface,
@@ -32,6 +33,9 @@ class AppSettings : public QObject {
     // The language of the interface: "system" (follows Windows) or es / en / pt / ko / zh / ja.
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
     Q_PROPERTY(bool smoothZoom READ smoothZoom WRITE setSmoothZoom NOTIFY smoothZoomChanged)
+    // The comic reader's sharpening (the button at the bottom right of the window while reading): FidelityFX CAS
+    // applied to what is on screen, 0..100 %, 0 = off. It changes how the page looks, never the file.
+    Q_PROPERTY(int viewSharpen READ viewSharpen WRITE setViewSharpen NOTIFY viewSharpenChanged)
     Q_PROPERTY(bool pixelMode READ pixelMode WRITE setPixelMode NOTIFY pixelModeChanged)
     Q_PROPERTY(bool pixelIntegerZoom READ pixelIntegerZoom WRITE setPixelIntegerZoom NOTIFY pixelIntegerZoomChanged)
     Q_PROPERTY(bool pixelCheckerboard READ pixelCheckerboard WRITE setPixelCheckerboard NOTIFY pixelCheckerboardChanged)
@@ -65,6 +69,8 @@ public:
     void setLanguage(const QString &value);
 
     bool smoothZoom() const { return m_smoothZoom; }
+    int viewSharpen() const { return m_viewSharpen; }
+    void setViewSharpen(int percent);
     void setSmoothZoom(bool value);
 
     bool pixelMode() const { return m_pixelMode; }
@@ -77,6 +83,12 @@ public:
     void setPixelCheckerboard(bool value);
     bool singleInstance() const { return m_singleInstance; }
     void setSingleInstance(bool value);
+    // Where the window was the last time (its normal, not maximised, rectangle; null when never saved) and whether it
+    // was maximised. Read once at startup and written when the program closes (main.cpp).
+    QRect windowRect() const;
+    bool windowMaximized() const { return m_windowMaximized; }
+    void saveWindowState(const QRect &normalRect, bool maximized);
+
     bool verticalSync() const { return m_verticalSync; }
     void setVerticalSync(bool value);
     // A grid between the picture's own pixels from 8x.
@@ -99,6 +111,7 @@ signals:
     void stripModeChanged();
     void languageChanged();
     void smoothZoomChanged();
+    void viewSharpenChanged();
     void pixelModeChanged();
     void pixelIntegerZoomChanged();
     void pixelCheckerboardChanged();
@@ -115,12 +128,14 @@ private:
 
     int m_batchExportQuality;
     int m_batchRenamePadding;
+    bool m_windowMaximized = false;
     bool m_confirmOverwrite;
     int m_stripThumbSize = 88;
     int m_stripColumns = 1;
     QString m_stripMode = QStringLiteral("manual");
     QString m_language = QStringLiteral("system");
     bool m_smoothZoom = false;
+    int m_viewSharpen = 0;
     bool m_pixelMode = false;
     bool m_pixelIntegerZoom = false;
     bool m_pixelCheckerboard = false;

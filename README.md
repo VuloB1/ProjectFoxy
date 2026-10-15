@@ -22,8 +22,9 @@ English · [Español](#español)
 ---
 
 <p align="center">
-  <img src="docs/screenshots/visor.webp" alt="The viewer, with the thumbnail bar" width="49%">
-  <img src="docs/screenshots/editar.webp" alt="The editor: every tool one click away" width="49%">
+  <img src="docs/screenshots/visor.webp" alt="The viewer, with the thumbnail bar" width="32%">
+  <img src="docs/screenshots/editar.webp" alt="The editor: every tool one click away" width="32%">
+  <img src="docs/screenshots/lector.webp" alt="The comic and manga reader" width="32%">
 </p>
 <p align="center">
   <img src="docs/screenshots/ajustes.webp" alt="Adjustments: sliders, levels, curves and histogram" width="32%">
@@ -118,6 +119,11 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
 - Respects the **EXIF orientation** (phone photos) and opens files and folders with any name (accents, Japanese,
   Cyrillic, emoji).
 - Animated GIF, APNG and WebP with real playback.
+- **Comic and manga reader**: open a `.cbz`, `.zip` or PDF (or read the folder of the open picture with the book button in
+  the title bar). Right to left (the manga way) or left to right, one page or two side by side (the cover alone, landscape
+  pages by themselves), fit to the screen, the height or the width, click zones, keyboard, a page slider in the dock, and it
+  remembers the page. The next pages are unpacked and decoded ahead. A button at the bottom right sharpens the pages
+  with AMD's **FSR CAS** (0 to 100 %).
 - **Compare view**: 2 to 10 images at once, arranged automatically by their shape, in a row or in a column, with
   linked zoom and pan that can be unlinked.
 - **Caption (meme)**: a colored band with text above or below the picture, or the text over it with an outline.
@@ -128,7 +134,7 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
 **Formats it opens** (each one checked against a real file in the tests):
 JPEG (CMYK too), PNG, WebP and TIFF (libvips; 16 bits per channel are scaled to 8) · BMP, GIF and ICO (Qt) · camera
 RAW (LibRaw) · HEIC/HEIF and AVIF (libheif) · animated GIF, APNG and WebP. **Saves** PNG, JPG, BMP, TIFF and WebP, and
-**creates** animated GIF, APNG and WebP.
+**creates** animated GIF, APNG and WebP. The reader also opens comic archives (`.cbz`, `.zip`) and PDF files.
 
 **Safe saving**: atomic writes (a failure never leaves the original half-written), high-quality JPEG (95, no chroma
 subsampling), keeps the original's EXIF, IPTC and XMP in JPEG, PNG and WebP (from HEIC/RAW it saves **and warns** that
@@ -142,7 +148,7 @@ does not match the file" (also after Save and Undo).
 |---|---|
 | Crop | Crop with handles, aspect ratios, rotate, straighten, flip · **Frame**: shape (rectangle, ellipse, hexagon, star, heart…), round, soft, cut or concave corners, outline, margin, shadow and background |
 | Size | By pixels or scale, Lanczos‑3 resampling with halo-free sharpening when enlarging |
-| Adjustments | 18 tone/color/detail controls, levels and per-channel curves, auto, live histogram, grain/noise (4 types) |
+| Adjustments | 18 tone/color/detail controls, levels and per-channel curves, auto, live histogram, grain/noise (4 types), sharpening with AMD FidelityFX CAS |
 | Filters | 38 "looks" with thumbnails of your own photo, amount, vignette and grain |
 | Effects | 43 effects in 7 groups (blur, style, color, drawing, light, distortion and finish: black and white, haze removal, cellophane, print halftone, lines, flares, bokeh, stretch, perspective…) with a preview over the whole image, their own sliders, presets and mix; "Apply" makes them an undoable step |
 | Lens | Fixes the distortion, color fringes and dark corners of your lens with the Lensfun profile database (it recognizes the camera and lens from the EXIF), or by hand |
@@ -232,7 +238,7 @@ python tools/i18n_tool.py build    # writes resources/i18n/<language>.json
 
 - Viewer, formats, animations, themes, settings, batch, Adjustments, Filters, Effects, Lens, Frame, Compare view,
   GIF/APNG/WebP, Collage, safe saving, full undo and six languages: **done**.
-- Pending: keyboard shortcuts, text and shape layers, brushes and masks, batch recipes. See `docs/DESARROLLO.md`,
+- Pending: RAR and 7z comics, webtoon (continuous scroll) mode in the reader, keyboard shortcuts, text and shape layers, brushes and masks, batch recipes. See `docs/DESARROLLO.md`,
   section 9.
 
 ## License
@@ -264,8 +270,9 @@ Bugs and ideas are welcome: open an *issue* (there are templates) or read [`CONT
 </div>
 
 <p align="center">
-  <img src="docs/screenshots/es/visor.webp" alt="El visor, con la barra de miniaturas" width="49%">
-  <img src="docs/screenshots/es/editar.webp" alt="El editor: cada herramienta a un clic" width="49%">
+  <img src="docs/screenshots/es/visor.webp" alt="El visor, con la barra de miniaturas" width="32%">
+  <img src="docs/screenshots/es/editar.webp" alt="El editor: cada herramienta a un clic" width="32%">
+  <img src="docs/screenshots/es/lector.webp" alt="El lector de cómics y manga" width="32%">
 </p>
 <p align="center">
   <img src="docs/screenshots/es/ajustes.webp" alt="Ajustes: controles, niveles, curvas e histograma" width="32%">
@@ -363,6 +370,11 @@ idioma, un *pull request* es muy bienvenido (ver [`CONTRIBUTING.md`](CONTRIBUTIN
 - Respeta la **orientación EXIF** (fotos de móvil) y abre archivos y carpetas con
   cualquier nombre (acentos, japonés, cirílico, emoji).
 - GIF, APNG y WebP animados con reproducción real.
+- **Lector de cómics y manga**: abre un `.cbz`, `.zip` o PDF (o lee la carpeta de la imagen abierta con el botón del libro de la
+  barra de título). De derecha a izquierda (como el manga) o de izquierda a derecha, de una página o de dos (la portada sola,
+  las páginas apaisadas a solas), ajuste a la pantalla, al alto o al ancho, zonas de clic, teclado, deslizador de páginas en el
+  dock y recuerda la página. Las páginas siguientes se preparan por adelantado. Un botón abajo a la derecha afila las páginas
+  con el **FSR CAS** de AMD (de 0 a 100 %).
 - **Comparador**: de 2 a 10 imágenes a la vez, acomodadas solas según su forma, en una fila o en una columna, con zoom y desplazamiento vinculados que se pueden desvincular.
 - **Leyenda (meme)**: franja de color con texto arriba o abajo de la imagen, o el texto sobre ella con contorno.
 - **Cuentagotas**: con Alt apretado el cursor pasa a cuentagotas y un clic copia el color en `#RRGGBB`.
@@ -372,7 +384,7 @@ idioma, un *pull request* es muy bienvenido (ver [`CONTRIBUTING.md`](CONTRIBUTIN
 
 **Formatos que abre** (cada uno comprobado con un archivo real en las pruebas):
 JPEG (también CMYK), PNG, WebP y TIFF (libvips; los de 16 bits por canal se escalan a 8) ·
-BMP, GIF e ICO (Qt) · RAW de cámara (LibRaw) · HEIC/HEIF y AVIF (libheif) · GIF, APNG y WebP animados. **Guarda** en PNG, JPG, BMP, TIFF y WebP, y **crea** GIF, APNG y WebP animados.
+BMP, GIF e ICO (Qt) · RAW de cámara (LibRaw) · HEIC/HEIF y AVIF (libheif) · GIF, APNG y WebP animados. **Guarda** en PNG, JPG, BMP, TIFF y WebP, y **crea** GIF, APNG y WebP animados. El lector también abre archivos de cómic (`.cbz`, `.zip`) y PDF.
 
 **Guardado seguro**: escritura atómica (un fallo nunca deja el original a medias), JPEG
 de alta calidad (95, sin submuestreo de croma), conserva EXIF, IPTC y XMP del
@@ -388,7 +400,7 @@ tras Guardar y Deshacer).
 |---|---|
 | Recortar | Recorte con tiradores, proporciones, rotar, enderezar, voltear · **Marco**: forma (rectángulo, elipse, hexágono, estrella, corazón…), esquinas redondas, suaves, cortadas o cóncavas, contorno, margen, sombra y fondo |
 | Tamaño | Por píxeles o escala, remuestreo Lanczos‑3 con nitidez sin halos al ampliar |
-| Ajustes | 18 controles de tono/color/detalle, niveles y curvas por canal, auto, histograma en vivo, grano/ruido (4 tipos) |
+| Ajustes | 18 controles de tono/color/detalle, niveles y curvas por canal, auto, histograma en vivo, grano/ruido (4 tipos), nitidez con el CAS de AMD FidelityFX |
 | Filtros | 38 "looks" con miniaturas de la propia foto, cantidad, viñeta y grano |
 | Efectos | 43 efectos en 7 grupos (desenfoque, estilo, color, dibujo, luz, distorsión y acabado: blanco y negro, borrar niebla, celofán, semitono de imprenta, líneas, destellos, bokeh, estirar, perspectiva…) con vista previa en toda la imagen, sliders propios, preajustes y mezcla; "Aplicar" los deja como un paso deshacible |
 | Lente | Corrige la distorsión, las franjas de color y las esquinas oscuras de tu objetivo con la base de perfiles de Lensfun (reconoce la cámara y el objetivo por el EXIF), o a mano |
@@ -495,7 +507,7 @@ python tools/i18n_tool.py build    # escribe resources/i18n/<idioma>.json
 
 - Visor, formatos, animaciones, temas, configuración, lote, Ajustes, Filtros, Efectos, Lente, Marco,
   Comparador, GIF/APNG/WebP, Collage, guardado seguro y deshacer completo: **terminados**.
-- Pendientes: atajos de teclado, capas de texto y formas, pinceles y máscaras, recetas por lote.
+- Pendientes: cómics en RAR y 7z, modo webtoon (desplazamiento continuo) en el lector, atajos de teclado, capas de texto y formas, pinceles y máscaras, recetas por lote.
   Ver `docs/DESARROLLO.md`, sección 9.
 
 ## Licencia

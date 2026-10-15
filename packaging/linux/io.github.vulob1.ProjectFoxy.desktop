@@ -20,4 +20,4 @@ Categories=Graphics;2DGraphics;RasterGraphics;Viewer;Photography;
 Keywords=image;photo;viewer;editor;gif;collage;raw;heic;picture;imagen;foto;
 StartupWMClass=ProjectFoxy
 StartupNotify=true
-MimeType=image/jpeg;image/png;image/gif;image/webp;image/tiff;image/bmp;image/heif;image/heic;image/avif;image/vnd.microsoft.icon;image/x-icon;image/x-canon-cr2;image/x-canon-cr3;image/x-adobe-dng;image/x-nikon-nef;image/x-olympus-orf;image/x-pentax-pef;image/x-fuji-raf;image/x-panasonic-rw2;image/x-panasonic-raw;image/x-samsung-srw;image/x-sony-arw;
+MimeType=application/vnd.comicbook+zip;application/x-cbz;image/jpeg;image/png;image/gif;image/webp;image/tiff;image/bmp;image/heif;image/heic;image/avif;image/vnd.microsoft.icon;image/x-icon;image/x-canon-cr2;image/x-canon-cr3;image/x-adobe-dng;image/x-nikon-nef;image/x-olympus-orf;image/x-pentax-pef;image/x-fuji-raf;image/x-panasonic-rw2;image/x-panasonic-raw;image/x-samsung-srw;image/x-sony-arw;

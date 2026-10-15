@@ -147,6 +147,67 @@ private slots:
         QVERIFY(item("titleDrag")->width() > 96);
     }
 
+    // ------------------------------------------------------------------------------------------------ the reader
+
+    // "Leer" turns the folder of the open picture into a book. Reading right to left (the default) the left side goes
+    // FORWARD; "R" turns the direction around; Home and End jump; Esc gives the viewer back.
+    void theReaderTurnsPagesInTheDirectionOfReading()
+    {
+        // portrait pages: landscape ones would stand alone in a double page
+        QString first;
+        for (const char *name : {"a.png", "b.png", "c.png"}) {
+            const QString path = file(name, picture(60, 100, Qt::darkGreen));
+            if (first.isEmpty())
+                first = path;
+        }
+        m_app.controller->openPath(first);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("a.png"), 15000);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.folderModel->count(), 3, 10000);
+        QObject *reader = m_engine->rootContext()->contextProperty("mangaReader").value<QObject *>();
+        QVERIFY(reader);
+        reader->setProperty("rightToLeft", true);
+        reader->setProperty("doublePage", false);
+        const auto page = [reader]() { return QQmlProperty::read(reader, "currentPage").toInt(); };
+
+        click("readButton");
+        QTRY_VERIFY_WITH_TIMEOUT(QQmlProperty::read(reader, "active").toBool(), 5000);
+        QCOMPARE(QQmlProperty::read(reader, "pageCount").toInt(), 3);
+        QCOMPARE(page(), 0);
+
+        QTest::keyClick(m_window, Qt::Key_Left); // right to left: left is forward
+        QTRY_COMPARE_WITH_TIMEOUT(page(), 1, 3000);
+        QTest::keyClick(m_window, Qt::Key_Right);
+        QTRY_COMPARE_WITH_TIMEOUT(page(), 0, 3000);
+
+        // the click zones at both sides of the page: the left one is forward when reading right to left
+        QTest::mouseClick(m_window, Qt::LeftButton, Qt::NoModifier, QPoint(m_window->width() / 10, m_window->height() / 2));
+        QTRY_COMPARE_WITH_TIMEOUT(page(), 1, 3000);
+        QTest::mouseClick(m_window, Qt::LeftButton, Qt::NoModifier, QPoint(m_window->width() * 9 / 10, m_window->height() / 2));
+        QTRY_COMPARE_WITH_TIMEOUT(page(), 0, 3000);
+
+        QTest::keyClick(m_window, Qt::Key_R); // left to right
+        QVERIFY(!QQmlProperty::read(reader, "rightToLeft").toBool());
+        QTest::keyClick(m_window, Qt::Key_Right);
+        QTRY_COMPARE_WITH_TIMEOUT(page(), 1, 3000);
+        QTest::keyClick(m_window, Qt::Key_End);
+        QTRY_COMPARE_WITH_TIMEOUT(page(), 2, 3000);
+        QTest::keyClick(m_window, Qt::Key_Right); // the end: nowhere to go
+        QTest::keyClick(m_window, Qt::Key_Home);
+        QTRY_COMPARE_WITH_TIMEOUT(page(), 0, 3000);
+
+        QTest::keyClick(m_window, Qt::Key_D); // two pages at a time: the cover stays alone, then 2 and 3 go together
+        QTRY_VERIFY_WITH_TIMEOUT(QQmlProperty::read(reader, "doublePage").toBool(), 3000);
+        QTest::keyClick(m_window, Qt::Key_Right);
+        QTRY_COMPARE_WITH_TIMEOUT(page(), 1, 3000);
+        QTRY_COMPARE_WITH_TIMEOUT(QQmlProperty::read(reader, "lastPage").toInt(), 2, 3000);
+
+        QTest::keyClick(m_window, Qt::Key_Escape);
+        QTRY_VERIFY_WITH_TIMEOUT(!QQmlProperty::read(reader, "active").toBool(), 3000);
+        QVERIFY(item("imageCanvas")->isVisible());
+        reader->setProperty("rightToLeft", true); // the tests share their settings folder
+        reader->setProperty("doublePage", false);
+    }
+
     // ------------------------------------------------------------------------------------------------ editing and saving
 
     // Edit mode, the crop tool, a quarter turn, Aplicar, Guardar and the overwrite question: the file on disk ends up

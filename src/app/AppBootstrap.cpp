@@ -10,6 +10,7 @@
 #include "FolderModel.h"
 #include "ImageProvider.h"
 #include "LensController.h"
+#include "MangaReader.h"
 #include "PaneImageProvider.h"
 #include "ThemeManager.h"
 #include "ThumbnailImageProvider.h"
@@ -43,6 +44,10 @@ Objects setup(QQmlApplicationEngine &engine)
     auto *paneStore = new PaneImageStore(&engine);
     engine.addImageProvider(QLatin1String("pane"), new PaneImageProvider(paneStore));
     engine.rootContext()->setContextProperty("paneImages", paneStore);
+
+    // The comic reader (qml/MangaReader.qml): a folder or .cbz read page by page; its pictures come from the pane provider.
+    auto *mangaReader = new MangaReader(paneStore, &engine);
+    engine.rootContext()->setContextProperty("mangaReader", mangaReader);
 
     // The animation studio (Crear > GIF animado): the list of pictures and options, and the pictures it shows.
     auto *animStudio = new AnimStudio(paneStore, &engine);

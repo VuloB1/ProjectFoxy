@@ -67,7 +67,7 @@ AppDialog {
                     visible: root.message.length > 0
                     text: root.message
                     color: themeManager.textPrimary
-                    wrapMode: Text.WordWrap
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere // a long file name has no spaces to break at
                 }
                 Label {
                     width: parent.width

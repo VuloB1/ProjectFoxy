@@ -1,4 +1,5 @@
 #include "AdjustMath.h"
+#include "Cas.h"
 #include "ParallelRows.h"
 #include "../Histogram.h"
 
@@ -287,7 +288,7 @@ void applyNoise(int x, int y, double amount, double scale, int type, bool mono, 
     }
 }
 
-// --- Stage C: clarity + sharpen -------------------------------------------
+// --- Stage C: clarity + sharpening (FidelityFX CAS) -------------------------------------------
 
 // Clarity's blur radius scales with the image so the look is the same on a
 // thumbnail and on the full-size file: 2^lod pixels across, ~2% of the long
@@ -370,8 +371,8 @@ BlurGrid buildBlurGrid(const QImage &img, int lod)
 }
 
 // Clarity (local contrast, strongest in the midtones so blacks and whites
-// don't halo) + the 5-tap sharpen, both computed from the SAME adjusted pixels
-// and added together, then the vignette and the grain on top - exactly what
+// don't halo) + the CAS sharpening (Cas.h), both computed from the SAME adjusted pixels
+// (the sharpened pixel plus the clarity term), then the vignette and the grain on top - exactly what
 // Detail.frag does.
 //
 // Pictures with transparency: the neighbourhood maths (sharpen, clarity) runs on
@@ -427,10 +428,13 @@ QImage applyDetail(const QImage &adjusted, double clarity, double sharpness, dou
             double value[3] = {c[0], c[1], c[2]};
 
             if (amount > 0.0) {
+                // FidelityFX CAS (see Cas.h) on the 3x3 neighbourhood of each channel.
                 for (int i = 0; i < 3; ++i) {
-                    const double sum = premultiplied(lineC, xl, i) + premultiplied(lineC, xr, i)
-                        + premultiplied(lineU, xc, i) + premultiplied(lineD, xc, i);
-                    value[i] += amount * (c[i] * 4.0 - sum);
+                    const float n[9] = {
+                        float(premultiplied(lineU, xl, i)), float(premultiplied(lineU, xc, i)), float(premultiplied(lineU, xr, i)),
+                        float(premultiplied(lineC, xl, i)), float(c[i]),                         float(premultiplied(lineC, xr, i)),
+                        float(premultiplied(lineD, xl, i)), float(premultiplied(lineD, xc, i)), float(premultiplied(lineD, xr, i))};
+                    value[i] = casChannel(n, float(amount));
                 }
             }
             if (useClarity) {

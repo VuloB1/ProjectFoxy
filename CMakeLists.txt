@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(ImageViewer VERSION 0.2.8 LANGUAGES CXX)
+project(ImageViewer VERSION 0.3.0 LANGUAGES CXX)
 if(WIN32)
     enable_language(RC)   # the executable carries its icon as a resource (resources/app.rc)
 endif()
@@ -21,6 +21,9 @@ endif()
 # Dependencies
 # ---------------------------------------------------------------------------
 find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools)
+# The comic reader draws PDF pages with Qt PDF when it is there (a Qt installed without it builds, and says so when a
+# PDF is opened).
+find_package(Qt6 6.6 OPTIONAL_COMPONENTS Pdf)
 
 # Qt is the one dependency vcpkg does not pin (it comes from the Qt online
 # installer / aqtinstall), so the exact version the project is validated with is
@@ -53,6 +56,8 @@ if(NOT PKG_CONFIG_EXECUTABLE AND DEFINED VCPKG_INSTALLED_DIR)
 endif()
 
 find_package(PkgConfig REQUIRED)
+# The comic reader unpacks .cbz files itself (src/core/ZipArchive.cpp).
+find_package(ZLIB REQUIRED)
 pkg_check_modules(VIPS REQUIRED IMPORTED_TARGET vips-cpp)
 # libraw_r (not plain libraw): the reentrant/thread-safe build, matching
 # IImageDecoder's "must be safe to call from a worker thread" contract -
@@ -127,6 +132,8 @@ add_library(imageviewer_app STATIC
     src/app/BatchExporter.cpp
     src/app/LensController.h
     src/app/LensController.cpp
+    src/app/MangaReader.h
+    src/app/MangaReader.cpp
     src/app/PaneImageProvider.h
     src/app/PaneImageProvider.cpp
     src/app/AnimStudio.h
@@ -198,11 +205,13 @@ function(iv_add_app_resources target)
         FILES
             qml/shaders/Grade.frag
             qml/shaders/Detail.frag
+            qml/shaders/Cas.frag
             qml/shaders/Checker.frag
             qml/shaders/PixelGrid.frag
         OUTPUTS
             Grade.frag.qsb
             Detail.frag.qsb
+            Cas.frag.qsb
             Checker.frag.qsb
             PixelGrid.frag.qsb
     )
@@ -252,6 +261,8 @@ set(IV_QML_FILES
         qml/FramePanel.qml
         qml/PaneView.qml
         qml/MultiView.qml
+        qml/ReaderView.qml
+        qml/CasEffect.qml
         qml/GifStudio.qml
         qml/CollageMaker.qml
         qml/FrameCornerPicker.qml

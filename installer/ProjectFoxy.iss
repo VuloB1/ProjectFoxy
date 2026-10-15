@@ -1,7 +1,7 @@
 ﻿; Project Foxy - installer (Inno Setup 6).
 ;
 ; Build it with tools\Build-Release.ps1 (which installs the program into dist\ProjectFoxy first), or by hand:
-;     ISCC.exe /DAppVersion=0.2.8 installer\ProjectFoxy.iss
+;     ISCC.exe /DAppVersion=0.3.0 installer\ProjectFoxy.iss
 ;
 ; What it does:
 ;   - installs the folder that `cmake --install` produces (the program, Qt, the libraries and the licences);
@@ -11,7 +11,7 @@
 ;     files. Windows does not let a program make itself the default, so the last step is the person's.
 
 #ifndef AppVersion
-  #define AppVersion "0.2.8"
+  #define AppVersion "0.3.0"
 #endif
 #define AppName "Project Foxy"
 #define AppExe "ProjectFoxy.exe"
@@ -107,6 +107,7 @@ Root: HKA; Subkey: "Software\Classes\.bmp\OpenWithProgids"; ValueType: string; V
 Root: HKA; Subkey: "Software\Classes\.gif\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.ico\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.heic\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
+Root: HKA; Subkey: "Software\Classes\.cbz\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.heif\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.avif\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\.cr2\OpenWithProgids"; ValueType: string; ValueName: "ProjectFoxy.Image"; ValueData: ""; Flags: uninsdeletevalue; Tasks: assoc
@@ -133,6 +134,7 @@ Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueTy
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".gif"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".ico"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".heic"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
+Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".cbz"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".heif"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".avif"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".cr2"; ValueData: "ProjectFoxy.Image"; Tasks: assoc

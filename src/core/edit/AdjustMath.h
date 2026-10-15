@@ -18,8 +18,8 @@ namespace core::edit {
 //   B. Per-pixel color mixing - shadows/highlights, saturation, vibrance, hue
 //      rotation, negative. Needs the three channels together, so it's plain
 //      float math, transcribed into the shader.
-//   C. Spatial detail - clarity (big-radius local contrast) and the 5-tap
-//      sharpen.
+//   C. Spatial detail - clarity (big-radius local contrast) and the sharpening
+//      (FidelityFX CAS, see Cas.h).
 
 struct AdjustLut {
     std::array<quint8, 256> r{};

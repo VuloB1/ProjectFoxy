@@ -368,6 +368,8 @@ public slots:
     void setAsWallpaper();
 
 signals:
+    // A comic archive (.cbz / .zip) was opened like a picture: the reader takes it (qml/ReaderView.qml).
+    void comicRequested(const QString &path);
     // Fired alongside currentSourceChanged() whenever the image's actual
     // identity/dimensions changed (a new file, or a structural edit baked)
     // - NOT on every animation frame tick, which reuses currentSourceChanged

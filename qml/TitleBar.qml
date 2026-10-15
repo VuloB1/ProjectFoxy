@@ -26,6 +26,9 @@ AppPanelBackground {
     property bool multiMode: false
     // A creation studio ("gif" or "collage") is open: they take over the window, so the rest waits.
     property string studio: ""
+    // The comic / manga reader is open: the picture tools wait, and the reading button closes it.
+    property bool reading: false
+    signal readRequested()
     signal editModeRequested(bool on)
     signal multiModeRequested(bool on)
     signal studioRequested(string name)
@@ -48,7 +51,7 @@ AppPanelBackground {
     // area are taken, decides how many of the optional tools fit.
     readonly property real spareForOptional: width - buttons.width - gap - fixedActionsW - leftBaseW
                                              - Math.min(nameNatural, nameMinW) - gap - minDrag
-    readonly property int optionalShown: Math.max(0, Math.min(3, Math.floor(spareForOptional / (btnW + gap))))
+    readonly property int optionalShown: Math.max(0, Math.min(4, Math.floor(spareForOptional / (btnW + gap))))
     readonly property real actionsW: fixedActionsW + optionalShown * (btnW + gap)
     // The name: its own width, but never more than half the bar, nor what would squeeze the drag area.
     readonly property real nameMaxW: Math.max(0, Math.min(width / 2,
@@ -124,16 +127,25 @@ AppPanelBackground {
             checkable: true
             // Structural edits/filters bake a single static frame, which
             // doesn't fit a playing animation - see AppController::isAnimated.
-            enabled: !appController.isAnimated && !root.locked && !root.multiMode && root.studio === ""
+            enabled: !appController.isAnimated && !root.locked && !root.multiMode && root.studio === "" && !root.reading
             checked: root.editMode
             onToggled: root.editModeRequested(checked)
+        }
+        ToolBtn {
+            text: qsTr("Leer un cómic o manga")
+            objectName: "readButton"
+            iconName: "book"
+            visible: root.optionalShown >= 1
+            enabled: !root.locked && root.studio === "" && !root.multiMode
+            checked: root.reading
+            onClicked: root.readRequested()
         }
         ToolBtn {
             text: qsTr("GIF animado")
             objectName: "gifButton"
             iconName: "film"
-            visible: root.optionalShown >= 1
-            enabled: !root.locked
+            visible: root.optionalShown >= 2
+            enabled: !root.locked && !root.reading
             checked: root.studio === "gif"
             onClicked: root.studioRequested(root.studio === "gif" ? "" : "gif")
         }
@@ -141,8 +153,8 @@ AppPanelBackground {
             text: qsTr("Collage")
             objectName: "collageButton"
             iconName: "collage"
-            visible: root.optionalShown >= 2
-            enabled: !root.locked
+            visible: root.optionalShown >= 3
+            enabled: !root.locked && !root.reading
             checked: root.studio === "collage"
             onClicked: root.studioRequested(root.studio === "collage" ? "" : "collage")
         }
@@ -150,8 +162,8 @@ AppPanelBackground {
             text: qsTr("Comparador (varias imágenes con zoom vinculado)")
             iconName: "multi"
             checkable: true
-            visible: root.optionalShown >= 3
-            enabled: folderModel.count > 0 && !root.locked && root.studio === ""
+            visible: root.optionalShown >= 4
+            enabled: folderModel.count > 0 && !root.locked && root.studio === "" && !root.reading
             checked: root.multiMode
             onToggled: root.multiModeRequested(checked)
         }
@@ -166,41 +178,49 @@ AppPanelBackground {
                 AppMenuItem {
                     visible: root.optionalShown < 1
                     height: visible ? implicitHeight : 0
-                    iconName: "film"
-                    text: qsTr("GIF animado")
-                    enabled: !root.locked
-                    onTriggered: root.studioRequested(root.studio === "gif" ? "" : "gif")
+                    iconName: "book"
+                    text: qsTr("Leer un cómic o manga")
+                    enabled: !root.locked && root.studio === "" && !root.multiMode
+                    onTriggered: root.readRequested()
                 }
                 AppMenuItem {
                     visible: root.optionalShown < 2
                     height: visible ? implicitHeight : 0
-                    iconName: "collage"
-                    text: qsTr("Collage")
-                    enabled: !root.locked
-                    onTriggered: root.studioRequested(root.studio === "collage" ? "" : "collage")
+                    iconName: "film"
+                    text: qsTr("GIF animado")
+                    enabled: !root.locked && !root.reading
+                    onTriggered: root.studioRequested(root.studio === "gif" ? "" : "gif")
                 }
                 AppMenuItem {
                     visible: root.optionalShown < 3
                     height: visible ? implicitHeight : 0
+                    iconName: "collage"
+                    text: qsTr("Collage")
+                    enabled: !root.locked && !root.reading
+                    onTriggered: root.studioRequested(root.studio === "collage" ? "" : "collage")
+                }
+                AppMenuItem {
+                    visible: root.optionalShown < 4
+                    height: visible ? implicitHeight : 0
                     iconName: "multi"
                     text: qsTr("Comparar")
-                    enabled: folderModel.count > 0 && !root.locked && root.studio === ""
+                    enabled: folderModel.count > 0 && !root.locked && root.studio === "" && !root.reading
                     onTriggered: root.multiModeRequested(!root.multiMode)
                 }
                 AppMenuSeparator {
-                    visible: root.optionalShown < 3
+                    visible: root.optionalShown < 4
                     height: visible ? implicitHeight : 0
                 }
                 AppMenuItem {
                     iconName: "export-batch"
                     text: qsTr("Exportar por lote…")
-                    enabled: folderModel.count > 0 && !root.locked
+                    enabled: folderModel.count > 0 && !root.locked && !root.reading
                     onTriggered: if (root.toolbar) root.toolbar.openBatchExport()
                 }
                 AppMenuItem {
                     iconName: "rename-batch"
                     text: qsTr("Renombrar por lote…")
-                    enabled: folderModel.count > 0 && !root.locked
+                    enabled: folderModel.count > 0 && !root.locked && !root.reading
                     onTriggered: if (root.toolbar) root.toolbar.openBatchRename()
                 }
             }
