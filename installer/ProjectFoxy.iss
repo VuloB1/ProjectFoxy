@@ -159,8 +159,15 @@ Root: HKA; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueNa
 [Run]
 Filename: "ms-settings:defaultapps"; Description: "{cm:RunDefaultApps}"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
+; the program updating itself runs this installer silently (/update=1): start it again
+Filename: "{app}\{#AppExe}"; Flags: nowait; Check: IsSelfUpdate
 
 [Code]
+function IsSelfUpdate: Boolean;
+begin
+  Result := ExpandConstant('{param:update|0}') = '1';
+end;
+
 // The welcome page and the "installation complete" page show the same picture by default: give the last one its own.
 procedure CurPageChanged(CurPageID: Integer);
 begin

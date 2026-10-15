@@ -1,5 +1,6 @@
 #pragma once
 
+class UpdateManager;
 class AppController;
 class AppSettings;
 class FolderModel;
@@ -15,6 +16,7 @@ struct Objects {
     FolderModel *folderModel = nullptr;
     AppController *controller = nullptr;
     AppSettings *settings = nullptr;
+    UpdateManager *updater = nullptr;
 };
 
 // Creates everything and hands it to `engine` (which owns it all: nothing needs manual cleanup). Does not load Main.qml.

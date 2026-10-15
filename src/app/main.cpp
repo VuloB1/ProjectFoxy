@@ -1,4 +1,5 @@
 #include "AppBootstrap.h"
+#include "UpdateManager.h"
 #include "AppController.h"
 #include "AppSettings.h"
 #include "FontSubstitutions.h"
@@ -83,7 +84,17 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     // Everything the QML needs, owned by the engine (see AppBootstrap.h).
-    AppController *controller = AppBootstrap::setup(engine).controller;
+    const AppBootstrap::Objects objects = AppBootstrap::setup(engine);
+    AppController *controller = objects.controller;
+#ifdef PROJECTFOXY_DEV_SERVER
+    // Developer build: a fake GitHub (PROJECTFOXY_UPDATE_URL, PROJECTFOXY_UPDATE_BASE for the files) and no real
+    // installer run (PROJECTFOXY_UPDATE_DRYRUN).
+    if (qEnvironmentVariableIsSet("PROJECTFOXY_UPDATE_URL"))
+        objects.updater->setApiUrl(QUrl(qEnvironmentVariable("PROJECTFOXY_UPDATE_URL")));
+    if (qEnvironmentVariableIsSet("PROJECTFOXY_UPDATE_BASE"))
+        objects.updater->setDownloadBase(qEnvironmentVariable("PROJECTFOXY_UPDATE_BASE"));
+    objects.updater->setDryRun(qEnvironmentVariableIsSet("PROJECTFOXY_UPDATE_DRYRUN"));
+#endif
     // Building the window takes a while: decode the picture meanwhile instead of after it.
     if (!fileArgument.isEmpty())
         controller->prefetch(fileArgument);

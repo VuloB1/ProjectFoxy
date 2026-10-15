@@ -48,6 +48,8 @@ class AppSettings : public QObject {
     // milliseconds in Direct3D 11 while the window is resized with it on; off avoids that and may tear on screens
     // without FreeSync / G-Sync. Read when the program starts: a change applies the next time it is opened.
     Q_PROPERTY(bool verticalSync READ verticalSync WRITE setVerticalSync NOTIFY verticalSyncChanged)
+    // Look on GitHub for a newer version when the program starts (at most once a day; on by default).
+    Q_PROPERTY(bool updateCheck READ updateCheck WRITE setUpdateCheck NOTIFY updateCheckChanged)
 
 public:
     explicit AppSettings(QObject *parent = nullptr);
@@ -81,6 +83,13 @@ public:
     // A checkerboard behind the transparent parts.
     bool pixelCheckerboard() const { return m_pixelCheckerboard; }
     void setPixelCheckerboard(bool value);
+    bool updateCheck() const { return m_updateCheck; }
+    void setUpdateCheck(bool value);
+    // When the last check succeeded (seconds since the epoch; 0 = never) and the version the person chose to skip.
+    qint64 lastUpdateCheck() const { return m_lastUpdateCheck; }
+    void setLastUpdateCheck(qint64 secs);
+    QString skippedUpdate() const { return m_skippedUpdate; }
+    void setSkippedUpdate(const QString &version);
     bool singleInstance() const { return m_singleInstance; }
     void setSingleInstance(bool value);
     // Where the window was the last time (its normal, not maximised, rectangle; null when never saved) and whether it
@@ -119,6 +128,7 @@ signals:
     void pixelSharpEditChanged();
     void singleInstanceChanged();
     void verticalSyncChanged();
+    void updateCheckChanged();
 
 private:
     // Stores `value` under `key` and reports whether it was a change.
@@ -143,4 +153,7 @@ private:
     bool m_pixelSharpEdit = false;
     bool m_singleInstance = true;
     bool m_verticalSync = true;
+    bool m_updateCheck = true;
+    qint64 m_lastUpdateCheck = 0;
+    QString m_skippedUpdate;
 };

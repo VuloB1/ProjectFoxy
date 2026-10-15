@@ -3,6 +3,20 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased] — Updates from inside the program
+
+- **A notice when a newer version is published.** At start (at most once a day, five seconds after the window opens) the
+  program asks GitHub's public API which is the latest release and, if it is newer than the one you run, shows a small
+  card at the top right: *Update now*, *What is new* and *Skip this version*. The only thing sent is that one HTTPS
+  request, with the program's name and version in the User-Agent. It is on by default and can be turned off, or run by
+  hand, in Settings > About.
+- **One-click update on Windows.** When the program was installed with its installer, *Update now* downloads the
+  installer, checks it against the release's `SHA256SUMS.txt` (a download that does not match is deleted, and a release
+  without sums is never run) and, with *Restart and install*, runs it silently and starts the program again. It will not
+  restart while the open picture has unsaved edits. The portable zip, Linux and Flatpak only get the notice (they
+  update by their own means).
+- The installer starts the program again after a silent update (`/update=1`).
+
 ## [0.3.1] — Faster opening
 
 - **Next and previous pictures open instantly.** While you look at a picture, the ones before and after it are decoded
@@ -181,6 +195,20 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar] — Actualizaciones desde el programa
+
+- **Un aviso cuando se publica una versión más nueva.** Al arrancar (como mucho una vez al día, cinco segundos después de
+  abrir la ventana) el programa pregunta a la API pública de GitHub cuál es la última versión y, si es posterior a la que
+  usas, muestra una tarjeta arriba a la derecha: *Actualizar ahora*, *Novedades* y *Omitir esta versión*. Lo único que se
+  envía es esa petición HTTPS, con el nombre y la versión del programa en el User-Agent. Viene activado y se puede
+  apagar, o lanzar a mano, en Ajustes > Acerca de.
+- **Actualización con un clic en Windows.** Cuando el programa se instaló con su instalador, *Actualizar ahora* descarga
+  el instalador, lo comprueba con el `SHA256SUMS.txt` de la versión (una descarga que no coincide se borra, y una versión
+  sin sumas nunca se ejecuta) y, con *Reiniciar e instalar*, lo ejecuta en silencio y vuelve a abrir el programa. No
+  reinicia mientras la imagen abierta tenga cambios sin guardar. El zip portátil, Linux y Flatpak solo reciben el aviso
+  (se actualizan por sus propios medios).
+- El instalador vuelve a abrir el programa tras una actualización silenciosa (`/update=1`).
 
 ## [0.3.1] — Apertura más rápida
 

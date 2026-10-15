@@ -35,6 +35,9 @@ AppSettings::AppSettings(QObject *parent)
     m_pixelSharpEdit = m_store.value(QStringLiteral("view/pixelSharpEdit"), wasAllInOne).toBool();
     m_singleInstance = m_store.value(QStringLiteral("window/singleInstance"), true).toBool();
     m_verticalSync = m_store.value(QStringLiteral("window/verticalSync"), true).toBool();
+    m_updateCheck = m_store.value(QStringLiteral("update/check"), true).toBool();
+    m_lastUpdateCheck = m_store.value(QStringLiteral("update/lastCheck"), 0).toLongLong();
+    m_skippedUpdate = m_store.value(QStringLiteral("update/skipped")).toString();
     m_windowMaximized = m_store.value(QStringLiteral("window/maximized"), false).toBool();
 }
 
@@ -141,6 +144,24 @@ void AppSettings::setPixelCheckerboard(bool value)
 {
     if (storeFlag(m_pixelCheckerboard, QStringLiteral("view/pixelCheckerboard"), value))
         emit pixelCheckerboardChanged();
+}
+
+void AppSettings::setUpdateCheck(bool value)
+{
+    if (storeFlag(m_updateCheck, QStringLiteral("update/check"), value))
+        emit updateCheckChanged();
+}
+
+void AppSettings::setLastUpdateCheck(qint64 secs)
+{
+    m_lastUpdateCheck = secs;
+    m_store.setValue(QStringLiteral("update/lastCheck"), secs);
+}
+
+void AppSettings::setSkippedUpdate(const QString &version)
+{
+    m_skippedUpdate = version;
+    m_store.setValue(QStringLiteral("update/skipped"), version);
 }
 
 void AppSettings::setSingleInstance(bool value)
