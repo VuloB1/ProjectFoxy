@@ -22,8 +22,9 @@ English · [Español](#español)
 ---
 
 <p align="center">
-  <img src="docs/screenshots/visor.webp" alt="The viewer, with the thumbnail bar" width="49%">
-  <img src="docs/screenshots/editar.webp" alt="The editor: every tool one click away" width="49%">
+  <img src="docs/screenshots/visor.webp" alt="The viewer, with the thumbnail bar" width="32%">
+  <img src="docs/screenshots/editar.webp" alt="The editor: every tool one click away" width="32%">
+  <img src="docs/screenshots/lector.webp" alt="The comic and manga reader" width="32%">
 </p>
 <p align="center">
   <img src="docs/screenshots/ajustes.webp" alt="Adjustments: sliders, levels, curves and histogram" width="32%">
@@ -269,8 +270,9 @@ Bugs and ideas are welcome: open an *issue* (there are templates) or read [`CONT
 </div>
 
 <p align="center">
-  <img src="docs/screenshots/es/visor.webp" alt="El visor, con la barra de miniaturas" width="49%">
-  <img src="docs/screenshots/es/editar.webp" alt="El editor: cada herramienta a un clic" width="49%">
+  <img src="docs/screenshots/es/visor.webp" alt="El visor, con la barra de miniaturas" width="32%">
+  <img src="docs/screenshots/es/editar.webp" alt="El editor: cada herramienta a un clic" width="32%">
+  <img src="docs/screenshots/es/lector.webp" alt="El lector de cómics y manga" width="32%">
 </p>
 <p align="center">
   <img src="docs/screenshots/es/ajustes.webp" alt="Ajustes: controles, niveles, curvas e histograma" width="32%">
