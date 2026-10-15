@@ -10,6 +10,8 @@
 #include <algorithm>
 #ifdef PROJECTFOXY_PDF
 #include <QPdfDocument>
+#else
+class QPdfDocument {}; // never created: this build has no Qt PDF (ComicBook.h only declares the class)
 #endif
 
 namespace core {
