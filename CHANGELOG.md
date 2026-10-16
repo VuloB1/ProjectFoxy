@@ -3,7 +3,7 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
-## [Unreleased] — Updates from inside the program
+## [0.3.2] — Updates from inside the program
 
 - **A notice when a newer version is published.** At start (at most once a day, five seconds after the window opens) the
   program asks GitHub's public API which is the latest release and, if it is newer than the one you run, shows a small
@@ -196,7 +196,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Sin publicar] — Actualizaciones desde el programa
+## [0.3.2] — Actualizaciones desde el programa
 
 - **Un aviso cuando se publica una versión más nueva.** Al arrancar (como mucho una vez al día, cinco segundos después de
   abrir la ventana) el programa pregunta a la API pública de GitHub cuál es la última versión y, si es posterior a la que

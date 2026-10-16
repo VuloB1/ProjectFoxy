@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.2" date="2026-10-16">
+      <description>
+        <p>The program now tells you when a newer version is published (one request to GitHub a day, can be turned off in Settings) and, on Windows when installed with the installer, updates itself in one click after checking the download.</p>
+      </description>
+    </release>
     <release version="0.3.1" date="2026-10-15">
       <description>
         <p>Pictures open faster: the neighbouring pictures are decoded ahead so the arrow keys are instant, big JPEGs show a reduced look at once while the whole picture finishes, and the window no longer flashes white when it opens. The installer has no licence page and has new pictures.</p>
