@@ -124,6 +124,8 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
   pages by themselves), fit to the screen, the height or the width, click zones, keyboard, a page slider in the dock, and it
   remembers the page. The next pages are unpacked and decoded ahead. A button at the bottom right sharpens the pages
   with AMD's **FSR CAS** (0 to 100 %).
+- **Updates from inside**: once a day it asks GitHub for a newer release and shows a small notice; on Windows, when installed
+  with the installer, one click downloads it, checks its SHA-256 and restarts into the new version. Optional (Settings > About).
 - **Compare view**: 2 to 10 images at once, arranged automatically by their shape, in a row or in a column, with
   linked zoom and pan that can be unlinked.
 - **Caption (meme)**: a colored band with text above or below the picture, or the text over it with an outline.
@@ -375,6 +377,8 @@ idioma, un *pull request* es muy bienvenido (ver [`CONTRIBUTING.md`](CONTRIBUTIN
   las páginas apaisadas a solas), ajuste a la pantalla, al alto o al ancho, zonas de clic, teclado, deslizador de páginas en el
   dock y recuerda la página. Las páginas siguientes se preparan por adelantado. Un botón abajo a la derecha afila las páginas
   con el **FSR CAS** de AMD (de 0 a 100 %).
+- **Actualizaciones desde el programa**: una vez al día pregunta a GitHub por una versión nueva y muestra un aviso discreto; en
+  Windows, si se instaló con el instalador, un clic la descarga, comprueba su SHA-256 y reinicia con la versión nueva. Opcional (Ajustes > Acerca de).
 - **Comparador**: de 2 a 10 imágenes a la vez, acomodadas solas según su forma, en una fila o en una columna, con zoom y desplazamiento vinculados que se pueden desvincular.
 - **Leyenda (meme)**: franja de color con texto arriba o abajo de la imagen, o el texto sobre ella con contorno.
 - **Cuentagotas**: con Alt apretado el cursor pasa a cuentagotas y un clic copia el color en `#RRGGBB`.

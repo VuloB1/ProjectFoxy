@@ -1609,3 +1609,29 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
 - **Pruebas:** `test_cas` (4: apagado/plano/negro, más contraste con más fuerza, siempre en 0..1 y sin NaN, sin hueco no añade).
   **No probado:** el rendimiento con ventanas 4K y el menú con los temas Classic.
 
+## 25. Actualizaciones desde el programa (`UpdateManager`)
+
+- **Qué hace:** `src/core/UpdateCheck.{h,cpp}` (lógica pura, probada en `test_update_check`: comparar versiones número a
+  número, leer la respuesta de `releases/latest`, buscar el hash en `SHA256SUMS.txt`, SHA‑256 de un archivo) y
+  `src/app/UpdateManager.{h,cpp}` (red, estados, descarga, lanzamiento). Propiedad de contexto `updater`; la tarjeta es
+  `qml/UpdateBanner.qml` (arriba a la derecha, bajo la barra de título) y los controles están en `qml/AboutPage.qml`.
+- **Estados:** `idle`, `checking`, `upToDate` (solo en comprobación manual), `available`, `downloading`, `ready`
+  (descargado y verificado), `installing`, `failed` (`error`: `network|invalid|nosums|corrupt|disk|launch`, las palabras
+  las pone el QML). Una comprobación automática que falla no muestra nada.
+- **Qué se envía:** una sola petición GET a `https://api.github.com/repos/VuloB1/ProjectFoxy/releases/latest`, como mucho
+  cada 20 h (`update/lastCheck`), solo con `update/check` activo (por defecto sí). `update/skipped` guarda la versión
+  omitida (una posterior vuelve a avisar).
+- **Instalar (solo Windows con `unins000.exe` junto al programa):** primero se baja `SHA256SUMS.txt`, luego el instalador
+  (a `%TEMP%/ProjectFoxy-update`, escribiéndolo según llega), se compara el SHA‑256 y solo entonces pasa a `ready`.
+  *Reiniciar e instalar* lanza `ProjectFoxy-Setup-X.exe /SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /update=1` y cierra el
+  programa; el QML lo deshabilita mientras `appController.isDirty`. `ProjectFoxy.iss` tiene un `[Run]` con
+  `Check: IsSelfUpdate` que lo vuelve a abrir (el normal lleva `skipifsilent`).
+- **Seguridad:** solo se aceptan enlaces `https://github.com/...` de la respuesta. Los hashes vienen de la misma versión
+  publicada: comprueban que la descarga llegó entera, **no** que el instalador sea auténtico (eso pediría firmar el
+  instalador; SmartScreen puede avisar).
+- **Pruebas a mano (compilación de desarrollo):** `PROJECTFOXY_UPDATE_URL` (JSON), `PROJECTFOXY_UPDATE_BASE` (sustituye
+  `https://github.com` en las descargas) y `PROJECTFOXY_UPDATE_DRYRUN` (no ejecuta el instalador ni sale); un servidor
+  falso con 9.9.9 llevó el flujo hasta `ready`, y con una suma mala hasta `failed/corrupt`. `PROJECTFOXY_NO_UPDATE_CHECK`
+  apaga la consulta (lo usan la prueba de arranque y `test_ui_flows`).
+- **No probado:** el instalador real lanzado desde el programa (UAC si se instaló para todos los usuarios, que el
+  `[Run]` reabra el programa), ni contra una versión publicada de verdad más nueva que la instalada.

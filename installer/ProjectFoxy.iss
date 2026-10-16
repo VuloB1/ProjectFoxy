@@ -1,7 +1,7 @@
 ﻿; Project Foxy - installer (Inno Setup 6).
 ;
 ; Build it with tools\Build-Release.ps1 (which installs the program into dist\ProjectFoxy first), or by hand:
-;     ISCC.exe /DAppVersion=0.3.1 installer\ProjectFoxy.iss
+;     ISCC.exe /DAppVersion=0.3.2 installer\ProjectFoxy.iss
 ;
 ; What it does:
 ;   - installs the folder that `cmake --install` produces (the program, Qt, the libraries and the licences);
@@ -11,7 +11,7 @@
 ;     files. Windows does not let a program make itself the default, so the last step is the person's.
 
 #ifndef AppVersion
-  #define AppVersion "0.3.1"
+  #define AppVersion "0.3.2"
 #endif
 #define AppName "Project Foxy"
 #define AppExe "ProjectFoxy.exe"
@@ -159,8 +159,15 @@ Root: HKA; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueNa
 [Run]
 Filename: "ms-settings:defaultapps"; Description: "{cm:RunDefaultApps}"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
+; the program updating itself runs this installer silently (/update=1): start it again
+Filename: "{app}\{#AppExe}"; Flags: nowait; Check: IsSelfUpdate
 
 [Code]
+function IsSelfUpdate: Boolean;
+begin
+  Result := ExpandConstant('{param:update|0}') = '1';
+end;
+
 // The welcome page and the "installation complete" page show the same picture by default: give the last one its own.
 procedure CurPageChanged(CurPageID: Integer);
 begin

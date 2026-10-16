@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(ImageViewer VERSION 0.3.1 LANGUAGES CXX)
+project(ImageViewer VERSION 0.3.2 LANGUAGES CXX)
 if(WIN32)
     enable_language(RC)   # the executable carries its icon as a resource (resources/app.rc)
 endif()
@@ -109,6 +109,8 @@ add_library(imageviewer_app STATIC
     src/app/SingleInstance.cpp
     src/app/AppBootstrap.h
     src/app/AppBootstrap.cpp
+    src/app/UpdateManager.h
+    src/app/UpdateManager.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
@@ -262,6 +264,7 @@ set(IV_QML_FILES
         qml/PaneView.qml
         qml/MultiView.qml
         qml/ReaderView.qml
+        qml/UpdateBanner.qml
         qml/CasEffect.qml
         qml/GifStudio.qml
         qml/CollageMaker.qml

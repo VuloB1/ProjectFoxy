@@ -200,6 +200,61 @@ Item {
             }
         }
 
+        // ---- updates
+        Panel {
+            heading: qsTr("Actualizaciones")
+            Label {
+                width: parent.width
+                wrapMode: Text.WordWrap
+                color: themeManager.textPrimary
+                text: {
+                    switch (updater.state) {
+                    case "checking": return qsTr("Buscando una versión nueva…")
+                    case "upToDate": return qsTr("Tienes la última versión.")
+                    case "available": case "downloading": case "ready": case "installing":
+                        return qsTr("Hay una versión nueva: %1").arg(updater.latestVersion)
+                    case "failed": return qsTr("No se pudo comprobar la versión.")
+                    default: return qsTr("Versión instalada: %1").arg(updater.currentVersion)
+                    }
+                }
+            }
+            Row {
+                spacing: 10
+                AppButton {
+                    text: qsTr("Buscar ahora")
+                    enabled: updater.state !== "checking" && updater.state !== "downloading" && updater.state !== "installing"
+                    onClicked: updater.checkNow()
+                }
+                AppButton {
+                    visible: updater.state === "available"
+                    primary: true
+                    text: updater.canInstall ? qsTr("Actualizar ahora") : qsTr("Descargar")
+                    onClicked: updater.download()
+                }
+            }
+            Item {
+                width: parent.width
+                height: 40
+                Label {
+                    anchors.left: parent.left
+                    anchors.right: autoSwitch.left
+                    anchors.rightMargin: 12
+                    anchors.verticalCenter: parent.verticalCenter
+                    wrapMode: Text.WordWrap
+                    color: themeManager.textSecondary
+                    font.pixelSize: 12
+                    text: qsTr("Buscar actualizaciones al iniciar (una consulta a GitHub al día, nada más).")
+                }
+                AppSwitch {
+                    id: autoSwitch
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    checked: appSettings.updateCheck
+                    onToggled: appSettings.updateCheck = checked
+                }
+            }
+        }
+
         // ---- the author
         Panel {
             Row {

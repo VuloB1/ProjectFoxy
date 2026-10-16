@@ -238,6 +238,14 @@ ApplicationWindow {
         }
         onLoaded: item.forceActiveFocus()
     }
+    // A newer version exists (UpdateManager): the notice sits over everything but the dialogs.
+    UpdateBanner {
+        anchors.top: titleBar.bottom
+        anchors.topMargin: 12
+        anchors.right: parent.right
+        anchors.rightMargin: 16
+        z: 8
+    }
     // A .cbz opened like any other file (Abrir, drag and drop, "Open with") is read, not shown.
     Connections {
         target: appController

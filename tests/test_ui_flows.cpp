@@ -47,6 +47,7 @@ private slots:
     {
         QVERIFY(m_dir.isValid());
         m_engine = new QQmlApplicationEngine;
+        qputenv("PROJECTFOXY_NO_UPDATE_CHECK", "1"); // no network in the tests
         m_app = AppBootstrap::setup(*m_engine);
         m_app.settings->setSingleInstance(true);
         m_engine->loadFromModule("ImageViewerApp", "Main");

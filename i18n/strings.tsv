@@ -930,3 +930,28 @@ Nitidez de la vista	View sharpening	Nitidez da visualização	보기 선명도	�
 Nitidez de la vista: %1 %	View sharpening: %1 %	Nitidez da visualização: %1 %	보기 선명도: %1 %	视图锐化：%1 %	ビューのシャープ化: %1 %
 Apagada	Off	Desativada	꺼짐	关闭	オフ
 Afila lo que ves en pantalla con FSR CAS, de AMD. No cambia el archivo.	Sharpens what you see on screen with FSR CAS, from AMD. It does not change the file.	Aumenta a nitidez do que você vê na tela com o FSR CAS, da AMD. Não altera o arquivo.	AMD의 FSR CAS로 화면에 보이는 것을 선명하게 합니다. 파일은 바뀌지 않습니다.	使用 AMD 的 FSR CAS 锐化屏幕上显示的内容，不会更改文件。	AMDのFSR CASで画面に表示されるものをシャープにします。ファイルは変更されません。
+No se pudo descargar. Revisa tu conexión e inténtalo de nuevo.	Could not download. Check your connection and try again.	Não foi possível baixar. Verifique sua conexão e tente novamente.	다운로드하지 못했습니다. 연결을 확인하고 다시 시도하세요.	无法下载。请检查网络连接后重试。	ダウンロードできませんでした。接続を確認してもう一度お試しください。
+La versión no trae su suma de verificación, así que no se instala desde aquí.	This version has no checksum, so it is not installed from here.	Esta versão não traz a soma de verificação, então não é instalada daqui.	이 버전에는 체크섬이 없어 여기서 설치하지 않습니다.	此版本没有校验和，因此不会从这里安装。	このバージョンにはチェックサムがないため、ここからはインストールしません。
+La descarga llegó dañada y se ha descartado.	The download arrived damaged and was discarded.	O download chegou corrompido e foi descartado.	다운로드한 파일이 손상되어 삭제했습니다.	下载的文件已损坏，已被丢弃。	ダウンロードしたファイルが壊れていたため破棄しました。
+No se pudo guardar el instalador en el disco.	Could not save the installer to disk.	Não foi possível salvar o instalador no disco.	설치 프로그램을 디스크에 저장하지 못했습니다.	无法将安装程序保存到磁盘。	インストーラーをディスクに保存できませんでした。
+No se pudo iniciar el instalador.	Could not start the installer.	Não foi possível iniciar o instalador.	설치 프로그램을 시작하지 못했습니다.	无法启动安装程序。	インストーラーを起動できませんでした。
+No se pudo comprobar la versión.	Could not check the version.	Não foi possível verificar a versão.	버전을 확인하지 못했습니다.	无法检查版本。	バージョンを確認できませんでした。
+Descargando la versión %1…	Downloading version %1…	Baixando a versão %1…	버전 %1 다운로드 중…	正在下载版本 %1…	バージョン %1 をダウンロード中…
+La versión %1 está lista para instalar	Version %1 is ready to install	A versão %1 está pronta para instalar	버전 %1 설치 준비가 되었습니다	版本 %1 已可安装	バージョン %1 のインストール準備ができました
+Instalando… el programa se reiniciará solo.	Installing… the program will restart by itself.	Instalando… o programa será reiniciado sozinho.	설치 중… 프로그램이 자동으로 다시 시작됩니다.	正在安装…程序将自动重新启动。	インストール中…プログラムは自動的に再起動します。
+No se pudo actualizar	Could not update	Não foi possível atualizar	업데이트하지 못했습니다	无法更新	更新できませんでした
+Hay una versión nueva: %1	A new version is available: %1	Há uma nova versão: %1	새 버전이 있습니다: %1	有新版本：%1	新しいバージョンがあります: %1
+Guarda o descarta los cambios de la imagen para poder actualizar.	Save or discard the changes to the picture to be able to update.	Salve ou descarte as alterações da imagem para poder atualizar.	업데이트하려면 이미지의 변경 사항을 저장하거나 취소하세요.	请保存或放弃对图片的更改后再更新。	更新するには、画像の変更を保存または破棄してください。
+Estás usando la %1.	You are using %1.	Você está usando a %1.	현재 %1 버전을 사용 중입니다.	您正在使用 %1。	現在 %1 を使用しています。
+Reiniciar e instalar	Restart and install	Reiniciar e instalar	다시 시작하고 설치	重启并安装	再起動してインストール
+Reintentar	Try again	Tentar novamente	다시 시도	重试	再試行
+Actualizar ahora	Update now	Atualizar agora	지금 업데이트	立即更新	今すぐ更新
+Novedades	What is new	Novidades	새로운 기능	更新内容	新機能
+Omitir esta versión	Skip this version	Ignorar esta versão	이 버전 건너뛰기	跳过此版本	このバージョンをスキップ
+Actualizaciones	Updates	Atualizações	업데이트	更新	アップデート
+Buscando una versión nueva…	Looking for a new version…	Procurando uma nova versão…	새 버전을 찾는 중…	正在查找新版本…	新しいバージョンを確認中…
+Tienes la última versión.	You have the latest version.	Você tem a versão mais recente.	최신 버전을 사용 중입니다.	您使用的是最新版本。	最新バージョンです。
+Versión instalada: %1	Installed version: %1	Versão instalada: %1	설치된 버전: %1	已安装版本：%1	インストール済みバージョン: %1
+Buscar ahora	Check now	Verificar agora	지금 확인	立即检查	今すぐ確認
+Buscar actualizaciones al iniciar (una consulta a GitHub al día, nada más).	Check for updates at start (one request to GitHub a day, nothing else).	Verificar atualizações ao iniciar (uma consulta ao GitHub por dia, nada mais).	시작할 때 업데이트 확인 (하루 한 번 GitHub에 요청, 그 외에는 없음).	启动时检查更新（每天向 GitHub 发送一次请求，仅此而已）。	起動時にアップデートを確認 (1日1回GitHubに問い合わせるだけです)。
+Descargar	Download	Baixar	다운로드	下载	ダウンロード

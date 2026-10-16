@@ -12,6 +12,7 @@ target_compile_definitions(test_decoder_registry PRIVATE
     FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 add_core_test(test_edit_stack)
 add_core_test(test_comic_book)
+add_core_test(test_update_check)
 add_core_test(test_cas)
 add_core_test(test_effect_families)
 add_core_test(test_frame)

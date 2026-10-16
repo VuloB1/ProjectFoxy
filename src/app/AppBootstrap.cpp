@@ -14,11 +14,13 @@
 #include "PaneImageProvider.h"
 #include "ThemeManager.h"
 #include "ThumbnailImageProvider.h"
+#include "UpdateManager.h"
 #include "Translations.h"
 
 #include <QCoreApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QTimer>
 
 namespace AppBootstrap {
 
@@ -72,6 +74,13 @@ Objects setup(QQmlApplicationEngine &engine)
     // The language: installed before any text is built (Main.qml's qsTr() are evaluated when it loads).
     auto *translations = new Translations(&engine, appSettings, &engine);
     engine.rootContext()->setContextProperty("translations", translations);
+
+    // Looks for a newer version on GitHub (qml/UpdateBanner.qml, Settings > Acerca de).
+    auto *updater = new UpdateManager(appSettings, QCoreApplication::applicationVersion(), &engine);
+    objects.updater = updater;
+    engine.rootContext()->setContextProperty("updater", updater);
+    if (!qEnvironmentVariableIsSet("PROJECTFOXY_NO_UPDATE_CHECK")) // the smoke test and the UI tests stay offline
+        QTimer::singleShot(5000, updater, &UpdateManager::checkOnStart);
 
     auto *batchExporter = new BatchExporter(&engine);
     engine.rootContext()->setContextProperty("batchExporter", batchExporter);

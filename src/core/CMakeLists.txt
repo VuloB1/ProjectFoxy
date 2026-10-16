@@ -1,6 +1,8 @@
 add_library(imageviewer_core STATIC
     ImageDocument.h
     ImageDocument.cpp
+    UpdateCheck.h
+    UpdateCheck.cpp
     ZipArchive.h
     ZipArchive.cpp
     ComicBook.h
