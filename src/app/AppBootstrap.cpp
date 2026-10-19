@@ -15,6 +15,7 @@
 #include "ThemeManager.h"
 #include "ThumbnailImageProvider.h"
 #include "UpdateManager.h"
+#include "VideoSupport.h"
 #include "Translations.h"
 
 #include <QCoreApplication>
@@ -81,6 +82,9 @@ Objects setup(QQmlApplicationEngine &engine)
     engine.rootContext()->setContextProperty("updater", updater);
     if (!qEnvironmentVariableIsSet("PROJECTFOXY_NO_UPDATE_CHECK")) // the smoke test and the UI tests stay offline
         QTimer::singleShot(5000, updater, &UpdateManager::checkOnStart);
+
+    // What video can be read (Qt Multimedia); the "video to GIF" screen will ask it.
+    engine.rootContext()->setContextProperty("videoSupport", new VideoSupport(&engine));
 
     auto *batchExporter = new BatchExporter(&engine);
     engine.rootContext()->setContextProperty("batchExporter", batchExporter);

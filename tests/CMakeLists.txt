@@ -155,3 +155,11 @@ add_executable(test_translations test_translations.cpp)
 target_link_libraries(test_translations PRIVATE imageviewer_app imageviewer_core Qt6::Test)
 target_compile_definitions(test_translations PRIVATE I18N_DIR="${CMAKE_SOURCE_DIR}/resources/i18n")
 add_test(NAME test_translations COMMAND test_translations)
+
+# Qt Multimedia (video to GIF): its FFmpeg backend must load and know the usual video formats. Needs the plugin folder.
+add_executable(test_multimedia test_multimedia.cpp)
+target_include_directories(test_multimedia PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
+target_link_libraries(test_multimedia PRIVATE imageviewer_app Qt6::Multimedia Qt6::Test)
+add_test(NAME test_multimedia COMMAND test_multimedia)
+set_tests_properties(test_multimedia PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_PLUGIN_PATH=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS};QT_FORCE_STDERR_LOGGING=1")

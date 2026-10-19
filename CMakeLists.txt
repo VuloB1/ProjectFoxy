@@ -20,7 +20,7 @@ endif()
 # ---------------------------------------------------------------------------
 # Dependencies
 # ---------------------------------------------------------------------------
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools Multimedia)
 # The comic reader draws PDF pages with Qt PDF when it is there (a Qt installed without it builds, and says so when a
 # PDF is opened).
 find_package(Qt6 6.6 OPTIONAL_COMPONENTS Pdf)
@@ -111,6 +111,8 @@ add_library(imageviewer_app STATIC
     src/app/AppBootstrap.cpp
     src/app/UpdateManager.h
     src/app/UpdateManager.cpp
+    src/app/VideoSupport.h
+    src/app/VideoSupport.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
@@ -157,12 +159,15 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(imageviewer_app PUBLIC Qt6::DBus)
 endif()
 
+# Qt Multimedia reads video (FFmpeg backend: MP4/H.264, WebM, MOV, MKV...) for "video to GIF"; its plugins and the
+# FFmpeg DLLs are deployed with the rest of Qt.
 target_link_libraries(imageviewer_app PUBLIC
     imageviewer_core
     Qt6::Core
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
+    Qt6::Multimedia
     $<$<PLATFORM_ID:Windows>:Shell32>
     $<$<PLATFORM_ID:Windows>:User32>
 )
