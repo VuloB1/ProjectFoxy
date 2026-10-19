@@ -92,6 +92,8 @@ private slots:
             reader.requestFrame(t + 10);
             if (frames.wait(5000))
                 ++got;
+            else
+                qInfo() << "no frame came for" << (t + 10) << "ms";
         }
         qInfo() << got << "of" << asked << "frames of a" << duration << "ms video," << reader.frameSize() << "in" << timer.elapsed()
                 << "ms:" << (timer.elapsed() / qMax(1, got)) << "ms per frame";
