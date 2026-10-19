@@ -163,3 +163,13 @@ target_link_libraries(test_multimedia PRIVATE imageviewer_app Qt6::Multimedia Qt
 add_test(NAME test_multimedia COMMAND test_multimedia)
 set_tests_properties(test_multimedia PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_PLUGIN_PATH=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS};QT_FORCE_STDERR_LOGGING=1")
+
+# Frame-exact reading of a video by time (the base of "video to GIF").
+add_executable(test_video_frames test_video_frames.cpp)
+target_include_directories(test_video_frames PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
+target_link_libraries(test_video_frames PRIVATE imageviewer_app Qt6::Multimedia Qt6::Test)
+target_compile_definitions(test_video_frames PRIVATE FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
+add_test(NAME test_video_frames COMMAND test_video_frames)
+set_tests_properties(test_video_frames PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_PLUGIN_PATH=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS};QT_FORCE_STDERR_LOGGING=1"
+    TIMEOUT 120)

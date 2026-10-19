@@ -113,6 +113,8 @@ add_library(imageviewer_app STATIC
     src/app/UpdateManager.cpp
     src/app/VideoSupport.h
     src/app/VideoSupport.cpp
+    src/app/VideoFrameReader.h
+    src/app/VideoFrameReader.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
