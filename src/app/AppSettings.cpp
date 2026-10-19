@@ -36,6 +36,7 @@ AppSettings::AppSettings(QObject *parent)
     m_singleInstance = m_store.value(QStringLiteral("window/singleInstance"), true).toBool();
     m_verticalSync = m_store.value(QStringLiteral("window/verticalSync"), true).toBool();
     m_updateCheck = m_store.value(QStringLiteral("update/check"), true).toBool();
+    m_festive = m_store.value(QStringLiteral("ui/festive"), true).toBool();
     m_lastUpdateCheck = m_store.value(QStringLiteral("update/lastCheck"), 0).toLongLong();
     m_skippedUpdate = m_store.value(QStringLiteral("update/skipped")).toString();
     m_windowMaximized = m_store.value(QStringLiteral("window/maximized"), false).toBool();
@@ -150,6 +151,12 @@ void AppSettings::setUpdateCheck(bool value)
 {
     if (storeFlag(m_updateCheck, QStringLiteral("update/check"), value))
         emit updateCheckChanged();
+}
+
+void AppSettings::setFestive(bool value)
+{
+    if (storeFlag(m_festive, QStringLiteral("ui/festive"), value))
+        emit festiveChanged();
 }
 
 void AppSettings::setLastUpdateCheck(qint64 secs)

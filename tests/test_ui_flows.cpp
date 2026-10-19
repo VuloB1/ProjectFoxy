@@ -48,6 +48,7 @@ private slots:
         QVERIFY(m_dir.isValid());
         m_engine = new QQmlApplicationEngine;
         qputenv("PROJECTFOXY_NO_UPDATE_CHECK", "1"); // no network in the tests
+        qputenv("PROJECTFOXY_FESTIVE", "off");       // no holiday decorations over the window
         m_app = AppBootstrap::setup(*m_engine);
         m_app.settings->setSingleInstance(true);
         m_engine->loadFromModule("ImageViewerApp", "Main");
@@ -101,6 +102,36 @@ private slots:
         QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("b.png"), 10000);
         QTest::keyClick(m_window, Qt::Key_Left);
         QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("a.png"), 10000);
+    }
+
+    // ------------------------------------------------------------------------------------------------ holidays
+
+    void theHolidayDecorationsShowForAPreviewAndHideAgain()
+    {
+        QQuickItem *decor = findIn(m_window->contentItem(), "festiveDecor");
+        QVERIFY(decor);
+        QVERIFY(!decor->isVisible()); // the tests start with PROJECTFOXY_FESTIVE=off
+        QObject *festive = m_engine->rootContext()->contextProperty("festive").value<QObject *>();
+        QVERIFY(festive);
+        festive->setProperty("preview", "navidad");
+        QTRY_VERIFY_WITH_TIMEOUT(decor->isVisible(), 3000);
+        QCOMPARE(festive->property("festival").toString(), QStringLiteral("navidad"));
+        festive->setProperty("preview", "");
+        QTRY_VERIFY_WITH_TIMEOUT(!decor->isVisible(), 3000);
+    }
+
+    void theSettingsHaveACardForTheDecorationsBelowTheWindowCard()
+    {
+        click("settingsButton");
+        QQuickItem *card = item("festiveCard");
+        QQuickItem *above = item("windowCard");
+        // the cards of this page are placed by hand: the new one must not overlap the one before it
+        QVERIFY(card->y() >= above->y() + above->height());
+        QVERIFY(m_app.settings->festive());
+        // (it sits far down the page, out of the window, so it is not clicked here: just that it shows the setting)
+        QCOMPARE(item("festiveSwitch")->property("checked").toBool(), true);
+        m_app.settings->setFestive(false);
+        QTRY_COMPARE_WITH_TIMEOUT(item("festiveSwitch")->property("checked").toBool(), false, 3000);
     }
 
     // ------------------------------------------------------------------------------------------------ zoom

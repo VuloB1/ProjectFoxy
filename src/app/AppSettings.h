@@ -50,6 +50,8 @@ class AppSettings : public QObject {
     Q_PROPERTY(bool verticalSync READ verticalSync WRITE setVerticalSync NOTIFY verticalSyncChanged)
     // Look on GitHub for a newer version when the program starts (at most once a day; on by default).
     Q_PROPERTY(bool updateCheck READ updateCheck WRITE setUpdateCheck NOTIFY updateCheckChanged)
+    // Decorations for the holidays (qml/FestiveDecor.qml; on by default).
+    Q_PROPERTY(bool festive READ festive WRITE setFestive NOTIFY festiveChanged)
 
 public:
     explicit AppSettings(QObject *parent = nullptr);
@@ -85,6 +87,8 @@ public:
     void setPixelCheckerboard(bool value);
     bool updateCheck() const { return m_updateCheck; }
     void setUpdateCheck(bool value);
+    bool festive() const { return m_festive; }
+    void setFestive(bool value);
     // When the last check succeeded (seconds since the epoch; 0 = never) and the version the person chose to skip.
     qint64 lastUpdateCheck() const { return m_lastUpdateCheck; }
     void setLastUpdateCheck(qint64 secs);
@@ -129,6 +133,7 @@ signals:
     void singleInstanceChanged();
     void verticalSyncChanged();
     void updateCheckChanged();
+    void festiveChanged();
 
 private:
     // Stores `value` under `key` and reports whether it was a change.
@@ -154,6 +159,7 @@ private:
     bool m_singleInstance = true;
     bool m_verticalSync = true;
     bool m_updateCheck = true;
+    bool m_festive = true;
     qint64 m_lastUpdateCheck = 0;
     QString m_skippedUpdate;
 };

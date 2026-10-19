@@ -955,3 +955,17 @@ Versión instalada: %1	Installed version: %1	Versão instalada: %1	설치된 버
 Buscar ahora	Check now	Verificar agora	지금 확인	立即检查	今すぐ確認
 Buscar actualizaciones al iniciar (una consulta a GitHub al día, nada más).	Check for updates at start (one request to GitHub a day, nothing else).	Verificar atualizações ao iniciar (uma consulta ao GitHub por dia, nada mais).	시작할 때 업데이트 확인 (하루 한 번 GitHub에 요청, 그 외에는 없음).	启动时检查更新（每天向 GitHub 发送一次请求，仅此而已）。	起動時にアップデートを確認 (1日1回GitHubに問い合わせるだけです)。
 Descargar	Download	Baixar	다운로드	下载	ダウンロード
+Adornos festivos	Holiday decorations	Decorações festivas	축제 장식	节日装饰	祝日の飾り
+Adornos en fechas señaladas	Decorations on special dates	Decorações em datas especiais	특별한 날 장식	节日期间的装饰	特別な日の飾り
+Pone adornos discretos en la ventana en Halloween, Día de los Muertos, Navidad, Año Nuevo, Noche de Reyes, San Valentín, San Patricio y Pascua. Solo en los temas modernos.	Puts discreet decorations on the window for Halloween, Day of the Dead, Christmas, New Year, Three Kings' Eve, Valentine's Day, St. Patrick's Day and Easter. Modern themes only.	Coloca decorações discretas na janela no Halloween, Dia dos Mortos, Natal, Ano Novo, Noite de Reis, Dia dos Namorados, Dia de São Patrício e Páscoa. Apenas nos temas modernos.	핼러윈, 죽은 자의 날, 크리스마스, 새해, 동방박사의 밤, 발렌타인데이, 성 패트릭의 날, 부활절에 창에 은은한 장식을 더합니다. 모던 테마에서만 표시됩니다.	在万圣节、亡灵节、圣诞节、新年、三王节前夜、情人节、圣帕特里克节和复活节期间，为窗口添加低调的装饰。仅适用于现代主题。	ハロウィン、死者の日、クリスマス、新年、三賢者の夜、バレンタインデー、聖パトリックの祝日、イースターに、ウィンドウにさりげない飾りを付けます。モダンテーマのみ。
+Ver los adornos de	Show decorations for	Ver as decorações de	장식 미리 보기	预览装饰	飾りをプレビュー
+Para ver cómo quedan cualquier día del año. Al reiniciar vuelve a «Según la fecha».	To see them on any day of the year. After a restart it goes back to "By date".	Para vê-las em qualquer dia do ano. Ao reiniciar volta a «Conforme a data».	연중 아무 때나 확인해 볼 수 있습니다. 다시 시작하면 «날짜에 따라»로 돌아갑니다.	可在一年中的任何一天查看效果。重启后将恢复为“按日期”。	一年中いつでも見られます。再起動すると「日付に従う」に戻ります。
+Según la fecha	By date	Conforme a data	날짜에 따라	按日期	日付に従う
+Halloween	Halloween	Halloween	핼러윈	万圣节	ハロウィン
+Día de los Muertos	Day of the Dead	Dia dos Mortos	죽은 자의 날	亡灵节	死者の日
+Navidad	Christmas	Natal	크리스마스	圣诞节	クリスマス
+Año Nuevo	New Year	Ano Novo	새해	新年	新年
+Noche de Reyes	Three Kings' Eve	Noite de Reis	동방박사의 밤	三王节前夜	三賢者の夜
+San Valentín	Valentine's Day	Dia dos Namorados	발렌타인데이	情人节	バレンタインデー
+San Patricio	St. Patrick's Day	Dia de São Patrício	성 패트릭의 날	圣帕特里克节	聖パトリックの祝日
+Pascua	Easter	Páscoa	부활절	复活节	イースター

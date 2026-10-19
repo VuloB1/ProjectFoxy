@@ -111,6 +111,8 @@ add_library(imageviewer_app STATIC
     src/app/AppBootstrap.cpp
     src/app/UpdateManager.h
     src/app/UpdateManager.cpp
+    src/app/FestiveManager.h
+    src/app/FestiveManager.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
@@ -181,6 +183,14 @@ function(iv_add_app_resources target)
         PREFIX "/lensfun"
         BASE "${CMAKE_SOURCE_DIR}/resources/lensfun"
         FILES ${_iv_lensfun_files}
+    )
+
+    # The holiday decorations (resources/festive/*.svg, drawn by tools/make_festive_art.js), shown by qml/FestiveDecor.qml.
+    file(GLOB _iv_festive_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/festive/*.svg")
+    qt_add_resources(${target} "festive"
+        PREFIX "/festive"
+        BASE "${CMAKE_SOURCE_DIR}/resources/festive"
+        FILES ${_iv_festive_files}
     )
 
     # The translations of the interface (resources/i18n/<language>.json, built from i18n/strings.tsv by tools/i18n_tool.py).
@@ -265,6 +275,7 @@ set(IV_QML_FILES
         qml/MultiView.qml
         qml/ReaderView.qml
         qml/UpdateBanner.qml
+        qml/FestiveDecor.qml
         qml/CasEffect.qml
         qml/GifStudio.qml
         qml/CollageMaker.qml

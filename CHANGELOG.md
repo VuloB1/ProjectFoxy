@@ -3,6 +3,19 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased] — Holiday decorations
+
+- **Discreet decorations for the holidays**, on by default and only on the modern themes: a thin garland along the top
+  edge of the picture area and a small piece in the bottom corner of the thumbnail bar (Halloween also gets a cobweb in
+  the corner of the picture). Nothing takes the mouse, and the thumbnails never go under the piece: the bar simply
+  leaves room for it. Halloween 1-31 Oct, Day of the Dead 1-3 Nov, Christmas 1-26 Dec, New Year 27 Dec-2 Jan, Three
+  Kings' Eve 3-6 Jan, Valentine's Day 7-15 Feb, St. Patrick's Day 12-17 Mar and Easter (the 7 days before Easter Sunday
+  and the Monday after it; it wins over St. Patrick's Day when they overlap).
+- Settings > Appearance > *Adornos festivos*: a switch, and a list to look at any holiday out of season (it goes back to
+  "by date" when the program restarts).
+- The pictures are drawn by `tools/make_festive_art.js` (plain SVG, `resources/festive/`); the dates are
+  `core/Festivity` (tested in `test_festivity`).
+
 ## [0.3.2] — Updates from inside the program
 
 - **A notice when a newer version is published.** At start (at most once a day, five seconds after the window opens) the
@@ -195,6 +208,20 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar] — Adornos festivos
+
+- **Adornos discretos en las fechas señaladas**, activados por defecto y solo en los temas modernos: una guirnalda fina
+  en el borde superior de la zona de la imagen y una pieza pequeña en la esquina inferior de la barra de miniaturas
+  (Halloween añade también una telaraña en la esquina de la imagen). Nada captura el ratón, y las miniaturas nunca
+  quedan debajo de la pieza: la barra le deja sitio. Halloween del 1 al 31 de octubre, Día de los Muertos del 1 al 3 de
+  noviembre, Navidad del 1 al 26 de diciembre, Año Nuevo del 27 de diciembre al 2 de enero, Noche de Reyes del 3 al 6 de
+  enero, San Valentín del 7 al 15 de febrero, San Patricio del 12 al 17 de marzo y Pascua (los 7 días antes del Domingo
+  de Resurrección y el lunes siguiente; gana a San Patricio si coinciden).
+- Ajustes > Apariencia > *Adornos festivos*: un interruptor y una lista para ver cualquier fiesta fuera de fecha (al
+  reiniciar el programa vuelve a «Según la fecha»).
+- Los dibujos los genera `tools/make_festive_art.js` (SVG sencillo, `resources/festive/`); las fechas son
+  `core/Festivity` (probadas en `test_festivity`).
 
 ## [0.3.2] — Actualizaciones desde el programa
 
