@@ -16,7 +16,10 @@ FestiveManager::FestiveManager(AppSettings *settings, QObject *parent)
         m_preview = env;
 
     if (m_settings)
+    {
         connect(m_settings, &AppSettings::festiveChanged, this, &FestiveManager::refresh);
+        connect(m_settings, &AppSettings::festiveOffChanged, this, &FestiveManager::refresh);
+    }
     m_dayTimer.setInterval(30 * 60 * 1000);
     connect(&m_dayTimer, &QTimer::timeout, this, &FestiveManager::refresh);
     m_dayTimer.start();
@@ -39,6 +42,8 @@ void FestiveManager::refresh()
         now = m_preview;
     else if (!m_forcedOff && (!m_settings || m_settings->festive()))
         now = core::festivalKey(core::festivalOn(QDate::currentDate()));
+        if (m_settings && m_settings->festiveOff().contains(now)) // the person turned this holiday off
+            now.clear();
     if (now == m_festival)
         return;
     m_festival = now;

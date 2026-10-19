@@ -23,7 +23,7 @@ Item {
         halloween: 1.106, muertos: 0.653, navidad: 1.238, nuevoano: 1.0,
         reyes: 0.677, sanvalentin: 0.88, sanpatricio: 1.55, pascua: 1.25
     })
-    readonly property bool heroRoom: shown && !!sidebar && sidebar.visible && sidebar.width >= 70
+    readonly property bool heroRoom: shown && appSettings.festiveCorner && !!sidebar && sidebar.visible && sidebar.width >= 70
     readonly property real heroWidth: sidebar ? sidebar.width - 8 : 0
     readonly property real heroHeight: Math.min(128, heroWidth / (aspect[key] || 1))
     // The space the thumbnail bar leaves free for the corner piece (it never covers a thumbnail).

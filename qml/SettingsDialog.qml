@@ -548,6 +548,37 @@ AppDialog {
                         }
                         Divider {}
                         SettingRow {
+                            label: qsTr("Pieza en la barra de miniaturas")
+                            hint: qsTr("Muestra el dibujo grande de la esquina inferior de la barra de miniaturas. Apágalo si te estorba; la guirnalda se queda.")
+                            AppSwitch {
+                                checked: appSettings.festiveCorner
+                                onToggled: appSettings.festiveCorner = checked
+                            }
+                        }
+                        Divider {}
+                        SettingRow {
+                            label: qsTr("Fiestas con adornos")
+                            hint: qsTr("Elige para cuáles quieres ver adornos.")
+                        }
+                        Repeater {
+                            model: [
+                                { key: "halloween", name: qsTr("Halloween") }, { key: "muertos", name: qsTr("Día de los Muertos") },
+                                { key: "navidad", name: qsTr("Navidad") }, { key: "nuevoano", name: qsTr("Año Nuevo") },
+                                { key: "reyes", name: qsTr("Noche de Reyes") }, { key: "sanvalentin", name: qsTr("San Valentín") },
+                                { key: "sanpatricio", name: qsTr("San Patricio") }, { key: "pascua", name: qsTr("Pascua") }
+                            ]
+                            delegate: SettingRow {
+                                required property var modelData
+                                label: modelData.name
+                                enabled: appSettings.festive
+                                AppSwitch {
+                                    checked: appSettings.festiveOff.indexOf(modelData.key) < 0
+                                    onToggled: appSettings.setFestiveOn(modelData.key, checked)
+                                }
+                            }
+                        }
+                        Divider {}
+                        SettingRow {
                             label: qsTr("Ver los adornos de")
                             hint: qsTr("Para ver cómo quedan cualquier día del año. Al reiniciar vuelve a «Según la fecha».")
                             AppComboBox {

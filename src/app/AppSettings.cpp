@@ -37,6 +37,8 @@ AppSettings::AppSettings(QObject *parent)
     m_verticalSync = m_store.value(QStringLiteral("window/verticalSync"), true).toBool();
     m_updateCheck = m_store.value(QStringLiteral("update/check"), true).toBool();
     m_festive = m_store.value(QStringLiteral("ui/festive"), true).toBool();
+    m_festiveOff = m_store.value(QStringLiteral("ui/festiveOff")).toStringList();
+    m_festiveCorner = m_store.value(QStringLiteral("ui/festiveCorner"), true).toBool();
     m_lastUpdateCheck = m_store.value(QStringLiteral("update/lastCheck"), 0).toLongLong();
     m_skippedUpdate = m_store.value(QStringLiteral("update/skipped")).toString();
     m_windowMaximized = m_store.value(QStringLiteral("window/maximized"), false).toBool();
@@ -157,6 +159,24 @@ void AppSettings::setFestive(bool value)
 {
     if (storeFlag(m_festive, QStringLiteral("ui/festive"), value))
         emit festiveChanged();
+}
+
+void AppSettings::setFestiveOn(const QString &key, bool on)
+{
+    if (on == !m_festiveOff.contains(key))
+        return;
+    if (on)
+        m_festiveOff.removeAll(key);
+    else
+        m_festiveOff << key;
+    m_store.setValue(QStringLiteral("ui/festiveOff"), m_festiveOff);
+    emit festiveOffChanged();
+}
+
+void AppSettings::setFestiveCorner(bool value)
+{
+    if (storeFlag(m_festiveCorner, QStringLiteral("ui/festiveCorner"), value))
+        emit festiveCornerChanged();
 }
 
 void AppSettings::setLastUpdateCheck(qint64 secs)

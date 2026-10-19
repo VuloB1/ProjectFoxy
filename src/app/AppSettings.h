@@ -52,6 +52,10 @@ class AppSettings : public QObject {
     Q_PROPERTY(bool updateCheck READ updateCheck WRITE setUpdateCheck NOTIFY updateCheckChanged)
     // Decorations for the holidays (qml/FestiveDecor.qml; on by default).
     Q_PROPERTY(bool festive READ festive WRITE setFestive NOTIFY festiveChanged)
+    // The holidays (keys of core/Festivity) the person turned off, and whether the big piece in the corner of the
+    // thumbnail bar is shown (the garland always is, while its holiday is on).
+    Q_PROPERTY(QStringList festiveOff READ festiveOff NOTIFY festiveOffChanged)
+    Q_PROPERTY(bool festiveCorner READ festiveCorner WRITE setFestiveCorner NOTIFY festiveCornerChanged)
 
 public:
     explicit AppSettings(QObject *parent = nullptr);
@@ -89,6 +93,10 @@ public:
     void setUpdateCheck(bool value);
     bool festive() const { return m_festive; }
     void setFestive(bool value);
+    QStringList festiveOff() const { return m_festiveOff; }
+    Q_INVOKABLE void setFestiveOn(const QString &key, bool on);
+    bool festiveCorner() const { return m_festiveCorner; }
+    void setFestiveCorner(bool value);
     // When the last check succeeded (seconds since the epoch; 0 = never) and the version the person chose to skip.
     qint64 lastUpdateCheck() const { return m_lastUpdateCheck; }
     void setLastUpdateCheck(qint64 secs);
@@ -134,6 +142,8 @@ signals:
     void verticalSyncChanged();
     void updateCheckChanged();
     void festiveChanged();
+    void festiveOffChanged();
+    void festiveCornerChanged();
 
 private:
     // Stores `value` under `key` and reports whether it was a change.
@@ -160,6 +170,8 @@ private:
     bool m_verticalSync = true;
     bool m_updateCheck = true;
     bool m_festive = true;
+    QStringList m_festiveOff;
+    bool m_festiveCorner = true;
     qint64 m_lastUpdateCheck = 0;
     QString m_skippedUpdate;
 };

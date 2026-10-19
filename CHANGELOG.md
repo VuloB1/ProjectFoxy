@@ -11,7 +11,8 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   leaves room for it. Halloween 1-31 Oct, Day of the Dead 1-3 Nov, Christmas 1-26 Dec, New Year 27 Dec-2 Jan, Three
   Kings' Eve 3-6 Jan, Valentine's Day 7-15 Feb, St. Patrick's Day 12-17 Mar and Easter (the 7 days before Easter Sunday
   and the Monday after it; it wins over St. Patrick's Day when they overlap).
-- Settings > Appearance > *Adornos festivos*: a switch, and a list to look at any holiday out of season (it goes back to
+- Settings > Appearance > *Adornos festivos*: a switch for all of them, one for each holiday, a switch to hide the piece
+  in the thumbnail bar (the garland stays), and a list to look at any holiday out of season (it goes back to
   "by date" when the program restarts).
 - The pictures are drawn by `tools/make_festive_art.js` (plain SVG, `resources/festive/`); the dates are
   `core/Festivity` (tested in `test_festivity`).
@@ -218,7 +219,8 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   noviembre, Navidad del 1 al 26 de diciembre, Año Nuevo del 27 de diciembre al 2 de enero, Noche de Reyes del 3 al 6 de
   enero, San Valentín del 7 al 15 de febrero, San Patricio del 12 al 17 de marzo y Pascua (los 7 días antes del Domingo
   de Resurrección y el lunes siguiente; gana a San Patricio si coinciden).
-- Ajustes > Apariencia > *Adornos festivos*: un interruptor y una lista para ver cualquier fiesta fuera de fecha (al
+- Ajustes > Apariencia > *Adornos festivos*: un interruptor general, uno por fiesta, otro para ocultar la pieza de la
+  barra de miniaturas (la guirnalda se queda) y una lista para ver cualquier fiesta fuera de fecha (al
   reiniciar el programa vuelve a «Según la fecha»).
 - Los dibujos los genera `tools/make_festive_art.js` (SVG sencillo, `resources/festive/`); las fechas son
   `core/Festivity` (probadas en `test_festivity`).

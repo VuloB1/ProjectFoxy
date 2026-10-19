@@ -127,11 +127,12 @@ private slots:
         QQuickItem *above = item("windowCard");
         // the cards of this page are placed by hand: the new one must not overlap the one before it
         QVERIFY(card->y() >= above->y() + above->height());
-        QVERIFY(m_app.settings->festive());
+        m_app.settings->setFestive(true); // (the tests share their settings folder: leave it as it was found)
         // (it sits far down the page, out of the window, so it is not clicked here: just that it shows the setting)
         QCOMPARE(item("festiveSwitch")->property("checked").toBool(), true);
         m_app.settings->setFestive(false);
         QTRY_COMPARE_WITH_TIMEOUT(item("festiveSwitch")->property("checked").toBool(), false, 3000);
+        m_app.settings->setFestive(true);
     }
 
     // ------------------------------------------------------------------------------------------------ zoom
