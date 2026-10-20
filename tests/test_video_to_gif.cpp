@@ -133,8 +133,7 @@ private slots:
         QVERIFY(dir.isValid());
         QFile fake(dir.filePath(QStringLiteral("not a video.mp4")));
         QVERIFY(fake.open(QIODevice::WriteOnly));
-        fake.write(QByteArray("this is text, not a video
-").repeated(200));
+        fake.write(QByteArray("this is text, not a video ").repeated(400));
         fake.close();
         VideoToGif v;
         v.open(fake.fileName());
