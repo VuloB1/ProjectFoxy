@@ -71,6 +71,36 @@ private slots:
         QCOMPARE(right, 20);
     }
 
+    void samplingPlaysTheVideoFastAndGivesEverySlotItsFrame()
+    {
+        VideoFrameReader reader;
+        QSignalSpy opened(&reader, &VideoFrameReader::opened);
+        QSignalSpy frames(&reader, &VideoFrameReader::frameReady);
+        QSignalSpy finished(&reader, &VideoFrameReader::sampleFinished);
+        reader.open(video());
+        QVERIFY2(opened.wait(10000), "the video did not open");
+
+        reader.sample(0, 2000, 100);
+        QVERIFY2(finished.wait(10000), "the sample did not finish");
+        QCOMPARE(frames.size(), 20);
+        for (int index = 0; index < 20; ++index) {
+            const QImage image = frames.at(index).at(1).value<QImage>();
+            QVERIFY2(qAbs(grayOf(image) - (10 + 12 * index)) <= 6,
+                     qPrintable(QStringLiteral("slot %1 came out gray %2").arg(index).arg(grayOf(image))));
+        }
+
+        // from the middle, with a coarser step
+        frames.clear();
+        finished.clear();
+        reader.sample(500, 1500, 200);
+        QVERIFY2(finished.wait(10000), "the second sample did not finish");
+        QCOMPARE(frames.size(), 5);
+        for (int slot = 0; slot < 5; ++slot) {
+            const int index = (500 + slot * 200) / 100;
+            QVERIFY2(qAbs(grayOf(frames.at(slot).at(1).value<QImage>()) - (10 + 12 * index)) <= 6, qPrintable(QStringLiteral("slot %1").arg(slot)));
+        }
+    }
+
     // Not part of the normal run: PROJECTFOXY_TEST_VIDEO=<file> times the same thing on a real video (a frame every
     // 100 ms, as a 10 fps GIF would take them).
     void aRealVideoAtTenFramesPerSecond()
@@ -98,6 +128,26 @@ private slots:
         qInfo() << got << "of" << asked << "frames of a" << duration << "ms video," << reader.frameSize() << "in" << timer.elapsed()
                 << "ms:" << (timer.elapsed() / qMax(1, got)) << "ms per frame";
         QCOMPARE(got, asked);
+    }
+
+    void aRealVideoSampledAtTenFramesPerSecond()
+    {
+        const QString path = qEnvironmentVariable("PROJECTFOXY_TEST_VIDEO");
+        if (path.isEmpty())
+            QSKIP("PROJECTFOXY_TEST_VIDEO is not set");
+        VideoFrameReader reader;
+        QSignalSpy opened(&reader, &VideoFrameReader::opened);
+        QSignalSpy frames(&reader, &VideoFrameReader::frameReady);
+        QSignalSpy finished(&reader, &VideoFrameReader::sampleFinished);
+        reader.open(path);
+        QVERIFY2(opened.wait(15000), "the video did not open");
+        QElapsedTimer timer;
+        timer.start();
+        reader.sample(0, reader.durationMs(), 100);
+        QVERIFY2(finished.wait(180000), "the sample did not finish");
+        qInfo() << frames.size() << "frames of a" << reader.durationMs() << "ms video," << reader.frameSize() << "sampled in"
+                << timer.elapsed() << "ms:" << (timer.elapsed() / qMax(1, int(frames.size()))) << "ms per frame";
+        QVERIFY(qAbs(frames.size() - reader.durationMs() / 100) <= 2);
     }
 };
 
