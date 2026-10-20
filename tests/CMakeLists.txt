@@ -173,3 +173,13 @@ add_test(NAME test_video_frames COMMAND test_video_frames)
 set_tests_properties(test_video_frames PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_PLUGIN_PATH=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS};QT_FORCE_STDERR_LOGGING=1"
     TIMEOUT 120)
+
+# "Desde un vídeo" (VideoToGif): the frames of the pieces that are kept, cropped and scaled.
+add_executable(test_video_to_gif test_video_to_gif.cpp)
+target_include_directories(test_video_to_gif PRIVATE ${CMAKE_SOURCE_DIR}/src/app)
+target_link_libraries(test_video_to_gif PRIVATE imageviewer_app Qt6::Multimedia Qt6::Test)
+target_compile_definitions(test_video_to_gif PRIVATE FIXTURES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
+add_test(NAME test_video_to_gif COMMAND test_video_to_gif)
+set_tests_properties(test_video_to_gif PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_PLUGIN_PATH=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS};QT_FORCE_STDERR_LOGGING=1"
+    TIMEOUT 120)

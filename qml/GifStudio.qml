@@ -17,6 +17,9 @@ Item {
     // The animation being shown: which frame of the finished animation, and whether it moves.
     property int playIndex: 0
     property bool playing: true
+    // "Desde un vídeo": the page that reads frames from a video is open
+    property bool videoOpen: false
+    function openVideo(file) { videoToGif.open(file); videoOpen = true; }
     property bool resultOk: true
     property string resultText: ""
     property string resultPath: ""
@@ -187,6 +190,7 @@ Item {
                     spacing: 8
                     AppButton { text: qsTr("Agregar imágenes…"); primary: true; onClicked: addDialog.open() }
                     AppButton { text: qsTr("Toda la carpeta"); enabled: folderModel.count > 0; onClicked: animStudio.addPaths(folderModel.filePaths()) }
+                    AppButton { objectName: "fromVideoButton"; text: qsTr("Desde un vídeo…"); visible: videoSupport.available; onClicked: videoDialog.open() }
                 }
             }
         }
@@ -264,6 +268,16 @@ Item {
                         topPadding: 3; bottomPadding: 3
                         enabled: folderModel.count > 0
                         onClicked: animStudio.addPaths(folderModel.filePaths())
+                    }
+                    AppToolButton {
+                        text: qsTr("Desde un vídeo…")
+                        visible: videoSupport.available
+                        iconName: "film"
+                        iconOnly: true
+                        iconSize: 18
+                        iconStroke: 1.4
+                        topPadding: 3; bottomPadding: 3
+                        onClicked: videoDialog.open()
                     }
                     AppToolButton {
                         text: qsTr("Invertir orden")
@@ -949,8 +963,14 @@ Item {
     DropArea {
         anchors.fill: parent
         onDropped: function (drop) {
-            if (drop.hasUrls)
-                animStudio.addUrls(Array.from(drop.urls, u => u.toString()));
+            if (!drop.hasUrls)
+                return;
+            const urls = Array.from(drop.urls, u => u.toString());
+            // a video dropped on the studio opens the video page; anything else joins the strip
+            if (urls.length === 1 && videoToGif.isVideo(urls[0]))
+                root.openVideo(urls[0]);
+            else
+                animStudio.addUrls(urls);
         }
     }
 
@@ -969,6 +989,20 @@ Item {
         fileMode: FileDialog.OpenFiles
         nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
         onAccepted: animStudio.addUrls(Array.from(selectedFiles, u => u.toString()))
+    }
+    FileDialog {
+        id: videoDialog
+        title: qsTr("Elige el vídeo")
+        fileMode: FileDialog.OpenFile
+        nameFilters: [qsTr("Vídeos (%1)").arg(videoSupport.extensions.map(e => "*." + e).join(" "))]
+        onAccepted: root.openVideo(selectedFile.toString())
+    }
+    Loader {
+        id: videoPage
+        anchors.fill: parent
+        z: 20
+        active: root.videoOpen
+        sourceComponent: VideoToGifPage { onCloseRequested: root.videoOpen = false }
     }
     FileDialog {
         id: saveDialog

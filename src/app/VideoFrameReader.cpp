@@ -36,7 +36,7 @@ void VideoFrameReader::requestFrame(qint64 ms)
 {
     // The player shows no frame when moved to the very end (it is "at the end of the media"): stay a frame short of it.
     const qint64 last = m_player.duration() > 60 ? m_player.duration() - 60 : 0;
-    ms = qMin(ms, last);
+    ms = qMax<qint64>(1, qMin(ms, last)); // (position 0 is where a new player already is: nothing would be shown)
     m_wanted = ms;
     m_player.setPosition(ms);
     m_player.pause(); // a paused player shows the frame of the position it was moved to

@@ -115,6 +115,8 @@ add_library(imageviewer_app STATIC
     src/app/VideoSupport.cpp
     src/app/VideoFrameReader.h
     src/app/VideoFrameReader.cpp
+    src/app/VideoToGif.h
+    src/app/VideoToGif.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
@@ -274,6 +276,8 @@ set(IV_QML_FILES
         qml/UpdateBanner.qml
         qml/CasEffect.qml
         qml/GifStudio.qml
+        qml/VideoToGifPage.qml
+        qml/VideoCropBox.qml
         qml/CollageMaker.qml
         qml/FrameCornerPicker.qml
         qml/UnsavedChangesDialog.qml
@@ -528,6 +532,7 @@ target_link_libraries(test_ui_flows PRIVATE
     $<$<PLATFORM_ID:Windows>:User32>
 )
 # QtQuick.Effects is copied next to the executable by ImageViewer's post-build step (Windows), so that one is built first.
+target_compile_definitions(test_ui_flows PRIVATE FIXTURES_DIR="${CMAKE_SOURCE_DIR}/tests/fixtures")
 add_dependencies(test_ui_flows ImageViewer)
 add_test(NAME test_ui_flows COMMAND test_ui_flows)
 # No window and no GPU needed: Qt's "offscreen" platform and its software renderer (as the startup smoke test does).

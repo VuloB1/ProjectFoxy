@@ -27,6 +27,7 @@ public:
     void sample(qint64 from, qint64 to, qint64 step);
     // Gives up a sample() half way (sampleFinished() follows).
     void cancelSample();
+    bool sampling() const { return m_sampling; }
 
 signals:
     void opened();

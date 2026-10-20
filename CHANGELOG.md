@@ -3,6 +3,17 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased] — Video to GIF
+
+- **Make an animation from a video.** In the animation studio (Create > Animated GIF) choose *Desde un vídeo…* (or drop
+  the video on the studio): pick the piece to keep on a timeline, **cut out parts in the middle** (cut at the cursor, then
+  leave out the pieces you do not want), **crop the picture** (1:1, 16:9, 4:3, 3:4, 9:16 or free: drag the frame and its
+  corners), and choose the frames per second (5-20) and the width. The frames go into the studio's strip, where the usual
+  tools (text, effects, size, speed, GIF/APNG/WebP) apply. Limits: 600 frames; the page warns over 30 s or about 25 MB.
+- Reads MP4 (H.264/H.265), MOV and MKV (Qt Multimedia; WebM/VP9/AV1 are not available with Qt's Windows build). A 36 s
+  1440p60 clip becomes 358 frames in about 9 s: the video is played at 4x and only the frames needed are kept.
+- Adds Qt Multimedia to the program (the installer grows by about 6 MB).
+
 ## [0.3.2] — Updates from inside the program
 
 - **A notice when a newer version is published.** At start (at most once a day, five seconds after the window opens) the
@@ -195,6 +206,18 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar] — Vídeo a GIF
+
+- **Crear una animación desde un vídeo.** En el estudio de animación (Crear > GIF animado) elige *Desde un vídeo…* (o
+  suelta el vídeo en el estudio): marca en una línea de tiempo el trozo que quieres, **corta partes en medio** (cortar
+  en el cursor y quitar los tramos que no quieras), **recorta la imagen** (1:1, 16:9, 4:3, 3:4, 9:16 o libre: arrastra
+  el marco y sus esquinas) y elige los fotogramas por segundo (5-20) y el ancho. Los fotogramas entran en la tira del
+  estudio, donde sirven las herramientas de siempre (texto, efectos, tamaño, velocidad, GIF/APNG/WebP). Límites: 600
+  fotogramas; la pantalla avisa por encima de 30 s o de unos 25 MB.
+- Lee MP4 (H.264/H.265), MOV y MKV (Qt Multimedia; WebM/VP9/AV1 no están en el Qt de Windows). Un clip de 36 s en
+  1440p a 60 fps da 358 fotogramas en unos 9 s: el vídeo se reproduce a 4x y solo se guardan los fotogramas necesarios.
+- El programa lleva Qt Multimedia (el instalador crece unos 6 MB).
 
 ## [0.3.2] — Actualizaciones desde el programa
 

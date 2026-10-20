@@ -103,6 +103,25 @@ private slots:
         QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("a.png"), 10000);
     }
 
+    // ------------------------------------------------------------------------------------------------ video to GIF
+
+    void aVideoOpenedInTheGifStudioBecomesTheFramesOfTheStrip()
+    {
+        click("gifButton");
+        QQuickItem *studio = item("gifStudio");
+        QVERIFY(QMetaObject::invokeMethod(studio, "openVideo", Q_ARG(QVariant, QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4"))));
+        item("videoToGifPage");
+        QObject *video = m_engine->rootContext()->contextProperty("videoToGif").value<QObject *>();
+        QObject *anim = m_engine->rootContext()->contextProperty("animStudio").value<QObject *>();
+        QVERIFY(video && anim);
+        QTRY_VERIFY_WITH_TIMEOUT(video->property("loaded").toBool(), 15000);
+        QCOMPARE(anim->property("count").toInt(), 0);
+
+        click("createFramesButton"); // the whole video at the page's 10 frames per second
+        QTRY_COMPARE_WITH_TIMEOUT(anim->property("count").toInt(), 20, 20000);
+        QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("videoToGifPage") == nullptr, 5000); // the page closes itself
+    }
+
     // ------------------------------------------------------------------------------------------------ zoom
 
     void theZoomButtonsChangeTheZoomAndFitBringsItBack()

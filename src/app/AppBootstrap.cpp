@@ -16,6 +16,7 @@
 #include "ThumbnailImageProvider.h"
 #include "UpdateManager.h"
 #include "VideoSupport.h"
+#include "VideoToGif.h"
 #include "Translations.h"
 
 #include <QCoreApplication>
@@ -57,6 +58,15 @@ Objects setup(QQmlApplicationEngine &engine)
     engine.rootContext()->setContextProperty("animStudio", animStudio);
     engine.addImageProvider(QLatin1String("animprev"), new AnimPreviewProvider(animStudio));
     engine.addImageProvider(QLatin1String("animsrc"), new AnimThumbnailProvider(animStudio));
+
+    // "Desde un vídeo" in the animation studio: reads the frames and hands them to the studio.
+    auto *videoToGif = new VideoToGif(&engine);
+    engine.rootContext()->setContextProperty("videoToGif", videoToGif);
+    engine.addImageProvider(QLatin1String("videoprev"), new VideoPreviewProvider(videoToGif));
+    QObject::connect(videoToGif, &VideoToGif::framesReady, animStudio,
+                     [animStudio](const QList<QImage> &frames, int holdMs, const QString &label) {
+                         animStudio->addFrames(frames, holdMs, label);
+                     });
 
     // The collage maker (Crear > Collage).
     auto *collageStudio = new CollageStudio(paneStore, &engine);
