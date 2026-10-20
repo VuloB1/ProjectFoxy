@@ -32,6 +32,10 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   effect presets, sizes) are now buttons. A **Compression** bar sets the colours of the GIF (256 down to 16) and the studio
   works out the file's weight in the background ("It will weigh about 1.2 MB"). The video page offers more small widths
   (240, 160 and 120 px). While one studio is open the other one's button is greyed out, and "Remove all" is a red cross.
+- **Faster start** (the picture is on screen about 0.65 s after launching instead of 0.9 s with a 24-megapixel JPEG;
+  0.54 s instead of 0.8 s without a file): the fonts of the interface (and their fallbacks for Asian scripts and emoji)
+  and the graphics driver are loaded on a helper thread while the window is built, the dialogs of the title bar (Settings,
+  batch tools, Open) are built when first used, and the video player is only created when a video is opened.
 - Adds Qt Multimedia to the program (the installer grows by about 6 MB).
 
 ## [0.3.2] — Updates from inside the program
@@ -259,6 +263,11 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   16) y el estudio calcula el peso del archivo en segundo plano («Pesará unos 1,2 MB»). La pantalla de vídeo ofrece más
   anchos pequeños (240, 160 y 120 px). Mientras hay un estudio abierto el botón del otro queda apagado, y «Quitar
   todas» es una cruz roja.
+- **Arranque más rápido** (la imagen está en pantalla unos 0,65 s después de abrir el programa en vez de 0,9 s con un
+  JPEG de 24 megapíxeles; 0,54 s en vez de 0,8 s sin archivo): las fuentes de la interfaz (y sus alternativas para
+  escrituras asiáticas y emoji) y el controlador gráfico se cargan en un hilo auxiliar mientras se construye la ventana,
+  los diálogos de la barra de título (Ajustes, procesos por lote, Abrir) se crean la primera vez que se usan y el
+  reproductor de vídeo solo se crea al abrir un vídeo.
 - El programa lleva Qt Multimedia (el instalador crece unos 6 MB).
 
 ## [0.3.2] — Actualizaciones desde el programa

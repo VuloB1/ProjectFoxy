@@ -42,7 +42,7 @@ public:
     int maxFrames() const { return kMaxFrames; }
     bool loaded() const { return m_loaded; }
     QString fileName() const { return m_fileName; }
-    int durationMs() const { return int(m_reader.durationMs()); }
+    int durationMs() const { return m_reader ? int(m_reader->durationMs()) : 0; }
     int sourceWidth() const { return m_source.width(); }
     int sourceHeight() const { return m_source.height(); }
     bool busy() const { return m_busy; }
@@ -86,7 +86,10 @@ private:
     void fail(const QString &what);
     static QString toPath(const QString &file);
 
-    VideoFrameReader m_reader;
+    // Made the first time a video is opened: creating a QMediaPlayer loads the multimedia backend and FFmpeg
+    // (~13 MB of DLLs), which the program should not pay for at start.
+    VideoFrameReader *reader();
+    VideoFrameReader *m_reader = nullptr;
     QString m_fileName;
     QSize m_source;
     bool m_loaded = false;

@@ -1685,3 +1685,29 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
   cada fotograma es de un gris distinto) y un recorrido en `test_ui_flows`; `PROJECTFOXY_TEST_VIDEO=<archivo>` mide con un
   vídeo real (480×480 desde 1080p: 60 fotogramas en 1,5 s).
 - **No probado:** MKV con audio raro ni vídeos de fotogramas variables; el backend de Qt en Linux (AppImage/Flatpak).
+
+## 28. Arranque (medido el 2026-10-20)
+
+- **Dónde se iba el tiempo** (JPEG de 24 MP, Windows, Direct3D 11; ms desde que se crea el proceso, 0,84 s hasta el primer
+  fotograma): `main()` 25, `QGuiApplication` 45, motor 57, `AppBootstrap::setup` 100, `Main.qml` cargado 810. Casi todo
+  es `loadFromModule`: con la plataforma `offscreen` crear `Main` cuesta 83 ms, con la de Windows 560. Un perfil de
+  muestreo (abajo) lo explicó: el primer texto que se maqueta lee los archivos de la fuente de la interfaz y de sus
+  alternativas (`QWindowsFontDatabase::populateFamily`, `GetFontData`: ~200 ms) y el hilo principal espera ~100 ms a que el
+  hilo de render cree el dispositivo Direct3D.
+- **Qué se hizo:** `StartupWarmup` (hilo auxiliar desde el principio de `main()`: maqueta un texto de muestra con Segoe UI en
+  normal y negrita, con CJK y emoji, y crea y suelta un dispositivo `D3D11CreateDevice`; es global al proceso, así que
+  el hilo principal lo encuentra hecho o espera a lo mismo en vez de repetirlo; `PROJECTFOXY_NO_WARMUP=1` lo apaga);
+  los diálogos de `Toolbar.qml` (Ajustes, lote, Abrir, Leer, Eliminar) se crean con `Loader` al usarse (~80 ms);
+  `VideoToGif` crea su `QMediaPlayer` al abrir un vídeo (antes cargaba FFmpeg, 13 MB, al arrancar: 36 ms).
+  Resultado: 0,64 s hasta ver la imagen con el calentamiento solo y 0,55 s con todo (sin archivo: 0,54 s).
+- **Probado y descartado:** `QSG_RENDER_LOOP=basic` (-30 ms, pero cambia el comportamiento del render con la interfaz en
+  marcha).
+- **Herramientas (compilación de desarrollo, `PROJECTFOXY_DEV_SERVER`):** `PROJECTFOXY_TRACE_STARTUP=1` imprime cada hito
+  (`main()`, motor, `Main.qml`, primer fotograma, imagen cargada...); `PROJECTFOXY_SAMPLE_STARTUP=1` muestrea el hilo
+  principal cada ~15 ms hasta el primer fotograma y escribe las funciones más frecuentes (`StartupSampler.cpp`: pone en
+  pausa el hilo, recorre su pila con dbghelp y lo reanuda; con 1 ms se bloquea por los candados del montón);
+  `PROJECTFOXY_BENCH_QML=1` (con `PROJECTFOXY_BENCH_QML_NAMES="TitleBar|Main|inline:Label{text:\"x\"}"`) mide la carga y la
+  creación de cada componente QML y se cierra (`PROJECTFOXY_BENCH_PLATFORM=1` mide además fuentes, ventana y primer
+  fotograma; `PROJECTFOXY_BENCH_HIDDEN=1` crea `Main` sin mostrarlo).
+- **Queda:** unos 200 ms de plataforma al mostrar la ventana (creación nativa, swapchain, primer fotograma) y ~200 ms de
+  creación de `Main`; lo siguiente serían los diálogos de `Main.qml` (~10 ms) y `UpdateBanner` (~10 ms).

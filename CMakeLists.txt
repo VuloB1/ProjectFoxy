@@ -113,6 +113,8 @@ add_library(imageviewer_app STATIC
     src/app/UpdateManager.cpp
     src/app/FestiveManager.h
     src/app/FestiveManager.cpp
+    src/app/StartupWarmup.h
+    src/app/StartupWarmup.cpp
     src/app/VideoSupport.h
     src/app/VideoSupport.cpp
     src/app/VideoFrameReader.h
@@ -246,7 +248,7 @@ qt_add_executable(ImageViewer
 # off by default, and even when built it does nothing unless PROJECTFOXY_DEV_PORT is set. Never in a release.
 option(PROJECTFOXY_DEV_SERVER "Build the development-only control channel (src/app/DevServer.cpp)" OFF)
 if(PROJECTFOXY_DEV_SERVER)
-    target_sources(ImageViewer PRIVATE src/app/DevServer.h src/app/DevServer.cpp)
+    target_sources(ImageViewer PRIVATE src/app/DevServer.h src/app/DevServer.cpp src/app/StartupSampler.h src/app/StartupSampler.cpp)
     target_compile_definitions(ImageViewer PRIVATE PROJECTFOXY_DEV_SERVER)
     target_link_libraries(ImageViewer PRIVATE Qt6::Network $<$<PLATFORM_ID:Windows>:dbghelp>)
 endif()

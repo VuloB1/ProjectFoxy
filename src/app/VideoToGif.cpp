@@ -14,10 +14,24 @@ constexpr int kWatchdogMs = 20000; // a video that gives no frame for this long 
 VideoToGif::VideoToGif(QObject *parent)
     : QObject(parent)
 {
-    connect(&m_reader, &VideoFrameReader::opened, this, [this]() { m_reader.requestFrame(0); });
-    connect(&m_reader, &VideoFrameReader::failed, this, [this](const QString &) { fail(m_loaded ? QStringLiteral("read") : QStringLiteral("open")); });
-    connect(&m_reader, &VideoFrameReader::frameReady, this, &VideoToGif::onFrame);
-    connect(&m_reader, &VideoFrameReader::sampleFinished, this, [this]() {
+    m_watchdog.setSingleShot(true);
+    m_watchdog.setInterval(kWatchdogMs);
+    connect(&m_watchdog, &QTimer::timeout, this, [this]() {
+        if (m_busy && m_reader)
+            m_reader->cancelSample();
+        fail(QStringLiteral("read"));
+    });
+}
+
+VideoFrameReader *VideoToGif::reader()
+{
+    if (m_reader)
+        return m_reader;
+    m_reader = new VideoFrameReader(this);
+    connect(m_reader, &VideoFrameReader::opened, this, [this]() { m_reader->requestFrame(0); });
+    connect(m_reader, &VideoFrameReader::failed, this, [this](const QString &) { fail(m_loaded ? QStringLiteral("read") : QStringLiteral("open")); });
+    connect(m_reader, &VideoFrameReader::frameReady, this, &VideoToGif::onFrame);
+    connect(m_reader, &VideoFrameReader::sampleFinished, this, [this]() {
         if (!m_busy)
             return;
         if (m_cancelled || int(m_frames.size()) >= kMaxFrames)
@@ -25,13 +39,7 @@ VideoToGif::VideoToGif(QObject *parent)
         else
             nextSegment();
     });
-    m_watchdog.setSingleShot(true);
-    m_watchdog.setInterval(kWatchdogMs);
-    connect(&m_watchdog, &QTimer::timeout, this, [this]() {
-        if (m_busy)
-            m_reader.cancelSample();
-        fail(QStringLiteral("read"));
-    });
+    return m_reader;
 }
 
 QString VideoToGif::toPath(const QString &file)
@@ -54,7 +62,7 @@ void VideoToGif::open(const QString &file)
     m_fileName = QFileInfo(path).fileName();
     m_error.clear();
     emit errorChanged();
-    m_reader.open(path);
+    reader()->open(path);
 }
 
 void VideoToGif::close()
@@ -77,7 +85,7 @@ void VideoToGif::seek(int ms)
 {
     if (!m_loaded || m_busy)
         return;
-    m_reader.requestFrame(ms);
+    reader()->requestFrame(ms);
 }
 
 void VideoToGif::onFrame(qint64, const QImage &image)
@@ -86,7 +94,7 @@ void VideoToGif::onFrame(qint64, const QImage &image)
         // a frame of the sample
         m_watchdog.start();
         if (m_cancelled || int(m_frames.size()) >= kMaxFrames) {
-            m_reader.cancelSample();
+            m_reader->cancelSample();
             return;
         }
         QImage cut = image;
@@ -175,7 +183,7 @@ void VideoToGif::nextSegment()
         return;
     }
     const auto seg = m_segments[m_segment++];
-    m_reader.sample(seg.first, seg.second, m_step);
+    reader()->sample(seg.first, seg.second, m_step);
 }
 
 void VideoToGif::cancel()
@@ -183,8 +191,8 @@ void VideoToGif::cancel()
     if (!m_busy)
         return;
     m_cancelled = true;
-    if (m_reader.sampling())
-        m_reader.cancelSample(); // -> sampleFinished -> finish()
+    if (m_reader && m_reader->sampling())
+        m_reader->cancelSample(); // -> sampleFinished -> finish()
     else
         finish(false);
 }

@@ -5,11 +5,19 @@
 #include "AppSettings.h"
 #include "FontSubstitutions.h"
 #include "SingleInstance.h"
+#include "StartupWarmup.h"
 #include "WindowGeometry.h"
 
 #include <QGuiApplication>
+#include <memory>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#ifdef PROJECTFOXY_DEV_SERVER
+#include <QElapsedTimer>
+#include <QFontDatabase>
+#include <QFontMetrics>
+#include <QQmlComponent>
+#endif
 #include <QQuickStyle>
 #include <QQuickWindow>
 #include <QScreen>
@@ -19,10 +27,32 @@
 
 #ifdef PROJECTFOXY_DEV_SERVER
 #include "DevServer.h"
+#include "StartupSampler.h"
 #endif
 
 #ifdef Q_OS_WIN
 #include "WindowsFrame.h"
+#include <windows.h>
+#endif
+
+#ifdef PROJECTFOXY_DEV_SERVER
+// PROJECTFOXY_TRACE_STARTUP=1 prints, on stderr, how long after the process was created each step of the start is reached.
+static void startupMark(const char *what)
+{
+    static const bool on = qEnvironmentVariableIsSet("PROJECTFOXY_TRACE_STARTUP");
+    if (!on)
+        return;
+#ifdef Q_OS_WIN
+    FILETIME created, exited, kernel, user, now;
+    GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user);
+    GetSystemTimeAsFileTime(&now);
+    const auto ticks = [](const FILETIME &f) { return (quint64(f.dwHighDateTime) << 32) | f.dwLowDateTime; };
+    fprintf(stderr, "STARTUP %7.1f ms  %s\n", double(ticks(now) - ticks(created)) / 10000.0, what);
+    fflush(stderr);
+#endif
+}
+#else
+static inline void startupMark(const char *) {}
 #endif
 
 int main(int argc, char *argv[])
@@ -36,8 +66,16 @@ int main(int argc, char *argv[])
 #endif
     // (Elsewhere Qt picks the platform's backend: OpenGL on Linux, Metal on macOS.)
 
+    startupMark("main()");
+#ifdef PROJECTFOXY_DEV_SERVER
+    // PROJECTFOXY_SAMPLE_STARTUP=1: sample the main thread from here to the first frame and print where the time went.
+    if (qEnvironmentVariableIsSet("PROJECTFOXY_SAMPLE_STARTUP"))
+        startSampling(1);
+#endif
     QGuiApplication app(argc, argv);
+    startupMark("QGuiApplication ready");
     installFontSubstitutions();
+    StartupWarmup warmup; // fonts and the graphics driver, on a helper thread, while the interface is built
     app.setApplicationName("ProjectFoxy");
 #ifndef Q_OS_WIN
     // Wayland matches a window to its .desktop file (icon, name, taskbar) by this ID, which is also the AppStream
@@ -82,6 +120,7 @@ int main(int argc, char *argv[])
     if (!qEnvironmentVariableIsSet("QSG_NO_VSYNC") && !AppSettings().verticalSync())
         qputenv("QSG_NO_VSYNC", "1");
 
+    startupMark("before the engine");
     QQmlApplicationEngine engine;
 
     // Everything the QML needs, owned by the engine (see AppBootstrap.h).
@@ -96,6 +135,7 @@ int main(int argc, char *argv[])
         objects.updater->setDownloadBase(qEnvironmentVariable("PROJECTFOXY_UPDATE_BASE"));
     objects.updater->setDryRun(qEnvironmentVariableIsSet("PROJECTFOXY_UPDATE_DRYRUN"));
 #endif
+    startupMark("AppBootstrap::setup done");
     // Building the window takes a while: decode the picture meanwhile instead of after it.
     if (!fileArgument.isEmpty() && !VideoSupport::looksLikeVideo(fileArgument))
         controller->prefetch(fileArgument);
@@ -120,7 +160,57 @@ int main(int argc, char *argv[])
         engine.setInitialProperties(initial);
     }
 
+#ifdef PROJECTFOXY_DEV_SERVER
+    // PROJECTFOXY_BENCH_QML=1 (optionally with PROJECTFOXY_BENCH_QML_NAMES="A,B"): how long each QML component takes to
+    // load and to create on its own, cold, then exit. Run it with QT_QPA_PLATFORM=offscreen.
+    if (qEnvironmentVariableIsSet("PROJECTFOXY_BENCH_QML")) {
+        QStringList names = qEnvironmentVariable("PROJECTFOXY_BENCH_QML_NAMES").split(QLatin1Char('|'), Qt::SkipEmptyParts);
+        if (names.isEmpty())
+            names = {"AppButton", "TitleBar", "ThumbnailStrip", "ImageCanvas", "StatusBar", "UpdateBanner", "FestiveDecor",
+                     "ConfirmDialog", "UnsavedChangesDialog", "OverwriteDialog", "SettingsDialog", "BatchExportDialog",
+                     "BatchRenameDialog", "Toolbar", "EditPanel", "ReaderView", "MultiView", "GifStudio", "CollageMaker", "AboutPage"};
+        if (qEnvironmentVariableIsSet("PROJECTFOXY_BENCH_PLATFORM")) {
+            QElapsedTimer p;
+            p.start();
+            const int families = QFontDatabase::families().size();
+            qWarning("BENCH fonts: %d families in %lld ms", families, p.restart());
+            QFontMetrics fm{QFont(QStringLiteral("Segoe UI"), 10)};
+            qWarning("BENCH first QFontMetrics: %lld ms (%d)", p.restart(), fm.height());
+            QQuickWindow w;
+            w.resize(800, 600);
+            w.create();
+            qWarning("BENCH QQuickWindow::create: %lld ms", p.restart());
+            w.show();
+            QCoreApplication::processEvents();
+            qWarning("BENCH show + first events: %lld ms", p.restart());
+            for (int i = 0; i < 20; ++i)
+                QCoreApplication::processEvents();
+            qWarning("BENCH 20 more event rounds: %lld ms", p.restart());
+        }
+        for (const QString &name : names) {
+            QElapsedTimer t;
+            t.start();
+            QQmlComponent component(&engine);
+            if (name.startsWith(QLatin1String("inline:")))
+                component.setData((QStringLiteral("import QtQuick; import QtQuick.Controls; import ImageViewerApp; ") + name.mid(7)).toUtf8(), QUrl(QStringLiteral("qrc:/bench.qml")));
+            else
+                component.loadFromModule("ImageViewerApp", name);
+            const qint64 load = t.restart();
+            if (component.isError()) {
+                fprintf(stderr, "BENCH %-22s ERROR %s\n", qPrintable(name), qPrintable(component.errorString().left(100)));
+                continue;
+            }
+            QObject *object = qEnvironmentVariableIsSet("PROJECTFOXY_BENCH_HIDDEN") ? component.createWithInitialProperties({{"visible", false}}) : component.create();
+            const qint64 create = t.elapsed();
+            fprintf(stderr, "BENCH %-22s load %4lld ms   create %4lld ms\n", qPrintable(name), load, create);
+            delete object;
+        }
+        return 0;
+    }
+#endif
+    startupMark("before loading Main.qml");
     engine.loadFromModule("ImageViewerApp", "Main");
+    startupMark("Main.qml loaded");
 
     if (engine.rootObjects().isEmpty())
         return -1;
@@ -167,6 +257,16 @@ int main(int argc, char *argv[])
         });
     }
 
+#ifdef PROJECTFOXY_DEV_SERVER
+    if (auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first())) {
+        auto once = std::make_shared<bool>(false);
+        QObject::connect(window, &QQuickWindow::frameSwapped, window, [once]() { if (!*once) { *once = true; startupMark("first frame shown"); if (qEnvironmentVariableIsSet("PROJECTFOXY_SAMPLE_STARTUP")) stopSamplingAndReport(70); } });
+        QObject::connect(controller, &AppController::currentSourceChanged, window, []() { startupMark("picture source set"); });
+        auto pictureLoaded = std::make_shared<bool>(false);
+        QObject::connect(controller, &AppController::isLoadingChanged, window, [controller, pictureLoaded]() { if (!controller->isLoading()) { *pictureLoaded = true; startupMark("picture loaded"); } });
+        QObject::connect(window, &QQuickWindow::frameSwapped, window, [pictureLoaded]() { static int after = 0; if (*pictureLoaded && after < 4) { ++after; startupMark("frame after the picture loaded"); } });
+    }
+#endif
     // Open-with / double-click association: the file in the arguments.
     if (!fileArgument.isEmpty())
         controller->openPath(fileArgument);
