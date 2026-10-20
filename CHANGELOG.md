@@ -26,6 +26,12 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   1440p60 clip becomes 358 frames in about 9 s: the video is played at 4x and only the frames needed are kept.
 - **One Open for everything.** The Open button (and Ctrl+O, drag and drop, "Open with" and the command line) takes
   pictures, comics and videos: a video goes straight to the animation studio's video page.
+- **GIF studio, easier and lighter.** The duration of the frames is one value for all of them (20 to 300 ms, with
+  buttons for the usual ones; it used to be 20 ms to 5 s and one frame at a time, and new pictures stay 100 ms), and the
+  effect and text are also for the whole animation. Dropdowns of a few options (transitions, repetitions, kind of text,
+  effect presets, sizes) are now buttons. A **Compression** bar sets the colours of the GIF (256 down to 16) and the studio
+  works out the file's weight in the background ("It will weigh about 1.2 MB"). The video page offers more small widths
+  (240, 160 and 120 px). While one studio is open the other one's button is greyed out, and "Remove all" is a red cross.
 - Adds Qt Multimedia to the program (the installer grows by about 6 MB).
 
 ## [0.3.2] — Updates from inside the program
@@ -246,6 +252,13 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   1440p a 60 fps da 358 fotogramas en unos 9 s: el vídeo se reproduce a 4x y solo se guardan los fotogramas necesarios.
 - **Un solo Abrir para todo.** El botón Abrir (y Ctrl+O, arrastrar y soltar, «Abrir con» y la línea de órdenes) admite
   imágenes, cómics y vídeos: un vídeo va directo a la pantalla de vídeo del estudio de animación.
+- **Estudio de GIF más cómodo y ligero.** La duración de los fotogramas es un solo valor para todos (de 20 a 300 ms, con
+  botones para los habituales; antes iba de 20 ms a 5 s y de uno en uno, y las imágenes nuevas duran 100 ms), y el efecto
+  y el texto también valen para toda la animación. Los menús de pocas opciones (transiciones, repeticiones, tipo de
+  texto, ajustes de un efecto, tamaños) ahora son botones. Una barra de **Compresión** fija los colores del GIF (de 256 a
+  16) y el estudio calcula el peso del archivo en segundo plano («Pesará unos 1,2 MB»). La pantalla de vídeo ofrece más
+  anchos pequeños (240, 160 y 120 px). Mientras hay un estudio abierto el botón del otro queda apagado, y «Quitar
+  todas» es una cruz roja.
 - El programa lleva Qt Multimedia (el instalador crece unos 6 MB).
 
 ## [0.3.2] — Actualizaciones desde el programa

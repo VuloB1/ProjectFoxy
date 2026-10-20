@@ -194,8 +194,8 @@ Item {
                 width: parent.width
                 spacing: 10
                 Label { height: 32; verticalAlignment: Text.AlignVCenter; text: qsTr("Recortar la imagen"); color: themeManager.textSecondary }
-                AppSegmented {
-                    width: 360
+                AppChoiceChips {
+                    width: Math.min(parent.width, 460)
                     model: [{ text: qsTr("Todo") }, { text: "1:1" }, { text: "16:9" }, { text: "4:3" }, { text: "3:4" }, { text: "9:16" }, { text: qsTr("Libre") }]
                     currentIndex: root.aspectIndex
                     onActivated: function (i) {
@@ -348,7 +348,7 @@ Item {
                 width: parent.width
                 spacing: 8
                 Label { text: qsTr("Fotogramas por segundo"); color: themeManager.textSecondary }
-                AppSegmented {
+                AppChoiceChips {
                     model: root.fpsChoices.map(function (f) { return { text: String(f) }; })
                     currentIndex: root.fpsChoices.indexOf(root.fps)
                     onActivated: function (i) { root.fps = root.fpsChoices[i]; }
@@ -366,9 +366,9 @@ Item {
                 width: parent.width
                 spacing: 8
                 Label { text: qsTr("Ancho de la imagen"); color: themeManager.textSecondary }
-                AppSegmented {
-                    readonly property var widths: [0, 1280, 720, 480, 320]
-                    model: [{ text: qsTr("Original") }, { text: "1280" }, { text: "720" }, { text: "480" }, { text: "320" }]
+                AppChoiceChips {
+                    readonly property var widths: [0, 1280, 720, 480, 320, 240, 160, 120]
+                    model: [{ text: qsTr("Original") }, { text: "1280" }, { text: "720" }, { text: "480" }, { text: "320" }, { text: "240" }, { text: "160" }, { text: "120" }]
                     currentIndex: {
                         for (let i = 0; i < widths.length; ++i)
                             if ((widths[i] === 0 ? root.cropWidthPx : widths[i]) === root.outWidth) return i;

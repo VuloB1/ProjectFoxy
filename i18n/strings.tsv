@@ -1016,3 +1016,19 @@ Puedes soltarlos aquí, elegirlos o usar todas las imágenes de la carpeta. Un G
 Agregar imágenes o vídeo	Add pictures or a video	Adicionar imagens ou vídeo	이미지 또는 동영상 추가	添加图像或视频	画像または動画を追加
 Imágenes y vídeos (%1)	Pictures and videos (%1)	Imagens e vídeos (%1)	이미지 및 동영상 (%1)	图像和视频 (%1)	画像と動画 (%1)
 Elige las imágenes o el vídeo de la animación	Choose the pictures or the video for the animation	Escolha as imagens ou o vídeo da animação	애니메이션의 이미지 또는 동영상 선택	选择动画的图像或视频	アニメーションの画像または動画を選択
+Agrega imágenes para ponerle un efecto o un texto a la animación.	Add pictures to give the animation an effect or a text.	Adicione imagens para dar um efeito ou um texto à animação.	이미지를 추가하면 애니메이션에 효과나 텍스트를 넣을 수 있습니다.	添加图像后，可为动画设置效果或文字。	画像を追加すると、アニメーションにエフェクトやテキストを付けられます。
+Cada fotograma	Each frame	Cada quadro	각 프레임	每一帧	各フレーム
+Calculando el peso…	Working out the weight…	Calculando o peso…	용량 계산 중…	正在计算大小…	サイズを計算中…
+Calcular	Calculate	Calcular	계산	计算	計算
+Clásico	Classic	Clássico	클래식	经典	クラシック
+Compresión	Compression	Compressão	압축	压缩	圧縮
+Efecto y texto	Effect and text	Efeito e texto	효과와 텍스트	效果和文字	エフェクトとテキスト
+Franja negra	Black band	Faixa preta	검은 띠	黑色条带	黒い帯
+Meme	Meme	Meme	밈	表情包	ミーム
+Más compresión, menos colores y un archivo más ligero: %1 colores.	More compression, fewer colours and a lighter file: %1 colours.	Mais compressão, menos cores e um arquivo mais leve: %1 cores.	압축을 높이면 색상이 줄고 파일이 가벼워집니다: %1색.	压缩越高，颜色越少，文件越小：%1 色。	圧縮を上げると色数が減りファイルが軽くなります: %1色。
+Pesará unos %1	It will weigh about %1	Pesará cerca de %1	용량은 약 %1입니다	大小约为 %1	サイズは約%1です
+Peso sin calcular	Weight not worked out	Peso não calculado	용량 미계산	尚未计算大小	サイズ未計算
+Quitar efecto y texto	Remove effect and text	Remover efeito e texto	효과와 텍스트 제거	移除效果和文字	エフェクトとテキストを削除
+Tramado (degradados más suaves, pesa más)	Dithering (smoother gradients, heavier)	Pontilhado (gradientes mais suaves, pesa mais)	디더링 (그라데이션이 부드러워지지만 용량 증가)	抖动（渐变更平滑，文件更大）	ディザリング (グラデーションが滑らかになるが重くなる)
+Vale para todos los fotogramas. Cuanto menos dura cada uno, más fluido se ve (los visores muestran los de menos de 20 ms como más lentos).	Applies to all frames. The shorter each one lasts, the smoother it looks (viewers show those under 20 ms as slower).	Vale para todos os quadros. Quanto menos dura cada um, mais fluido fica (os visualizadores mostram os de menos de 20 ms como mais lentos).	모든 프레임에 적용됩니다. 각 프레임이 짧을수록 부드럽게 보입니다 (뷰어는 20ms 미만을 더 느리게 표시합니다).	适用于所有帧。每帧越短越流畅（查看器会把低于 20 毫秒的帧显示得更慢）。	すべてのフレームに適用されます。1枚が短いほど滑らかに見えます (20ms未満は多くのビューアーで遅く表示されます)。
+Escribe el texto de la animación	Write the text of the animation	Escreva o texto da animação	애니메이션의 텍스트 입력	输入动画的文字	アニメーションのテキストを入力

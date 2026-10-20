@@ -3,6 +3,7 @@
 #include "edit/Effects.h"
 #include "decoders/AnimatedDecoder.h"
 
+#include <QBuffer>
 #include <QDir>
 #include <QFontDatabase>
 #include <QFileInfo>
@@ -42,12 +43,13 @@ QVariantMap defaultOptions()
     m.insert("speed", 1.0);
     m.insert("loops", 0);
     m.insert("format", 0);
+    m.insert("gifCompression", 0);
     m.insert("gifColors", 256);
     m.insert("gifDither", true);
     m.insert("gifLocal", false);
     m.insert("webpLossless", false);
     m.insert("webpQuality", 80);
-    m.insert("defaultHold", 1000);
+    m.insert("defaultHold", 100); // (a video or an animation brings its own)
     return m;
 }
 
@@ -100,6 +102,7 @@ private:
 
 AnimStudio::AnimStudio(PaneImageStore *store, QObject *parent) : QAbstractListModel(parent), m_store(store), m_options(defaultOptions())
 {
+    m_estimatePool.setMaxThreadCount(1);
     rebuildSnapshot();
 }
 
@@ -107,6 +110,9 @@ AnimStudio::~AnimStudio()
 {
     if (m_cancel)
         m_cancel->store(true);
+    if (m_estimateCancel)
+        m_estimateCancel->store(true);
+    m_estimatePool.waitForDone();
     m_pool.waitForDone(); // no timeout: an export still running reports back to this object (it stops at the next frame)
 }
 
@@ -186,6 +192,14 @@ void AnimStudio::rebuildSnapshot()
 void AnimStudio::changed(bool planAffected)
 {
     ++m_revision;
+    if (m_estimating || m_estimatedBytes >= 0) { // what was found out no longer holds
+        if (m_estimateCancel)
+            m_estimateCancel->store(true);
+        ++m_estimateGeneration;
+        m_estimating = false;
+        m_estimatedBytes = -1;
+        emit estimateChanged();
+    }
     rebuildSnapshot();
     emit optionsChanged();
     if (planAffected)
@@ -243,6 +257,8 @@ int AnimStudio::addPaths(const QStringList &paths)
                     e.memory = r.frames[i].convertToFormat(QImage::Format_RGBA8888);
                     e.label = QStringLiteral("%1 · %2").arg(entryName(path)).arg(i + 1);
                     e.holdMs = i < r.frameDelaysMs.size() ? std::max(20, r.frameDelaysMs[i]) : hold;
+                    if (!m_entries.empty())
+                        e.style = m_entries.front().style; // the effect and text are the animation's
                     m_entries.push_back(std::move(e));
                     ++added;
                 }
@@ -256,6 +272,8 @@ int AnimStudio::addPaths(const QStringList &paths)
         e.label = entryName(path);
         e.holdMs = hold;
         beginInsertRows({}, int(m_entries.size()), int(m_entries.size()));
+        if (!m_entries.empty())
+            e.style = m_entries.front().style; // the effect and text are the animation's
         m_entries.push_back(std::move(e));
         endInsertRows();
         ++added;
@@ -293,6 +311,8 @@ int AnimStudio::addFrames(const QList<QImage> &frames, int holdMs, const QString
         e.memory = frames[i].convertToFormat(QImage::Format_RGBA8888);
         e.label = QStringLiteral("%1 · %2").arg(label).arg(i + 1);
         e.holdMs = std::max(20, holdMs);
+        if (!m_entries.empty())
+            e.style = m_entries.front().style; // the effect and text are the animation's
         m_entries.push_back(std::move(e));
     }
     endInsertRows();
@@ -425,11 +445,8 @@ QVariantMap AnimStudio::styleOf(int index) const
     return m;
 }
 
-void AnimStudio::setStyleValue(int index, const QString &key, const QVariant &value)
+bool AnimStudio::applyStyleKey(core::anim::FrameStyle &st, const QString &key, const QVariant &value)
 {
-    if (index < 0 || index >= count())
-        return;
-    core::anim::FrameStyle &st = m_entries[size_t(index)].style;
     const core::anim::FrameStyle before = st;
     if (key == QLatin1String("effectId")) {
         const QString id = value.toString();
@@ -456,10 +473,42 @@ void AnimStudio::setStyleValue(int index, const QString &key, const QVariant &va
         else if (c == 2) { st.text.color = QColor(255, 255, 255); st.text.size = 12.0; }
         else if (c == 3) { st.text.color = QColor(255, 255, 255); st.text.size = 7.0; }
     }
-    else return;
-    if (st == before)
+    else return false;
+    return !(st == before);
+}
+
+void AnimStudio::setStyleValue(int index, const QString &key, const QVariant &value)
+{
+    if (index < 0 || index >= count())
+        return;
+    if (!applyStyleKey(m_entries[size_t(index)].style, key, value))
         return;
     emit dataChanged(this->index(index), this->index(index), {StyledRole});
+    changed();
+}
+
+void AnimStudio::setStyleValueAll(const QString &key, const QVariant &value)
+{
+    bool any = false;
+    for (Entry &e : m_entries)
+        any = applyStyleKey(e.style, key, value) || any;
+    if (!any)
+        return;
+    emit dataChanged(this->index(0), this->index(count() - 1), {StyledRole});
+    changed();
+}
+
+void AnimStudio::clearStyleAll()
+{
+    bool any = false;
+    for (Entry &e : m_entries)
+        if (!(e.style == core::anim::FrameStyle{})) {
+            e.style = {};
+            any = true;
+        }
+    if (!any)
+        return;
+    emit dataChanged(this->index(0), this->index(count() - 1), {StyledRole});
     changed();
 }
 
@@ -522,7 +571,8 @@ void AnimStudio::setOption(const QString &key, const QVariant &value)
     else if (key == "format") clampInt(0, 2);
     else if (key == "gifColors") clampInt(2, 256);
     else if (key == "webpQuality") clampInt(0, 100);
-    else if (key == "defaultHold") clampInt(20, 60000);
+    else if (key == "defaultHold") clampInt(20, 300);
+    else if (key == "gifCompression") clampInt(0, 100);
     else if (key == "background") v = int(value.toUInt() & 0xFFFFFF);
     else if (key == "speed") v = std::clamp(value.toDouble(), 0.1, 10.0);
     else if (value.typeId() == QMetaType::Bool || m_options.value(key).typeId() == QMetaType::Bool) v = value.toBool();
@@ -530,6 +580,13 @@ void AnimStudio::setOption(const QString &key, const QVariant &value)
     if (m_options.value(key) == v)
         return;
     m_options.insert(key, v);
+    if (key == "gifCompression") {
+        // one bar for the weight: 256 colours (with dithering) down to 16 (without)
+        const double level = v.toInt() / 100.0;
+        m_options.insert("gifColors", std::clamp(int(std::lround(256.0 * std::pow(16.0 / 256.0, level))), 2, 256));
+        m_options.insert("gifDither", v.toInt() < 35);
+        m_options.insert("gifLocal", false);
+    }
 
     if (m_options.value("lockAspect").toBool() && (key == "width" || key == "lockAspect")) {
         m_options.insert("height", std::clamp(int(std::lround(m_options.value("width").toInt() / m_aspect)), 16, 4096));
@@ -694,6 +751,45 @@ bool AnimStudio::exportTo(const QUrl &file)
         }, Qt::QueuedConnection);
     }));
     return true;
+}
+
+void AnimStudio::estimateSize()
+{
+    if (m_exporting || m_estimating)
+        return;
+    const auto snap = snapshot();
+    if (snap->plan.empty())
+        return;
+    m_estimating = true;
+    m_estimatedBytes = -1;
+    const int generation = ++m_estimateGeneration;
+    m_estimateCancel = std::make_shared<std::atomic<bool>>(false);
+    emit estimateChanged();
+
+    const auto cancel = m_estimateCancel;
+    PaneImageStore *store = m_store;
+    m_estimatePool.start(QRunnable::create([this, snap, cancel, store, generation]() {
+        StudioFrameSource source(snap, store);
+        QBuffer out;
+        QString error;
+        bool ok = out.open(QIODevice::WriteOnly);
+        auto progress = [&](int, int) { return !cancel->load(); };
+        if (ok) {
+            switch (snap->format) {
+            case 1: ok = writeApng(source, snap->apng, out, progress, &error); break;
+            case 2: ok = writeWebp(source, snap->webp, out, progress, &error); break;
+            default: ok = writeGif(source, snap->gif, out, progress, &error); break;
+            }
+        }
+        const qint64 bytes = ok && !cancel->load() ? out.size() : -1;
+        QMetaObject::invokeMethod(this, [this, bytes, generation]() {
+            if (generation != m_estimateGeneration)
+                return; // something changed meanwhile
+            m_estimating = false;
+            m_estimatedBytes = bytes;
+            emit estimateChanged();
+        }, Qt::QueuedConnection);
+    }));
 }
 
 void AnimStudio::cancelExport()

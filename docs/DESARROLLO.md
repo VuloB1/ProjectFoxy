@@ -1673,6 +1673,12 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
   (`VideoSupport::looksLikeVideo`, solo mira el nombre, no carga el plugin), igual que con los cómics; `Main.qml` abre el
   estudio de GIF y la página. El diálogo de Abrir lee las extensiones decodificables al abrirse (`Toolbar.requestOpen`),
   no al arrancar.
+- **Estudio de GIF (0.3.3):** efecto, texto y duración son globales (`setStyleValueAll`, `clearStyleAll`, `setAllHold`; las
+  imágenes nuevas heredan el aspecto de la primera; `defaultHold` 100 ms, máximo 300). `gifCompression` (0-100) fija
+  `gifColors` (256 a 16, en escala logarítmica) y el tramado. `AnimStudio::estimateSize()` escribe la animación en un
+  `QBuffer` en un hilo propio y publica `estimatedBytes` (se invalida con cualquier cambio); `GifStudio.qml` lo pide solo
+  900 ms después del último cambio si hay 120 fotogramas o menos. `qml/controls/AppChoiceChips.qml` es el botón de varias
+  opciones que sustituye a los menús cortos.
 - **Detalles que costaron:** la posición 0 no produce fotograma en un reproductor nuevo (se pide 1 ms); pedir el último
   instante no da nada (se queda 60 ms antes); el proveedor de imágenes recibe `sourceSize` con un lado a 0.
 - **Pruebas:** `test_multimedia`, `test_video_frames`, `test_video_to_gif` (con `tests/fixtures/video_20frames_10fps.mp4`:

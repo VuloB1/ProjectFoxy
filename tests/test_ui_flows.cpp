@@ -154,6 +154,18 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("videoToGifPage") == nullptr, 5000); // the page closes itself
     }
 
+    void whileOneStudioIsOpenTheButtonOfTheOtherIsOff()
+    {
+        click("gifButton");
+        QTRY_VERIFY_WITH_TIMEOUT(!item("collageButton")->isEnabled(), 3000);
+        QVERIFY(item("gifButton")->isEnabled()); // it closes its own studio
+        click("gifButton");
+        QTRY_VERIFY_WITH_TIMEOUT(item("collageButton")->isEnabled(), 3000);
+        click("collageButton");
+        QTRY_VERIFY_WITH_TIMEOUT(!item("gifButton")->isEnabled(), 3000);
+        QVERIFY(item("collageButton")->isEnabled());
+    }
+
     void theStudiosAddButtonTakesPicturesAndVideosAlike()
     {
         click("gifButton");

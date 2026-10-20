@@ -59,6 +59,15 @@ Item {
 
     Rectangle { anchors.fill: parent; color: themeManager.background }
 
+    // The weight is worked out by itself a moment after the last change while the animation is small; a big one has the
+    // "Calcular" button (writing it takes as long as saving it).
+    Timer {
+        id: estimateTimer
+        interval: 900
+        onTriggered: if (root.count > 0 && root.count <= 120 && !animStudio.exporting) animStudio.estimateSize()
+    }
+    Connections { target: animStudio; function onOptionsChanged() { estimateTimer.restart(); } }
+
     // ---------------------------------------------------------------- the preview
     function showFrame(i) {
         const n = animStudio.planCount;
@@ -303,7 +312,7 @@ Item {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     text: qsTr("Quitar todas")
-                    iconName: "trash"
+                    iconName: "close"
                     iconOnly: true
                     iconSize: 18
                     iconStroke: 1.4
@@ -545,7 +554,7 @@ Item {
                 to: parent.to
                 stepSize: parent.step
                 value: parent.shown
-                onMoved: animStudio.setStyleValue(root.currentIndex, parent.key, value)
+                onMoved: animStudio.setStyleValueAll(parent.key, value)
             }
         }
         component OptCheck: AppCheckBox {
@@ -576,13 +585,16 @@ Item {
                 width: flick.width - bar.implicitWidth - 6
                 spacing: 8
 
-                // ---- the picture picked in the strip
+                // ---- how long each frame stays: the same for all of them
                 AdjustSection {
+                    id: durationSection
                     width: parent.width
                     title: qsTr("Duración de los fotogramas")
+                    readonly property int hold: { animStudio.revision; return root.count > 0 ? animStudio.holdAt(0) : root.opts.defaultHold; }
+                    function setAll(ms) { animStudio.setOption("defaultHold", ms); animStudio.setAllHold(ms); }
                     Label {
                         width: parent.width
-                        text: root.currentIndex >= 0 ? qsTr("Fotograma %1").arg(root.currentIndex + 1) : qsTr("Elige un fotograma de la tira para cambiarle la duración.")
+                        text: qsTr("Vale para todos los fotogramas. Cuanto menos dura cada uno, más fluido se ve (los visores muestran los de menos de 20 ms como más lentos).")
                         color: themeManager.textSecondary
                         wrapMode: Text.WordWrap
                         font.pixelSize: 11
@@ -590,46 +602,22 @@ Item {
                     Item {
                         width: parent.width
                         implicitHeight: 40
-                        visible: root.currentIndex >= 0
-                        readonly property int hold: { animStudio.revision; return root.count > 0 ? animStudio.holdAt(root.currentIndex) : 1000; }
-                        Label { text: qsTr("Este fotograma"); color: themeManager.textSecondary }
-                        Label { anchors.right: parent.right; text: parent.hold + " ms"; color: themeManager.textPrimary; font.bold: true }
+                        Label { text: qsTr("Cada fotograma"); color: themeManager.textSecondary }
+                        Label { anchors.right: parent.right; text: durationSection.hold + " ms"; color: themeManager.textPrimary; font.bold: true }
                         AppSlider {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             anchors.bottom: parent.bottom
-                            from: 20; to: 5000; stepSize: 10
-                            value: parent.hold
-                            onMoved: animStudio.setHold(root.currentIndex, Math.round(value))
+                            from: 20; to: 300; stepSize: 10
+                            value: durationSection.hold
+                            onMoved: durationSection.setAll(Math.round(value))
                         }
                     }
-                    Row {
-                        width: parent.width
-                        spacing: 6
-                        AppToolButton {
-                            anchors.bottom: parent.bottom
-                            text: qsTr("A todos los fotogramas")
-                            iconName: "copy"
-                            iconOnly: true
-                            enabled: root.currentIndex >= 0
-                            onClicked: animStudio.setAllHold(animStudio.holdAt(root.currentIndex))
-                        }
-                        Item {
-                            width: parent.width - 40 - 6
-                            height: 56
-                            Label { text: qsTr("Duración de las nuevas"); color: themeManager.textSecondary; font.pixelSize: 11 }
-                            AppSpinBox {
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                width: parent.width
-                                height: 26
-                                from: 20; to: 60000; stepSize: 100
-                                editable: true
-                                value: root.opts.defaultHold
-                                onValueModified: animStudio.setOption("defaultHold", value)
-                                AppToolTip { visible: parent.hovered; text: qsTr("Cuántos milisegundos dura cada imagen que agregues de ahora en adelante. No cambia las que ya están en la tira.") }
-                            }
-                        }
+                    AppChoiceChips {
+                        readonly property var values: [20, 30, 40, 50, 60, 80, 100, 150, 200, 300]
+                        model: values.map(v => ({ text: String(v) }))
+                        currentIndex: values.indexOf(durationSection.hold)
+                        onActivated: function (i) { durationSection.setAll(values[i]); }
                     }
                 }
 
@@ -637,13 +625,13 @@ Item {
                 AdjustSection {
                     id: styleSection
                     width: parent.width
-                    title: qsTr("Efecto y texto del fotograma")
+                    title: qsTr("Efecto y texto")
                     // read again whenever anything changed
-                    readonly property var st: { animStudio.revision; return root.currentIndex >= 0 && root.currentIndex < root.count ? animStudio.styleOf(root.currentIndex) : ({}); }
+                    readonly property var st: { animStudio.revision; return root.count > 0 ? animStudio.styleOf(0) : ({}); }
                     readonly property var effects: animStudio.frameEffects()
                     readonly property int effectIndex: { for (let i = 0; i < effects.length; ++i) if (effects[i].id === st.effectId) return i; return -1; }
                     readonly property var presetNames: effectIndex >= 0 ? effects[effectIndex].presets : []
-                    readonly property bool has: root.currentIndex >= 0 && root.currentIndex < root.count
+                    readonly property bool has: root.count > 0
                     // the text is a meme caption (a band or text with outline from the Efectos catalogue)
                     readonly property bool captioned: (st.caption ?? -1) >= 0
                     function rgbColor(v) { return Qt.rgba(((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255, 1); }
@@ -652,7 +640,7 @@ Item {
                     Label {
                         width: parent.width
                         visible: !styleSection.has
-                        text: qsTr("Elige un fotograma de la tira para ponerle un efecto o un texto.")
+                        text: qsTr("Agrega imágenes para ponerle un efecto o un texto a la animación.")
                         color: themeManager.textSecondary
                         wrapMode: Text.WordWrap
                         font.pixelSize: 11
@@ -666,35 +654,36 @@ Item {
                             width: parent.width
                             model: [qsTr("Ninguno")].concat(styleSection.effects.map(e => e.name))
                             currentIndex: styleSection.effectIndex + 1
-                            onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "effectId", i === 0 ? "" : styleSection.effects[i - 1].id); }
+                            onActivated: function (i) { animStudio.setStyleValueAll("effectId", i === 0 ? "" : styleSection.effects[i - 1].id); }
                         }
                         Column {
                             width: parent.width
                             spacing: 6
                             visible: styleSection.effectIndex >= 0
-                            AppComboBox {
-                                width: parent.width
+                            AppChoiceChips {
                                 visible: styleSection.presetNames.length > 0
                                 model: [qsTr("Valores de fábrica")].concat(styleSection.presetNames)
                                 currentIndex: (styleSection.st.effectPreset ?? -1) + 1
-                                onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "effectPreset", i - 1); }
+                                onActivated: function (i) { animStudio.setStyleValueAll("effectPreset", i - 1); }
                             }
                             StyleSlider { key: "effectMix"; label: qsTr("Cantidad"); from: 0; to: 100; step: 1; suffix: "%" }
                         }
 
                         Label { text: qsTr("Texto"); color: themeManager.textSecondary; topPadding: 4 }
-                        AppComboBox {
-                            width: parent.width
-                            model: [qsTr("Texto libre (lo pones donde quieras)"), qsTr("Meme: franja blanca arriba"), qsTr("Franja negra abajo"),
-                                    qsTr("Texto clásico sobre la imagen"), qsTr("Subtítulo")]
+                        AppChoiceChips {
+                            model: [{ text: qsTr("Libre"), tip: qsTr("Texto libre (lo pones donde quieras)") },
+                                    { text: qsTr("Meme"), tip: qsTr("Meme: franja blanca arriba") },
+                                    { text: qsTr("Franja negra"), tip: qsTr("Franja negra abajo") },
+                                    { text: qsTr("Clásico"), tip: qsTr("Texto clásico sobre la imagen") },
+                                    { text: qsTr("Subtítulo") }]
                             currentIndex: (styleSection.st.caption ?? -1) + 1
-                            onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "caption", i - 1); }
+                            onActivated: function (i) { animStudio.setStyleValueAll("caption", i - 1); }
                         }
                         AppTextField {
                             width: parent.width
-                            placeholderText: qsTr("Escribe el texto del fotograma")
+                            placeholderText: qsTr("Escribe el texto de la animación")
                             text: styleSection.st.text ?? ""
-                            onTextEdited: animStudio.setStyleValue(root.currentIndex, "text", text)
+                            onTextEdited: animStudio.setStyleValueAll("text", text)
                         }
                         Column {
                             width: parent.width
@@ -707,7 +696,7 @@ Item {
                                 readonly property var families: animStudio.fontFamilies()
                                 model: [qsTr("Letra predeterminada")].concat(families)
                                 currentIndex: Math.max(0, families.indexOf(styleSection.st.family) + 1)
-                                onActivated: function (i) { animStudio.setStyleValue(root.currentIndex, "family", i === 0 ? "" : families[i - 1]); }
+                                onActivated: function (i) { animStudio.setStyleValueAll("family", i === 0 ? "" : families[i - 1]); }
                             }
                             StyleSlider { key: "textSize"; label: qsTr("Tamaño"); from: 2; to: 40; step: 0.5; suffix: "%"; decimals: 1 }
                             StyleSlider { visible: !styleSection.captioned; key: "textX"; label: qsTr("Posición horizontal"); from: 0; to: 100; step: 1; suffix: "%" }
@@ -720,7 +709,7 @@ Item {
                                 AppColorSwatch {
                                     anchors.verticalCenter: parent.verticalCenter
                                     value: styleSection.rgbColor(styleSection.st.bandColor ?? 0xFFFFFF)
-                                    onPicked: function (c) { animStudio.setStyleValue(root.currentIndex, "bandColor", styleSection.packed(c)); }
+                                    onPicked: function (c) { animStudio.setStyleValueAll("bandColor", styleSection.packed(c)); }
                                 }
                             }
                             Row {
@@ -730,14 +719,14 @@ Item {
                                 AppColorSwatch {
                                     anchors.verticalCenter: parent.verticalCenter
                                     value: styleSection.rgbColor(styleSection.st.color ?? 0xFFFFFF)
-                                    onPicked: function (c) { animStudio.setStyleValue(root.currentIndex, "color", styleSection.packed(c)); }
+                                    onPicked: function (c) { animStudio.setStyleValueAll("color", styleSection.packed(c)); }
                                 }
                                 AppCheckBox {
                                     visible: !styleSection.captioned
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: qsTr("Negrita")
                                     checked: styleSection.st.bold === true
-                                    onToggled: animStudio.setStyleValue(root.currentIndex, "bold", checked)
+                                    onToggled: animStudio.setStyleValueAll("bold", checked)
                                 }
                             }
                             Row {
@@ -748,31 +737,21 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: qsTr("Contorno")
                                     checked: styleSection.st.outline === true
-                                    onToggled: animStudio.setStyleValue(root.currentIndex, "outline", checked)
+                                    onToggled: animStudio.setStyleValueAll("outline", checked)
                                 }
                                 AppColorSwatch {
                                     anchors.verticalCenter: parent.verticalCenter
                                     enabled: styleSection.st.outline === true
                                     opacity: enabled ? 1 : 0.4
                                     value: styleSection.rgbColor(styleSection.st.outlineColor ?? 0)
-                                    onPicked: function (c) { animStudio.setStyleValue(root.currentIndex, "outlineColor", styleSection.packed(c)); }
+                                    onPicked: function (c) { animStudio.setStyleValueAll("outlineColor", styleSection.packed(c)); }
                                 }
                             }
                         }
-                        Row {
-                            spacing: 4
-                            AppToolButton {
-                                text: qsTr("A todos los fotogramas")
-                                iconName: "copy"
-                                iconOnly: true
-                                onClicked: animStudio.copyStyleToAll(root.currentIndex)
-                            }
-                            AppToolButton {
-                                text: qsTr("Quitar")
-                                iconName: "trash"
-                                iconOnly: true
-                                onClicked: animStudio.clearStyle(root.currentIndex)
-                            }
+                        AppButton {
+                            text: qsTr("Quitar efecto y texto")
+                            enabled: (styleSection.st.effectId ?? "") !== "" || (styleSection.st.text ?? "") !== "" || (styleSection.st.caption ?? -1) >= 0
+                            onClicked: animStudio.clearStyleAll()
                         }
                     }
                 }
@@ -807,18 +786,11 @@ Item {
                             onValueModified: animStudio.setOption("height", value)
                         }
                     }
-                    Flow {
-                        width: parent.width
-                        spacing: 4
-                        Repeater {
-                            model: [240, 320, 480, 640, 800, 1080]
-                            delegate: AppToolButton {
-                                required property int modelData
-                                text: modelData + " px"
-                                enabled: root.count > 0
-                                onClicked: animStudio.sizeFromFirst(modelData)
-                            }
-                        }
+                    AppChoiceChips {
+                        readonly property var sizes: [160, 240, 320, 480, 640, 800, 1080]
+                        enabled: root.count > 0
+                        model: sizes.map(v => ({ text: v + " px" }))
+                        onActivated: function (i) { animStudio.sizeFromFirst(sizes[i]); }
                     }
                     Label { text: qsTr("Cómo entra cada imagen"); color: themeManager.textSecondary }
                     AppSegmented {
@@ -849,8 +821,7 @@ Item {
                     width: parent.width
                     title: qsTr("Animación")
                     Label { text: qsTr("Transición entre imágenes"); color: themeManager.textSecondary }
-                    AppComboBox {
-                        width: parent.width
+                    AppChoiceChips {
                         model: [qsTr("Ninguna (corte directo)"), qsTr("Fundido"), qsTr("Deslizar a la izquierda"), qsTr("Deslizar a la derecha"),
                                 qsTr("Deslizar hacia arriba"), qsTr("Deslizar hacia abajo"), qsTr("Zoom")]
                         currentIndex: root.opts.transition
@@ -868,8 +839,7 @@ Item {
                     OptCheck { key: "pingPong"; text: qsTr("Ida y vuelta") }
                     OptSlider { key: "speed"; label: qsTr("Velocidad"); from: 0.25; to: 4; step: 0.05; suffix: "×"; decimals: 2 }
                     Label { text: qsTr("Repeticiones"); color: themeManager.textSecondary }
-                    AppComboBox {
-                        width: parent.width
+                    AppChoiceChips {
                         readonly property var values: [0, 1, 2, 3, 5, 10]
                         model: [qsTr("Para siempre"), qsTr("1 vez"), qsTr("2 veces"), qsTr("3 veces"), qsTr("5 veces"), qsTr("10 veces")]
                         currentIndex: Math.max(0, values.indexOf(root.opts.loops))
@@ -899,8 +869,15 @@ Item {
                         width: parent.width
                         spacing: 6
                         visible: root.opts.format === 0
-                        OptSlider { key: "gifColors"; label: qsTr("Colores"); from: 8; to: 256; step: 1 }
-                        OptCheck { key: "gifDither"; text: qsTr("Tramado (degradados más suaves)") }
+                        OptSlider { key: "gifCompression"; label: qsTr("Compresión"); from: 0; to: 100; step: 1; suffix: "%" }
+                        Label {
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            color: themeManager.textSecondary
+                            font.pixelSize: 11
+                            text: qsTr("Más compresión, menos colores y un archivo más ligero: %1 colores.").arg(root.opts.gifColors)
+                        }
+                        OptCheck { key: "gifDither"; text: qsTr("Tramado (degradados más suaves, pesa más)") }
                         OptCheck { key: "gifLocal"; text: qsTr("Una paleta por fotograma (mejor, pesa más)") }
                     }
                     Column {
@@ -909,6 +886,27 @@ Item {
                         visible: root.opts.format === 2
                         OptCheck { key: "webpLossless"; text: qsTr("Sin pérdida de calidad") }
                         OptSlider { key: "webpQuality"; label: qsTr("Calidad"); from: 10; to: 100; step: 1; visible: !root.opts.webpLossless }
+                    }
+                    // what the file would weigh with all of this (found by writing it in the background)
+                    Row {
+                        width: parent.width
+                        spacing: 8
+                        Label {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - estimateButton.width - 8
+                            wrapMode: Text.WordWrap
+                            color: themeManager.textPrimary
+                            text: animStudio.estimating ? qsTr("Calculando el peso…")
+                                : animStudio.estimatedBytes >= 0 ? qsTr("Pesará unos %1").arg(root.sizeText(animStudio.estimatedBytes))
+                                : qsTr("Peso sin calcular")
+                        }
+                        AppButton {
+                            id: estimateButton
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: qsTr("Calcular")
+                            enabled: root.count > 0 && !animStudio.estimating && !animStudio.exporting
+                            onClicked: animStudio.estimateSize()
+                        }
                     }
                 }
             }

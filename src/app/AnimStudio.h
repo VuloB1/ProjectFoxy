@@ -34,6 +34,10 @@ class AnimStudio : public QAbstractListModel {
     // Bumped whenever a preview frame would look different: put it in the preview URLs.
     Q_PROPERTY(int revision READ revision NOTIFY planChanged)
     Q_PROPERTY(bool exporting READ exporting NOTIFY exportingChanged)
+    // How much the file would weigh with the current pictures and options (-1: not known yet, or out of date),
+    // found by writing it into memory in the background (estimateSize()).
+    Q_PROPERTY(qint64 estimatedBytes READ estimatedBytes NOTIFY estimateChanged)
+    Q_PROPERTY(bool estimating READ estimating NOTIFY estimateChanged)
     Q_PROPERTY(qreal progress READ progress NOTIFY progressChanged)
 
 public:
@@ -64,6 +68,8 @@ public:
     int totalMs() const;
     int revision() const { return m_revision; }
     bool exporting() const { return m_exporting; }
+    qint64 estimatedBytes() const { return m_estimatedBytes; }
+    bool estimating() const { return m_estimating; }
     qreal progress() const { return m_progress; }
 
     // The pictures. Files that are animations (GIF, APNG, animated WebP) are taken apart into their frames.
@@ -87,6 +93,9 @@ public:
     Q_INVOKABLE void setStyleValue(int index, const QString &key, const QVariant &value);
     Q_INVOKABLE void copyStyleToAll(int index);
     Q_INVOKABLE void clearStyle(int index);
+    // The same, for every picture at once (the studio applies effect and text to the whole animation).
+    Q_INVOKABLE void setStyleValueAll(const QString &key, const QVariant &value);
+    Q_INVOKABLE void clearStyleAll();
     // The effects a picture can be given: [{id, name, group, presets: [name...]}].
     Q_INVOKABLE QVariantList frameEffects() const;
     Q_INVOKABLE QStringList fontFamilies() const;
@@ -106,6 +115,9 @@ public:
     // Writes the animation (in the background); progress, exportFinished.
     Q_INVOKABLE bool exportTo(const QUrl &file);
     Q_INVOKABLE void cancelExport();
+    // Writes the animation into memory in the background to learn its weight (estimatedBytes); a change of anything
+    // makes the last answer out of date again.
+    Q_INVOKABLE void estimateSize();
 
     // For the image providers (any thread).
     QImage previewFrame(int planIndex) const;
@@ -115,6 +127,7 @@ signals:
     void optionsChanged();
     void planChanged();
     void exportingChanged();
+    void estimateChanged();
     void progressChanged();
     void exportFinished(bool ok, const QString &path, qint64 bytes, const QString &error);
 
@@ -138,6 +151,8 @@ private:
     std::shared_ptr<const Snapshot> snapshot() const;
     Snapshot makeSnapshot() const;
     static QImage loadEntry(PaneImageStore *store, const Entry &entry, int maxSide);
+    // Sets one key of a picture's look; false when the key is unknown or nothing changed.
+    static bool applyStyleKey(core::anim::FrameStyle &style, const QString &key, const QVariant &value);
 
     PaneImageStore *m_store;
     std::vector<Entry> m_entries;
@@ -159,6 +174,12 @@ private:
     qreal m_progress = 0.0;
     std::shared_ptr<std::atomic<bool>> m_cancel;
     QThreadPool m_pool; // the export worker holds `this`: its own pool, waited for in the destructor
+
+    qint64 m_estimatedBytes = -1;
+    bool m_estimating = false;
+    int m_estimateGeneration = 0;
+    std::shared_ptr<std::atomic<bool>> m_estimateCancel;
+    QThreadPool m_estimatePool; // one at a time, so an estimate never slows the export down for long
 };
 
 // "image://animprev/<plan index>?r=<revision>": a frame of the animation as the preview shows it.

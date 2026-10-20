@@ -305,6 +305,7 @@ set(IV_QML_FILES
         qml/controls/AppButton.qml
         qml/controls/AppCard.qml
         qml/controls/AppSegmented.qml
+        qml/controls/AppChoiceChips.qml
         qml/controls/AppToolButton.qml
         qml/controls/AppSlider.qml
         qml/controls/AppCheckBox.qml
