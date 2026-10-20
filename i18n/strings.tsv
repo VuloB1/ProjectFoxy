@@ -973,3 +973,46 @@ Pieza en la barra de miniaturas	Piece in the thumbnail bar	Peça na barra de min
 Muestra el dibujo grande de la esquina inferior de la barra de miniaturas. Apágalo si te estorba; la guirnalda se queda.	Shows the large drawing in the bottom corner of the thumbnail bar. Turn it off if it gets in the way; the garland stays.	Mostra o desenho grande no canto inferior da barra de miniaturas. Desative se atrapalhar; a guirlanda permanece.	미리보기 막대 왼쪽 아래 모서리의 큰 그림을 표시합니다. 방해가 되면 끄세요. 가랜드는 그대로 남습니다.	显示缩略图栏左下角的大图案。如果碍事可以关闭，彩带仍会保留。	サムネイルバー左下の大きな絵を表示します。邪魔なときはオフにしてください。ガーランドは残ります。
 Fiestas con adornos	Holidays with decorations	Festas com decorações	장식을 표시할 기념일	要装饰的节日	飾りを付ける祝日
 Elige para cuáles quieres ver adornos.	Choose which ones you want decorations for.	Escolha para quais quer ver decorações.	장식을 보고 싶은 기념일을 고르세요.	选择要显示装饰的节日。	飾りを表示したい祝日を選んでください。
+%1 de %2	%1 of %2	%1 de %2	%2개 중 %1개	%1 / %2	%1 / %2
+%1 fotogramas · %2	%1 frames · %2	%1 quadros · %2	프레임 %1개 · %2	%1 帧 · %2	%1 フレーム · %2
+%1 · %2×%3 · %4	%1 · %2×%3 · %4	%1 · %2×%3 · %4	%1 · %2×%3 · %4	%1 · %2×%3 · %4	%1 · %2×%3 · %4
+%1 → %2	%1 → %2	%1 → %2	%1 → %2	%1 → %2	%1 → %2
+10 es lo habitual; 15 o 20 se ve más fluido y pesa más.	10 is the usual choice; 15 or 20 looks smoother and weighs more.	10 é o habitual; 15 ou 20 fica mais fluido e pesa mais.	보통 10이면 충분하고, 15나 20은 더 부드럽지만 용량이 커집니다.	一般用 10；15 或 20 更流畅，但文件更大。	10が標準です。15や20はより滑らかですが、サイズが大きくなります。
+Abriendo el vídeo…	Opening the video…	Abrindo o vídeo…	동영상을 여는 중…	正在打开视频…	動画を開いています…
+Ancho de la imagen	Width of the picture	Largura da imagem	이미지 너비	图像宽度	画像の幅
+Arrastra el marco; las esquinas lo hacen más grande o más pequeño.	Drag the frame; the corners make it bigger or smaller.	Arraste a moldura; os cantos a deixam maior ou menor.	프레임을 끌어 옮기고, 모서리로 크기를 조절하세요.	拖动方框；拖动角可放大或缩小。	枠をドラッグして移動し、角で大きさを変えます。
+Cortar en el cursor	Cut at the cursor	Cortar no cursor	커서 위치에서 자르기	在光标处剪切	カーソル位置で分割
+Crear fotogramas	Create frames	Criar quadros	프레임 만들기	创建帧	フレームを作成
+Desde un vídeo…	From a video…	A partir de um vídeo…	동영상에서…	从视频…	動画から…
+Deshacer cortes	Undo cuts	Desfazer cortes	자르기 취소	撤销剪切	分割を取り消す
+El recorte tiene %1 px de ancho: a %2 px saldría borroso.	The crop is %1 px wide: at %2 px it would look blurry.	O recorte tem %1 px de largura: a %2 px ficaria desfocado.	잘라낸 영역의 너비가 %1px이라 %2px로 하면 흐릿해집니다.	裁剪区域只有 %1 px 宽，设为 %2 px 会变模糊。	トリミングの幅は %1 px です。%2 px にするとぼやけます。
+El vídeo dejó de dar fotogramas. Prueba con otro tramo o con otro archivo.	The video stopped giving frames. Try another piece or another file.	O vídeo parou de fornecer quadros. Tente outro trecho ou outro arquivo.	동영상이 더 이상 프레임을 주지 않습니다. 다른 구간이나 다른 파일을 시도해 보세요.	视频不再提供帧。请试试其他片段或其他文件。	動画からフレームを読み込めなくなりました。別の区間や別のファイルをお試しください。
+Elige el vídeo	Choose the video	Escolha o vídeo	동영상 선택	选择视频	動画を選択
+Fotogramas por segundo	Frames per second	Quadros por segundo	초당 프레임 수	每秒帧数	毎秒フレーム数
+GIF de %1 (aproximado)	GIF of %1 (approximate)	GIF de %1 (aproximado)	약 %1 크기의 GIF	GIF 约 %1	約%1のGIF
+Leyendo fotogramas…	Reading frames…	Lendo quadros…	프레임을 읽는 중…	正在读取帧…	フレームを読み込み中…
+Los fotogramas entran en la tira del estudio, donde puedes quitar, reordenar y ponerles texto o efectos.	The frames go into the studio's strip, where you can remove, reorder and add text or effects to them.	Os quadros entram na tira do estúdio, onde você pode remover, reordenar e colocar texto ou efeitos.	프레임은 스튜디오의 필름 스트립에 들어가며, 거기서 삭제, 순서 변경, 텍스트·효과 추가를 할 수 있습니다.	帧会进入工作室的胶片条，您可以在那里删除、调整顺序并添加文字或效果。	フレームはスタジオのフィルムストリップに入り、そこで削除、並べ替え、テキストやエフェクトの追加ができます。
+Los vídeos MP4 (H.264), MOV y MKV suelen abrirse bien. Algunos códecs, como VP9 o AV1, no se pueden leer.	MP4 (H.264), MOV and MKV videos usually open fine. Some codecs, such as VP9 or AV1, cannot be read.	Vídeos MP4 (H.264), MOV e MKV costumam abrir bem. Alguns codecs, como VP9 ou AV1, não podem ser lidos.	MP4(H.264), MOV, MKV 동영상은 대체로 잘 열립니다. VP9, AV1 같은 일부 코덱은 읽을 수 없습니다.	MP4 (H.264)、MOV 和 MKV 视频通常可以正常打开；VP9、AV1 等部分编解码器无法读取。	MP4 (H.264)、MOV、MKV の動画は通常開けます。VP9 や AV1 などの一部のコーデックは読み込めません。
+Más de %1 s: el GIF saldrá muy pesado.	More than %1 s: the GIF will be very heavy.	Mais de %1 s: o GIF ficará muito pesado.	%1초가 넘으면 GIF 용량이 매우 커집니다.	超过 %1 秒：GIF 会非常大。	%1 秒を超えると GIF がとても重くなります。
+No queda ningún tramo.	No piece is left.	Não sobrou nenhum trecho.	남은 구간이 없습니다.	没有剩余的片段。	残っている区間がありません。
+No se pudo abrir este vídeo	This video could not be opened	Não foi possível abrir este vídeo	이 동영상을 열 수 없습니다	无法打开此视频	この動画を開けませんでした
+Original	Original	Original	원본	原始	元のまま
+Pasa de %1 MB: reduce el ancho o los fotogramas por segundo.	Over %1 MB: reduce the width or the frames per second.	Passa de %1 MB: reduza a largura ou os quadros por segundo.	%1MB를 넘습니다. 너비나 초당 프레임 수를 줄이세요.	超过 %1 MB：请减小宽度或每秒帧数。	%1 MB を超えています。幅か毎秒フレーム数を減らしてください。
+Pasa de %1 fotogramas: baja los fotogramas por segundo o quita tramos.	Over %1 frames: lower the frames per second or remove pieces.	Passa de %1 quadros: reduza os quadros por segundo ou remova trechos.	프레임이 %1개를 넘습니다. 초당 프레임 수를 낮추거나 구간을 제거하세요.	超过 %1 帧：请降低每秒帧数或删除片段。	%1 フレームを超えています。毎秒フレーム数を下げるか区間を削除してください。
+Poner	Put back	Recolocar	되돌리기	恢复	戻す
+Recortar la imagen	Crop the picture	Recortar a imagem	이미지 자르기	裁剪图像	画像をトリミング
+Se van a crear	To be created	Serão criados	만들어질 항목	将创建	作成される内容
+Todo	All	Tudo	전체	全部	全体
+Vídeo a GIF	Video to GIF	Vídeo para GIF	동영상을 GIF로	视频转 GIF	動画からGIF
+Vídeos (%1)	Videos (%1)	Vídeos (%1)	동영상 (%1)	视频 (%1)	動画 (%1)
+menos de 1 MB	less than 1 MB	menos de 1 MB	1MB 미만	不到 1 MB	1MB未満
+px · alto %1 px	px · height %1 px	px · altura %1 px	px · 높이 %1px	px · 高 %1 px	px · 高さ %1 px
+unos %1 MB	about %1 MB	cerca de %1 MB	약 %1MB	约 %1 MB	約%1MB
+Abrir imagen o vídeo	Open image or video	Abrir imagem ou vídeo	이미지 또는 동영상 열기	打开图像或视频	画像または動画を開く
+Imágenes, vídeos y cómics (%1)	Images, videos and comics (%1)	Imagens, vídeos e quadrinhos (%1)	이미지, 동영상, 만화 (%1)	图像、视频和漫画 (%1)	画像、動画、コミック (%1)
+Agregar imágenes o vídeo…	Add pictures or a video…	Adicionar imagens ou vídeo…	이미지 또는 동영상 추가…	添加图像或视频…	画像または動画を追加…
+Agrega las imágenes o el vídeo con los que armar la animación	Add the pictures or the video to make the animation from	Adicione as imagens ou o vídeo para montar a animação	애니메이션을 만들 이미지나 동영상을 추가하세요	添加用于制作动画的图像或视频	アニメーションを作る画像または動画を追加してください
+Puedes soltarlos aquí, elegirlos o usar todas las imágenes de la carpeta. Un GIF, APNG o WebP animado se desarma en sus fotogramas, y de un vídeo eliges el trozo que quieres.	Drop them here, choose them or use all the pictures of the folder. An animated GIF, APNG or WebP is taken apart into its frames, and from a video you pick the piece you want.	Você pode soltá-los aqui, escolhê-los ou usar todas as imagens da pasta. Um GIF, APNG ou WebP animado é desmontado em seus quadros e, de um vídeo, você escolhe o trecho que quer.	여기에 끌어다 놓거나, 선택하거나, 폴더의 모든 이미지를 사용할 수 있습니다. 움직이는 GIF, APNG, WebP는 프레임으로 분해되고, 동영상은 원하는 구간을 고를 수 있습니다.	可以拖放到这里、选择文件，或使用文件夹中的所有图像。动画 GIF、APNG 或 WebP 会被拆分为帧，视频则可选择需要的片段。	ここにドロップするか、ファイルを選ぶか、フォルダー内のすべての画像を使えます。アニメーション GIF・APNG・WebP はフレームに分解され、動画は使いたい区間を選べます。
+Agregar imágenes o vídeo	Add pictures or a video	Adicionar imagens ou vídeo	이미지 또는 동영상 추가	添加图像或视频	画像または動画を追加
+Imágenes y vídeos (%1)	Pictures and videos (%1)	Imagens e vídeos (%1)	이미지 및 동영상 (%1)	图像和视频 (%1)	画像と動画 (%1)
+Elige las imágenes o el vídeo de la animación	Choose the pictures or the video for the animation	Escolha as imagens ou o vídeo da animação	애니메이션의 이미지 또는 동영상 선택	选择动画的图像或视频	アニメーションの画像または動画を選択

@@ -1656,3 +1656,26 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
   par‑impar, para que sirvan sobre cualquier tema. Los SVG generados se suben al repositorio; el programa no ejecuta el
   script. Se compilan como recursos `:/festive`.
 - **No probado:** los temas claros a fondo, ni pantallas con escalado distinto del 100 %.
+## 27. Vídeo a GIF (`VideoToGif`)
+
+- **Piezas:** `VideoFrameReader` (Qt Multimedia: `QMediaPlayer` + `QVideoSink`) lee fotogramas por tiempo de dos maneras:
+  `requestFrame(ms)` (un salto por fotograma; exacto, pero 70-370 ms cada uno porque cada salto decodifica desde el fotograma
+  clave anterior: 134 s para 358 fotogramas de un clip 1440p60) y `sample(desde, hasta, paso)` (reproduce a 4x y se queda con
+  el fotograma de cada instante: 9 s para el mismo clip; a 8x el decodificador por hardware se queda sin fotogramas y
+  registra errores). `VideoToGif` (contexto `videoToGif`) abre el vídeo, da la vista previa (`image://videoprev/`), y
+  `create(tramos, fps, recorte x y w h en fracciones, ancho)` lee los tramos que se quedan, recorta y escala cada
+  fotograma y emite `framesReady`, que `AppBootstrap` entrega a `AnimStudio::addFrames` (fotogramas en memoria; el
+  máximo de la tira sube a 600). `VideoSupport` dice qué extensiones se pueden decodificar.
+- **Pantalla:** `qml/VideoToGifPage.qml` (dentro de `GifStudio.qml`: el botón *Agregar imágenes o vídeo…* y soltar archivos pasan por `addFiles`, que mete las imágenes en la tira y abre la página con el primer vídeo) y
+  `qml/VideoCropBox.qml` (marco de recorte arrastrable con esquinas, proporción fija o libre). Los tramos son una lista
+  de cortes y de inicios de tramo quitados; el peso mostrado es una regla (0,3 bytes por píxel), solo orientativa.
+- **Abrir:** `AppController::loadPath` emite `videoRequested(path)` para un archivo con extensión de vídeo
+  (`VideoSupport::looksLikeVideo`, solo mira el nombre, no carga el plugin), igual que con los cómics; `Main.qml` abre el
+  estudio de GIF y la página. El diálogo de Abrir lee las extensiones decodificables al abrirse (`Toolbar.requestOpen`),
+  no al arrancar.
+- **Detalles que costaron:** la posición 0 no produce fotograma en un reproductor nuevo (se pide 1 ms); pedir el último
+  instante no da nada (se queda 60 ms antes); el proveedor de imágenes recibe `sourceSize` con un lado a 0.
+- **Pruebas:** `test_multimedia`, `test_video_frames`, `test_video_to_gif` (con `tests/fixtures/video_20frames_10fps.mp4`:
+  cada fotograma es de un gris distinto) y un recorrido en `test_ui_flows`; `PROJECTFOXY_TEST_VIDEO=<archivo>` mide con un
+  vídeo real (480×480 desde 1080p: 60 fotogramas en 1,5 s).
+- **No probado:** MKV con audio raro ni vídeos de fotogramas variables; el backend de Qt en Linux (AppImage/Flatpak).

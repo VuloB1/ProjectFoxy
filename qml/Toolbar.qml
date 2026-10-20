@@ -12,7 +12,13 @@ Item {
     // The file chosen in "Leer un cómic o manga"; Main.qml opens the reader on it.
     signal readChosen(string file)
 
-    function requestOpen() { openDialog.open() }
+    // One Open for pictures, comics and videos (a video goes to the animation studio: Main.qml). The video extensions are
+    // asked when the dialog opens, not at start: that loads the multimedia plugin.
+    function requestOpen() {
+        openDialog.nameFilters = [qsTr("Imágenes, vídeos y cómics (%1)").arg(appController.supportedExtensions
+            .concat(["*.cbz", "*.zip", "*.pdf"]).concat(videoSupport.extensions.map(function (e) { return "*." + e; })).join(" "))];
+        openDialog.open();
+    }
     function requestDelete() { deleteConfirmDialog.open() }
     function openSettings() { settingsDialog.open() }
     function openBatchExport() { batchExportDialog.open() }
@@ -39,8 +45,7 @@ Item {
 
     FileDialog {
         id: openDialog
-        title: qsTr("Abrir imagen")
-        nameFilters: [qsTr("Imágenes y cómics (%1)").arg(appController.supportedExtensions.concat(["*.cbz", "*.zip", "*.pdf"]).join(" "))]
+        title: qsTr("Abrir imagen o vídeo")
         onAccepted: appController.openFile(selectedFile)
     }
 

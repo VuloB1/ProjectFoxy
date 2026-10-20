@@ -1,4 +1,5 @@
 #include "AppController.h"
+#include "VideoSupport.h"
 #include "AdjustModel.h"
 #include "LookModel.h"
 #include "ImageProvider.h"
@@ -157,6 +158,11 @@ void AppController::loadPath(const QString &path)
     // A comic is read, not shown: the picture that is open stays as it is, edits included.
     if (core::ComicBook::isBookFile(path)) {
         emit comicRequested(path);
+        return;
+    }
+    // A video is not shown here either: it becomes frames in the animation studio.
+    if (VideoSupport::looksLikeVideo(path)) {
+        emit videoRequested(path);
         return;
     }
 

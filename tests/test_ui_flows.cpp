@@ -133,6 +133,48 @@ private slots:
         m_app.settings->setFestive(false);
         QTRY_COMPARE_WITH_TIMEOUT(item("festiveSwitch")->property("checked").toBool(), false, 3000);
         m_app.settings->setFestive(true);
+    // ------------------------------------------------------------------------------------------------ video to GIF
+
+    void aVideoOpenedInTheGifStudioBecomesTheFramesOfTheStrip()
+    {
+        click("gifButton");
+        QQuickItem *studio = item("gifStudio");
+        QVERIFY(QMetaObject::invokeMethod(studio, "openVideo", Q_ARG(QVariant, QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4"))));
+        item("videoToGifPage");
+        QObject *video = m_engine->rootContext()->contextProperty("videoToGif").value<QObject *>();
+        QObject *anim = m_engine->rootContext()->contextProperty("animStudio").value<QObject *>();
+        QVERIFY(video && anim);
+        QTRY_VERIFY_WITH_TIMEOUT(video->property("loaded").toBool(), 15000);
+        QCOMPARE(anim->property("count").toInt(), 0);
+
+        click("createFramesButton"); // the whole video at the page's 10 frames per second
+        QTRY_COMPARE_WITH_TIMEOUT(anim->property("count").toInt(), 20, 20000);
+        QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("videoToGifPage") == nullptr, 5000); // the page closes itself
+    }
+
+    void theStudiosAddButtonTakesPicturesAndVideosAlike()
+    {
+        click("gifButton");
+        QQuickItem *studio = item("gifStudio");
+        const QString png = file("p.png", picture(40, 30, Qt::red));
+        // what the add dialog or a drop hands over: a picture and a video at once
+        const QVariantList both{png, QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4")};
+        QVERIFY(QMetaObject::invokeMethod(studio, "addFiles", Q_ARG(QVariant, both)));
+        QObject *anim = m_engine->rootContext()->contextProperty("animStudio").value<QObject *>();
+        QTRY_COMPARE_WITH_TIMEOUT(anim->property("count").toInt(), 1, 5000); // the picture joined the strip
+        item("videoToGifPage");                                              // and the video opened its page
+    }
+
+    void aVideoOpenedLikeAnyFileGoesToTheGifStudio()
+    {
+        QSignalSpy requested(m_app.controller, &AppController::videoRequested);
+        m_app.controller->openPath(QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4")); // as Abrir, a drop or the command line do
+        QCOMPARE(requested.size(), 1);
+        item("gifStudio");
+        item("videoToGifPage");
+        QObject *video = m_engine->rootContext()->contextProperty("videoToGif").value<QObject *>();
+        QTRY_VERIFY_WITH_TIMEOUT(video->property("loaded").toBool(), 15000);
+        QVERIFY(m_app.controller->currentFileName().isEmpty()); // no picture was opened
     }
 
     // ------------------------------------------------------------------------------------------------ zoom

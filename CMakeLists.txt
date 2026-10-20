@@ -20,7 +20,7 @@ endif()
 # ---------------------------------------------------------------------------
 # Dependencies
 # ---------------------------------------------------------------------------
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools Multimedia)
 # The comic reader draws PDF pages with Qt PDF when it is there (a Qt installed without it builds, and says so when a
 # PDF is opened).
 find_package(Qt6 6.6 OPTIONAL_COMPONENTS Pdf)
@@ -113,6 +113,12 @@ add_library(imageviewer_app STATIC
     src/app/UpdateManager.cpp
     src/app/FestiveManager.h
     src/app/FestiveManager.cpp
+    src/app/VideoSupport.h
+    src/app/VideoSupport.cpp
+    src/app/VideoFrameReader.h
+    src/app/VideoFrameReader.cpp
+    src/app/VideoToGif.h
+    src/app/VideoToGif.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
@@ -159,12 +165,15 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(imageviewer_app PUBLIC Qt6::DBus)
 endif()
 
+# Qt Multimedia reads video (FFmpeg backend: MP4/H.264, WebM, MOV, MKV...) for "video to GIF"; its plugins and the
+# FFmpeg DLLs are deployed with the rest of Qt.
 target_link_libraries(imageviewer_app PUBLIC
     imageviewer_core
     Qt6::Core
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
+    Qt6::Multimedia
     $<$<PLATFORM_ID:Windows>:Shell32>
     $<$<PLATFORM_ID:Windows>:User32>
 )
@@ -278,6 +287,8 @@ set(IV_QML_FILES
         qml/FestiveDecor.qml
         qml/CasEffect.qml
         qml/GifStudio.qml
+        qml/VideoToGifPage.qml
+        qml/VideoCropBox.qml
         qml/CollageMaker.qml
         qml/FrameCornerPicker.qml
         qml/UnsavedChangesDialog.qml
@@ -532,6 +543,7 @@ target_link_libraries(test_ui_flows PRIVATE
     $<$<PLATFORM_ID:Windows>:User32>
 )
 # QtQuick.Effects is copied next to the executable by ImageViewer's post-build step (Windows), so that one is built first.
+target_compile_definitions(test_ui_flows PRIVATE FIXTURES_DIR="${CMAKE_SOURCE_DIR}/tests/fixtures")
 add_dependencies(test_ui_flows ImageViewer)
 add_test(NAME test_ui_flows COMMAND test_ui_flows)
 # No window and no GPU needed: Qt's "offscreen" platform and its software renderer (as the startup smoke test does).

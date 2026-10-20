@@ -1,5 +1,6 @@
 #include "AppBootstrap.h"
 #include "UpdateManager.h"
+#include "VideoSupport.h"
 #include "AppController.h"
 #include "AppSettings.h"
 #include "FontSubstitutions.h"
@@ -96,7 +97,7 @@ int main(int argc, char *argv[])
     objects.updater->setDryRun(qEnvironmentVariableIsSet("PROJECTFOXY_UPDATE_DRYRUN"));
 #endif
     // Building the window takes a while: decode the picture meanwhile instead of after it.
-    if (!fileArgument.isEmpty())
+    if (!fileArgument.isEmpty() && !VideoSupport::looksLikeVideo(fileArgument))
         controller->prefetch(fileArgument);
 
     QObject::connect(

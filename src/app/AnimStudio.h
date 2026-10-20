@@ -69,6 +69,9 @@ public:
     // The pictures. Files that are animations (GIF, APNG, animated WebP) are taken apart into their frames.
     Q_INVOKABLE int addPaths(const QStringList &paths);
     Q_INVOKABLE int addUrls(const QVariantList &urls);
+    // Pictures that live in memory (the frames read from a video): each stays `holdMs`. The first ones set the size
+    // of the animation (the size of the pictures themselves).
+    int addFrames(const QList<QImage> &frames, int holdMs, const QString &label);
     Q_INVOKABLE void removeAt(int index);
     Q_INVOKABLE void duplicateAt(int index);
     Q_INVOKABLE void move(int from, int to);

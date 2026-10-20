@@ -260,6 +260,19 @@ ApplicationWindow {
         anchors.rightMargin: 16
         z: 8
     }
+    // A video opened like any other file (Abrir, drag and drop, "Open with") becomes frames in the animation studio.
+    Connections {
+        target: appController
+        function onVideoRequested(path) { root.openVideo(path) }
+    }
+    function openVideo(path) {
+        if (root.toolLocked || (root.studio !== "" && root.studio !== "gif"))
+            return;
+        root.setEditMode(false);
+        root.setMultiMode(false);
+        root.setStudio("gif");
+        Qt.callLater(function () { if (studioLoader.item && studioLoader.item.openVideo) studioLoader.item.openVideo(path); });
+    }
     // A .cbz opened like any other file (Abrir, drag and drop, "Open with") is read, not shown.
     Connections {
         target: appController

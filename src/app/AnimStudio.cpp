@@ -20,7 +20,7 @@ using namespace core::anim;
 
 namespace {
 
-constexpr int kMaxEntries = 400;
+constexpr int kMaxEntries = 600; // (a video of 60 s at 10 fps)
 constexpr int kPreviewLongSide = 480;
 constexpr int kPreviewCacheSize = 24;
 
@@ -277,6 +277,34 @@ int AnimStudio::addPaths(const QStringList &paths)
     }
     changed();
     return added;
+}
+
+int AnimStudio::addFrames(const QList<QImage> &frames, int holdMs, const QString &label)
+{
+    const bool wasEmpty = m_entries.empty();
+    const int room = std::max(0, kMaxEntries - int(m_entries.size()));
+    const int n = std::min(int(frames.size()), room);
+    if (n == 0)
+        return 0;
+    beginInsertRows({}, int(m_entries.size()), int(m_entries.size()) + n - 1);
+    for (int i = 0; i < n; ++i) {
+        Entry e;
+        e.id = m_nextId++;
+        e.memory = frames[i].convertToFormat(QImage::Format_RGBA8888);
+        e.label = QStringLiteral("%1 · %2").arg(label).arg(i + 1);
+        e.holdMs = std::max(20, holdMs);
+        m_entries.push_back(std::move(e));
+    }
+    endInsertRows();
+    if (wasEmpty) {
+        const QSize s = m_entries.front().memory.size();
+        if (s.isValid() && s.height() > 0)
+            m_aspect = double(s.width()) / s.height();
+        applyFirstSize(std::max(s.width(), s.height())); // the size chosen for the video
+        m_sizeIsAutomatic = false;
+    }
+    changed();
+    return n;
 }
 
 int AnimStudio::addUrls(const QVariantList &urls)
