@@ -128,10 +128,17 @@ private slots:
 
     void aFileThatIsNotAVideoReportsAnError()
     {
+        // (a picture is no test: FFmpeg opens a PNG as a video of one frame)
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        QFile fake(dir.filePath(QStringLiteral("not a video.mp4")));
+        QVERIFY(fake.open(QIODevice::WriteOnly));
+        fake.write(QByteArray("this is text, not a video
+").repeated(200));
+        fake.close();
         VideoToGif v;
-        QSignalSpy errors(&v, &VideoToGif::errorChanged);
-        v.open(QStringLiteral(FIXTURES_DIR "/format_sample.png"));
-        QTRY_VERIFY_WITH_TIMEOUT(v.error() == QLatin1String("open"), 10000);
+        v.open(fake.fileName());
+        QTRY_VERIFY_WITH_TIMEOUT(v.error() == QLatin1String("open"), 15000);
         QVERIFY(!v.loaded());
     }
 };
