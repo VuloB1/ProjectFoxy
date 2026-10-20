@@ -5,8 +5,8 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 ## [Unreleased] — Video to GIF
 
-- **Make an animation from a video.** In the animation studio (Create > Animated GIF) choose *Desde un vídeo…* (or drop
-  the video on the studio): pick the piece to keep on a timeline, **cut out parts in the middle** (cut at the cursor, then
+- **Make an animation from a video.** In the animation studio (Create > Animated GIF) use the same *Agregar imágenes o vídeo…* button as for
+  pictures (or drop the video on the studio): pick the piece to keep on a timeline, **cut out parts in the middle** (cut at the cursor, then
   leave out the pieces you do not want), **crop the picture** (1:1, 16:9, 4:3, 3:4, 9:16 or free: drag the frame and its
   corners), and choose the frames per second (5-20) and the width. The frames go into the studio's strip, where the usual
   tools (text, effects, size, speed, GIF/APNG/WebP) apply. Limits: 600 frames; the page warns over 30 s or about 25 MB.
@@ -211,8 +211,8 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
 
 ## [Sin publicar] — Vídeo a GIF
 
-- **Crear una animación desde un vídeo.** En el estudio de animación (Crear > GIF animado) elige *Desde un vídeo…* (o
-  suelta el vídeo en el estudio): marca en una línea de tiempo el trozo que quieres, **corta partes en medio** (cortar
+- **Crear una animación desde un vídeo.** En el estudio de animación (Crear > GIF animado) usa el mismo botón *Agregar imágenes o vídeo…* que
+  para las imágenes (o suelta el vídeo en el estudio): marca en una línea de tiempo el trozo que quieres, **corta partes en medio** (cortar
   en el cursor y quitar los tramos que no quieras), **recorta la imagen** (1:1, 16:9, 4:3, 3:4, 9:16 o libre: arrastra
   el marco y sus esquinas) y elige los fotogramas por segundo (5-20) y el ancho. Los fotogramas entran en la tira del
   estudio, donde sirven las herramientas de siempre (texto, efectos, tamaño, velocidad, GIF/APNG/WebP). Límites: 600

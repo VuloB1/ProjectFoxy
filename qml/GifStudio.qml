@@ -20,6 +20,25 @@ Item {
     // "Desde un vídeo": the page that reads frames from a video is open
     property bool videoOpen: false
     function openVideo(file) { videoToGif.open(file); videoOpen = true; }
+    // One dialog for pictures and videos; the video extensions are asked now, not at start (it loads the multimedia plugin).
+    function requestAdd() {
+        addDialog.nameFilters = [qsTr("Imágenes y vídeos (%1)").arg(appController.supportedExtensions
+            .concat(videoSupport.extensions.map(function (e) { return "*." + e; })).join(" "))];
+        addDialog.open();
+    }
+    // Pictures join the strip; a video opens its page (only one at a time: the first).
+    function addFiles(urls) {
+        const pictures = [];
+        let video = "";
+        for (const u of urls) {
+            if (videoToGif.isVideo(u)) { if (video === "") video = u; }
+            else pictures.push(u);
+        }
+        if (pictures.length > 0)
+            animStudio.addUrls(pictures);
+        if (video !== "")
+            openVideo(video);
+    }
     property bool resultOk: true
     property string resultText: ""
     property string resultPath: ""
@@ -173,13 +192,13 @@ Item {
                 visible: root.count === 0
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Agrega las imágenes con las que armar la animación")
+                    text: qsTr("Agrega las imágenes o el vídeo con los que armar la animación")
                     color: themeManager.textPrimary
                     font.pixelSize: 15
                 }
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: qsTr("Puedes soltarlas aquí, elegirlas o usar todas las de la carpeta. Un GIF, APNG o WebP animado que agregues se desarma en sus fotogramas.")
+                    text: qsTr("Puedes soltarlos aquí, elegirlos o usar todas las imágenes de la carpeta. Un GIF, APNG o WebP animado se desarma en sus fotogramas, y de un vídeo eliges el trozo que quieres.")
                     color: themeManager.textSecondary
                     width: 460
                     wrapMode: Text.WordWrap
@@ -188,9 +207,8 @@ Item {
                 Row {
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 8
-                    AppButton { text: qsTr("Agregar imágenes…"); primary: true; onClicked: addDialog.open() }
+                    AppButton { text: qsTr("Agregar imágenes o vídeo…"); primary: true; onClicked: root.requestAdd() }
                     AppButton { text: qsTr("Toda la carpeta"); enabled: folderModel.count > 0; onClicked: animStudio.addPaths(folderModel.filePaths()) }
-                    AppButton { objectName: "fromVideoButton"; text: qsTr("Desde un vídeo…"); visible: videoSupport.available; onClicked: videoDialog.open() }
                 }
             }
         }
@@ -270,16 +288,6 @@ Item {
                         onClicked: animStudio.addPaths(folderModel.filePaths())
                     }
                     AppToolButton {
-                        text: qsTr("Desde un vídeo…")
-                        visible: videoSupport.available
-                        iconName: "film"
-                        iconOnly: true
-                        iconSize: 18
-                        iconStroke: 1.4
-                        topPadding: 3; bottomPadding: 3
-                        onClicked: videoDialog.open()
-                    }
-                    AppToolButton {
                         text: qsTr("Invertir orden")
                         iconName: "swap"
                         iconOnly: true
@@ -332,8 +340,8 @@ Item {
                         border.color: addHover.hovered ? themeManager.accent : themeManager.border
                         AppIcon { anchors.centerIn: parent; name: "plus"; size: 28; color: addHover.hovered ? themeManager.accent : themeManager.textSecondary }
                         HoverHandler { id: addHover; cursorShape: Qt.PointingHandCursor }
-                        TapHandler { onTapped: addDialog.open() }
-                        AppToolTip { visible: addHover.hovered; text: qsTr("Agregar imágenes") }
+                        TapHandler { onTapped: root.requestAdd() }
+                        AppToolTip { visible: addHover.hovered; text: qsTr("Agregar imágenes o vídeo") }
                     }
                 }
                 delegate: Item {
@@ -965,12 +973,8 @@ Item {
         onDropped: function (drop) {
             if (!drop.hasUrls)
                 return;
-            const urls = Array.from(drop.urls, u => u.toString());
-            // a video dropped on the studio opens the video page; anything else joins the strip
-            if (urls.length === 1 && videoToGif.isVideo(urls[0]))
-                root.openVideo(urls[0]);
-            else
-                animStudio.addUrls(urls);
+            // pictures join the strip; a video dropped on the studio opens the video page
+            root.addFiles(Array.from(drop.urls, u => u.toString()));
         }
     }
 
@@ -985,17 +989,9 @@ Item {
     }
     FileDialog {
         id: addDialog
-        title: qsTr("Elige las imágenes de la animación")
+        title: qsTr("Elige las imágenes o el vídeo de la animación")
         fileMode: FileDialog.OpenFiles
-        nameFilters: [qsTr("Imágenes (%1)").arg(appController.supportedExtensions.join(" "))]
-        onAccepted: animStudio.addUrls(Array.from(selectedFiles, u => u.toString()))
-    }
-    FileDialog {
-        id: videoDialog
-        title: qsTr("Elige el vídeo")
-        fileMode: FileDialog.OpenFile
-        nameFilters: [qsTr("Vídeos (%1)").arg(videoSupport.extensions.map(e => "*." + e).join(" "))]
-        onAccepted: root.openVideo(selectedFile.toString())
+        onAccepted: root.addFiles(Array.from(selectedFiles, u => u.toString()))
     }
     Loader {
         id: videoPage

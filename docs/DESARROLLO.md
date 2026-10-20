@@ -1646,7 +1646,7 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
   `create(tramos, fps, recorte x y w h en fracciones, ancho)` lee los tramos que se quedan, recorta y escala cada
   fotograma y emite `framesReady`, que `AppBootstrap` entrega a `AnimStudio::addFrames` (fotogramas en memoria; el
   máximo de la tira sube a 600). `VideoSupport` dice qué extensiones se pueden decodificar.
-- **Pantalla:** `qml/VideoToGifPage.qml` (dentro de `GifStudio.qml`, botón *Desde un vídeo…* y soltar un vídeo) y
+- **Pantalla:** `qml/VideoToGifPage.qml` (dentro de `GifStudio.qml`: el botón *Agregar imágenes o vídeo…* y soltar archivos pasan por `addFiles`, que mete las imágenes en la tira y abre la página con el primer vídeo) y
   `qml/VideoCropBox.qml` (marco de recorte arrastrable con esquinas, proporción fija o libre). Los tramos son una lista
   de cortes y de inicios de tramo quitados; el peso mostrado es una regla (0,3 bytes por píxel), solo orientativa.
 - **Abrir:** `AppController::loadPath` emite `videoRequested(path)` para un archivo con extensión de vídeo

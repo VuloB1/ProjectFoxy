@@ -122,6 +122,19 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("videoToGifPage") == nullptr, 5000); // the page closes itself
     }
 
+    void theStudiosAddButtonTakesPicturesAndVideosAlike()
+    {
+        click("gifButton");
+        QQuickItem *studio = item("gifStudio");
+        const QString png = file("p.png", picture(40, 30, Qt::red));
+        // what the add dialog or a drop hands over: a picture and a video at once
+        const QVariantList both{png, QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4")};
+        QVERIFY(QMetaObject::invokeMethod(studio, "addFiles", Q_ARG(QVariant, both)));
+        QObject *anim = m_engine->rootContext()->contextProperty("animStudio").value<QObject *>();
+        QTRY_COMPARE_WITH_TIMEOUT(anim->property("count").toInt(), 1, 5000); // the picture joined the strip
+        item("videoToGifPage");                                              // and the video opened its page
+    }
+
     void aVideoOpenedLikeAnyFileGoesToTheGifStudio()
     {
         QSignalSpy requested(m_app.controller, &AppController::videoRequested);
