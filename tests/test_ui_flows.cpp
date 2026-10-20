@@ -133,6 +133,8 @@ private slots:
         m_app.settings->setFestive(false);
         QTRY_COMPARE_WITH_TIMEOUT(item("festiveSwitch")->property("checked").toBool(), false, 3000);
         m_app.settings->setFestive(true);
+    }
+
     // ------------------------------------------------------------------------------------------------ video to GIF
 
     void aVideoOpenedInTheGifStudioBecomesTheFramesOfTheStrip()
