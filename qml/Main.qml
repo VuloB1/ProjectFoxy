@@ -175,6 +175,7 @@ ApplicationWindow {
         anchors.bottom: statusBar.top
         visible: folderModel.count > 1
         busy: root.editMode
+        bottomReserve: festiveDecor.heroReserve
         enabled: !root.toolLocked && !root.multiMode && root.studio === ""
         opacity: enabled ? 1.0 : 0.45
     }
@@ -237,6 +238,19 @@ ApplicationWindow {
             onCloseRequested: mangaReader.close()
         }
         onLoaded: item.forceActiveFocus()
+    }
+    // The holiday decorations (FestiveManager): drawn over the picture area, they take no mouse.
+    FestiveDecor {
+        id: festiveDecor
+        objectName: "festiveDecor"
+        anchors.fill: parent
+        titleBar: titleBar
+        sidebar: sidebar
+        statusBar: statusBar
+        canvas: canvas
+        rightInset: root.editMode ? editLoader.width : 0
+        suppressed: root.studio !== "" || mangaReader.active
+        z: 4
     }
     // A newer version exists (UpdateManager): the notice sits over everything but the dialogs.
     UpdateBanner {

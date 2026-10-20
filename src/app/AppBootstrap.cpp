@@ -14,6 +14,7 @@
 #include "PaneImageProvider.h"
 #include "ThemeManager.h"
 #include "ThumbnailImageProvider.h"
+#include "FestiveManager.h"
 #include "UpdateManager.h"
 #include "Translations.h"
 
@@ -74,6 +75,9 @@ Objects setup(QQmlApplicationEngine &engine)
     // The language: installed before any text is built (Main.qml's qsTr() are evaluated when it loads).
     auto *translations = new Translations(&engine, appSettings, &engine);
     engine.rootContext()->setContextProperty("translations", translations);
+
+    // The holiday decorations (qml/FestiveDecor.qml).
+    engine.rootContext()->setContextProperty("festive", new FestiveManager(appSettings, &engine));
 
     // Looks for a newer version on GitHub (qml/UpdateBanner.qml, Settings > Acerca de).
     auto *updater = new UpdateManager(appSettings, QCoreApplication::applicationVersion(), &engine);

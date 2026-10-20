@@ -1635,3 +1635,24 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
   apaga la consulta (lo usan la prueba de arranque y `test_ui_flows`).
 - **No probado:** el instalador real lanzado desde el programa (UAC si se instaló para todos los usuarios, que el
   `[Run]` reabra el programa), ni contra una versión publicada de verdad más nueva que la instalada.
+
+## 26. Adornos festivos (`FestiveManager`)
+
+- **Qué hace:** `src/core/Festivity.{h,cpp}` (lógica pura, probada en `test_festivity`: Pascua con el algoritmo
+  gregoriano, los rangos de cada fiesta y la prioridad de Pascua sobre San Patricio) decide la fiesta de una fecha.
+  `src/app/FestiveManager.{h,cpp}` (propiedad de contexto `festive`) la expone como `festival` (`""`, `halloween`,
+  `muertos`, `navidad`, `nuevoano`, `reyes`, `sanvalentin`, `sanpatricio`, `pascua`), la recalcula cada 30 minutos y
+  respeta `appSettings.festive` (`ui/festive`, por defecto sí). `preview` enseña otra fiesta sin guardarla (Ajustes >
+  Apariencia); `PROJECTFOXY_FESTIVE=<clave>` arranca con esa vista previa y `=off` lo apaga (lo usan la prueba de
+  arranque y `test_ui_flows`).
+- **Dónde se ve:** `qml/FestiveDecor.qml` (en `Main.qml`, z 4, sin ratón): guirnalda de 48 px bajo la barra de título,
+  solo sobre la zona de la imagen (no sobre la barra de miniaturas ni el panel de edición); una pieza en la esquina
+  inferior de la barra de miniaturas (la barra recibe `bottomReserve` y acorta su lista, así que no tapa miniaturas);
+  la telaraña de Halloween en la esquina superior derecha de la imagen. Solo si `themeManager.skin !== "win98"`, y
+  oculto en los estudios y en el lector.
+- **Los dibujos:** `tools/make_festive_art.js` (`node tools/make_festive_art.js`) escribe `resources/festive/*.svg`
+  (`<clave>-garland.svg`, una tira de 680 unidades que se repite en horizontal, y `<clave>-hero.svg`). SVG plano que el
+  renderizador de Qt entiende: sin recortes (`clipPath`), sin degradados y con los huecos hechos con trazados
+  par‑impar, para que sirvan sobre cualquier tema. Los SVG generados se suben al repositorio; el programa no ejecuta el
+  script. Se compilan como recursos `:/festive`.
+- **No probado:** los temas claros a fondo, ni pantallas con escalado distinto del 100 %.
