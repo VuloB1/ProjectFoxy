@@ -12,6 +12,8 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   tools (text, effects, size, speed, GIF/APNG/WebP) apply. Limits: 600 frames; the page warns over 30 s or about 25 MB.
 - Reads MP4 (H.264/H.265), MOV and MKV (Qt Multimedia; WebM/VP9/AV1 are not available with Qt's Windows build). A 36 s
   1440p60 clip becomes 358 frames in about 9 s: the video is played at 4x and only the frames needed are kept.
+- **One Open for everything.** The Open button (and Ctrl+O, drag and drop, "Open with" and the command line) takes
+  pictures, comics and videos: a video goes straight to the animation studio's video page.
 - Adds Qt Multimedia to the program (the installer grows by about 6 MB).
 
 ## [0.3.2] — Updates from inside the program
@@ -217,6 +219,8 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   fotogramas; la pantalla avisa por encima de 30 s o de unos 25 MB.
 - Lee MP4 (H.264/H.265), MOV y MKV (Qt Multimedia; WebM/VP9/AV1 no están en el Qt de Windows). Un clip de 36 s en
   1440p a 60 fps da 358 fotogramas en unos 9 s: el vídeo se reproduce a 4x y solo se guardan los fotogramas necesarios.
+- **Un solo Abrir para todo.** El botón Abrir (y Ctrl+O, arrastrar y soltar, «Abrir con» y la línea de órdenes) admite
+  imágenes, cómics y vídeos: un vídeo va directo a la pantalla de vídeo del estudio de animación.
 - El programa lleva Qt Multimedia (el instalador crece unos 6 MB).
 
 ## [0.3.2] — Actualizaciones desde el programa

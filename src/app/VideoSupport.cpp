@@ -1,6 +1,14 @@
 #include "VideoSupport.h"
 
+#include <QFileInfo>
 #include <QMediaFormat>
+
+bool VideoSupport::looksLikeVideo(const QString &path)
+{
+    static const QStringList kKnown = {QStringLiteral("mp4"), QStringLiteral("m4v"), QStringLiteral("mov"), QStringLiteral("webm"),
+                                       QStringLiteral("mkv"), QStringLiteral("avi"), QStringLiteral("ogv"), QStringLiteral("wmv")};
+    return kKnown.contains(QFileInfo(path).suffix().toLower());
+}
 
 QStringList VideoSupport::extensions() const
 {

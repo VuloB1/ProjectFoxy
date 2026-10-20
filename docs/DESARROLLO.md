@@ -1649,6 +1649,10 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
 - **Pantalla:** `qml/VideoToGifPage.qml` (dentro de `GifStudio.qml`, botón *Desde un vídeo…* y soltar un vídeo) y
   `qml/VideoCropBox.qml` (marco de recorte arrastrable con esquinas, proporción fija o libre). Los tramos son una lista
   de cortes y de inicios de tramo quitados; el peso mostrado es una regla (0,3 bytes por píxel), solo orientativa.
+- **Abrir:** `AppController::loadPath` emite `videoRequested(path)` para un archivo con extensión de vídeo
+  (`VideoSupport::looksLikeVideo`, solo mira el nombre, no carga el plugin), igual que con los cómics; `Main.qml` abre el
+  estudio de GIF y la página. El diálogo de Abrir lee las extensiones decodificables al abrirse (`Toolbar.requestOpen`),
+  no al arrancar.
 - **Detalles que costaron:** la posición 0 no produce fotograma en un reproductor nuevo (se pide 1 ms); pedir el último
   instante no da nada (se queda 60 ms antes); el proveedor de imágenes recibe `sourceSize` con un lado a 0.
 - **Pruebas:** `test_multimedia`, `test_video_frames`, `test_video_to_gif` (con `tests/fixtures/video_20frames_10fps.mp4`:

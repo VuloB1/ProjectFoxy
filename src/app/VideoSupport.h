@@ -16,6 +16,10 @@ class VideoSupport : public QObject {
 public:
     explicit VideoSupport(QObject *parent = nullptr) : QObject(parent) {}
 
+    // Whether the file name has the extension of a video (mp4, mov, mkv...): only a look at the name, it does not load
+    // the multimedia plugin; whether this computer can read that video is what extensions() tells.
+    static bool looksLikeVideo(const QString &path);
+
     bool available() const { return !extensions().isEmpty(); }
     QStringList extensions() const;
 

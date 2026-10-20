@@ -43,7 +43,8 @@ QString VideoToGif::toPath(const QString &file)
 bool VideoToGif::isVideo(const QString &file) const
 {
     static VideoSupport support;
-    return support.extensions().contains(QFileInfo(toPath(file)).suffix().toLower());
+    const QString path = toPath(file);
+    return VideoSupport::looksLikeVideo(path) && support.extensions().contains(QFileInfo(path).suffix().toLower());
 }
 
 void VideoToGif::open(const QString &file)

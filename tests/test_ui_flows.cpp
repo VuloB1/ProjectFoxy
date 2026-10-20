@@ -122,6 +122,18 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("videoToGifPage") == nullptr, 5000); // the page closes itself
     }
 
+    void aVideoOpenedLikeAnyFileGoesToTheGifStudio()
+    {
+        QSignalSpy requested(m_app.controller, &AppController::videoRequested);
+        m_app.controller->openPath(QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4")); // as Abrir, a drop or the command line do
+        QCOMPARE(requested.size(), 1);
+        item("gifStudio");
+        item("videoToGifPage");
+        QObject *video = m_engine->rootContext()->contextProperty("videoToGif").value<QObject *>();
+        QTRY_VERIFY_WITH_TIMEOUT(video->property("loaded").toBool(), 15000);
+        QVERIFY(m_app.controller->currentFileName().isEmpty()); // no picture was opened
+    }
+
     // ------------------------------------------------------------------------------------------------ zoom
 
     void theZoomButtonsChangeTheZoomAndFitBringsItBack()
