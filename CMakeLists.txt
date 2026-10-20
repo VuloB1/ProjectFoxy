@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(ImageViewer VERSION 0.3.2 LANGUAGES CXX)
+project(ImageViewer VERSION 0.3.3 LANGUAGES CXX)
 if(WIN32)
     enable_language(RC)   # the executable carries its icon as a resource (resources/app.rc)
 endif()
@@ -20,7 +20,7 @@ endif()
 # ---------------------------------------------------------------------------
 # Dependencies
 # ---------------------------------------------------------------------------
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Network Qml Quick QuickControls2 QuickDialogs2 Svg ShaderTools Multimedia)
 # The comic reader draws PDF pages with Qt PDF when it is there (a Qt installed without it builds, and says so when a
 # PDF is opened).
 find_package(Qt6 6.6 OPTIONAL_COMPONENTS Pdf)
@@ -111,6 +111,16 @@ add_library(imageviewer_app STATIC
     src/app/AppBootstrap.cpp
     src/app/UpdateManager.h
     src/app/UpdateManager.cpp
+    src/app/FestiveManager.h
+    src/app/FestiveManager.cpp
+    src/app/StartupWarmup.h
+    src/app/StartupWarmup.cpp
+    src/app/VideoSupport.h
+    src/app/VideoSupport.cpp
+    src/app/VideoFrameReader.h
+    src/app/VideoFrameReader.cpp
+    src/app/VideoToGif.h
+    src/app/VideoToGif.cpp
     src/app/AnimationPlayback.h
     src/app/AnimationPlayback.cpp
     src/app/DesktopWallpaper.h
@@ -157,12 +167,15 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(imageviewer_app PUBLIC Qt6::DBus)
 endif()
 
+# Qt Multimedia reads video (FFmpeg backend: MP4/H.264, WebM, MOV, MKV...) for "video to GIF"; its plugins and the
+# FFmpeg DLLs are deployed with the rest of Qt.
 target_link_libraries(imageviewer_app PUBLIC
     imageviewer_core
     Qt6::Core
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
+    Qt6::Multimedia
     $<$<PLATFORM_ID:Windows>:Shell32>
     $<$<PLATFORM_ID:Windows>:User32>
 )
@@ -181,6 +194,14 @@ function(iv_add_app_resources target)
         PREFIX "/lensfun"
         BASE "${CMAKE_SOURCE_DIR}/resources/lensfun"
         FILES ${_iv_lensfun_files}
+    )
+
+    # The holiday decorations (resources/festive/*.svg, drawn by tools/make_festive_art.js), shown by qml/FestiveDecor.qml.
+    file(GLOB _iv_festive_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/resources/festive/*.svg")
+    qt_add_resources(${target} "festive"
+        PREFIX "/festive"
+        BASE "${CMAKE_SOURCE_DIR}/resources/festive"
+        FILES ${_iv_festive_files}
     )
 
     # The translations of the interface (resources/i18n/<language>.json, built from i18n/strings.tsv by tools/i18n_tool.py).
@@ -227,7 +248,7 @@ qt_add_executable(ImageViewer
 # off by default, and even when built it does nothing unless PROJECTFOXY_DEV_PORT is set. Never in a release.
 option(PROJECTFOXY_DEV_SERVER "Build the development-only control channel (src/app/DevServer.cpp)" OFF)
 if(PROJECTFOXY_DEV_SERVER)
-    target_sources(ImageViewer PRIVATE src/app/DevServer.h src/app/DevServer.cpp)
+    target_sources(ImageViewer PRIVATE src/app/DevServer.h src/app/DevServer.cpp src/app/StartupSampler.h src/app/StartupSampler.cpp)
     target_compile_definitions(ImageViewer PRIVATE PROJECTFOXY_DEV_SERVER)
     target_link_libraries(ImageViewer PRIVATE Qt6::Network $<$<PLATFORM_ID:Windows>:dbghelp>)
 endif()
@@ -265,8 +286,11 @@ set(IV_QML_FILES
         qml/MultiView.qml
         qml/ReaderView.qml
         qml/UpdateBanner.qml
+        qml/FestiveDecor.qml
         qml/CasEffect.qml
         qml/GifStudio.qml
+        qml/VideoToGifPage.qml
+        qml/VideoCropBox.qml
         qml/CollageMaker.qml
         qml/FrameCornerPicker.qml
         qml/UnsavedChangesDialog.qml
@@ -283,6 +307,7 @@ set(IV_QML_FILES
         qml/controls/AppButton.qml
         qml/controls/AppCard.qml
         qml/controls/AppSegmented.qml
+        qml/controls/AppChoiceChips.qml
         qml/controls/AppToolButton.qml
         qml/controls/AppSlider.qml
         qml/controls/AppCheckBox.qml
@@ -521,6 +546,7 @@ target_link_libraries(test_ui_flows PRIVATE
     $<$<PLATFORM_ID:Windows>:User32>
 )
 # QtQuick.Effects is copied next to the executable by ImageViewer's post-build step (Windows), so that one is built first.
+target_compile_definitions(test_ui_flows PRIVATE FIXTURES_DIR="${CMAKE_SOURCE_DIR}/tests/fixtures")
 add_dependencies(test_ui_flows ImageViewer)
 add_test(NAME test_ui_flows COMMAND test_ui_flows)
 # No window and no GPU needed: Qt's "offscreen" platform and its software renderer (as the startup smoke test does).

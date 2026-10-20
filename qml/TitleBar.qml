@@ -145,7 +145,8 @@ AppPanelBackground {
             objectName: "gifButton"
             iconName: "film"
             visible: root.optionalShown >= 2
-            enabled: !root.locked && !root.reading
+            // while the other studio is open this one is not offered (close that one first)
+            enabled: !root.locked && !root.reading && (root.studio === "" || root.studio === "gif")
             checked: root.studio === "gif"
             onClicked: root.studioRequested(root.studio === "gif" ? "" : "gif")
         }
@@ -154,7 +155,7 @@ AppPanelBackground {
             objectName: "collageButton"
             iconName: "collage"
             visible: root.optionalShown >= 3
-            enabled: !root.locked && !root.reading
+            enabled: !root.locked && !root.reading && (root.studio === "" || root.studio === "collage")
             checked: root.studio === "collage"
             onClicked: root.studioRequested(root.studio === "collage" ? "" : "collage")
         }

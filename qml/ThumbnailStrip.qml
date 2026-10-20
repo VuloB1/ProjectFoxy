@@ -20,6 +20,8 @@ Item {
 
     // Set by the window: true while editing.
     property bool busy: false
+    // Room kept free at the bottom (the holiday decoration of the window sits there).
+    property real bottomReserve: 0
 
     readonly property string mode: appSettings.stripMode
     readonly property int margin: 8
@@ -72,7 +74,7 @@ Item {
             x: root.margin + (root.width - root.expandedWidth)
             y: root.margin
             width: root.cols * cellWidth
-            height: parent.height - 2 * root.margin
+            height: parent.height - 2 * root.margin - root.bottomReserve
             cellWidth: root.cell + root.gap
             cellHeight: root.cell + root.gap
             clip: true

@@ -235,7 +235,7 @@ AppDialog {
                 Item {
                     id: pageColumn
                     width: scroller.width - 12
-                    implicitHeight: root.page === 0 ? appearance.implicitHeight + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + windowCard.implicitHeight + 80
+                    implicitHeight: root.page === 0 ? appearance.implicitHeight + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + windowCard.implicitHeight + festiveCard.implicitHeight + 96
                                        : root.page === 1 ? saving.implicitHeight
                                        : root.page === 2 ? batch.implicitHeight
                                        : (about.item ? about.item.implicitHeight : 0)
@@ -505,6 +505,7 @@ AppDialog {
                     // -- Apariencia, 4th card: one window or several -----------------------------
                     Card {
                         id: windowCard
+                        objectName: "windowCard"
                         width: parent.width
                         visible: root.page === 0
                         y: appearance.height + languageCard.height + zoomCard.height + pixelCard.height + stripCard.height + 80
@@ -524,6 +525,72 @@ AppDialog {
                             AppSwitch {
                                 checked: appSettings.verticalSync
                                 onToggled: appSettings.verticalSync = checked
+                            }
+                        }
+                    }
+
+                    // -- Apariencia, 5th card: the holiday decorations ---------------------------
+                    Card {
+                        id: festiveCard
+                        objectName: "festiveCard"
+                        width: parent.width
+                        visible: root.page === 0
+                        y: appearance.height + languageCard.height + zoomCard.height + pixelCard.height + stripCard.height + windowCard.height + 96
+                        heading: qsTr("Adornos festivos")
+                        SettingRow {
+                            label: qsTr("Adornos en fechas señaladas")
+                            hint: qsTr("Pone adornos discretos en la ventana en Halloween, Día de los Muertos, Navidad, Año Nuevo, Noche de Reyes, San Valentín, San Patricio y Pascua. Solo en los temas modernos.")
+                            AppSwitch {
+                                objectName: "festiveSwitch"
+                                checked: appSettings.festive
+                                onToggled: appSettings.festive = checked
+                            }
+                        }
+                        Divider {}
+                        SettingRow {
+                            label: qsTr("Pieza en la barra de miniaturas")
+                            hint: qsTr("Muestra el dibujo grande de la esquina inferior de la barra de miniaturas. Apágalo si te estorba; la guirnalda se queda.")
+                            AppSwitch {
+                                checked: appSettings.festiveCorner
+                                onToggled: appSettings.festiveCorner = checked
+                            }
+                        }
+                        Divider {}
+                        SettingRow {
+                            label: qsTr("Fiestas con adornos")
+                            hint: qsTr("Elige para cuáles quieres ver adornos.")
+                        }
+                        Repeater {
+                            model: [
+                                { key: "halloween", name: qsTr("Halloween") }, { key: "muertos", name: qsTr("Día de los Muertos") },
+                                { key: "navidad", name: qsTr("Navidad") }, { key: "nuevoano", name: qsTr("Año Nuevo") },
+                                { key: "reyes", name: qsTr("Noche de Reyes") }, { key: "sanvalentin", name: qsTr("San Valentín") },
+                                { key: "sanpatricio", name: qsTr("San Patricio") }, { key: "pascua", name: qsTr("Pascua") }
+                            ]
+                            delegate: SettingRow {
+                                required property var modelData
+                                label: modelData.name
+                                enabled: appSettings.festive
+                                AppSwitch {
+                                    checked: appSettings.festiveOff.indexOf(modelData.key) < 0
+                                    onToggled: appSettings.setFestiveOn(modelData.key, checked)
+                                }
+                            }
+                        }
+                        Divider {}
+                        SettingRow {
+                            label: qsTr("Ver los adornos de")
+                            hint: qsTr("Para ver cómo quedan cualquier día del año. Al reiniciar vuelve a «Según la fecha».")
+                            AppComboBox {
+                                id: festivePreviewBox
+                                width: 190
+                                readonly property var keys: ["", "halloween", "muertos", "navidad", "nuevoano", "reyes", "sanvalentin", "sanpatricio", "pascua"]
+                                model: [qsTr("Según la fecha"), qsTr("Halloween"), qsTr("Día de los Muertos"), qsTr("Navidad"), qsTr("Año Nuevo"),
+                                        qsTr("Noche de Reyes"), qsTr("San Valentín"), qsTr("San Patricio"), qsTr("Pascua")]
+                                function sync() { currentIndex = Math.max(0, keys.indexOf(festive.preview)); }
+                                Component.onCompleted: sync()
+                                onActivated: function (i) { festive.preview = keys[i]; }
+                                Connections { target: festive; function onFestivalChanged() { festivePreviewBox.sync(); } }
                             }
                         }
                     }

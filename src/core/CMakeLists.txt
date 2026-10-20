@@ -3,6 +3,8 @@ add_library(imageviewer_core STATIC
     ImageDocument.cpp
     UpdateCheck.h
     UpdateCheck.cpp
+    Festivity.h
+    Festivity.cpp
     ZipArchive.h
     ZipArchive.cpp
     ComicBook.h

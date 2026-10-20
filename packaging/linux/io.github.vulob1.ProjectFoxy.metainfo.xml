@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.3" date="2026-10-20">
+      <description>
+        <p>Discreet decorations for the holidays (Halloween, Day of the Dead, Christmas, New Year, Three Kings, Valentine's Day, St. Patrick's Day and Easter), and a new "video to GIF" in the animation studio: choose the piece, cut parts out, crop the picture and make frames from MP4, MOV and MKV videos. One Open button now takes pictures, comics and videos.</p>
+      </description>
+    </release>
     <release version="0.3.2" date="2026-10-16">
       <description>
         <p>The program now tells you when a newer version is published (one request to GitHub a day, can be turned off in Settings) and, on Windows when installed with the installer, updates itself in one click after checking the download.</p>

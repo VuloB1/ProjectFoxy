@@ -80,7 +80,7 @@ private slots:
         QCOMPARE(s.options().value("width").toInt(), 640);
         QCOMPARE(s.options().value("height").toInt(), 384);
         QCOMPARE(s.planCount(), 3);
-        QCOMPARE(s.totalMs(), 3000);
+        QCOMPARE(s.totalMs(), 300); // each picture stays 100 ms until told otherwise
         QCOMPARE(s.addPaths({m_dir.filePath("missing.png"), m_dir.filePath("notes")}), 0);
     }
 
@@ -155,16 +155,68 @@ private slots:
         s.setOption("transitionMs", 400);
         s.setOption("transitionSteps", 4);
         QCOMPARE(s.planCount(), 3 + 3 * 4);
-        QCOMPARE(s.totalMs(), 3000 + 3 * 400);
+        QCOMPARE(s.totalMs(), 300 + 3 * 400);
         s.setOption("transitionOnLoop", false);
         QCOMPARE(s.planCount(), 3 + 2 * 4);
         s.setOption("transition", 0);
+        s.setAllHold(1000);
         s.setOption("pingPong", true);
         QCOMPARE(s.planCount(), 4);          // a b c b
         s.setOption("speed", 2.0);
         QCOMPARE(s.totalMs(), 2000);
         QCOMPARE(s.planDelay(0), 500);
         QCOMPARE(s.planDelay(99), 100);
+    }
+
+    void theLookIsSetForAllPicturesAndNewOnesTakeIt()
+    {
+        PaneImageStore store;
+        AnimStudio s(&store);
+        s.addPaths({makePng("a.png", Qt::red), makePng("b.png", Qt::green)});
+        s.setStyleValueAll("text", QStringLiteral("hola"));
+        s.setStyleValueAll("bold", true);
+        for (int i = 0; i < 2; ++i) {
+            QCOMPARE(s.styleOf(i).value("text").toString(), QStringLiteral("hola"));
+            QCOMPARE(s.styleOf(i).value("bold").toBool(), true);
+        }
+        s.addPaths({makePng("c.png", Qt::blue)}); // a picture added later has the animation's look
+        QCOMPARE(s.styleOf(2).value("text").toString(), QStringLiteral("hola"));
+        s.clearStyleAll();
+        for (int i = 0; i < 3; ++i)
+            QVERIFY(s.styleOf(i).value("text").toString().isEmpty());
+    }
+
+    void oneBarSetsTheColoursOfTheGif()
+    {
+        PaneImageStore store;
+        AnimStudio s(&store);
+        QCOMPARE(s.options().value("gifColors").toInt(), 256);
+        s.setOption("gifCompression", 100);
+        QCOMPARE(s.options().value("gifColors").toInt(), 16);
+        QCOMPARE(s.options().value("gifDither").toBool(), false);
+        s.setOption("gifCompression", 0);
+        QCOMPARE(s.options().value("gifColors").toInt(), 256);
+        QCOMPARE(s.options().value("gifDither").toBool(), true);
+        s.setOption("defaultHold", 5000); // the most a picture may stay by default
+        QCOMPARE(s.options().value("defaultHold").toInt(), 300);
+    }
+
+    void theWeightIsWorkedOutInTheBackgroundAndGoesStaleWithAnyChange()
+    {
+        PaneImageStore store;
+        AnimStudio s(&store);
+        s.addPaths({makePng("a.png", Qt::red), makePng("b.png", Qt::green)});
+        QCOMPARE(s.estimatedBytes(), qint64(-1));
+        QSignalSpy spy(&s, &AnimStudio::estimateChanged);
+        s.estimateSize();
+        QVERIFY(s.estimating());
+        QTRY_VERIFY_WITH_TIMEOUT(!s.estimating() && s.estimatedBytes() > 0, 10000);
+        const qint64 plain = s.estimatedBytes();
+        s.setOption("gifCompression", 100);
+        QCOMPARE(s.estimatedBytes(), qint64(-1)); // out of date
+        s.estimateSize();
+        QTRY_VERIFY_WITH_TIMEOUT(!s.estimating() && s.estimatedBytes() > 0, 10000);
+        QVERIFY(s.estimatedBytes() <= plain);
     }
 
     void thePreviewIsADownsizedCanvas()

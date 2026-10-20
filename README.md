@@ -118,7 +118,8 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
   washed out; what you save is tagged as sRGB.
 - Respects the **EXIF orientation** (phone photos) and opens files and folders with any name (accents, Japanese,
   Cyrillic, emoji).
-- Animated GIF, APNG and WebP with real playback.
+- Animated GIF, APNG and WebP with real playback; **video to GIF** (cut pieces out, crop, MP4/MOV/MKV).
+- Discreet decorations for the holidays, which can be turned off or chosen one by one.
 - **Comic and manga reader**: open a `.cbz`, `.zip` or PDF (or read the folder of the open picture with the book button in
   the title bar). Right to left (the manga way) or left to right, one page or two side by side (the cover alone, landscape
   pages by themselves), fit to the screen, the height or the width, click zones, keyboard, a page slider in the dock, and it
@@ -371,7 +372,8 @@ idioma, un *pull request* es muy bienvenido (ver [`CONTRIBUTING.md`](CONTRIBUTIN
   abrirlas, en lugar de verse apagadas; lo que se guarda va etiquetado como sRGB.
 - Respeta la **orientación EXIF** (fotos de móvil) y abre archivos y carpetas con
   cualquier nombre (acentos, japonés, cirílico, emoji).
-- GIF, APNG y WebP animados con reproducción real.
+- GIF, APNG y WebP animados con reproducción real; **vídeo a GIF** (cortar tramos, recortar, MP4/MOV/MKV).
+- Adornos discretos en las fechas señaladas, que se pueden apagar o elegir uno a uno.
 - **Lector de cómics y manga**: abre un `.cbz`, `.zip` o PDF (o lee la carpeta de la imagen abierta con el botón del libro de la
   barra de título). De derecha a izquierda (como el manga) o de izquierda a derecha, de una página o de dos (la portada sola,
   las páginas apaisadas a solas), ajuste a la pantalla, al alto o al ancho, zonas de clic, teclado, deslizador de páginas en el

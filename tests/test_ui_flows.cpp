@@ -48,6 +48,7 @@ private slots:
         QVERIFY(m_dir.isValid());
         m_engine = new QQmlApplicationEngine;
         qputenv("PROJECTFOXY_NO_UPDATE_CHECK", "1"); // no network in the tests
+        qputenv("PROJECTFOXY_FESTIVE", "off");       // no holiday decorations over the window
         m_app = AppBootstrap::setup(*m_engine);
         m_app.settings->setSingleInstance(true);
         m_engine->loadFromModule("ImageViewerApp", "Main");
@@ -101,6 +102,93 @@ private slots:
         QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("b.png"), 10000);
         QTest::keyClick(m_window, Qt::Key_Left);
         QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("a.png"), 10000);
+    }
+
+    // ------------------------------------------------------------------------------------------------ holidays
+
+    void theHolidayDecorationsShowForAPreviewAndHideAgain()
+    {
+        QQuickItem *decor = findIn(m_window->contentItem(), "festiveDecor");
+        QVERIFY(decor);
+        QVERIFY(!decor->isVisible()); // the tests start with PROJECTFOXY_FESTIVE=off
+        QObject *festive = m_engine->rootContext()->contextProperty("festive").value<QObject *>();
+        QVERIFY(festive);
+        festive->setProperty("preview", "navidad");
+        QTRY_VERIFY_WITH_TIMEOUT(decor->isVisible(), 3000);
+        QCOMPARE(festive->property("festival").toString(), QStringLiteral("navidad"));
+        festive->setProperty("preview", "");
+        QTRY_VERIFY_WITH_TIMEOUT(!decor->isVisible(), 3000);
+    }
+
+    void theSettingsHaveACardForTheDecorationsBelowTheWindowCard()
+    {
+        click("settingsButton");
+        QQuickItem *card = item("festiveCard");
+        QQuickItem *above = item("windowCard");
+        // the cards of this page are placed by hand: the new one must not overlap the one before it
+        QVERIFY(card->y() >= above->y() + above->height());
+        m_app.settings->setFestive(true); // (the tests share their settings folder: leave it as it was found)
+        // (it sits far down the page, out of the window, so it is not clicked here: just that it shows the setting)
+        QCOMPARE(item("festiveSwitch")->property("checked").toBool(), true);
+        m_app.settings->setFestive(false);
+        QTRY_COMPARE_WITH_TIMEOUT(item("festiveSwitch")->property("checked").toBool(), false, 3000);
+        m_app.settings->setFestive(true);
+    }
+
+    // ------------------------------------------------------------------------------------------------ video to GIF
+
+    void aVideoOpenedInTheGifStudioBecomesTheFramesOfTheStrip()
+    {
+        click("gifButton");
+        QQuickItem *studio = item("gifStudio");
+        QVERIFY(QMetaObject::invokeMethod(studio, "openVideo", Q_ARG(QVariant, QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4"))));
+        item("videoToGifPage");
+        QObject *video = m_engine->rootContext()->contextProperty("videoToGif").value<QObject *>();
+        QObject *anim = m_engine->rootContext()->contextProperty("animStudio").value<QObject *>();
+        QVERIFY(video && anim);
+        QTRY_VERIFY_WITH_TIMEOUT(video->property("loaded").toBool(), 15000);
+        QCOMPARE(anim->property("count").toInt(), 0);
+
+        click("createFramesButton"); // the whole video at the page's 10 frames per second
+        QTRY_COMPARE_WITH_TIMEOUT(anim->property("count").toInt(), 20, 20000);
+        QTRY_VERIFY_WITH_TIMEOUT(itemOrNull("videoToGifPage") == nullptr, 5000); // the page closes itself
+    }
+
+    void whileOneStudioIsOpenTheButtonOfTheOtherIsOff()
+    {
+        click("gifButton");
+        QTRY_VERIFY_WITH_TIMEOUT(!item("collageButton")->isEnabled(), 3000);
+        QVERIFY(item("gifButton")->isEnabled()); // it closes its own studio
+        click("gifButton");
+        QTRY_VERIFY_WITH_TIMEOUT(item("collageButton")->isEnabled(), 3000);
+        click("collageButton");
+        QTRY_VERIFY_WITH_TIMEOUT(!item("gifButton")->isEnabled(), 3000);
+        QVERIFY(item("collageButton")->isEnabled());
+    }
+
+    void theStudiosAddButtonTakesPicturesAndVideosAlike()
+    {
+        click("gifButton");
+        QQuickItem *studio = item("gifStudio");
+        const QString png = file("p.png", picture(40, 30, Qt::red));
+        // what the add dialog or a drop hands over: a picture and a video at once
+        const QVariantList both{png, QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4")};
+        QVERIFY(QMetaObject::invokeMethod(studio, "addFiles", Q_ARG(QVariant, both)));
+        QObject *anim = m_engine->rootContext()->contextProperty("animStudio").value<QObject *>();
+        QTRY_COMPARE_WITH_TIMEOUT(anim->property("count").toInt(), 1, 5000); // the picture joined the strip
+        item("videoToGifPage");                                              // and the video opened its page
+    }
+
+    void aVideoOpenedLikeAnyFileGoesToTheGifStudio()
+    {
+        QSignalSpy requested(m_app.controller, &AppController::videoRequested);
+        m_app.controller->openPath(QStringLiteral(FIXTURES_DIR "/video_20frames_10fps.mp4")); // as Abrir, a drop or the command line do
+        QCOMPARE(requested.size(), 1);
+        item("gifStudio");
+        item("videoToGifPage");
+        QObject *video = m_engine->rootContext()->contextProperty("videoToGif").value<QObject *>();
+        QTRY_VERIFY_WITH_TIMEOUT(video->property("loaded").toBool(), 15000);
+        QVERIFY(m_app.controller->currentFileName().isEmpty()); // no picture was opened
     }
 
     // ------------------------------------------------------------------------------------------------ zoom

@@ -1635,3 +1635,79 @@ control y además reparte el resultado: `e + s·(cas − e)`, para que arranque 
   apaga la consulta (lo usan la prueba de arranque y `test_ui_flows`).
 - **No probado:** el instalador real lanzado desde el programa (UAC si se instaló para todos los usuarios, que el
   `[Run]` reabra el programa), ni contra una versión publicada de verdad más nueva que la instalada.
+
+## 26. Adornos festivos (`FestiveManager`)
+
+- **Qué hace:** `src/core/Festivity.{h,cpp}` (lógica pura, probada en `test_festivity`: Pascua con el algoritmo
+  gregoriano, los rangos de cada fiesta y la prioridad de Pascua sobre San Patricio) decide la fiesta de una fecha.
+  `src/app/FestiveManager.{h,cpp}` (propiedad de contexto `festive`) la expone como `festival` (`""`, `halloween`,
+  `muertos`, `navidad`, `nuevoano`, `reyes`, `sanvalentin`, `sanpatricio`, `pascua`), la recalcula cada 30 minutos y
+  respeta `appSettings.festive` (`ui/festive`, por defecto sí). `preview` enseña otra fiesta sin guardarla (Ajustes >
+  Apariencia); `PROJECTFOXY_FESTIVE=<clave>` arranca con esa vista previa y `=off` lo apaga (lo usan la prueba de
+  arranque y `test_ui_flows`).
+- **Dónde se ve:** `qml/FestiveDecor.qml` (en `Main.qml`, z 4, sin ratón): guirnalda de 48 px bajo la barra de título,
+  solo sobre la zona de la imagen (no sobre la barra de miniaturas ni el panel de edición); una pieza en la esquina
+  inferior de la barra de miniaturas (la barra recibe `bottomReserve` y acorta su lista, así que no tapa miniaturas);
+  la telaraña de Halloween en la esquina superior derecha de la imagen. Solo si `themeManager.skin !== "win98"`, y
+  oculto en los estudios y en el lector.
+- **Los dibujos:** `tools/make_festive_art.js` (`node tools/make_festive_art.js`) escribe `resources/festive/*.svg`
+  (`<clave>-garland.svg`, una tira de 680 unidades que se repite en horizontal, y `<clave>-hero.svg`). SVG plano que el
+  renderizador de Qt entiende: sin recortes (`clipPath`), sin degradados y con los huecos hechos con trazados
+  par‑impar, para que sirvan sobre cualquier tema. Los SVG generados se suben al repositorio; el programa no ejecuta el
+  script. Se compilan como recursos `:/festive`.
+- **No probado:** los temas claros a fondo, ni pantallas con escalado distinto del 100 %.
+## 27. Vídeo a GIF (`VideoToGif`)
+
+- **Piezas:** `VideoFrameReader` (Qt Multimedia: `QMediaPlayer` + `QVideoSink`) lee fotogramas por tiempo de dos maneras:
+  `requestFrame(ms)` (un salto por fotograma; exacto, pero 70-370 ms cada uno porque cada salto decodifica desde el fotograma
+  clave anterior: 134 s para 358 fotogramas de un clip 1440p60) y `sample(desde, hasta, paso)` (reproduce a 4x y se queda con
+  el fotograma de cada instante: 9 s para el mismo clip; a 8x el decodificador por hardware se queda sin fotogramas y
+  registra errores). `VideoToGif` (contexto `videoToGif`) abre el vídeo, da la vista previa (`image://videoprev/`), y
+  `create(tramos, fps, recorte x y w h en fracciones, ancho)` lee los tramos que se quedan, recorta y escala cada
+  fotograma y emite `framesReady`, que `AppBootstrap` entrega a `AnimStudio::addFrames` (fotogramas en memoria; el
+  máximo de la tira sube a 600). `VideoSupport` dice qué extensiones se pueden decodificar.
+- **Pantalla:** `qml/VideoToGifPage.qml` (dentro de `GifStudio.qml`: el botón *Agregar imágenes o vídeo…* y soltar archivos pasan por `addFiles`, que mete las imágenes en la tira y abre la página con el primer vídeo) y
+  `qml/VideoCropBox.qml` (marco de recorte arrastrable con esquinas, proporción fija o libre). Los tramos son una lista
+  de cortes y de inicios de tramo quitados; el peso mostrado es una regla (0,3 bytes por píxel), solo orientativa.
+- **Abrir:** `AppController::loadPath` emite `videoRequested(path)` para un archivo con extensión de vídeo
+  (`VideoSupport::looksLikeVideo`, solo mira el nombre, no carga el plugin), igual que con los cómics; `Main.qml` abre el
+  estudio de GIF y la página. El diálogo de Abrir lee las extensiones decodificables al abrirse (`Toolbar.requestOpen`),
+  no al arrancar.
+- **Estudio de GIF (0.3.3):** efecto, texto y duración son globales (`setStyleValueAll`, `clearStyleAll`, `setAllHold`; las
+  imágenes nuevas heredan el aspecto de la primera; `defaultHold` 100 ms, máximo 300). `gifCompression` (0-100) fija
+  `gifColors` (256 a 16, en escala logarítmica) y el tramado. `AnimStudio::estimateSize()` escribe la animación en un
+  `QBuffer` en un hilo propio y publica `estimatedBytes` (se invalida con cualquier cambio); `GifStudio.qml` lo pide solo
+  900 ms después del último cambio si hay 120 fotogramas o menos. `qml/controls/AppChoiceChips.qml` es el botón de varias
+  opciones que sustituye a los menús cortos.
+- **Detalles que costaron:** la posición 0 no produce fotograma en un reproductor nuevo (se pide 1 ms); pedir el último
+  instante no da nada (se queda 60 ms antes); el proveedor de imágenes recibe `sourceSize` con un lado a 0.
+- **Pruebas:** `test_multimedia`, `test_video_frames`, `test_video_to_gif` (con `tests/fixtures/video_20frames_10fps.mp4`:
+  cada fotograma es de un gris distinto) y un recorrido en `test_ui_flows`; `PROJECTFOXY_TEST_VIDEO=<archivo>` mide con un
+  vídeo real (480×480 desde 1080p: 60 fotogramas en 1,5 s).
+- **No probado:** MKV con audio raro ni vídeos de fotogramas variables; el backend de Qt en Linux (AppImage/Flatpak).
+
+## 28. Arranque (medido el 2026-10-20)
+
+- **Dónde se iba el tiempo** (JPEG de 24 MP, Windows, Direct3D 11; ms desde que se crea el proceso, 0,84 s hasta el primer
+  fotograma): `main()` 25, `QGuiApplication` 45, motor 57, `AppBootstrap::setup` 100, `Main.qml` cargado 810. Casi todo
+  es `loadFromModule`: con la plataforma `offscreen` crear `Main` cuesta 83 ms, con la de Windows 560. Un perfil de
+  muestreo (abajo) lo explicó: el primer texto que se maqueta lee los archivos de la fuente de la interfaz y de sus
+  alternativas (`QWindowsFontDatabase::populateFamily`, `GetFontData`: ~200 ms) y el hilo principal espera ~100 ms a que el
+  hilo de render cree el dispositivo Direct3D.
+- **Qué se hizo:** `StartupWarmup` (hilo auxiliar desde el principio de `main()`: maqueta un texto de muestra con Segoe UI en
+  normal y negrita, con CJK y emoji, y crea y suelta un dispositivo `D3D11CreateDevice`; es global al proceso, así que
+  el hilo principal lo encuentra hecho o espera a lo mismo en vez de repetirlo; `PROJECTFOXY_NO_WARMUP=1` lo apaga);
+  los diálogos de `Toolbar.qml` (Ajustes, lote, Abrir, Leer, Eliminar) se crean con `Loader` al usarse (~80 ms);
+  `VideoToGif` crea su `QMediaPlayer` al abrir un vídeo (antes cargaba FFmpeg, 13 MB, al arrancar: 36 ms).
+  Resultado: 0,64 s hasta ver la imagen con el calentamiento solo y 0,55 s con todo (sin archivo: 0,54 s).
+- **Probado y descartado:** `QSG_RENDER_LOOP=basic` (-30 ms, pero cambia el comportamiento del render con la interfaz en
+  marcha).
+- **Herramientas (compilación de desarrollo, `PROJECTFOXY_DEV_SERVER`):** `PROJECTFOXY_TRACE_STARTUP=1` imprime cada hito
+  (`main()`, motor, `Main.qml`, primer fotograma, imagen cargada...); `PROJECTFOXY_SAMPLE_STARTUP=1` muestrea el hilo
+  principal cada ~15 ms hasta el primer fotograma y escribe las funciones más frecuentes (`StartupSampler.cpp`: pone en
+  pausa el hilo, recorre su pila con dbghelp y lo reanuda; con 1 ms se bloquea por los candados del montón);
+  `PROJECTFOXY_BENCH_QML=1` (con `PROJECTFOXY_BENCH_QML_NAMES="TitleBar|Main|inline:Label{text:\"x\"}"`) mide la carga y la
+  creación de cada componente QML y se cierra (`PROJECTFOXY_BENCH_PLATFORM=1` mide además fuentes, ventana y primer
+  fotograma; `PROJECTFOXY_BENCH_HIDDEN=1` crea `Main` sin mostrarlo).
+- **Queda:** unos 200 ms de plataforma al mostrar la ventana (creación nativa, swapchain, primer fotograma) y ~200 ms de
+  creación de `Main`; lo siguiente serían los diálogos de `Main.qml` (~10 ms) y `UpdateBanner` (~10 ms).

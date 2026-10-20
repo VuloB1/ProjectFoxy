@@ -3,6 +3,41 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.3] — Holiday decorations and video to GIF
+
+- **Discreet decorations for the holidays**, on by default and only on the modern themes: a thin garland along the top
+  edge of the picture area and a small piece in the bottom corner of the thumbnail bar (Halloween also gets a cobweb in
+  the corner of the picture). Nothing takes the mouse, and the thumbnails never go under the piece: the bar simply
+  leaves room for it. Halloween 1-31 Oct, Day of the Dead 1-3 Nov, Christmas 1-26 Dec, New Year 27 Dec-2 Jan, Three
+  Kings' Eve 3-6 Jan, Valentine's Day 7-15 Feb, St. Patrick's Day 12-17 Mar and Easter (the 7 days before Easter Sunday
+  and the Monday after it; it wins over St. Patrick's Day when they overlap).
+- Settings > Appearance > *Adornos festivos*: a switch for all of them, one for each holiday, a switch to hide the piece
+  in the thumbnail bar (the garland stays), and a list to look at any holiday out of season (it goes back to
+  "by date" when the program restarts).
+- The pictures are drawn by `tools/make_festive_art.js` (plain SVG, `resources/festive/`); the dates are
+  `core/Festivity` (tested in `test_festivity`).
+
+- **Make an animation from a video.** In the animation studio (Create > Animated GIF) use the same *Agregar imágenes o vídeo…* button as for
+  pictures (or drop the video on the studio): pick the piece to keep on a timeline, **cut out parts in the middle** (cut at the cursor, then
+  leave out the pieces you do not want), **crop the picture** (1:1, 16:9, 4:3, 3:4, 9:16 or free: drag the frame and its
+  corners), and choose the frames per second (5-20) and the width. The frames go into the studio's strip, where the usual
+  tools (text, effects, size, speed, GIF/APNG/WebP) apply. Limits: 600 frames; the page warns over 30 s or about 25 MB.
+- Reads MP4 (H.264/H.265), MOV and MKV (Qt Multimedia; WebM/VP9/AV1 are not available with Qt's Windows build). A 36 s
+  1440p60 clip becomes 358 frames in about 9 s: the video is played at 4x and only the frames needed are kept.
+- **One Open for everything.** The Open button (and Ctrl+O, drag and drop, "Open with" and the command line) takes
+  pictures, comics and videos: a video goes straight to the animation studio's video page.
+- **GIF studio, easier and lighter.** The duration of the frames is one value for all of them (20 to 300 ms, with
+  buttons for the usual ones; it used to be 20 ms to 5 s and one frame at a time, and new pictures stay 100 ms), and the
+  effect and text are also for the whole animation. Dropdowns of a few options (transitions, repetitions, kind of text,
+  effect presets, sizes) are now buttons. A **Compression** bar sets the colours of the GIF (256 down to 16) and the studio
+  works out the file's weight in the background ("It will weigh about 1.2 MB"). The video page offers more small widths
+  (240, 160 and 120 px). While one studio is open the other one's button is greyed out, and "Remove all" is a red cross.
+- **Faster start** (the picture is on screen about 0.65 s after launching instead of 0.9 s with a 24-megapixel JPEG;
+  0.54 s instead of 0.8 s without a file): the fonts of the interface (and their fallbacks for Asian scripts and emoji)
+  and the graphics driver are loaded on a helper thread while the window is built, the dialogs of the title bar (Settings,
+  batch tools, Open) are built when first used, and the video player is only created when a video is opened.
+- Adds Qt Multimedia to the program (the installer grows by about 6 MB).
+
 ## [0.3.2] — Updates from inside the program
 
 - **A notice when a newer version is published.** At start (at most once a day, five seconds after the window opens) the
@@ -195,6 +230,45 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.3] — Adornos festivos y vídeo a GIF
+
+- **Adornos discretos en las fechas señaladas**, activados por defecto y solo en los temas modernos: una guirnalda fina
+  en el borde superior de la zona de la imagen y una pieza pequeña en la esquina inferior de la barra de miniaturas
+  (Halloween añade también una telaraña en la esquina de la imagen). Nada captura el ratón, y las miniaturas nunca
+  quedan debajo de la pieza: la barra le deja sitio. Halloween del 1 al 31 de octubre, Día de los Muertos del 1 al 3 de
+  noviembre, Navidad del 1 al 26 de diciembre, Año Nuevo del 27 de diciembre al 2 de enero, Noche de Reyes del 3 al 6 de
+  enero, San Valentín del 7 al 15 de febrero, San Patricio del 12 al 17 de marzo y Pascua (los 7 días antes del Domingo
+  de Resurrección y el lunes siguiente; gana a San Patricio si coinciden).
+- Ajustes > Apariencia > *Adornos festivos*: un interruptor general, uno por fiesta, otro para ocultar la pieza de la
+  barra de miniaturas (la guirnalda se queda) y una lista para ver cualquier fiesta fuera de fecha (al
+  reiniciar el programa vuelve a «Según la fecha»).
+- Los dibujos los genera `tools/make_festive_art.js` (SVG sencillo, `resources/festive/`); las fechas son
+  `core/Festivity` (probadas en `test_festivity`).
+
+- **Crear una animación desde un vídeo.** En el estudio de animación (Crear > GIF animado) usa el mismo botón *Agregar imágenes o vídeo…* que
+  para las imágenes (o suelta el vídeo en el estudio): marca en una línea de tiempo el trozo que quieres, **corta partes en medio** (cortar
+  en el cursor y quitar los tramos que no quieras), **recorta la imagen** (1:1, 16:9, 4:3, 3:4, 9:16 o libre: arrastra
+  el marco y sus esquinas) y elige los fotogramas por segundo (5-20) y el ancho. Los fotogramas entran en la tira del
+  estudio, donde sirven las herramientas de siempre (texto, efectos, tamaño, velocidad, GIF/APNG/WebP). Límites: 600
+  fotogramas; la pantalla avisa por encima de 30 s o de unos 25 MB.
+- Lee MP4 (H.264/H.265), MOV y MKV (Qt Multimedia; WebM/VP9/AV1 no están en el Qt de Windows). Un clip de 36 s en
+  1440p a 60 fps da 358 fotogramas en unos 9 s: el vídeo se reproduce a 4x y solo se guardan los fotogramas necesarios.
+- **Un solo Abrir para todo.** El botón Abrir (y Ctrl+O, arrastrar y soltar, «Abrir con» y la línea de órdenes) admite
+  imágenes, cómics y vídeos: un vídeo va directo a la pantalla de vídeo del estudio de animación.
+- **Estudio de GIF más cómodo y ligero.** La duración de los fotogramas es un solo valor para todos (de 20 a 300 ms, con
+  botones para los habituales; antes iba de 20 ms a 5 s y de uno en uno, y las imágenes nuevas duran 100 ms), y el efecto
+  y el texto también valen para toda la animación. Los menús de pocas opciones (transiciones, repeticiones, tipo de
+  texto, ajustes de un efecto, tamaños) ahora son botones. Una barra de **Compresión** fija los colores del GIF (de 256 a
+  16) y el estudio calcula el peso del archivo en segundo plano («Pesará unos 1,2 MB»). La pantalla de vídeo ofrece más
+  anchos pequeños (240, 160 y 120 px). Mientras hay un estudio abierto el botón del otro queda apagado, y «Quitar
+  todas» es una cruz roja.
+- **Arranque más rápido** (la imagen está en pantalla unos 0,65 s después de abrir el programa en vez de 0,9 s con un
+  JPEG de 24 megapíxeles; 0,54 s en vez de 0,8 s sin archivo): las fuentes de la interfaz (y sus alternativas para
+  escrituras asiáticas y emoji) y el controlador gráfico se cargan en un hilo auxiliar mientras se construye la ventana,
+  los diálogos de la barra de título (Ajustes, procesos por lote, Abrir) se crean la primera vez que se usan y el
+  reproductor de vídeo solo se crea al abrir un vídeo.
+- El programa lleva Qt Multimedia (el instalador crece unos 6 MB).
 
 ## [0.3.2] — Actualizaciones desde el programa
 

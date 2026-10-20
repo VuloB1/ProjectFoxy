@@ -175,6 +175,7 @@ ApplicationWindow {
         anchors.bottom: statusBar.top
         visible: folderModel.count > 1
         busy: root.editMode
+        bottomReserve: festiveDecor.heroReserve
         enabled: !root.toolLocked && !root.multiMode && root.studio === ""
         opacity: enabled ? 1.0 : 0.45
     }
@@ -238,6 +239,19 @@ ApplicationWindow {
         }
         onLoaded: item.forceActiveFocus()
     }
+    // The holiday decorations (FestiveManager): drawn over the picture area, they take no mouse.
+    FestiveDecor {
+        id: festiveDecor
+        objectName: "festiveDecor"
+        anchors.fill: parent
+        titleBar: titleBar
+        sidebar: sidebar
+        statusBar: statusBar
+        canvas: canvas
+        rightInset: root.editMode ? editLoader.width : 0
+        suppressed: root.studio !== "" || mangaReader.active
+        z: 4
+    }
     // A newer version exists (UpdateManager): the notice sits over everything but the dialogs.
     UpdateBanner {
         anchors.top: titleBar.bottom
@@ -245,6 +259,19 @@ ApplicationWindow {
         anchors.right: parent.right
         anchors.rightMargin: 16
         z: 8
+    }
+    // A video opened like any other file (Abrir, drag and drop, "Open with") becomes frames in the animation studio.
+    Connections {
+        target: appController
+        function onVideoRequested(path) { root.openVideo(path) }
+    }
+    function openVideo(path) {
+        if (root.toolLocked || (root.studio !== "" && root.studio !== "gif"))
+            return;
+        root.setEditMode(false);
+        root.setMultiMode(false);
+        root.setStudio("gif");
+        Qt.callLater(function () { if (studioLoader.item && studioLoader.item.openVideo) studioLoader.item.openVideo(path); });
     }
     // A .cbz opened like any other file (Abrir, drag and drop, "Open with") is read, not shown.
     Connections {

@@ -18,6 +18,7 @@ endforeach()
 set(ENV{QT_QPA_PLATFORM} "offscreen")
 set(ENV{QT_PLUGIN_PATH} "${QT_PLUGINS}")      # the offscreen platform plugin is not deployed with the app
 set(ENV{QSG_RHI_BACKEND} "software")          # no GPU needed (works on a build server too)
+set(ENV{PROJECTFOXY_FESTIVE} "off")              # no holiday decorations over the window
 set(ENV{PROJECTFOXY_NO_UPDATE_CHECK} "1")     # no looking for updates on the network
 set(ENV{QT_FORCE_STDERR_LOGGING} "1")         # a GUI (WIN32) app otherwise hides Qt's messages
 
