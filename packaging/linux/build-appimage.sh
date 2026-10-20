@@ -46,8 +46,27 @@ cmake --install "$BUILD_DIR" --prefix "$APPDIR/usr"
 # linuxdeploy and its plugins are AppImages themselves: run them extracted, so this works without FUSE (containers, CI).
 export APPIMAGE_EXTRACT_AND_RUN=1
 export PATH="$TOOLS_DIR:$PATH"
-export QMAKE="$QT_ROOT_DIR/bin/qmake"
 export LD_LIBRARY_PATH="$QT_ROOT_DIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+# Qt Multimedia comes with two backends. The program uses FFmpeg (the default; it reads the MP4/H.264, MOV and MKV that
+# "video to GIF" is for), so the GStreamer plugin is left out of the bundle: it would pull the whole GStreamer stack in
+# (and fail to deploy where its libraries are not installed). linuxdeploy's Qt plugin finds Qt's plugins through qmake, so
+# it is given a qmake that points to a copy of the plugin folder without that one file.
+FILTERED_PLUGINS="$BUILD_DIR/qt-plugins-for-bundle"
+rm -rf "$FILTERED_PLUGINS"
+mkdir -p "$FILTERED_PLUGINS"
+cp -a "$QT_ROOT_DIR/plugins/." "$FILTERED_PLUGINS/"
+rm -f "$FILTERED_PLUGINS/multimedia/libgstreamermediaplugin.so"
+cat > "$BUILD_DIR/qmake-for-bundle" <<WRAPPER
+#!/usr/bin/env bash
+real="$QT_ROOT_DIR/bin/qmake"
+if [ "\${1:-}" = "-query" ]; then
+    if [ "\${2:-}" = "QT_INSTALL_PLUGINS" ]; then echo "$FILTERED_PLUGINS"; exit 0; fi
+    if [ "\$#" -eq 1 ]; then "\$real" -query | sed "s#^QT_INSTALL_PLUGINS:.*#QT_INSTALL_PLUGINS:$FILTERED_PLUGINS#"; exit 0; fi
+fi
+exec "\$real" "\$@"
+WRAPPER
+chmod +x "$BUILD_DIR/qmake-for-bundle"
+export QMAKE="$BUILD_DIR/qmake-for-bundle"
 # The plugin reads the QML imports of the interface (so QtQuick.Effects, Controls, Dialogs... are bundled).
 export QML_SOURCES_PATHS="$ROOT/qml"
 # X11 (xcb) is always bundled; Wayland natively as well, and the platform themes (GTK / desktop portal dialogs).
