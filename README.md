@@ -99,6 +99,8 @@ Tested on (the files built by the CI, started on X11 and, for the AppImage, nati
 | Ubuntu 24.04, Debian 13, Fedora 43, Arch | works | works |
 | AlmaLinux 9 (glibc 2.34) | does not start: glibc and libstdc++ too old | works |
 
+Video to GIF (H.264/MP4) was also checked in both packages. Real Wayland, hardware decoding and other codecs on Linux were not.
+
 ## Languages
 
 English · Español · Português · 한국어 · 中文（简体） · 日本語
@@ -118,7 +120,7 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
   washed out; what you save is tagged as sRGB.
 - Respects the **EXIF orientation** (phone photos) and opens files and folders with any name (accents, Japanese,
   Cyrillic, emoji).
-- Animated GIF, APNG and WebP with real playback; **video to GIF** (cut pieces out, crop, MP4/MOV/MKV).
+- Animated GIF, APNG and WebP with real playback; **video to GIF** (cut pieces out, crop, MP4/MOV/MKV). The Open button, Ctrl+O and drag and drop take pictures, comics and videos alike.
 - Discreet decorations for the holidays, which can be turned off or chosen one by one.
 - **Comic and manga reader**: open a `.cbz`, `.zip` or PDF (or read the folder of the open picture with the book button in
   the title bar). Right to left (the manga way) or left to right, one page or two side by side (the cover alone, landscape
@@ -137,7 +139,7 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
 **Formats it opens** (each one checked against a real file in the tests):
 JPEG (CMYK too), PNG, WebP and TIFF (libvips; 16 bits per channel are scaled to 8) · BMP, GIF and ICO (Qt) · camera
 RAW (LibRaw) · HEIC/HEIF and AVIF (libheif) · animated GIF, APNG and WebP. **Saves** PNG, JPG, BMP, TIFF and WebP, and
-**creates** animated GIF, APNG and WebP. The reader also opens comic archives (`.cbz`, `.zip`) and PDF files.
+**creates** animated GIF, APNG and WebP. The reader also opens comic archives (`.cbz`, `.zip`) and PDF files, and the GIF studio reads video (MP4 H.264/H.265, MOV, MKV; WebM/VP9/AV1 are not available on Windows).
 
 **Safe saving**: atomic writes (a failure never leaves the original half-written), high-quality JPEG (95, no chroma
 subsampling), keeps the original's EXIF, IPTC and XMP in JPEG, PNG and WebP (from HEIC/RAW it saves **and warns** that
@@ -155,7 +157,7 @@ does not match the file" (also after Save and Undo).
 | Filters | 38 "looks" with thumbnails of your own photo, amount, vignette and grain |
 | Effects | 43 effects in 7 groups (blur, style, color, drawing, light, distortion and finish: black and white, haze removal, cellophane, print halftone, lines, flares, bokeh, stretch, perspective…) with a preview over the whole image, their own sliders, presets and mix; "Apply" makes them an undoable step |
 | Lens | Fixes the distortion, color fringes and dark corners of your lens with the Lensfun profile database (it recognizes the camera and lens from the EXIF), or by hand |
-| Create (title bar) | **Animated GIF** (images with their own duration, effect and text, transitions, GIF/APNG/WebP) and **Collage** (1 to 12 photos, adjustable divider lines or free layout, photos that move and zoom without limits inside their cell, your own saved templates) |
+| Create (title bar) | **Animated GIF** (pictures or a video, one frame duration, effect and text for the whole animation, transitions, a Compression bar with the file's estimated weight, GIF/APNG/WebP) and **Collage** (1 to 12 photos, adjustable divider lines or free layout, photos that move and zoom without limits inside their cell, your own saved templates) |
 
 The Adjustments and Filters preview is computed on the GPU and the saved file is generated on the CPU with the same
 math, **also with semi-transparent images**; an automatic test (`test_gpu_parity`) compares them with Direct3D 11 (see
@@ -163,7 +165,7 @@ math, **also with semi-transparent images**; an automatic test (`test_gpu_parity
 whole slider drag is a single step).
 
 ## Stack
-- C++20 · Qt 6.7 (Qt Quick/QML, RHI with Direct3D 11)
+- C++20 · Qt 6.7 (Qt Quick/QML, Qt Multimedia for video, RHI with Direct3D 11)
 - libvips (JPEG/PNG/WebP/TIFF) · LibRaw (RAW) · libheif + libde265 + libaom (HEIC/HEIF/AVIF) · exiv2 (EXIF/IPTC/XMP
   metadata)
 - CMake + Ninja + MSVC 2022, native dependencies with vcpkg
@@ -352,6 +354,8 @@ Probado en (los archivos construidos por el CI, abiertos con X11 y, el AppImage,
 | Ubuntu 24.04, Debian 13, Fedora 43, Arch | funciona | funciona |
 | AlmaLinux 9 (glibc 2.34) | no arranca: glibc y libstdc++ demasiado viejas | funciona |
 
+El vídeo a GIF (MP4 H.264) también se comprobó en ambos paquetes. Wayland real, la descodificación por hardware y otros códecs en Linux no.
+
 ## Idiomas
 
 Español · English · Português · 한국어 · 中文（简体） · 日本語
@@ -372,7 +376,7 @@ idioma, un *pull request* es muy bienvenido (ver [`CONTRIBUTING.md`](CONTRIBUTIN
   abrirlas, en lugar de verse apagadas; lo que se guarda va etiquetado como sRGB.
 - Respeta la **orientación EXIF** (fotos de móvil) y abre archivos y carpetas con
   cualquier nombre (acentos, japonés, cirílico, emoji).
-- GIF, APNG y WebP animados con reproducción real; **vídeo a GIF** (cortar tramos, recortar, MP4/MOV/MKV).
+- GIF, APNG y WebP animados con reproducción real; **vídeo a GIF** (cortar tramos, recortar, MP4/MOV/MKV). El botón Abrir, Ctrl+O y arrastrar y soltar sirven igual para imágenes, cómics y vídeos.
 - Adornos discretos en las fechas señaladas, que se pueden apagar o elegir uno a uno.
 - **Lector de cómics y manga**: abre un `.cbz`, `.zip` o PDF (o lee la carpeta de la imagen abierta con el botón del libro de la
   barra de título). De derecha a izquierda (como el manga) o de izquierda a derecha, de una página o de dos (la portada sola,
@@ -390,7 +394,7 @@ idioma, un *pull request* es muy bienvenido (ver [`CONTRIBUTING.md`](CONTRIBUTIN
 
 **Formatos que abre** (cada uno comprobado con un archivo real en las pruebas):
 JPEG (también CMYK), PNG, WebP y TIFF (libvips; los de 16 bits por canal se escalan a 8) ·
-BMP, GIF e ICO (Qt) · RAW de cámara (LibRaw) · HEIC/HEIF y AVIF (libheif) · GIF, APNG y WebP animados. **Guarda** en PNG, JPG, BMP, TIFF y WebP, y **crea** GIF, APNG y WebP animados. El lector también abre archivos de cómic (`.cbz`, `.zip`) y PDF.
+BMP, GIF e ICO (Qt) · RAW de cámara (LibRaw) · HEIC/HEIF y AVIF (libheif) · GIF, APNG y WebP animados. **Guarda** en PNG, JPG, BMP, TIFF y WebP, y **crea** GIF, APNG y WebP animados. El lector también abre archivos de cómic (`.cbz`, `.zip`) y PDF, y el estudio de GIF lee vídeo (MP4 H.264/H.265, MOV, MKV; WebM/VP9/AV1 no están disponibles en Windows).
 
 **Guardado seguro**: escritura atómica (un fallo nunca deja el original a medias), JPEG
 de alta calidad (95, sin submuestreo de croma), conserva EXIF, IPTC y XMP del
@@ -410,7 +414,7 @@ tras Guardar y Deshacer).
 | Filtros | 38 "looks" con miniaturas de la propia foto, cantidad, viñeta y grano |
 | Efectos | 43 efectos en 7 grupos (desenfoque, estilo, color, dibujo, luz, distorsión y acabado: blanco y negro, borrar niebla, celofán, semitono de imprenta, líneas, destellos, bokeh, estirar, perspectiva…) con vista previa en toda la imagen, sliders propios, preajustes y mezcla; "Aplicar" los deja como un paso deshacible |
 | Lente | Corrige la distorsión, las franjas de color y las esquinas oscuras de tu objetivo con la base de perfiles de Lensfun (reconoce la cámara y el objetivo por el EXIF), o a mano |
-| Crear (barra de título) | **GIF animado** (imágenes con duración, efecto y texto propios, transiciones, GIF/APNG/WebP) y **Collage** (1 a 12 fotos, líneas divisorias ajustables o diseño libre, fotos que se mueven y se acercan sin límites dentro de su celda, plantillas propias guardables) |
+| Crear (barra de título) | **GIF animado** (imágenes o un vídeo, una sola duración de fotograma, efecto y texto para toda la animación, transiciones, una barra de Compresión con el peso estimado del archivo, GIF/APNG/WebP) y **Collage** (1 a 12 fotos, líneas divisorias ajustables o diseño libre, fotos que se mueven y se acercan sin límites dentro de su celda, plantillas propias guardables) |
 
 La vista previa de Ajustes y Filtros se calcula en la GPU y el archivo guardado
 se genera en CPU con la misma matemática, **también con imágenes semitransparentes**; una
@@ -420,7 +424,7 @@ prueba automática (`test_gpu_parity`) las compara con Direct3D 11 (ver
 arrastre completo de un slider es un solo paso).
 
 ## Stack
-- C++20 · Qt 6.7 (Qt Quick/QML, RHI con Direct3D 11)
+- C++20 · Qt 6.7 (Qt Quick/QML, Qt Multimedia para vídeo, RHI con Direct3D 11)
 - libvips (JPEG/PNG/WebP/TIFF) · LibRaw (RAW) · libheif + libde265 + libaom
   (HEIC/HEIF/AVIF) · exiv2 (metadatos EXIF/IPTC/XMP)
 - CMake + Ninja + MSVC 2022, dependencias nativas con vcpkg
