@@ -3,7 +3,7 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
-## [Unreleased]
+## [0.3.4] — Videos that did not open
 
 - Fixed: some MP4s (Twitter downloads, for one) stayed on "Abriendo el vídeo…" for ever, or lost frames when turned into a GIF. They
   report every frame as lasting 1.7 ms, so no position fell inside a frame; a frame now lasts at least one frame period.
@@ -236,7 +236,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Sin publicar]
+## [0.3.4] — Vídeos que no se abrían
 
 - Corregido: algunos MP4 (por ejemplo, descargados de Twitter) se quedaban en «Abriendo el vídeo…» para siempre o perdían fotogramas al
   pasarlos a GIF. Declaran que cada fotograma dura 1,7 ms, así que ninguna posición caía dentro de uno; ahora un fotograma dura como
