@@ -1,5 +1,6 @@
 #include "VideoFrameReader.h"
 
+#include <QMediaMetaData>
 #include <QUrl>
 #include <QVideoFrame>
 
@@ -29,6 +30,8 @@ void VideoFrameReader::open(const QString &path)
 {
     m_wanted = -1;
     m_sampling = false;
+    m_lastStart = -1;
+    m_period = 0;
     m_player.setSource(QUrl::fromLocalFile(path));
 }
 
@@ -74,7 +77,18 @@ void VideoFrameReader::onFrame(const QVideoFrame &frame)
         return;
     m_size = frame.size();
     const qint64 start = frame.startTime() / 1000; // microseconds -> ms
-    const qint64 end = frame.endTime() > frame.startTime() ? frame.endTime() / 1000 : start + 50;
+    if (m_lastStart >= 0 && start > m_lastStart && start - m_lastStart < 1000 && (m_period == 0 || start - m_lastStart < m_period))
+        m_period = start - m_lastStart;
+    m_lastStart = start;
+    // The end the video reports is not to be trusted (some Twitter MP4s say every frame lasts 1.7 ms, so no position
+    // fell inside one): a frame lasts at least a frame period, the measured one or, before two frames were seen, the
+    // one the file states (100 ms when it states none).
+    qint64 period = m_period;
+    if (period == 0) {
+        const double fps = m_player.metaData().value(QMediaMetaData::VideoFrameRate).toDouble();
+        period = fps >= 1 ? qint64(1000 / fps) : 100;
+    }
+    const qint64 end = qMax(frame.endTime() / 1000, start + period);
 
     if (m_sampling) {
         // A frame still stands for every slot that falls before it ends (a slot a fast decoder skipped over gets the

@@ -46,4 +46,5 @@ private:
     qint64 m_wanted = -1;
     bool m_sampling = false;
     qint64 m_next = 0, m_end = 0, m_step = 100;
+    qint64 m_lastStart = -1, m_period = 0; // ms: the smallest gap seen between two frames (0: not known yet)
 };
