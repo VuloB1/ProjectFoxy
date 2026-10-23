@@ -3,9 +3,11 @@
 #include "VideoSupport.h"
 #include "AppController.h"
 #include "AppSettings.h"
+#include "Autostart.h"
 #include "FontSubstitutions.h"
 #include "SingleInstance.h"
 #include "StartupWarmup.h"
+#include "TrayIcon.h"
 #include "WindowGeometry.h"
 
 #include <QGuiApplication>
@@ -97,11 +99,21 @@ int main(int argc, char *argv[])
     // emoji... - arrives intact; argv[] would already have turned them into '?'.)
     QString fileArgument;
     bool newWindow = false;
+    bool background = false; // started at sign-in: no window, only the tray icon
     for (const QString &argument : app.arguments().mid(1)) {
         if (argument == QLatin1String("--new-window"))
             newWindow = true;
+        else if (argument == QLatin1String("--background"))
+            background = true;
         else if (!argument.startsWith(QLatin1String("--")) && fileArgument.isEmpty())
             fileArgument = argument;
+    }
+
+    {
+        const AppSettings settings;
+        if (settings.startWithWindows())
+            Autostart::apply(true, settings.startsHidden()); // follows the program if it was moved or updated
+        background = background && settings.startsHidden();
     }
 
     // One window: when Project Foxy is already running, hand it the file and leave. `--new-window` (or turning the
@@ -155,8 +167,12 @@ int main(int argc, char *argv[])
         QVariantMap initial;
         if (!fit.isNull())
             initial = {{"x", fit.x()}, {"y", fit.y()}, {"width", fit.width()}, {"height", fit.height()}};
-        if (remembered.windowMaximized())
+        if (background) {
+            initial.insert("visible", false);
+            initial.insert("wasMaximized", remembered.windowMaximized());
+        } else if (remembered.windowMaximized()) {
             initial.insert("visibility", int(QWindow::Maximized));
+        }
         engine.setInitialProperties(initial);
     }
 
@@ -208,6 +224,8 @@ int main(int argc, char *argv[])
         return 0;
     }
 #endif
+    TrayIcon tray; // the window goes here instead of closing, when the setting is on (Main.qml)
+    engine.rootContext()->setContextProperty(QStringLiteral("trayIcon"), &tray);
     startupMark("before loading Main.qml");
     engine.loadFromModule("ImageViewerApp", "Main");
     startupMark("Main.qml loaded");
@@ -278,8 +296,7 @@ int main(int argc, char *argv[])
         auto *window = qobject_cast<QQuickWindow *>(engine.rootObjects().first());
         if (!window)
             return;
-        if (window->windowStates() & Qt::WindowMinimized)
-            window->showNormal();
+        QMetaObject::invokeMethod(window, "showFromTray"); // also brings it back from the tray
         window->raise();
         window->requestActivate();
     });

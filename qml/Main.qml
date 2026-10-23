@@ -23,6 +23,11 @@ ApplicationWindow {
 
     // Closing the window with edits that exist only in memory asks first.
     onClosing: function (close) {
+        if (trayIcon.available && appSettings.keepInTray && !root.quitting) {
+            close.accepted = false; // only hidden: the program stays loaded, ready to open fast
+            root.hideToTray();
+            return;
+        }
         if (appController.isSaving) {
             close.accepted = false;
             root.closeWhenSaved = true;
@@ -34,6 +39,39 @@ ApplicationWindow {
             unsavedDialog.open();
         }
     }
+
+    property bool quitting: false
+    property bool wasMaximized: false
+    function hideToTray() {
+        root.wasMaximized = root.visibility === Window.Maximized;
+        trayIcon.setGraphicsPersistent(root, false);
+        root.hide();
+        trimTimer.restart();
+    }
+    Component.onCompleted: if (!root.visible) { trayIcon.setGraphicsPersistent(root, false); trimTimer.restart() }
+    Timer { id: trimTimer; interval: 3000; onTriggered: if (!root.visible) trayIcon.trimMemory() }
+    function showFromTray() {
+        trayIcon.setGraphicsPersistent(root, true);
+        if (!root.visible)
+            root.wasMaximized ? root.showMaximized() : root.showNormal();
+        else if (root.visibility === Window.Minimized)
+            root.showNormal();
+        root.raise();
+        root.requestActivate();
+    }
+    function quitFromTray() {
+        root.quitting = true;
+        root.showFromTray(); // an unsaved edit raises its question on the visible window
+        root.close();
+    }
+    Connections {
+        target: trayIcon
+        function onActivated() { root.showFromTray() }
+        function onQuitRequested() { root.quitFromTray() }
+    }
+    Binding { target: trayIcon; property: "visible"; value: appSettings.keepInTray || !root.visible }
+    Binding { target: trayIcon; property: "openText"; value: qsTr("Abrir Project Foxy") }
+    Binding { target: trayIcon; property: "quitText"; value: qsTr("Salir") }
 
     // "Guardar": over the original file (after asking, unless switched off), or - for
     // a picture that has no file, or a format that cannot be rewritten - as a copy.

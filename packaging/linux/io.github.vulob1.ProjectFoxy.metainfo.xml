@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.5" date="2026-10-23">
+      <description>
+        <p>On Windows: stay loaded in the tray after closing, and start with Windows (optionally without a window).</p>
+      </description>
+    </release>
     <release version="0.3.4" date="2026-10-22">
       <description>
         <p>Fixes some MP4 videos (Twitter downloads, for one) that never opened in "video to GIF" or lost frames.</p>

@@ -520,6 +520,40 @@ AppDialog {
                         }
                         Divider {}
                         SettingRow {
+                            visible: trayIcon.available
+                            label: qsTr("Seguir abierto en la bandeja")
+                            hint: qsTr("Al cerrar la ventana el programa se queda cargado junto al reloj, sin ventana, y se abre al instante. Ocupa algo de memoria mientras tanto. Para salir del todo, usa «Salir» en el menú de su icono.")
+                            AppSwitch {
+                                checked: appSettings.keepInTray
+                                onToggled: appSettings.keepInTray = checked
+                            }
+                        }
+                        Divider { visible: trayIcon.available }
+                        SettingRow {
+                            visible: trayIcon.available
+                            label: qsTr("Iniciar con Windows")
+                            hint: qsTr("Abre Project Foxy al iniciar sesión.")
+                            AppSwitch {
+                                checked: appSettings.startWithWindows
+                                onToggled: appSettings.startWithWindows = checked
+                            }
+                        }
+                        Divider { visible: trayIcon.available && appSettings.startWithWindows }
+                        SettingRow {
+                            visible: trayIcon.available && appSettings.startWithWindows
+                            label: qsTr("Iniciar minimizado en la bandeja")
+                            hint: qsTr("Arranca sin ventana, solo con el icono junto al reloj, y se abre al instante cuando lo necesites. Si está apagado, al iniciar sesión se abre la ventana. Necesita «Seguir abierto en la bandeja».")
+                            AppSwitch {
+                                checked: appSettings.startMinimized
+                                onToggled: {
+                                    appSettings.startMinimized = checked
+                                    if (checked)
+                                        appSettings.keepInTray = true
+                                }
+                            }
+                        }
+                        Divider { visible: trayIcon.available }
+                        SettingRow {
                             label: qsTr("Sincronizar con la pantalla (V-Sync)")
                             hint: qsTr("Evita cortes en la imagen. Si la ventana se traba al cambiarle el tamaño (pasa con algunas tarjetas AMD), prueba a apagarla. Se aplica la próxima vez que abras el programa.")
                             AppSwitch {

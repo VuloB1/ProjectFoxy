@@ -3,6 +3,15 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.5] — Stay in the tray and start with Windows
+
+- **Stay open in the tray** (Settings > Appearance > Windows, Windows only, off by default). Closing the window only hides it and leaves an
+  icon next to the clock: click it, or open a picture from Explorer, and the window is back in about 0.1 s. Right click: *Abrir
+  Project Foxy* / *Salir* (quit; an unsaved edit still asks first). While hidden it frees its graphics and gives the memory back to
+  Windows: about 3 MB in Task Manager and no GPU memory, against about 130 MB and 50 MB with a picture open.
+- **Start with Windows**, with the option **Start minimized in the tray**: it starts without a window (about 1-2 MB) and opens
+  instantly when needed. It writes the per-user *Run* entry (the portable version too, when you turn it on).
+
 ## [0.3.4] — Videos that did not open
 
 - Fixed: some MP4s (Twitter downloads, for one) stayed on "Abriendo el vídeo…" for ever, or lost frames when turned into a GIF. They
@@ -235,6 +244,16 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.5] — Quedarse en la bandeja e iniciar con Windows
+
+- **Seguir abierto en la bandeja** (Ajustes > Apariencia > Ventanas, solo en Windows, apagado por defecto). Al cerrar, la ventana solo se
+  oculta y deja un icono junto al reloj: haz clic en él, o abre una imagen desde el Explorador, y la ventana vuelve en unos 0,1 s.
+  Clic derecho: *Abrir Project Foxy* / *Salir* (un cambio sin guardar sigue preguntando antes). Oculto libera su parte gráfica y
+  devuelve la memoria a Windows: unos 3 MB en el Administrador de tareas y nada de memoria de GPU, frente a unos 130 MB y 50 MB con
+  una imagen abierta.
+- **Iniciar con Windows**, con la opción **Iniciar minimizado en la bandeja**: arranca sin ventana (1-2 MB) y se abre al instante cuando
+  lo necesites. Escribe la entrada *Run* del usuario (también la versión portable, si lo activas).
 
 ## [0.3.4] — Vídeos que no se abrían
 

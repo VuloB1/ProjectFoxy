@@ -1,6 +1,7 @@
 #include "AppSettings.h"
 
 #include "AppPaths.h"
+#include "Autostart.h"
 
 #include <QStandardPaths>
 #include <algorithm>
@@ -34,6 +35,9 @@ AppSettings::AppSettings(QObject *parent)
     m_pixelGrid = m_store.value(QStringLiteral("view/pixelGrid"), wasAllInOne).toBool();
     m_pixelSharpEdit = m_store.value(QStringLiteral("view/pixelSharpEdit"), wasAllInOne).toBool();
     m_singleInstance = m_store.value(QStringLiteral("window/singleInstance"), true).toBool();
+    m_startWithWindows = m_store.value(QStringLiteral("window/startWithWindows"), false).toBool();
+    m_startMinimized = m_store.value(QStringLiteral("window/startMinimized"), true).toBool();
+    m_keepInTray = m_store.value(QStringLiteral("window/keepInTray"), false).toBool();
     m_verticalSync = m_store.value(QStringLiteral("window/verticalSync"), true).toBool();
     m_updateCheck = m_store.value(QStringLiteral("update/check"), true).toBool();
     m_festive = m_store.value(QStringLiteral("ui/festive"), true).toBool();
@@ -195,6 +199,30 @@ void AppSettings::setSingleInstance(bool value)
 {
     if (storeFlag(m_singleInstance, QStringLiteral("window/singleInstance"), value))
         emit singleInstanceChanged();
+}
+
+void AppSettings::setKeepInTray(bool value)
+{
+    if (storeFlag(m_keepInTray, QStringLiteral("window/keepInTray"), value)) {
+        Autostart::apply(m_startWithWindows, startsHidden());
+        emit keepInTrayChanged();
+    }
+}
+
+void AppSettings::setStartWithWindows(bool value)
+{
+    if (storeFlag(m_startWithWindows, QStringLiteral("window/startWithWindows"), value)) {
+        Autostart::apply(m_startWithWindows, startsHidden());
+        emit startWithWindowsChanged();
+    }
+}
+
+void AppSettings::setStartMinimized(bool value)
+{
+    if (storeFlag(m_startMinimized, QStringLiteral("window/startMinimized"), value)) {
+        Autostart::apply(m_startWithWindows, startsHidden());
+        emit startMinimizedChanged();
+    }
 }
 
 void AppSettings::setVerticalSync(bool value)
