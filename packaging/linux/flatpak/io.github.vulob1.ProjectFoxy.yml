@@ -129,6 +129,7 @@ modules:
   # The text recogniser (Apache-2.0) and the library it reads pictures with. No training tools, no curl, no libarchive.
   - name: leptonica
     buildsystem: cmake-ninja
+    builddir: true # these two refuse to configure inside their own source folder
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_LIBDIR=lib
@@ -141,6 +142,7 @@ modules:
 
   - name: tesseract
     buildsystem: cmake-ninja
+    builddir: true # these two refuse to configure inside their own source folder
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DCMAKE_INSTALL_LIBDIR=lib

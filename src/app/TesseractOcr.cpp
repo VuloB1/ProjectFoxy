@@ -1,5 +1,10 @@
 #include "OcrBackend.h"
 
+// Some build setups define this for every file; Tesseract's installed headers then ask for config_auto.h, which is not installed.
+#ifdef HAVE_CONFIG_H
+#undef HAVE_CONFIG_H
+#endif
+
 #include <QDir>
 #include <QFile>
 #include <QTemporaryDir>
