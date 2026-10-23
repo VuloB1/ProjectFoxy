@@ -3,6 +3,13 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased]
+
+- **Read the text of a picture** (Windows only, with the recogniser Windows itself uses; nothing is downloaded and the picture never leaves the
+  computer). The *Reconocer texto* button in the dock (or Ctrl+T, or right click) darkens what is not text and leaves each line,
+  and the lines of a paragraph together, as they are, with the corners of the theme. Drag to select, double click for a line, triple
+  click for a paragraph, Ctrl+A for everything, Ctrl+C or right click to copy. It reads the languages installed in Windows.
+
 ## [0.3.5] — Stay in the tray and start with Windows
 
 - **Stay open in the tray** (Settings > Appearance > Windows, Windows only, off by default). Closing the window only hides it and leaves an
@@ -244,6 +251,13 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar]
+
+- **Leer el texto de una imagen** (solo Windows, con el reconocedor del propio Windows; no se descarga nada y la imagen no sale del equipo).
+  El botón *Reconocer texto* del dock (o Ctrl+T, o clic derecho) oscurece lo que no es texto y deja cada línea, y las líneas de un
+  párrafo juntas, tal cual, con las esquinas del tema. Arrastra para seleccionar, doble clic para una línea, triple clic para un
+  párrafo, Ctrl+A para todo, Ctrl+C o clic derecho para copiar. Lee los idiomas que tengas instalados en Windows.
 
 ## [0.3.5] — Quedarse en la bandeja e iniciar con Windows
 

@@ -1147,6 +1147,7 @@ Rectangle {
         z: 5
         visible: root.textMode && !root.editMode && !root.cropActive
         picture: image
+        radius: themeManager.radiusMedium
         viewport: flick
         onExitRequested: root.setTextMode(false)
     }

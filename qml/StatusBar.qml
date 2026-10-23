@@ -306,6 +306,18 @@ Item {
             hPad: 10
             iconOnly: true
             iconSize: 22
+            text: qsTr("Reconocer texto")
+            objectName: "textButton"
+            iconName: "text"
+            visible: !root.editMode && textRecognizer.available
+            enabled: appController.currentSource.length > 0 && !appController.isAnimated
+            checked: root.canvas ? root.canvas.textMode : false
+            onClicked: if (root.canvas) root.canvas.setTextMode(!root.canvas.textMode)
+        }
+        AppToolButton {
+            hPad: 10
+            iconOnly: true
+            iconSize: 22
             text: qsTr("Comparar")
             iconName: "compare"
             visible: root.editMode

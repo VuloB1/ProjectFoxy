@@ -1,6 +1,7 @@
 #include "TextRecognizer.h"
 
 #include "AppController.h"
+#include "TextParagraphs.h"
 
 #include <QClipboard>
 #include <QGuiApplication>
@@ -52,7 +53,9 @@ Found recognise(QImage image)
         const QString tag = QString::fromStdWString(std::wstring(engine.RecognizerLanguage().LanguageTag()));
         const bool noSpaces = tag.startsWith(QLatin1String("zh")) || tag.startsWith(QLatin1String("ja")); // their words are not separated
         int line = 0;
+        std::vector<QRectF> boxes; // one per line, to group them into paragraphs
         for (const OcrLine &l : result.Lines()) {
+            QRectF box;
             for (const OcrWord &w : l.Words()) {
                 const auto r = w.BoundingRect();
                 QVariantMap word;
@@ -64,8 +67,16 @@ Found recognise(QImage image)
                 word[QStringLiteral("line")] = line;
                 word[QStringLiteral("joined")] = noSpaces;
                 found.words.append(word);
+                box = box.united(QRectF(r.X * back, r.Y * back, r.Width * back, r.Height * back));
             }
+            boxes.push_back(box);
             ++line;
+        }
+        const std::vector<int> paragraph = core::paragraphsOf(boxes);
+        for (QVariant &v : found.words) {
+            QVariantMap word = v.toMap();
+            word[QStringLiteral("para")] = paragraph[size_t(word[QStringLiteral("line")].toInt())];
+            v = word;
         }
     } catch (const winrt::hresult_error &) {
         found.words.clear(); // whatever failed, the answer is "no text"
