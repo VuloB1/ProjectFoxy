@@ -19,6 +19,7 @@
 #include "VideoSupport.h"
 #include "VideoToGif.h"
 #include "Translations.h"
+#include "TextRecognizer.h"
 
 #include <QCoreApplication>
 #include <QQmlApplicationEngine>
@@ -76,6 +77,7 @@ Objects setup(QQmlApplicationEngine &engine)
 
     auto *controller = new AppController(imageProvider, folderModel, &engine);
     engine.rootContext()->setContextProperty("appController", controller);
+    engine.rootContext()->setContextProperty("textRecognizer", new TextRecognizer(controller, &engine));
 
     auto *themeManager = new ThemeManager(&engine);
     engine.rootContext()->setContextProperty("themeManager", themeManager);

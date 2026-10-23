@@ -358,6 +358,8 @@ public slots:
     // any) - the pasted image has no file path of its own, so "Guardar"
     // stays disabled for it until "Guardar como..." gives it one.
     bool copyToClipboard();
+    // What is on screen, with a preview that is still pending (the text recogniser reads this).
+    QImage displayedImage() const { return currentBaked(); }
     bool pasteFromClipboard();
 
     // Sends the current file to the Recycle Bin (not a permanent delete -

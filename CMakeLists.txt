@@ -160,6 +160,8 @@ add_library(imageviewer_app STATIC
     src/app/ColorPicker.cpp
     src/app/Translations.h
     src/app/Translations.cpp
+    src/app/TextRecognizer.h
+    src/app/TextRecognizer.cpp
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)
@@ -180,6 +182,7 @@ target_link_libraries(imageviewer_app PUBLIC
     Qt6::Qml
     Qt6::Quick
     Qt6::Multimedia
+    $<$<PLATFORM_ID:Windows>:WindowsApp> # C++/WinRT: the text recogniser of Windows
     $<$<PLATFORM_ID:Windows>:Shell32>
     $<$<PLATFORM_ID:Windows>:User32>
 )
@@ -261,6 +264,7 @@ endif()
 set(IV_QML_FILES
         qml/Main.qml
         qml/ImageCanvas.qml
+        qml/TextLayer.qml
         qml/ThumbnailStrip.qml
         qml/TitleBar.qml
         qml/Toolbar.qml
