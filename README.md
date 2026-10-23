@@ -63,7 +63,7 @@ Go to the [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases/latest) 
 | | |
 |---|---|
 | **`ProjectFoxy-Setup-x.y.z.exe`** | The installer. It needs no administrator rights (it installs for your user), creates the shortcut and, if you want, adds Project Foxy to "Open with" and to Windows' *Default apps*. |
-| **`ProjectFoxy-portable-x.y.z.zip`** | Portable version: unzip the **whole** folder and open `ProjectFoxy.exe`. It keeps its settings next to the program and does not touch the registry. |
+| **`ProjectFoxy-portable-x.y.z.zip`** | Portable version: unzip the **whole** folder and open `ProjectFoxy.exe`. It keeps its settings next to the program and does not touch the registry (except the sign-in entry, if you turn on *Start with Windows*). |
 
 Requirements: 64-bit Windows 10 or 11. Windows may warn "Windows protected your PC" because the program is not signed
 yet: *More info → Run anyway*. Every file in a release comes with its SHA-256 checksum.
@@ -134,6 +134,7 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
 - **Caption (meme)**: a colored band with text above or below the picture, or the text over it with an outline.
 - **Eyedropper**: hold Alt and the cursor becomes an eyedropper; a click copies the color as `#RRGGBB`.
 - **Smooth zoom** (optional, in Settings) as well as the usual stepped one.
+- **Stay in the tray / start with Windows** (Windows, optional, in Settings): closing only hides the window, which comes back in about 0.1 s and uses about 3 MB while hidden; it can also start with Windows without a window.
 - Batch export (JPG/WebP, keeps the metadata) and batch rename; settings kept in an `.ini`.
 
 **Formats it opens** (each one checked against a real file in the tests):
@@ -316,7 +317,7 @@ Ve a la página de [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases
 | | |
 |---|---|
 | **`ProjectFoxy-Setup-x.y.z.exe`** | El instalador. No pide permisos de administrador (se instala para tu usuario), crea el acceso directo y, si quieres, deja a Project Foxy en «Abrir con» y en *Aplicaciones predeterminadas* de Windows. |
-| **`ProjectFoxy-portable-x.y.z.zip`** | Versión portable: descomprime **toda** la carpeta y abre `ProjectFoxy.exe`. Guarda su configuración al lado del programa y no toca el registro. |
+| **`ProjectFoxy-portable-x.y.z.zip`** | Versión portable: descomprime **toda** la carpeta y abre `ProjectFoxy.exe`. Guarda su configuración al lado del programa y no toca el registro (salvo la entrada de inicio, si activas *Iniciar con Windows*). |
 
 Requisitos: Windows 10 u 11 de 64 bits. Windows puede avisar con «Windows protegió su PC» porque el programa aún
 no está firmado: *Más información → Ejecutar de todas formas*. Cada archivo de la release lleva su suma SHA-256.

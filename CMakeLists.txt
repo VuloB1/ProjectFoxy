@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(ImageViewer VERSION 0.3.4 LANGUAGES CXX)
+project(ImageViewer VERSION 0.3.5 LANGUAGES CXX)
 if(WIN32)
     enable_language(RC)   # the executable carries its icon as a resource (resources/app.rc)
 endif()
@@ -115,6 +115,10 @@ add_library(imageviewer_app STATIC
     src/app/FestiveManager.cpp
     src/app/StartupWarmup.h
     src/app/StartupWarmup.cpp
+    src/app/Autostart.h
+    src/app/Autostart.cpp
+    src/app/TrayIcon.h
+    src/app/TrayIcon.cpp
     src/app/VideoSupport.h
     src/app/VideoSupport.cpp
     src/app/VideoFrameReader.h

@@ -47,6 +47,9 @@ class AppSettings : public QObject {
     // Presenting each frame in step with the screen's refresh (on by default). Some AMD cards stall for hundreds of
     // milliseconds in Direct3D 11 while the window is resized with it on; off avoids that and may tear on screens
     // without FreeSync / G-Sync. Read when the program starts: a change applies the next time it is opened.
+    Q_PROPERTY(bool startWithWindows READ startWithWindows WRITE setStartWithWindows NOTIFY startWithWindowsChanged)
+    Q_PROPERTY(bool startMinimized READ startMinimized WRITE setStartMinimized NOTIFY startMinimizedChanged)
+    Q_PROPERTY(bool keepInTray READ keepInTray WRITE setKeepInTray NOTIFY keepInTrayChanged)
     Q_PROPERTY(bool verticalSync READ verticalSync WRITE setVerticalSync NOTIFY verticalSyncChanged)
     // Look on GitHub for a newer version when the program starts (at most once a day; on by default).
     Q_PROPERTY(bool updateCheck READ updateCheck WRITE setUpdateCheck NOTIFY updateCheckChanged)
@@ -110,6 +113,14 @@ public:
     bool windowMaximized() const { return m_windowMaximized; }
     void saveWindowState(const QRect &normalRect, bool maximized);
 
+    bool startWithWindows() const { return m_startWithWindows; }
+    void setStartWithWindows(bool value);
+    bool startMinimized() const { return m_startMinimized; }
+    void setStartMinimized(bool value);
+    // At sign-in: no window, only the tray icon (that needs the tray, or there would be no way back to it).
+    bool startsHidden() const { return m_startMinimized && m_keepInTray; }
+    bool keepInTray() const { return m_keepInTray; }
+    void setKeepInTray(bool value);
     bool verticalSync() const { return m_verticalSync; }
     void setVerticalSync(bool value);
     // A grid between the picture's own pixels from 8x.
@@ -139,6 +150,9 @@ signals:
     void pixelGridChanged();
     void pixelSharpEditChanged();
     void singleInstanceChanged();
+    void startWithWindowsChanged();
+    void startMinimizedChanged();
+    void keepInTrayChanged();
     void verticalSyncChanged();
     void updateCheckChanged();
     void festiveChanged();
@@ -167,6 +181,9 @@ private:
     bool m_pixelGrid = false;
     bool m_pixelSharpEdit = false;
     bool m_singleInstance = true;
+    bool m_keepInTray = false;
+    bool m_startWithWindows = false;
+    bool m_startMinimized = true;
     bool m_verticalSync = true;
     bool m_updateCheck = true;
     bool m_festive = true;
