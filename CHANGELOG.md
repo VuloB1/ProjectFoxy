@@ -3,7 +3,7 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
-## [Unreleased]
+## [0.3.6] — Text in pictures
 
 - **Read the text of a picture** (Windows only, with the recogniser Windows itself uses; nothing is downloaded and the picture never leaves the
   computer). The *Reconocer texto* button in the dock (or Ctrl+T, or right click) darkens what is not text and leaves each line,
@@ -256,7 +256,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Sin publicar]
+## [0.3.6] — Texto en las imágenes
 
 - **Leer el texto de una imagen** (solo Windows, con el reconocedor del propio Windows; no se descarga nada y la imagen no sale del equipo).
   El botón *Reconocer texto* del dock (o Ctrl+T, o clic derecho) oscurece lo que no es texto y deja cada línea, y las líneas de un

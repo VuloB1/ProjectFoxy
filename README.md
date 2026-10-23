@@ -134,6 +134,7 @@ or want to add a language? A pull request is very welcome (see [`CONTRIBUTING.md
 - **Caption (meme)**: a colored band with text above or below the picture, or the text over it with an outline.
 - **Eyedropper**: hold Alt and the cursor becomes an eyedropper; a click copies the color as `#RRGGBB`.
 - **Smooth zoom** (optional, in Settings) as well as the usual stepped one.
+- **Text in pictures**: the *Reconocer texto* button (or Ctrl+T) darkens what is not text and lets you select it by line or paragraph and copy it. Windows uses its own recogniser; Linux uses Tesseract (English and Spanish included, more languages downloadable in Settings).
 - **Stay in the tray / start with Windows** (Windows, optional, in Settings): closing only hides the window, which comes back in about 0.1 s and uses about 3 MB while hidden; it can also start with Windows without a window.
 - Batch export (JPG/WebP, keeps the metadata) and batch rename; settings kept in an `.ini`.
 
