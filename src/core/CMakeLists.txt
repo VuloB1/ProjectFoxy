@@ -11,6 +11,7 @@ add_library(imageviewer_core STATIC
     ComicBook.cpp
     ImageHeader.h
     SpreadLayout.h
+    TextParagraphs.h
     ImageLoader.h
     ImageLoader.cpp
     DecoderRegistry.h

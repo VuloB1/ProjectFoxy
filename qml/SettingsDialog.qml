@@ -16,14 +16,22 @@ AppDialog {
     height: Math.min(620, (Overlay.overlay ? Overlay.overlay.height : 620) - 40)
 
     property int page: 0
+    function showPage(id) { for (let i = 0; i < pages.length; ++i) if (pages[i].id === id) page = i }
     // Each page starts at its top: the previous page may have been scrolled further than this one is tall.
     onPageChanged: scroller.contentY = 0
-    readonly property var pages: [
-        { icon: "theme", name: qsTr("Apariencia"), hint: qsTr("Cómo se ve el programa.") },
-        { icon: "save", name: qsTr("Guardado"), hint: qsTr("Qué pasa al guardar una imagen editada.") },
-        { icon: "folder-batch", name: qsTr("Procesos por lote"), hint: qsTr("Valores para exportar y renombrar carpetas enteras.") },
-        { icon: "info", name: qsTr("Acerca de"), hint: qsTr("El programa, su autor y las licencias.") }
-    ]
+    // `id` tells the pages apart whatever their position: the one about the text recogniser only exists where
+    // Tesseract does the reading (Linux), because Windows reads whatever languages Windows has.
+    readonly property var pages: {
+        const list = [
+            { id: "appearance", icon: "theme", name: qsTr("Apariencia"), hint: qsTr("Cómo se ve el programa.") },
+            { id: "saving", icon: "save", name: qsTr("Guardado"), hint: qsTr("Qué pasa al guardar una imagen editada.") },
+            { id: "batch", icon: "folder-batch", name: qsTr("Procesos por lote"), hint: qsTr("Valores para exportar y renombrar carpetas enteras.") }
+        ];
+        if (ocrLanguages.available)
+            list.push({ id: "ocr", icon: "text", name: qsTr("Reconocimiento de texto"), hint: qsTr("Los idiomas que se leen en las imágenes.") });
+        list.push({ id: "about", icon: "info", name: qsTr("Acerca de"), hint: qsTr("El programa, su autor y las licencias.") });
+        return list;
+    }
 
     // One setting: its name (and a line explaining it) on the left, the control on the right.
     component SettingRow: Item {
@@ -238,6 +246,7 @@ AppDialog {
                     implicitHeight: root.page === 0 ? appearance.implicitHeight + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + windowCard.implicitHeight + festiveCard.implicitHeight + 96
                                        : root.page === 1 ? saving.implicitHeight
                                        : root.page === 2 ? batch.implicitHeight
+                                       : root.pages[root.page].id === "ocr" ? ocr.implicitHeight
                                        : (about.item ? about.item.implicitHeight : 0)
 
                     // -- Apariencia: one preview card per theme --------------------
@@ -648,8 +657,53 @@ AppDialog {
                     Loader {
                         id: about
                         width: parent.width
-                        active: root.page === 3
+                        active: root.pages[root.page].id === "about"
                         source: "AboutPage.qml"
+                    }
+
+                    // -- Reconocimiento de texto (Linux): the languages Tesseract reads ----------
+                    Card {
+                        id: ocr
+                        width: parent.width
+                        visible: root.pages[root.page].id === "ocr"
+                        heading: qsTr("Idiomas")
+                        SettingRow {
+                            label: qsTr("Idiomas que se leen")
+                            hint: qsTr("Activa los de los textos que sueles tener en las imágenes: leer varios a la vez es algo más lento. Los demás se descargan una vez (1-4 MB cada uno) y se quedan en tu carpeta de datos.")
+                        }
+                        Repeater {
+                            model: ocrLanguages.languages
+                            delegate: Column {
+                                width: parent ? parent.width : 0
+                                Divider {}
+                                SettingRow {
+                                    label: modelData.name
+                                    hint: modelData.failed ? qsTr("No se pudo descargar. Comprueba la conexión.")
+                                          : modelData.busy ? qsTr("Descargando… %1 %").arg(Math.round(modelData.progress * 100))
+                                          : modelData.installed ? (modelData.bundled ? qsTr("Incluido con el programa") : qsTr("Descargado")) : ""
+                                    Row {
+                                        spacing: 8
+                                        AppButton {
+                                            visible: modelData.installed && !modelData.bundled
+                                            objectName: "ocrRemove_" + modelData.code
+                                            text: qsTr("Quitar")
+                                            onClicked: ocrLanguages.remove(modelData.code)
+                                        }
+                                        AppButton {
+                                            visible: !modelData.installed && !modelData.busy
+                                            objectName: "ocrDownload_" + modelData.code
+                                            text: modelData.failed ? qsTr("Reintentar") : qsTr("Descargar")
+                                            onClicked: ocrLanguages.download(modelData.code)
+                                        }
+                                        AppSwitch {
+                                            visible: modelData.installed
+                                            checked: modelData.enabled
+                                            onToggled: ocrLanguages.setEnabled(modelData.code, checked)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     // -- Procesos por lote ------------------------------------------

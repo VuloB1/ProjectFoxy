@@ -34,6 +34,7 @@ Todos se distribuyen como DLL junto a `ProjectFoxy.exe`.
 | GLib / GObject / GIO | 2.90.0 | LGPL‑2.1‑or‑later AND (LGPL‑2.1‑only OR MPL‑1.1) | base de libvips |
 | gettext‑libintl, libiconv, libffi, PCRE2 | — | LGPL‑2.1+, MIT, BSD‑3 | dependencias de GLib |
 | Expat | 2.8.5 | MIT AND CC0‑1.0 | XML (Exiv2, libvips) |
+| Tesseract + Leptonica (solo Linux) | 5.5 / 1.85 | Apache‑2.0 / BSD‑2‑Clause | leer el texto de las imágenes; los datos de idioma (`tessdata_fast`, Apache‑2.0) vienen con el AppImage/Flatpak (inglés y español) o se descargan a petición |
 | Little CMS | 2.19.1 | MIT | gestión de color |
 | libjpeg‑turbo | 3.2.0 | BSD‑3‑Clause AND IJG | JPEG |
 | libpng · libwebp · libtiff · zlib · liblzma | — | libpng‑2.0 · BSD‑3 · libtiff · Zlib · 0BSD | formatos y compresión |

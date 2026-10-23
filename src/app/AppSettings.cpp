@@ -35,6 +35,8 @@ AppSettings::AppSettings(QObject *parent)
     m_pixelGrid = m_store.value(QStringLiteral("view/pixelGrid"), wasAllInOne).toBool();
     m_pixelSharpEdit = m_store.value(QStringLiteral("view/pixelSharpEdit"), wasAllInOne).toBool();
     m_singleInstance = m_store.value(QStringLiteral("window/singleInstance"), true).toBool();
+    if (m_store.contains(QStringLiteral("ocr/languages")))
+        m_ocrLanguages = m_store.value(QStringLiteral("ocr/languages")).toStringList();
     m_startWithWindows = m_store.value(QStringLiteral("window/startWithWindows"), false).toBool();
     m_startMinimized = m_store.value(QStringLiteral("window/startMinimized"), true).toBool();
     m_keepInTray = m_store.value(QStringLiteral("window/keepInTray"), false).toBool();
@@ -207,6 +209,15 @@ void AppSettings::setKeepInTray(bool value)
         Autostart::apply(m_startWithWindows, startsHidden());
         emit keepInTrayChanged();
     }
+}
+
+void AppSettings::setOcrLanguages(const QStringList &value)
+{
+    if (value == m_ocrLanguages)
+        return;
+    m_ocrLanguages = value;
+    m_store.setValue(QStringLiteral("ocr/languages"), value);
+    emit ocrLanguagesChanged();
 }
 
 void AppSettings::setStartWithWindows(bool value)

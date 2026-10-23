@@ -149,7 +149,20 @@ QString DevServer::run(const QString &line)
         }
         return QStringLiteral("ok");
     }
-    return QStringLiteral("error: unknown command (items | get <name> <property> | click <name> | grab <file.png> | frames start|stop)");
+    // call <name> <function> [true|false|number|text]: runs a function of the QML item (to drive what has no button yet)
+    if (command == QLatin1String("call") && (words.size() == 3 || words.size() == 4)) {
+        QQuickItem *item = itemNamed(m_window->contentItem(), words[1]);
+        if (!item)
+            return QStringLiteral("error: no item named %1").arg(words[1]);
+        QVariant arg;
+        if (words.size() == 4)
+            arg = words[3] == QLatin1String("true") ? QVariant(true) : words[3] == QLatin1String("false") ? QVariant(false) : QVariant(words[3]);
+        const QByteArray function = words[2].toUtf8();
+        const bool ok = words.size() == 4 ? QMetaObject::invokeMethod(item, function.constData(), Q_ARG(QVariant, arg))
+                                          : QMetaObject::invokeMethod(item, function.constData());
+        return ok ? QStringLiteral("ok") : QStringLiteral("error: cannot call %1").arg(words[2]);
+    }
+    return QStringLiteral("error: unknown command (items | get <name> <property> | click <name> | call <name> <function> [arg] | grab <file.png> | frames start|stop)");
 }
 
 QString DevServer::framesReport()

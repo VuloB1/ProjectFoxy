@@ -1057,7 +1057,7 @@ Rectangle {
 
         TapHandler {
             acceptedButtons: Qt.LeftButton
-            enabled: !root.pickerOn
+            enabled: !root.pickerOn && !root.textMode
             onDoubleTapped: root.toggleActualSize()
         }
         // with Alt held a click picks the colour under the cursor
@@ -1089,7 +1089,7 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.RightButton
-            enabled: !root.cropActive
+            enabled: !root.cropActive && !root.textMode
             onClicked: function (mouse) {
                 if (mouse.button === Qt.RightButton)
                     imageContextMenu.popup();
@@ -1097,8 +1097,76 @@ Rectangle {
         }
     }
 
+    // Reading the text of the picture (TextLayer.qml): the words are found by the recogniser of Windows and can be
+    // selected and copied from the picture itself.
+    property bool textMode: false
+    function setTextMode(on) {
+        if (on === root.textMode)
+            return;
+        if (on && (!textRecognizer.available || appController.currentSource.length === 0 || root.editMode || root.cropActive || appController.isAnimated))
+            return;
+        root.textMode = on;
+        if (on) {
+            textRecognizer.scan();
+        } else {
+            textRecognizer.clear();
+            root.noticeText = "";
+        }
+    }
+    Connections {
+        target: textRecognizer
+        function onBusyChanged() {
+            if (root.textMode && textRecognizer.busy)
+                root.showNotice(qsTr("Buscando texto…"), 60000);
+            else if (root.textMode)
+                root.noticeText = "";
+        }
+        function onProblemChanged() {
+            if (!root.textMode)
+                return;
+            if (textRecognizer.problem === "none")
+                root.showNotice(qsTr("No se ha encontrado texto en la imagen"), 3500);
+            else if (textRecognizer.problem === "language" && ocrLanguages.available)
+                root.showNotice(qsTr("No hay ningún idioma de reconocimiento de texto activo. Elige uno en Ajustes > Reconocimiento de texto."), 6000);
+            else if (textRecognizer.problem === "language")
+                root.showNotice(qsTr("Windows no tiene instalado un idioma para reconocer texto"), 5000);
+        }
+    }
+    Connections {
+        target: appController
+        function onStructuralImageChanged() { if (root.textMode) textRecognizer.scan() }
+    }
+    onEditModeChanged: if (editMode) setTextMode(false)
+    onCropActiveChanged: if (cropActive) setTextMode(false)
+    Shortcut {
+        sequence: "Ctrl+T"
+        enabled: root.visible && textRecognizer.available && !root.locked
+        onActivated: root.setTextMode(!root.textMode)
+    }
+    TextLayer {
+        objectName: "textLayer"
+        anchors.fill: parent
+        z: 5
+        visible: root.textMode && !root.editMode && !root.cropActive
+        picture: image
+        radius: themeManager.radiusMedium
+        viewport: flick
+        onExitRequested: root.setTextMode(false)
+    }
+
     AppMenu {
         id: imageContextMenu
+        AppMenuItem {
+            iconName: "text"
+            visible: textRecognizer.available
+            height: visible ? implicitHeight : 0
+            text: qsTr("Reconocer texto")
+            checkable: true
+            checked: root.textMode
+            enabled: appController.currentSource.length > 0 && !root.editMode && !appController.isAnimated
+            onTriggered: root.setTextMode(!root.textMode)
+        }
+        AppMenuSeparator { visible: textRecognizer.available }
         AppMenuItem {
             iconName: "copy"
             text: qsTr("Copiar imagen")

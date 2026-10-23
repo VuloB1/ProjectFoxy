@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.6" date="2026-10-23">
+      <description>
+        <p>Read and copy the text of a picture (Windows: the recogniser of Windows; Linux: Tesseract, with English and Spanish included and more languages to download).</p>
+      </description>
+    </release>
     <release version="0.3.5" date="2026-10-23">
       <description>
         <p>On Windows: stay loaded in the tray after closing, and start with Windows (optionally without a window).</p>

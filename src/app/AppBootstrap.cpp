@@ -19,6 +19,8 @@
 #include "VideoSupport.h"
 #include "VideoToGif.h"
 #include "Translations.h"
+#include "TextRecognizer.h"
+#include "OcrLanguages.h"
 
 #include <QCoreApplication>
 #include <QQmlApplicationEngine>
@@ -82,6 +84,9 @@ Objects setup(QQmlApplicationEngine &engine)
 
     auto *appSettings = new AppSettings(&engine);
     engine.rootContext()->setContextProperty("appSettings", appSettings);
+    auto *ocrLanguages = new OcrLanguages(appSettings, &engine);
+    engine.rootContext()->setContextProperty("ocrLanguages", ocrLanguages);
+    engine.rootContext()->setContextProperty("textRecognizer", new TextRecognizer(controller, ocrLanguages, &engine));
 
     // The language: installed before any text is built (Main.qml's qsTr() are evaluated when it loads).
     auto *translations = new Translations(&engine, appSettings, &engine);

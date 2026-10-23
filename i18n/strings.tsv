@@ -1040,3 +1040,20 @@ Iniciar con Windows	Start with Windows	Iniciar com o Windows	Windows와 함께 �
 Abre Project Foxy al iniciar sesión.	Opens Project Foxy when you sign in.	Abre o Project Foxy ao iniciar a sessão.	로그인할 때 Project Foxy를 엽니다.	登录时打开 Project Foxy。	サインイン時に Project Foxy を開きます。
 Iniciar minimizado en la bandeja	Start minimized in the tray	Iniciar minimizado na bandeja	트레이에 최소화하여 시작	启动时最小化到托盘	トレイに最小化して起動
 Arranca sin ventana, solo con el icono junto al reloj, y se abre al instante cuando lo necesites. Si está apagado, al iniciar sesión se abre la ventana. Necesita «Seguir abierto en la bandeja».	Starts without a window, only the icon next to the clock, and opens instantly when you need it. If it is off, the window opens when you sign in. It needs "Stay open in the tray".	Inicia sem janela, só com o ícone junto ao relógio, e abre na hora quando você precisar. Se estiver desligado, a janela abre ao iniciar a sessão. Precisa de «Continuar aberto na bandeja».	창 없이 시계 옆 아이콘만 두고 시작하며, 필요할 때 즉시 열립니다. 꺼져 있으면 로그인할 때 창이 열립니다. «트레이에서 계속 실행»이 필요합니다.	无窗口启动，只在时钟旁显示图标，需要时立即打开。关闭时，登录后会打开窗口。需要启用“保留在托盘中”。	ウィンドウなしで起動し、時計の横にアイコンだけを置いて、必要なときにすぐ開きます。オフの場合はサインイン時にウィンドウが開きます。「トレイに常駐する」が必要です。
+Reconocer texto	Recognize text	Reconhecer texto	텍스트 인식	识别文字	テキストを認識
+Buscando texto…	Looking for text…	Procurando texto…	텍스트를 찾는 중…	正在查找文字…	テキストを検索中…
+No se ha encontrado texto en la imagen	No text was found in the picture	Nenhum texto foi encontrado na imagem	이미지에서 텍스트를 찾지 못했습니다	图片中未找到文字	画像にテキストが見つかりませんでした
+Windows no tiene instalado un idioma para reconocer texto	Windows has no language installed to recognize text	O Windows não tem um idioma instalado para reconhecer texto	Windows에 텍스트 인식용 언어가 설치되어 있지 않습니다	Windows 未安装用于识别文字的语言	Windows にテキスト認識用の言語がインストールされていません
+Copiar texto	Copy text	Copiar texto	텍스트 복사	复制文字	テキストをコピー
+Seleccionar todo el texto	Select all text	Selecionar todo o texto	모든 텍스트 선택	选择全部文字	すべてのテキストを選択
+Salir del reconocimiento de texto	Leave text recognition	Sair do reconhecimento de texto	텍스트 인식 종료	退出文字识别	テキスト認識を終了
+Activa los de los textos que sueles tener en las imágenes: leer varios a la vez es algo más lento. Los demás se descargan una vez (1-4 MB cada uno) y se quedan en tu carpeta de datos.	Turn on the languages of the text you usually have in pictures: reading several at once is a little slower. The others are downloaded once (1-4 MB each) and stay in your data folder.	Ative os idiomas dos textos que você costuma ter nas imagens: ler vários ao mesmo tempo é um pouco mais lento. Os outros são baixados uma vez (1-4 MB cada) e ficam na sua pasta de dados.	이미지에 자주 나오는 텍스트의 언어를 켜세요. 여러 언어를 동시에 읽으면 조금 느려집니다. 나머지는 한 번만 내려받으며(각 1-4 MB) 데이터 폴더에 저장됩니다.	开启图片中常见文字的语言：同时识别多种语言会稍慢。其他语言只需下载一次（每个 1-4 MB），并保存在你的数据文件夹中。	画像によく含まれるテキストの言語をオンにしてください。複数同時に読み取ると少し遅くなります。その他は一度だけダウンロードされ（各 1-4 MB）、データフォルダーに保存されます。
+Descargado	Downloaded	Baixado	다운로드됨	已下载	ダウンロード済み
+Descargando… %1 %	Downloading… %1 %	Baixando… %1 %	다운로드 중… %1 %	正在下载… %1 %	ダウンロード中… %1 %
+Idiomas	Languages	Idiomas	언어	语言	言語
+Idiomas que se leen	Languages that are read	Idiomas lidos	읽는 언어	识别的语言	読み取る言語
+Incluido con el programa	Comes with the program	Incluído no programa	프로그램에 포함됨	程序自带	プログラムに同梱
+Los idiomas que se leen en las imágenes.	The languages read in pictures.	Os idiomas lidos nas imagens.	이미지에서 읽는 언어입니다.	在图片中识别的语言。	画像内で読み取る言語です。
+No hay ningún idioma de reconocimiento de texto activo. Elige uno en Ajustes > Reconocimiento de texto.	No text recognition language is on. Choose one in Settings > Text recognition.	Nenhum idioma de reconhecimento de texto está ativo. Escolha um em Ajustes > Reconhecimento de texto.	활성화된 텍스트 인식 언어가 없습니다. 설정 > 텍스트 인식에서 선택하세요.	没有启用任何文字识别语言。请在设置 > 文字识别中选择。	有効なテキスト認識の言語がありません。設定 > テキスト認識で選んでください。
+No se pudo descargar. Comprueba la conexión.	Could not download it. Check your connection.	Não foi possível baixar. Verifique a conexão.	다운로드할 수 없습니다. 연결을 확인하세요.	无法下载。请检查网络连接。	ダウンロードできませんでした。接続を確認してください。
+Reconocimiento de texto	Text recognition	Reconhecimento de texto	텍스트 인식	文字识别	テキスト認識
