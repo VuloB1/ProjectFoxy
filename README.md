@@ -22,24 +22,34 @@ English · [Español](#español)
 ---
 
 <p align="center">
-  <img src="docs/screenshots/visor.webp" alt="The viewer, with the thumbnail bar" width="32%">
-  <img src="docs/screenshots/editar.webp" alt="The editor: every tool one click away" width="32%">
-  <img src="docs/screenshots/lector.webp" alt="The comic and manga reader" width="32%">
+  <img src="docs/screenshots/visor.webp" alt="The viewer, with the thumbnail bar" width="100%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/ajustes.webp" alt="Adjustments: sliders, levels, curves and histogram" width="32%">
-  <img src="docs/screenshots/filtros.webp" alt="Filters: looks previewed on your own photo" width="32%">
-  <img src="docs/screenshots/efectos.webp" alt="Effects, with a preview over the whole image" width="32%">
+  <img src="docs/screenshots/editar.webp" alt="The editor: every tool one click away" width="49%">
+  <img src="docs/screenshots/recortar.webp" alt="Crop, rotate and straighten" width="49%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/gif.webp" alt="Animated GIF maker" width="32%">
-  <img src="docs/screenshots/collage.webp" alt="Collage maker" width="32%">
-  <img src="docs/screenshots/comparador.webp" alt="Compare view with linked zoom" width="32%">
+  <img src="docs/screenshots/tamano.webp" alt="Resize: width, height and scale" width="49%">
+  <img src="docs/screenshots/ajustes.webp" alt="Adjustments: sliders, levels, curves and histogram" width="49%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/recortar.webp" alt="Crop, rotate and straighten" width="32%">
-  <img src="docs/screenshots/lente.webp" alt="Lens correction" width="32%">
-  <img src="docs/screenshots/temas.webp" alt="Settings and the Classic theme" width="32%">
+  <img src="docs/screenshots/filtros.webp" alt="Filters: looks previewed on your own photo" width="49%">
+  <img src="docs/screenshots/efectos.webp" alt="Effects, with a preview over the whole image" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/lente.webp" alt="Lens correction" width="49%">
+  <img src="docs/screenshots/lector.webp" alt="The comic and manga reader" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/gif.webp" alt="Animated GIF maker" width="49%">
+  <img src="docs/screenshots/collage.webp" alt="Collage maker" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/comparador.webp" alt="Compare view with linked zoom" width="49%">
+  <img src="docs/screenshots/temas.webp" alt="Settings: themes and language" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/festivo.webp" alt="The holiday decorations" width="100%">
 </p>
 
 Open any photo instantly (JPEG, PNG, WebP, TIFF, HEIC, AVIF, camera RAW, animated GIFs…), browse its folder, and when
@@ -277,24 +287,34 @@ Bugs and ideas are welcome: open an *issue* (there are templates) or read [`CONT
 </div>
 
 <p align="center">
-  <img src="docs/screenshots/es/visor.webp" alt="El visor, con la barra de miniaturas" width="32%">
-  <img src="docs/screenshots/es/editar.webp" alt="El editor: cada herramienta a un clic" width="32%">
-  <img src="docs/screenshots/es/lector.webp" alt="El lector de cómics y manga" width="32%">
+  <img src="docs/screenshots/visor.webp" alt="El visor, con la barra de miniaturas" width="100%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/es/ajustes.webp" alt="Ajustes: controles, niveles, curvas e histograma" width="32%">
-  <img src="docs/screenshots/es/filtros.webp" alt="Filtros: «looks» con la vista previa de tu propia foto" width="32%">
-  <img src="docs/screenshots/es/efectos.webp" alt="Efectos, con vista previa sobre toda la imagen" width="32%">
+  <img src="docs/screenshots/editar.webp" alt="El editor: cada herramienta a un clic" width="49%">
+  <img src="docs/screenshots/recortar.webp" alt="Recortar, girar y enderezar" width="49%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/es/gif.webp" alt="Creador de GIF animado" width="32%">
-  <img src="docs/screenshots/es/collage.webp" alt="Creador de collage" width="32%">
-  <img src="docs/screenshots/es/comparador.webp" alt="Comparador con zoom vinculado" width="32%">
+  <img src="docs/screenshots/tamano.webp" alt="Tamaño: ancho, alto y escala" width="49%">
+  <img src="docs/screenshots/ajustes.webp" alt="Ajustes: controles, niveles, curvas e histograma" width="49%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/es/recortar.webp" alt="Recortar, girar y enderezar" width="32%">
-  <img src="docs/screenshots/es/lente.webp" alt="Corrección de lente" width="32%">
-  <img src="docs/screenshots/es/temas.webp" alt="Configuración y el tema Classic" width="32%">
+  <img src="docs/screenshots/filtros.webp" alt="Filtros: «looks» con la vista previa de tu propia foto" width="49%">
+  <img src="docs/screenshots/efectos.webp" alt="Efectos, con vista previa sobre toda la imagen" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/lente.webp" alt="Corrección de lente" width="49%">
+  <img src="docs/screenshots/lector.webp" alt="El lector de cómics y manga" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/gif.webp" alt="Creador de GIF animado" width="49%">
+  <img src="docs/screenshots/collage.webp" alt="Creador de collage" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/comparador.webp" alt="Comparador con zoom vinculado" width="49%">
+  <img src="docs/screenshots/temas.webp" alt="Configuración: temas e idioma" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/festivo.webp" alt="Los adornos festivos" width="100%">
 </p>
 
 Abre cualquier foto al instante (JPEG, PNG, WebP, TIFF, HEIC, AVIF, RAW de cámara, GIF animados…), la recorre con
