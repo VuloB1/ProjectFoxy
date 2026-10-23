@@ -8,6 +8,7 @@
 #include <QElapsedTimer>
 #include <QMimeData>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QUrl>
 #include <QQuickItem>
 #include <QQuickWindow>
@@ -189,6 +190,20 @@ QString DevServer::run(const QString &line)
     if (command == QLatin1String("dragleave")) {
         QDragLeaveEvent leave;
         QCoreApplication::sendEvent(m_window, &leave);
+        return QStringLiteral("ok");
+    }
+    // wheel <x> <y> <delta> <count> <ms>: `count` wheel steps of `delta` at that point, `ms` apart
+    if (command == QLatin1String("wheel") && words.size() == 6) {
+        const QPointF p(words[1].toDouble(), words[2].toDouble());
+        const int delta = words[3].toInt(), count = words[4].toInt(), gap = words[5].toInt();
+        for (int i = 0; i < count; ++i) {
+            QWheelEvent event(p, m_window->mapToGlobal(p), QPoint(), QPoint(0, delta), Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
+            QCoreApplication::sendEvent(m_window, &event);
+            QElapsedTimer pause;
+            pause.start();
+            while (pause.elapsed() < gap)
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 5);
+        }
         return QStringLiteral("ok");
     }
     // tap <x> <y>: a left click at that point of the window

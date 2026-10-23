@@ -1,4 +1,5 @@
 #include "CollageStudio.h"
+
 #include "PaneImageProvider.h"
 
 #include <QDir>
@@ -717,7 +718,16 @@ QImage CollageStudio::preview(int longSide) const
     const double k = double(std::max(64, longSide)) / std::max(full.width(), full.height());
     const QSize out(std::max(8, int(std::lround(full.width() * k))), std::max(8, int(std::lround(full.height() * k))));
     PaneImageStore *store = m_store;
-    return render(snap->cells, snap->style, [store](const QString &path, int maxSide) { return store->image(path, maxSide); }, out);
+    // The sharpness a picture needs grows with every step of the zoom: asked for as it is, each step would decode the whole
+    // file again at a new size (a second or more for a big photo) and the zoom would crawl. The sizes asked for are a few
+    // fixed ones instead, so the decodes are kept and reused by the next steps; the saved file is not limited (exportTo).
+    const auto step = [](int side) {
+        for (const int s : {512, 768, 1280, 2048, 3072})
+            if (side <= s)
+                return s;
+        return 3072;
+    };
+    return render(snap->cells, snap->style, [store, step](const QString &path, int maxSide) { return store->image(path, step(maxSide)); }, out);
 }
 
 bool CollageStudio::exportTo(const QUrl &file)

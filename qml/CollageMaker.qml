@@ -333,11 +333,27 @@ Item {
                         const cell = collageStudio.cellAt(m.x / box.width, m.y / box.height);
                         if (cell >= 0) collageStudio.resetPicture(cell);
                     }
+                    // a free wheel (or a touchpad) sends dozens of steps between two frames: their zoom is multiplied and applied once
+                    property int zoomCell: -1
+                    property real zoomFactor: 1
+                    property real zoomX: 0
+                    property real zoomY: 0
+                    function flushZoom() {
+                        if (zoomCell >= 0 && zoomFactor !== 1)
+                            collageStudio.zoomCell(zoomCell, zoomFactor, zoomX, zoomY);
+                        zoomFactor = 1;
+                    }
                     onWheel: function (w) {
                         const cell = collageStudio.cellAt(w.x / box.width, w.y / box.height);
                         if (cell < 0) return;
+                        if (cell !== zoomCell)
+                            flushZoom();
                         collageStudio.select(cell);
-                        collageStudio.zoomCell(cell, Math.pow(1.0016, w.angleDelta.y), w.x / box.width, w.y / box.height);
+                        zoomCell = cell;
+                        zoomFactor *= Math.pow(1.0016, w.angleDelta.y);
+                        zoomX = w.x / box.width;
+                        zoomY = w.y / box.height;
+                        Qt.callLater(flushZoom);
                     }
                 }
 
