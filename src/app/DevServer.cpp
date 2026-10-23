@@ -4,7 +4,11 @@
 #include <QFileInfo>
 #include <QMutexLocker>
 #include <algorithm>
+#include <QDropEvent>
+#include <QElapsedTimer>
+#include <QMimeData>
 #include <QMouseEvent>
+#include <QUrl>
 #include <QQuickItem>
 #include <QQuickWindow>
 #include <QTcpServer>
@@ -149,9 +153,77 @@ QString DevServer::run(const QString &line)
         }
         return QStringLiteral("ok");
     }
-    // call <name> <function> [true|false|number|text]: runs a function of the QML item (to drive what has no button yet)
+    // drop <x> <y> <file>...: files dropped from the file manager onto the window at that point (window coordinates)
+    if (command == QLatin1String("drop") && words.size() >= 4) {
+        const QPointF at(words[1].toDouble(), words[2].toDouble());
+        auto *mime = new QMimeData;
+        QList<QUrl> urls;
+        for (int i = 3; i < words.size(); ++i)
+            urls << QUrl::fromLocalFile(words[i]);
+        mime->setUrls(urls);
+        QDragEnterEvent enter(at.toPoint(), Qt::CopyAction, mime, Qt::LeftButton, Qt::NoModifier);
+        QCoreApplication::sendEvent(m_window, &enter);
+        QDragMoveEvent move(at.toPoint(), Qt::CopyAction, mime, Qt::LeftButton, Qt::NoModifier);
+        QCoreApplication::sendEvent(m_window, &move);
+        QDropEvent drop(at, Qt::CopyAction, mime, Qt::LeftButton, Qt::NoModifier);
+        QCoreApplication::sendEvent(m_window, &drop);
+        delete mime;
+        return QStringLiteral("enter=%1 move=%2 drop=%3").arg(enter.isAccepted()).arg(move.isAccepted()).arg(drop.isAccepted());
+    }
+    // dragover <x> <y> <file>...: files held over the window at that point, not dropped yet; dragleave ends it
+    if (command == QLatin1String("dragover") && words.size() >= 4) {
+        const QPoint at(words[1].toInt(), words[2].toInt());
+        static QMimeData *held = nullptr;
+        delete held;
+        held = new QMimeData;
+        QList<QUrl> urls;
+        for (int i = 3; i < words.size(); ++i)
+            urls << QUrl::fromLocalFile(words[i]);
+        held->setUrls(urls);
+        QDragEnterEvent enter(at, Qt::CopyAction, held, Qt::LeftButton, Qt::NoModifier);
+        QCoreApplication::sendEvent(m_window, &enter);
+        QDragMoveEvent move(at, Qt::CopyAction, held, Qt::LeftButton, Qt::NoModifier);
+        QCoreApplication::sendEvent(m_window, &move);
+        return QStringLiteral("ok");
+    }
+    if (command == QLatin1String("dragleave")) {
+        QDragLeaveEvent leave;
+        QCoreApplication::sendEvent(m_window, &leave);
+        return QStringLiteral("ok");
+    }
+    // tap <x> <y>: a left click at that point of the window
+    if (command == QLatin1String("tap") && words.size() == 3) {
+        const QPointF p(words[1].toDouble(), words[2].toDouble());
+        for (QEvent::Type type : {QEvent::MouseButtonPress, QEvent::MouseButtonRelease}) {
+            QMouseEvent event(type, p, p, m_window->mapToGlobal(p), Qt::LeftButton,
+                              type == QEvent::MouseButtonPress ? Qt::LeftButton : Qt::NoButton, Qt::NoModifier);
+            QCoreApplication::sendEvent(m_window, &event);
+        }
+        return QStringLiteral("ok");
+    }
+    // drag <x1> <y1> <x2> <y2> <steps> <ms>: the left button pressed at (x1, y1), moved to (x2, y2) in `steps` moves that
+    // are `ms` milliseconds apart (the event loop runs between them, as with a real mouse), then released
+    if (command == QLatin1String("drag") && words.size() == 7) {
+        const QPointF from(words[1].toDouble(), words[2].toDouble()), to(words[3].toDouble(), words[4].toDouble());
+        const int steps = qMax(1, words[5].toInt()), gap = words[6].toInt();
+        const auto send = [this](QEvent::Type type, QPointF p, Qt::MouseButtons buttons) {
+            QMouseEvent event(type, p, p, m_window->mapToGlobal(p), Qt::LeftButton, buttons, Qt::NoModifier);
+            QCoreApplication::sendEvent(m_window, &event);
+        };
+        send(QEvent::MouseButtonPress, from, Qt::LeftButton);
+        for (int i = 1; i <= steps; ++i) {
+            send(QEvent::MouseMove, from + (to - from) * (double(i) / steps), Qt::LeftButton);
+            QElapsedTimer pause;
+            pause.start();
+            while (pause.elapsed() < gap)
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 5);
+        }
+        send(QEvent::MouseButtonRelease, to, Qt::NoButton);
+        return QStringLiteral("ok");
+    }
+    // call <name|window> <function> [true|false|number|text]: runs a function of the QML item (or of the main window) (to drive what has no button yet)
     if (command == QLatin1String("call") && (words.size() == 3 || words.size() == 4)) {
-        QQuickItem *item = itemNamed(m_window->contentItem(), words[1]);
+        QObject *item = words[1] == QLatin1String("window") ? static_cast<QObject *>(m_window) : itemNamed(m_window->contentItem(), words[1]);
         if (!item)
             return QStringLiteral("error: no item named %1").arg(words[1]);
         QVariant arg;

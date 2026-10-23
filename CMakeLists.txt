@@ -332,6 +332,7 @@ set(IV_QML_FILES
         qml/controls/AppIcon.qml
         qml/controls/AppToolTip.qml
         qml/controls/AppHintBox.qml
+        qml/controls/DropHint.qml
         qml/controls/AppButton.qml
         qml/controls/AppCard.qml
         qml/controls/AppSegmented.qml

@@ -3,6 +3,17 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased]
+
+- **Reader:** a book (.cbz, .zip, .pdf or a folder) can be dropped on the reader to open it, and the page you are on shows at the top
+  ("Page 20-21 of 186"), with a thin line along the edge that fills as you read.
+- **Collage maker and GIF studio:** files dragged from any folder are taken anywhere on the studio, and while they are over it the
+  window says so (in the collage the cell they would replace is marked). The mouse moves that drag a cell, a handle or a dividing line
+  are now added up once per frame, so a fast mouse no longer redraws the collage hundreds of times a second.
+- **Menus of the studios:** each section has an icon before its title, the long explanations moved into a small "i" with a tip, and the
+  fold arrow is on the right. The size fields (GIF, collage, video) have no more up and down arrows: click and drag left or right to
+  change the value, or click to type it.
+
 ## [0.3.6] — Text in pictures
 
 - **Read the text of a picture** (Windows only, with the recogniser Windows itself uses; nothing is downloaded and the picture never leaves the
@@ -255,6 +266,18 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar]
+
+- **Lector:** se puede soltar un libro (.cbz, .zip, .pdf o una carpeta) sobre el lector para abrirlo, y arriba se ve la página en la que estás
+  («Página 20-21 de 186»), con una línea fina en el borde que se llena a medida que lees.
+- **Collage y estudio de GIF:** los archivos arrastrados desde cualquier carpeta se aceptan en cualquier punto del estudio, y mientras
+  están encima la ventana lo avisa (en el collage se marca la celda que sustituirían). Los movimientos del ratón que arrastran una celda,
+  un tirador o una línea de división se suman y se aplican una vez por fotograma, así un ratón rápido ya no redibuja el collage cientos de
+  veces por segundo.
+- **Menús de los estudios:** cada sección lleva un icono antes del título, las explicaciones largas pasaron a una pequeña «i» con su aviso y
+  la flecha de plegar está a la derecha. Los campos de tamaño (GIF, collage, vídeo) ya no tienen flechitas arriba y abajo: arrastra a izquierda o
+  derecha para cambiar el valor, o haz clic para escribirlo.
 
 ## [0.3.6] — Texto en las imágenes
 

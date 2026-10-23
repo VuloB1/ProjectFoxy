@@ -590,15 +590,10 @@ Item {
                     id: durationSection
                     width: parent.width
                     title: qsTr("Duración de los fotogramas")
+                    icon: "clock"
+                    hint: qsTr("Vale para todos los fotogramas. Cuanto menos dura cada uno, más fluido se ve (los visores muestran los de menos de 20 ms como más lentos).")
                     readonly property int hold: { animStudio.revision; return root.count > 0 ? animStudio.holdAt(0) : root.opts.defaultHold; }
                     function setAll(ms) { animStudio.setOption("defaultHold", ms); animStudio.setAllHold(ms); }
-                    Label {
-                        width: parent.width
-                        text: qsTr("Vale para todos los fotogramas. Cuanto menos dura cada uno, más fluido se ve (los visores muestran los de menos de 20 ms como más lentos).")
-                        color: themeManager.textSecondary
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 11
-                    }
                     Item {
                         width: parent.width
                         implicitHeight: 40
@@ -626,6 +621,7 @@ Item {
                     id: styleSection
                     width: parent.width
                     title: qsTr("Efecto y texto")
+                    icon: "effects"
                     // read again whenever anything changed
                     readonly property var st: { animStudio.revision; return root.count > 0 ? animStudio.styleOf(0) : ({}); }
                     readonly property var effects: animStudio.frameEffects()
@@ -760,15 +756,15 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Tamaño")
+                    icon: "resize"
                     Row {
                         width: parent.width
                         spacing: 6
-                        AppSpinBox {
+                        ScrubNumberField {
                             width: (parent.width - 44) / 2
-                            from: 16; to: 4096; stepSize: 10
-                            editable: true
+                            from: 16; to: 4096; dragStep: 4; suffix: " px"
                             value: root.opts.width
-                            onValueModified: animStudio.setOption("width", value)
+                            onValueEdited: animStudio.setOption("width", Math.round(newValue))
                         }
                         AppToolButton {
                             anchors.verticalCenter: parent.verticalCenter
@@ -778,12 +774,11 @@ Item {
                             iconOnly: true
                             onClicked: animStudio.setOption("lockAspect", !root.opts.lockAspect)
                         }
-                        AppSpinBox {
+                        ScrubNumberField {
                             width: (parent.width - 44) / 2
-                            from: 16; to: 4096; stepSize: 10
-                            editable: true
+                            from: 16; to: 4096; dragStep: 4; suffix: " px"
                             value: root.opts.height
-                            onValueModified: animStudio.setOption("height", value)
+                            onValueEdited: animStudio.setOption("height", Math.round(newValue))
                         }
                     }
                     AppChoiceChips {
@@ -820,6 +815,7 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Animación")
+                    icon: "play"
                     Label { text: qsTr("Transición entre imágenes"); color: themeManager.textSecondary }
                     AppChoiceChips {
                         model: [qsTr("Ninguna (corte directo)"), qsTr("Fundido"), qsTr("Deslizar a la izquierda"), qsTr("Deslizar a la derecha"),
@@ -851,6 +847,7 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Formato")
+                    icon: "save"
                     AppSegmented {
                         model: root.formatNames.map(n => ({ text: n }))
                         currentIndex: root.opts.format
@@ -967,7 +964,9 @@ Item {
 
     // files dropped anywhere on the studio (from Explorer) are added to the strip
     DropArea {
+        id: dropArea
         anchors.fill: parent
+        onEntered: function (drag) { drag.accepted = drag.hasUrls }
         onDropped: function (drop) {
             if (!drop.hasUrls)
                 return;
@@ -975,6 +974,7 @@ Item {
             root.addFiles(Array.from(drop.urls, u => u.toString()));
         }
     }
+    DropHint { active: dropArea.containsDrag; iconName: "film"; text: qsTr("Suelta las imágenes o el vídeo para añadirlos") }
 
     ConfirmDialog {
         id: removeAllDialog

@@ -19,6 +19,8 @@ FocusScope {
     id: root
 
     signal closeRequested()
+    // a book dropped on the window (from the file manager): a .cbz, .zip, .pdf, a folder or a picture
+    signal bookDropped(string path)
 
     // The dock of the bottom bar rises over the page: the spread is fitted (and centred) above it, and a taller one
     // scrolls up past it, as the picture does in the viewer.
@@ -170,6 +172,49 @@ FocusScope {
             }
         }
     }
+
+    // Where the book is, at the top: "Página 20-21 de 186", and a thin line along the edge that fills as the book is read
+    // (from the right when the reading goes right to left).
+    readonly property bool twoOnScreen: mangaReader.lastPage > mangaReader.currentPage
+    AppHintBox {
+        id: pageBox
+        z: 6
+        anchors.top: parent.top
+        anchors.topMargin: 12
+        anchors.horizontalCenter: parent.horizontalCenter
+        visible: mangaReader.pageCount > 0
+        text: root.twoOnScreen
+              ? qsTr("Páginas %1-%2 de %3").arg(mangaReader.currentPage + 1).arg(mangaReader.lastPage + 1).arg(mangaReader.pageCount)
+              : qsTr("Página %1 de %2").arg(mangaReader.currentPage + 1).arg(mangaReader.pageCount)
+    }
+    Item {
+        z: 6
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 3
+        visible: mangaReader.pageCount > 1
+        Rectangle {
+            height: parent.height
+            width: parent.width * (mangaReader.lastPage + 1) / Math.max(1, mangaReader.pageCount)
+            x: root.rtl ? parent.width - width : 0
+            color: themeManager.accent
+            opacity: 0.85
+        }
+    }
+
+    // A book dropped anywhere on the reader is opened (this one is closed for it).
+    DropArea {
+        id: bookDrop
+        anchors.fill: parent
+        z: 7
+        onEntered: function (drag) { drag.accepted = drag.hasUrls }
+        onDropped: function (drop) {
+            if (drop.hasUrls && drop.urls.length > 0)
+                root.bookDropped(drop.urls[0].toString());
+        }
+    }
+    DropHint { active: bookDrop.containsDrag; iconName: "book"; text: qsTr("Suelta el cómic para abrirlo") }
 
     // Keys.
     Keys.onPressed: function (event) {

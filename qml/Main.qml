@@ -274,6 +274,7 @@ ApplicationWindow {
         sourceComponent: ReaderView {
             bottomInset: statusBar.rise
             onCloseRequested: mangaReader.close()
+            onBookDropped: function (path) { root.readBook(path) }
         }
         onLoaded: item.forceActiveFocus()
     }
