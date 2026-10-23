@@ -21,7 +21,13 @@ Item {
         openDialog.open();
     }
     function requestDelete() { show(deleteLoader).open() }
-    function openSettings() { show(settingsLoader).open() }
+    // `page` (optional): the id of the page to show first, e.g. "ocr"
+    function openSettings(page) {
+        const dialog = show(settingsLoader);
+        if (page)
+            dialog.showPage(page);
+        dialog.open();
+    }
     function openBatchExport() { show(batchExportLoader).open() }
     function openBatchRename() { show(batchRenameLoader).open() }
     function requestReadComic() { show(readLoader).open() }

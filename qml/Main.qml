@@ -161,7 +161,7 @@ ApplicationWindow {
 
 
     // The title bar is also the toolbar (TitleBar.qml); Toolbar.qml only owns the dialogs its buttons open.
-    Toolbar { id: toolbar; onReadChosen: function (file) { root.readBook(file) } }
+    Toolbar { id: toolbar; objectName: "toolbar"; onReadChosen: function (file) { root.readBook(file) } }
 
     TitleBar {
         id: titleBar

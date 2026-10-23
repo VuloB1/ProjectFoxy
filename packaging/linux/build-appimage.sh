@@ -43,6 +43,16 @@ APPDIR="$BUILD_DIR/AppDir"
 rm -rf "$APPDIR"
 cmake --install "$BUILD_DIR" --prefix "$APPDIR/usr"
 
+# The languages the text recogniser comes with (Tesseract's "fast" models, tag 4.1.0, checked by hash). Others are
+# downloaded by the program when the user asks (src/app/OcrLanguages.cpp).
+mkdir -p "$APPDIR/usr/share/tessdata"
+for entry in "eng 7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2" \
+             "spa 6f2e04d02774a18f01bed44b1111f2cd7f3ba7ac9dc4373cd3f898a40ea6b464"; do
+    set -- $entry
+    fetch "https://github.com/tesseract-ocr/tessdata_fast/raw/4.1.0/$1.traineddata" "$2" "$1.traineddata"
+    install -m644 "$TOOLS_DIR/$1.traineddata" "$APPDIR/usr/share/tessdata/$1.traineddata"
+done
+
 # linuxdeploy and its plugins are AppImages themselves: run them extracted, so this works without FUSE (containers, CI).
 export APPIMAGE_EXTRACT_AND_RUN=1
 export PATH="$TOOLS_DIR:$PATH"

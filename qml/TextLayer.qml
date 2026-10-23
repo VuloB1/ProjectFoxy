@@ -274,7 +274,7 @@ Item {
         }
     }
 
-    Shortcut { sequence: StandardKey.Copy; enabled: root.visible && root.hasSelection; onActivated: root.copySelection() }
-    Shortcut { sequence: StandardKey.SelectAll; enabled: root.visible; onActivated: root.selectAll() }
+    Shortcut { sequences: [StandardKey.Copy]; enabled: root.visible && root.hasSelection; onActivated: root.copySelection() }
+    Shortcut { sequences: [StandardKey.SelectAll]; enabled: root.visible; onActivated: root.selectAll() }
     Shortcut { sequence: "Escape"; enabled: root.visible; onActivated: root.exitRequested() }
 }

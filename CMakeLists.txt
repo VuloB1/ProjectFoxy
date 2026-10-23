@@ -162,6 +162,9 @@ add_library(imageviewer_app STATIC
     src/app/Translations.cpp
     src/app/TextRecognizer.h
     src/app/TextRecognizer.cpp
+    src/app/OcrBackend.h
+    src/app/OcrLanguages.h
+    src/app/OcrLanguages.cpp
 )
 
 target_include_directories(imageviewer_app PUBLIC src/app)
@@ -173,6 +176,22 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(imageviewer_app PUBLIC Qt6::DBus)
 endif()
 
+# Text in pictures: Windows has its own recogniser (TextRecognizer.cpp); elsewhere Tesseract (Apache-2.0) does it, with
+# the languages that come with the program and the ones the user downloads (OcrLanguages.cpp). The option is also there to
+# try Tesseract on Windows (-DPROJECTFOXY_TESSERACT=ON, with Tesseract found through CMAKE_PREFIX_PATH).
+if(UNIX AND NOT APPLE)
+    set(_iv_tesseract_default ON)
+else()
+    set(_iv_tesseract_default OFF)
+endif()
+option(PROJECTFOXY_TESSERACT "Read the text of pictures with Tesseract" ${_iv_tesseract_default})
+if(PROJECTFOXY_TESSERACT)
+    find_package(Tesseract CONFIG REQUIRED)
+    target_sources(imageviewer_app PRIVATE src/app/TesseractOcr.cpp)
+    target_link_libraries(imageviewer_app PUBLIC Tesseract::libtesseract)
+    target_compile_definitions(imageviewer_app PUBLIC PROJECTFOXY_TESSERACT)
+endif()
+
 # Qt Multimedia reads video (FFmpeg backend: MP4/H.264, WebM, MOV, MKV...) for "video to GIF"; its plugins and the
 # FFmpeg DLLs are deployed with the rest of Qt.
 target_link_libraries(imageviewer_app PUBLIC
@@ -182,6 +201,7 @@ target_link_libraries(imageviewer_app PUBLIC
     Qt6::Qml
     Qt6::Quick
     Qt6::Multimedia
+    Qt6::Network # downloading the languages of the text recogniser
     $<$<PLATFORM_ID:Windows>:WindowsApp> # C++/WinRT: the text recogniser of Windows
     $<$<PLATFORM_ID:Windows>:Shell32>
     $<$<PLATFORM_ID:Windows>:User32>

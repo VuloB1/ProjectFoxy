@@ -22,6 +22,8 @@ finish-args:
   # exports next to them: a file chooser alone (which only hands over the chosen file) is not enough. Same as other
   # image viewers. Trash and wallpaper go through the desktop portals (src/app/LinuxPortal.cpp), which need no access.
   - --filesystem=host
+  # Only to download the languages of the text recogniser the user asks for (Settings > Text recognition); nothing else uses it.
+  - --share=network
 
 cleanup:
   - /include
@@ -123,6 +125,50 @@ modules:
       - type: archive
         url: https://github.com/libvips/libvips/releases/download/v8.18.5/vips-8.18.5.tar.xz
         sha256: 8c4e6332d818249ed05ce98e36e6ed8a08e3249ac70f69680842ab2e5fee8510
+
+  # The text recogniser (Apache-2.0) and the library it reads pictures with. No training tools, no curl, no libarchive.
+  - name: leptonica
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_LIBDIR=lib
+      - -DBUILD_SHARED_LIBS=ON
+      - -DSW_BUILD=OFF
+    sources:
+      - type: archive
+        url: https://github.com/DanBloomberg/leptonica/releases/download/1.85.0/leptonica-1.85.0.tar.gz
+        sha256: 3745ae3bf271a6801a2292eead83ac926e3a9bc1bf622e9cd4dd0f3786e17205
+
+  - name: tesseract
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_LIBDIR=lib
+      - -DBUILD_SHARED_LIBS=ON
+      - -DBUILD_TRAINING_TOOLS=OFF
+      - -DBUILD_TESTS=OFF
+      - -DDISABLE_CURL=ON
+      - -DDISABLE_ARCHIVE=ON
+      - -DOPENMP_BUILD=OFF
+      - -DSW_BUILD=OFF
+    sources:
+      - type: archive
+        url: https://github.com/tesseract-ocr/tesseract/archive/refs/tags/5.5.1.tar.gz
+        sha256: a7a3f2a7420cb6a6a94d80c24163e183cf1d2f1bed2df3bbc397c81808a57237
+
+  # English and Spanish ("fast" models of tessdata_fast, tag 4.1.0), the languages the program comes with.
+  - name: tessdata
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 eng.traineddata /app/share/tessdata/eng.traineddata
+      - install -Dm644 spa.traineddata /app/share/tessdata/spa.traineddata
+    sources:
+      - type: file
+        url: https://github.com/tesseract-ocr/tessdata_fast/raw/4.1.0/eng.traineddata
+        sha256: 7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2
+      - type: file
+        url: https://github.com/tesseract-ocr/tessdata_fast/raw/4.1.0/spa.traineddata
+        sha256: 6f2e04d02774a18f01bed44b1111f2cd7f3ba7ac9dc4373cd3f898a40ea6b464
 
   - name: projectfoxy
     buildsystem: cmake-ninja

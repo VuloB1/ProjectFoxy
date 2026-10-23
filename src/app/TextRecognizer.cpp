@@ -1,6 +1,8 @@
 #include "TextRecognizer.h"
 
 #include "AppController.h"
+#include "OcrBackend.h"
+#include "OcrLanguages.h"
 #include "TextParagraphs.h"
 
 #include <QClipboard>
@@ -8,7 +10,8 @@
 #include <QPointer>
 #include <QThreadPool>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) && !defined(PROJECTFOXY_TESSERACT)
+#define PROJECTFOXY_WINDOWS_OCR
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Globalization.h>
 #include <winrt/Windows.Graphics.Imaging.h>
@@ -17,16 +20,11 @@
 
 namespace {
 
-struct Found {
-    QVariantList words;
-    bool noLanguage = false;
-};
-
-Found recognise(QImage image)
+OcrFound recognise(QImage image)
 {
     using namespace winrt::Windows::Media::Ocr;
     using namespace winrt::Windows::Graphics::Imaging;
-    Found found;
+    OcrFound found;
     try {
         winrt::init_apartment(winrt::apartment_type::multi_threaded);
         OcrEngine engine = OcrEngine::TryCreateFromUserProfileLanguages();
@@ -87,11 +85,14 @@ Found recognise(QImage image)
 } // namespace
 #endif
 
-TextRecognizer::TextRecognizer(AppController *controller, QObject *parent) : QObject(parent), m_controller(controller) {}
+TextRecognizer::TextRecognizer(AppController *controller, OcrLanguages *languages, QObject *parent)
+    : QObject(parent), m_controller(controller), m_languages(languages)
+{
+}
 
 bool TextRecognizer::available() const
 {
-#ifdef Q_OS_WIN
+#if defined(PROJECTFOXY_WINDOWS_OCR) || defined(PROJECTFOXY_TESSERACT)
     return true;
 #else
     return false;
@@ -101,7 +102,7 @@ bool TextRecognizer::available() const
 void TextRecognizer::scan()
 {
     clear();
-#ifdef Q_OS_WIN
+#if defined(PROJECTFOXY_WINDOWS_OCR) || defined(PROJECTFOXY_TESSERACT)
     const QImage image = m_controller->displayedImage();
     if (image.isNull())
         return;
@@ -109,8 +110,15 @@ void TextRecognizer::scan()
     emit busyChanged();
     const int job = ++m_job;
     QPointer<TextRecognizer> self(this);
-    QThreadPool::globalInstance()->start([self, image, job]() {
-        const Found found = recognise(image);
+    const QStringList languages = m_languages->activeLanguages(); // Tesseract's; the recogniser of Windows reads what Windows has
+    const QStringList dirs = m_languages->dataDirs();
+    QThreadPool::globalInstance()->start([self, image, job, languages, dirs]() {
+#ifdef PROJECTFOXY_TESSERACT
+        const OcrFound found = recogniseWithTesseract(image, languages, dirs);
+#else
+        Q_UNUSED(languages) Q_UNUSED(dirs)
+        const OcrFound found = recognise(image);
+#endif
         QMetaObject::invokeMethod(qApp, [self, found, job]() {
             if (!self || job != self->m_job)
                 return;

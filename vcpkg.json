@@ -22,6 +22,11 @@
       "$comment": "GPL-2.0-or-later: the one dependency that blocks closed-source distribution. Used only by src/core/MetadataReader.cpp and src/core/ImageWriter.cpp. Decision pending, see docs/LICENCIAS.md. 'png' (zlib) and 'xmp' (expat) are OFF in the port by default: without them exiv2 does not recognise a PNG at all and cannot read or write XMP, so the metadata a save is supposed to keep was silently dropped (tests/test_image_writer.cpp checks both). 'bmff' (HEIC/AVIF/CR3 metadata, needs brotli) is deliberately left off."
     },
     {
+      "name": "tesseract",
+      "platform": "linux",
+      "$comment": "Apache-2.0. Reads the text of pictures on Linux (Windows uses its own recogniser). Its language files are not part of this: the AppImage and the Flatpak bring English and Spanish and the program downloads others on request (src/app/OcrLanguages.cpp)."
+    },
+    {
       "name": "pkgconf",
       "host": true
     }

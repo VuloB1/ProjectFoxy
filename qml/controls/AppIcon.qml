@@ -289,7 +289,7 @@ Canvas {
             ctx.moveTo(20, 15); ctx.lineTo(20, 20); ctx.lineTo(15, 20);
             ctx.moveTo(9, 20); ctx.lineTo(4, 20); ctx.lineTo(4, 15);
             ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(8.5, 9); ctx.lineTo(15.5, 9); ctx.moveTo(12, 9); ctx.lineTo(12, 16); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(8, 9); ctx.lineTo(16, 9); ctx.moveTo(8, 12); ctx.lineTo(16, 12); ctx.moveTo(8, 15); ctx.lineTo(13, 15); ctx.stroke();
             break;
         case "copy":
             closedShape([4, 9, 15, 9, 15, 20, 4, 20]);

@@ -1126,6 +1126,8 @@ Rectangle {
                 return;
             if (textRecognizer.problem === "none")
                 root.showNotice(qsTr("No se ha encontrado texto en la imagen"), 3500);
+            else if (textRecognizer.problem === "language" && ocrLanguages.available)
+                root.showNotice(qsTr("No hay ningún idioma de reconocimiento de texto activo. Elige uno en Ajustes > Reconocimiento de texto."), 6000);
             else if (textRecognizer.problem === "language")
                 root.showNotice(qsTr("Windows no tiene instalado un idioma para reconocer texto"), 5000);
         }

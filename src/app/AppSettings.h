@@ -47,6 +47,8 @@ class AppSettings : public QObject {
     // Presenting each frame in step with the screen's refresh (on by default). Some AMD cards stall for hundreds of
     // milliseconds in Direct3D 11 while the window is resized with it on; off avoids that and may tear on screens
     // without FreeSync / G-Sync. Read when the program starts: a change applies the next time it is opened.
+    // the text-recognition languages in use (Tesseract codes), Linux
+    Q_PROPERTY(QStringList ocrLanguages READ ocrLanguages WRITE setOcrLanguages NOTIFY ocrLanguagesChanged)
     Q_PROPERTY(bool startWithWindows READ startWithWindows WRITE setStartWithWindows NOTIFY startWithWindowsChanged)
     Q_PROPERTY(bool startMinimized READ startMinimized WRITE setStartMinimized NOTIFY startMinimizedChanged)
     Q_PROPERTY(bool keepInTray READ keepInTray WRITE setKeepInTray NOTIFY keepInTrayChanged)
@@ -113,6 +115,8 @@ public:
     bool windowMaximized() const { return m_windowMaximized; }
     void saveWindowState(const QRect &normalRect, bool maximized);
 
+    QStringList ocrLanguages() const { return m_ocrLanguages; }
+    void setOcrLanguages(const QStringList &value);
     bool startWithWindows() const { return m_startWithWindows; }
     void setStartWithWindows(bool value);
     bool startMinimized() const { return m_startMinimized; }
@@ -150,6 +154,7 @@ signals:
     void pixelGridChanged();
     void pixelSharpEditChanged();
     void singleInstanceChanged();
+    void ocrLanguagesChanged();
     void startWithWindowsChanged();
     void startMinimizedChanged();
     void keepInTrayChanged();
@@ -182,6 +187,7 @@ private:
     bool m_pixelSharpEdit = false;
     bool m_singleInstance = true;
     bool m_keepInTray = false;
+    QStringList m_ocrLanguages{QStringLiteral("spa"), QStringLiteral("eng")};
     bool m_startWithWindows = false;
     bool m_startMinimized = true;
     bool m_verticalSync = true;

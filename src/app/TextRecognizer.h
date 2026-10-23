@@ -5,6 +5,7 @@
 #include <QVariantList>
 
 class AppController;
+class OcrLanguages;
 
 // Reads the text of the picture that is on show, with the recogniser Windows already has (Windows.Media.Ocr: the one
 // Photos and the Snipping Tool use; it runs on this computer, needs no download and reads the languages installed in
@@ -20,7 +21,7 @@ class TextRecognizer : public QObject
     Q_PROPERTY(QString problem READ problem NOTIFY problemChanged)
 
 public:
-    explicit TextRecognizer(AppController *controller, QObject *parent = nullptr);
+    TextRecognizer(AppController *controller, OcrLanguages *languages, QObject *parent = nullptr);
 
     bool available() const;
     bool busy() const { return m_busy; }
@@ -38,6 +39,7 @@ signals:
 
 private:
     AppController *m_controller;
+    OcrLanguages *m_languages;
     bool m_busy = false;
     int m_job = 0; // a result that arrives for an older scan is dropped
     QVariantList m_words;
