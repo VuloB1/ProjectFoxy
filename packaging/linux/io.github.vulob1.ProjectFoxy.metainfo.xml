@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.7" date="2026-10-23">
+      <description>
+        <p>Comic reader, collage maker and GIF studio: drop files on them, page indicator, smoother collage, menus with icons.</p>
+      </description>
+    </release>
     <release version="0.3.6" date="2026-10-23">
       <description>
         <p>Read and copy the text of a picture (Windows: the recogniser of Windows; Linux: Tesseract, with English and Spanish included and more languages to download).</p>
