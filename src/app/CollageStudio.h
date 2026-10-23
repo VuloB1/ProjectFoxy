@@ -121,6 +121,8 @@ private:
     void rebuildSnapshot();
     std::shared_ptr<const Snapshot> snapshot() const;
     QRectF canvasRectOf(const core::collage::Cell &cell) const;   // as drawn, fractions of the canvas
+    // How far (in cell widths and heights) the picture of `cell` may be moved: until its far edge is at the middle of the cell.
+    double panLimit(const core::collage::Cell &cell) const;
     QSize canvasSize() const;
     // maps a move along the canvas to one in the layout's own 0..1 units
     QPointF toLayoutDelta(double dx, double dy) const;

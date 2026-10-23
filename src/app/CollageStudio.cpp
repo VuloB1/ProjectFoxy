@@ -542,6 +542,22 @@ void CollageStudio::swapPictures(int a, int b)
     touch(true);
 }
 
+double CollageStudio::panLimit(const core::collage::Cell &cell) const
+{
+    // The picture is as large as the cell covers (times the zoom): a fixed limit made the zoomed picture stop short of its edges.
+    // Never less than 3 cells, as it always was, so a picture that is not zoomed moves as freely as before.
+    double extent = cell.content.zoom; // the picture's size in cells, when it is not known yet: as big as the cell
+    const QSize source = m_store->sourceSize(cell.content.path);
+    const QSize canvas = canvasSize();
+    const QRectF r = canvasRectOf(cell);
+    const double cw = r.width() * canvas.width(), ch = r.height() * canvas.height();
+    if (source.isValid() && cw > 0 && ch > 0) {
+        const double cover = std::max(cw / source.width(), ch / source.height());
+        extent = std::max(source.width() * cover / cw, source.height() * cover / ch) * cell.content.zoom;
+    }
+    return std::max(3.0, extent / 2.0 + 0.5);
+}
+
 void CollageStudio::panCell(int cell, double dx, double dy)
 {
     if (cell < 0 || cell >= cellCount())
@@ -551,8 +567,9 @@ void CollageStudio::panCell(int cell, double dx, double dy)
     c.panX += dx / r.width();
     c.panY += dy / r.height();
     // never so far that the picture is out of sight
-    c.panX = std::clamp(c.panX, -3.0, 3.0);
-    c.panY = std::clamp(c.panY, -3.0, 3.0);
+    const double limit = panLimit(m_cells[size_t(cell)]);
+    c.panX = std::clamp(c.panX, -limit, limit);
+    c.panY = std::clamp(c.panY, -limit, limit);
     // only the picture changes: the page does not read the pan, so the cells and lines are not rebuilt
     // (doing it on every mouse move is what made dragging a picture stutter)
     touch(false);
@@ -573,6 +590,9 @@ void CollageStudio::zoomCell(int cell, double factor, double atX, double atY)
     c.panX = px - (px - c.panX) * k;
     c.panY = py - (py - c.panY) * k;
     c.zoom = nz;
+    const double limit = panLimit(m_cells[size_t(cell)]);
+    c.panX = std::clamp(c.panX, -limit, limit);
+    c.panY = std::clamp(c.panY, -limit, limit);
     touch(false);
     emit layoutChanged();
 }
