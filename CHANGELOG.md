@@ -3,6 +3,22 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.7] — Comic reader, collage and GIF studio
+
+- **Reader:** a book (.cbz, .zip, .pdf or a folder) can be dropped on the reader to open it, and the page you are on shows at the top
+  ("Page 20-21 of 186"), with a thin line along the edge that fills as you read.
+- **Collage maker and GIF studio:** files dragged from any folder are taken anywhere on the studio, and while they are over it the
+  window says so (in the collage the cell they would replace is marked). The mouse moves that drag a cell, a handle or a dividing line
+  are now added up once per frame, so a fast mouse no longer redraws the collage hundreds of times a second.
+- **Menus of the studios:** each section has an icon before its title, the long explanations moved into a small "i" with a tip, and the
+  fold arrow is on the right. The size fields (GIF, collage, video) have no more up and down arrows: click and drag left or right to
+  change the value, or click to type it.
+- **Collage, zoom:** each step of the zoom no longer decodes the whole photo again at a new size (it took a second or more for a big
+  one): the preview asks for a few fixed sizes and keeps them, and the wheel steps that arrive between two frames are applied once.
+  The saved file is not limited by this.
+- **Collage, moving a zoomed picture:** the limit of how far a picture could be moved was the same whatever the zoom, so a zoomed
+  picture stopped short of its edges. It now grows with the picture (and is still at least what it was).
+
 ## [0.3.6] — Text in pictures
 
 - **Read the text of a picture** (Windows only, with the recogniser Windows itself uses; nothing is downloaded and the picture never leaves the
@@ -255,6 +271,23 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.7] — Lector, collage y estudio de GIF
+
+- **Lector:** se puede soltar un libro (.cbz, .zip, .pdf o una carpeta) sobre el lector para abrirlo, y arriba se ve la página en la que estás
+  («Página 20-21 de 186»), con una línea fina en el borde que se llena a medida que lees.
+- **Collage y estudio de GIF:** los archivos arrastrados desde cualquier carpeta se aceptan en cualquier punto del estudio, y mientras
+  están encima la ventana lo avisa (en el collage se marca la celda que sustituirían). Los movimientos del ratón que arrastran una celda,
+  un tirador o una línea de división se suman y se aplican una vez por fotograma, así un ratón rápido ya no redibuja el collage cientos de
+  veces por segundo.
+- **Menús de los estudios:** cada sección lleva un icono antes del título, las explicaciones largas pasaron a una pequeña «i» con su aviso y
+  la flecha de plegar está a la derecha. Los campos de tamaño (GIF, collage, vídeo) ya no tienen flechitas arriba y abajo: arrastra a izquierda o
+  derecha para cambiar el valor, o haz clic para escribirlo.
+- **Collage, zoom:** cada paso del zoom ya no decodifica la foto entera otra vez a un tamaño nuevo (a una foto grande le costaba un segundo o
+  más): la vista previa pide unos pocos tamaños fijos y los conserva, y los pasos de la rueda que llegan entre dos fotogramas se aplican de una vez.
+  El archivo guardado no tiene ese límite.
+- **Collage, mover una foto con zoom:** el límite de cuánto se podía mover una foto era el mismo con cualquier zoom, así que una foto ampliada se
+  quedaba corta antes de sus bordes. Ahora crece con la foto (y nunca es menos de lo que era).
 
 ## [0.3.6] — Texto en las imágenes
 

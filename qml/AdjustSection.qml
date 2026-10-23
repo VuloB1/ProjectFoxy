@@ -9,6 +9,10 @@ Item {
     id: root
 
     property string title: ""
+    // an icon (AppIcon name) that says what the section is about; it goes before the title
+    property string icon: ""
+    // the explanation of the section: shown as a tip on a small "i" next to the title, not as text taking room
+    property string hint: ""
     property bool expanded: true
     default property alias content: body.data
 
@@ -17,7 +21,7 @@ Item {
     Item {
         id: header
         width: parent.width
-        height: 30
+        height: 34
 
         Rectangle {
             anchors.fill: parent
@@ -32,12 +36,51 @@ Item {
             anchors.top: parent.top
             height: 1
             color: themeManager.border
+            opacity: 0.55
         }
         HoverHandler { id: headerHover }
 
         AppIcon {
-            id: chevron
+            id: sectionIcon
+            visible: root.icon.length > 0
             anchors.left: parent.left
+            anchors.leftMargin: 2
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 1
+            name: root.icon
+            size: 18
+            color: root.expanded ? themeManager.accent : themeManager.textSecondary
+        }
+        Label {
+            id: titleLabel
+            anchors.left: sectionIcon.visible ? sectionIcon.right : parent.left
+            anchors.leftMargin: sectionIcon.visible ? 8 : 2
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 1
+            text: root.title
+            color: themeManager.textPrimary
+            font.pixelSize: 13
+            font.weight: Font.DemiBold
+        }
+        // the explanation, on hover
+        AppIcon {
+            id: hintIcon
+            visible: root.hint.length > 0
+            anchors.left: titleLabel.right
+            anchors.leftMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 1
+            name: "info"
+            size: 15
+            color: hintHover.hovered ? themeManager.accent : themeManager.textSecondary
+            opacity: hintHover.hovered ? 1 : 0.7
+            HoverHandler { id: hintHover }
+            AppToolTip { visible: hintHover.hovered; text: root.hint }
+        }
+        AppIcon {
+            id: chevron
+            anchors.right: parent.right
+            anchors.rightMargin: 2
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 1
             name: "next"
@@ -46,17 +89,9 @@ Item {
             rotation: root.expanded ? 90 : 0
             Behavior on rotation { NumberAnimation { duration: themeManager.animFast } }
         }
-        Label {
-            anchors.left: chevron.right
-            anchors.leftMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: 1
-            text: root.title
-            color: themeManager.textPrimary
-            font.bold: true
-        }
         MouseArea {
             anchors.fill: parent
+            z: -1
             cursorShape: Qt.PointingHandCursor
             onClicked: root.expanded = !root.expanded
         }

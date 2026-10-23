@@ -378,11 +378,11 @@ Item {
                 }
                 Row {
                     spacing: 8
-                    AppSpinBox {
-                        from: 16; to: 4096
-                        editable: true
+                    ScrubNumberField {
+                        width: 110
+                        from: 16; to: 4096; dragStep: 4; suffix: " px"
                         value: root.outWidth
-                        onValueModified: { root.chosenWidth = value; root.widthChosen = true; }
+                        onValueEdited: { root.chosenWidth = Math.round(newValue); root.widthChosen = true; }
                     }
                     Label {
                         anchors.verticalCenter: parent.verticalCenter

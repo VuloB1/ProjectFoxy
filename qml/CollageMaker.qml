@@ -255,6 +255,7 @@ Item {
                     onPressed: function (m) {
                         pendingDx = 0;
                         pendingDy = 0;
+                        pendingDivider = -1;
                         lastX = m.x;
                         lastY = m.y;
                         const nx = m.x / box.width, ny = m.y / box.height;
@@ -290,33 +291,39 @@ Item {
                         const dx = (m.x - lastX) / box.width, dy = (m.y - lastY) / box.height;
                         lastX = m.x;
                         lastY = m.y;
+                        // a mouse reports far more often than the screen redraws (a gaming one, a thousand times a
+                        // second): the moves are added up and applied once per pass of the event loop, whatever is
+                        // being dragged - each application rebuilds the cells and draws the collage again
                         if (mode === "divider") {
                             const list = root.dividerData;
-                            const v = list[target] ? list[target].vertical : true;
-                            collageStudio.dragDivider(v ? nx : ny);
-                        } else if (mode === "resize") collageStudio.resizeCell(root.sel, target, dx, dy);
-                        else if (mode === "move") collageStudio.moveCell(target, dx, dy);
-                        else if (mode === "pan") {
-                            // a mouse reports far more often than the screen redraws: the moves are added up
-                            // and applied once per pass of the event loop
+                            pendingDivider = (list[target] ? list[target].vertical : true) ? nx : ny;
+                        } else {
                             pendingDx += dx;
                             pendingDy += dy;
-                            Qt.callLater(flushPan);
                         }
+                        Qt.callLater(flushPending);
                     }
                     property real pendingDx: 0
                     property real pendingDy: 0
-                    function flushPan() {
+                    property real pendingDivider: -1
+                    function flushPending() {
+                        if (mode === "divider") {
+                            if (pendingDivider >= 0)
+                                collageStudio.dragDivider(pendingDivider);
+                            pendingDivider = -1;
+                            return;
+                        }
                         if (pendingDx === 0 && pendingDy === 0)
                             return;
                         const dx = pendingDx, dy = pendingDy;
                         pendingDx = 0;
                         pendingDy = 0;
-                        if (mode === "pan")
-                            collageStudio.panCell(target, dx, dy);
+                        if (mode === "pan") collageStudio.panCell(target, dx, dy);
+                        else if (mode === "move") collageStudio.moveCell(target, dx, dy);
+                        else if (mode === "resize") collageStudio.resizeCell(root.sel, target, dx, dy);
                     }
                     onReleased: {
-                        flushPan();
+                        flushPending();
                         if (mode === "divider")
                             collageStudio.endDividerDrag();
                         mode = "";
@@ -326,32 +333,80 @@ Item {
                         const cell = collageStudio.cellAt(m.x / box.width, m.y / box.height);
                         if (cell >= 0) collageStudio.resetPicture(cell);
                     }
+                    // a free wheel (or a touchpad) sends dozens of steps between two frames: their zoom is multiplied and applied once
+                    property int zoomCell: -1
+                    property real zoomFactor: 1
+                    property real zoomX: 0
+                    property real zoomY: 0
+                    function flushZoom() {
+                        if (zoomCell >= 0 && zoomFactor !== 1)
+                            collageStudio.zoomCell(zoomCell, zoomFactor, zoomX, zoomY);
+                        zoomFactor = 1;
+                    }
                     onWheel: function (w) {
                         const cell = collageStudio.cellAt(w.x / box.width, w.y / box.height);
                         if (cell < 0) return;
+                        if (cell !== zoomCell)
+                            flushZoom();
                         collageStudio.select(cell);
-                        collageStudio.zoomCell(cell, Math.pow(1.0016, w.angleDelta.y), w.x / box.width, w.y / box.height);
+                        zoomCell = cell;
+                        zoomFactor *= Math.pow(1.0016, w.angleDelta.y);
+                        zoomX = w.x / box.width;
+                        zoomY = w.y / box.height;
+                        Qt.callLater(flushZoom);
                     }
                 }
 
-                // files dropped on a cell replace its picture; anywhere else they fill the empty cells
-                DropArea {
-                    anchors.fill: parent
-                    onDropped: function (drop) {
-                        if (!drop.hasUrls || drop.urls.length === 0)
-                            return;
-                        const cell = collageStudio.cellAt(drop.x / box.width, drop.y / box.height);
-                        if (cell >= 0) {
-                            collageStudio.setPicture(cell, drop.urls[0].toString());
-                            collageStudio.select(cell);
-                            if (drop.urls.length > 1)
-                                collageStudio.addUrls(Array.from(drop.urls.slice(1), u => u.toString()));
-                        } else {
-                            collageStudio.addUrls(Array.from(drop.urls, u => u.toString()));
-                        }
-                    }
+                // the cell the files being dragged are over (they would replace its picture)
+                Rectangle {
+                    visible: dropArea.containsDrag && dropArea.overCell >= 0 && !!root.cellData[dropArea.overCell]
+                    x: root.cellData[dropArea.overCell] ? root.cellData[dropArea.overCell].x * box.width : 0
+                    y: root.cellData[dropArea.overCell] ? root.cellData[dropArea.overCell].y * box.height : 0
+                    width: root.cellData[dropArea.overCell] ? root.cellData[dropArea.overCell].w * box.width : 0
+                    height: root.cellData[dropArea.overCell] ? root.cellData[dropArea.overCell].h * box.height : 0
+                    color: Qt.rgba(themeManager.accent.r, themeManager.accent.g, themeManager.accent.b, 0.28)
+                    border.width: 3
+                    border.color: themeManager.accent
                 }
             }
+        }
+
+        // Files dragged from any folder onto the studio: on a cell they replace its picture, anywhere else they fill the empty
+        // cells (and add cells when there are more files than cells).
+        DropArea {
+            id: dropArea
+            anchors.fill: parent
+            z: 40
+            property int overCell: -1
+            function cellUnder(drag) {
+                const p = box.mapFromItem(dropArea, drag.x, drag.y);
+                if (p.x < 0 || p.y < 0 || p.x > box.width || p.y > box.height)
+                    return -1;
+                return collageStudio.cellAt(p.x / box.width, p.y / box.height);
+            }
+            onEntered: function (drag) { drag.accepted = drag.hasUrls; overCell = cellUnder(drag); }
+            onPositionChanged: function (drag) { overCell = cellUnder(drag); }
+            onExited: overCell = -1
+            onDropped: function (drop) {
+                const cell = cellUnder(drop);
+                overCell = -1;
+                if (!drop.hasUrls || drop.urls.length === 0)
+                    return;
+                const urls = Array.from(drop.urls, u => u.toString());
+                if (cell >= 0) {
+                    collageStudio.setPicture(cell, urls[0]);
+                    collageStudio.select(cell);
+                    if (urls.length > 1)
+                        collageStudio.addUrls(urls.slice(1));
+                } else {
+                    collageStudio.addUrls(urls);
+                }
+            }
+        }
+        DropHint {
+            active: dropArea.containsDrag && dropArea.overCell < 0
+            iconName: "collage"
+            text: qsTr("Suelta las fotos para añadirlas al collage")
         }
 
         Label {
@@ -488,6 +543,7 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Diseño")
+                    icon: "collage"
                     Row {
                         width: parent.width
                         spacing: 6
@@ -630,6 +686,7 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: root.selCell ? qsTr("Foto %1").arg(root.sel + 1) : qsTr("Foto")
+                    icon: "image"
                     Label {
                         width: parent.width
                         visible: root.selCell === null
@@ -706,6 +763,7 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Celdas")
+                    icon: "multi"
                     OptSlider { key: "spacing"; label: qsTr("Separación"); from: 0; to: 15; step: 0.1; suffix: "%"; decimals: 1 }
                     OptSlider { key: "margin"; label: qsTr("Margen"); from: 0; to: 25; step: 0.1; suffix: "%"; decimals: 1 }
                     OptSlider { key: "radius"; label: qsTr("Esquinas redondeadas"); from: 0; to: 100; step: 1; suffix: "%" }
@@ -746,6 +804,7 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Fondo")
+                    icon: "theme"
                     AppSegmented {
                         model: [qsTr("Color"), qsTr("Degradado"), qsTr("Foto desenfocada")].map(n => ({ text: n }))
                         currentIndex: collageStudio.options.background
@@ -776,23 +835,22 @@ Item {
                 AdjustSection {
                     width: parent.width
                     title: qsTr("Tamaño y archivo")
+                    icon: "resize"
                     Row {
                         width: parent.width
                         spacing: 8
-                        AppSpinBox {
+                        ScrubNumberField {
                             width: (parent.width - 28) / 2
-                            from: 100; to: 8000; stepSize: 50
-                            editable: true
+                            from: 100; to: 8000; dragStep: 10; suffix: " px"
                             value: collageStudio.options.sizeW
-                            onValueModified: collageStudio.setOption("sizeW", value)
+                            onValueEdited: collageStudio.setOption("sizeW", Math.round(newValue))
                         }
                         Label { anchors.verticalCenter: parent.verticalCenter; text: "×"; color: themeManager.textSecondary }
-                        AppSpinBox {
+                        ScrubNumberField {
                             width: (parent.width - 28) / 2
-                            from: 100; to: 8000; stepSize: 50
-                            editable: true
+                            from: 100; to: 8000; dragStep: 10; suffix: " px"
                             value: collageStudio.options.sizeH
-                            onValueModified: collageStudio.setOption("sizeH", value)
+                            onValueEdited: collageStudio.setOption("sizeH", Math.round(newValue))
                         }
                     }
                     Flow {

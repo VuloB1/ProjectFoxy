@@ -291,6 +291,15 @@ Canvas {
             ctx.stroke();
             ctx.beginPath(); ctx.moveTo(8, 9); ctx.lineTo(16, 9); ctx.moveTo(8, 12); ctx.lineTo(16, 12); ctx.moveTo(8, 15); ctx.lineTo(13, 15); ctx.stroke();
             break;
+        case "clock":
+            ctx.beginPath(); ctx.arc(12, 12, 9, 0, 2 * Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(12, 7); ctx.lineTo(12, 12); ctx.lineTo(15.5, 14); ctx.stroke();
+            break;
+        case "image":
+            closedShape([3, 4, 21, 4, 21, 20, 3, 20]);
+            ctx.beginPath(); ctx.arc(8.5, 9.5, 1.8, 0, 2 * Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(3, 17); ctx.lineTo(9, 12); ctx.lineTo(13, 16); ctx.lineTo(16, 13); ctx.lineTo(21, 18); ctx.stroke();
+            break;
         case "copy":
             closedShape([4, 9, 15, 9, 15, 20, 4, 20]);
             ctx.beginPath(); ctx.moveTo(9, 9); ctx.lineTo(9, 4); ctx.lineTo(20, 4); ctx.lineTo(20, 15); ctx.lineTo(15, 15); ctx.stroke();

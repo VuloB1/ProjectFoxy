@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(ImageViewer VERSION 0.3.6 LANGUAGES CXX)
+project(ImageViewer VERSION 0.3.7 LANGUAGES CXX)
 if(WIN32)
     enable_language(RC)   # the executable carries its icon as a resource (resources/app.rc)
 endif()
@@ -332,6 +332,7 @@ set(IV_QML_FILES
         qml/controls/AppIcon.qml
         qml/controls/AppToolTip.qml
         qml/controls/AppHintBox.qml
+        qml/controls/DropHint.qml
         qml/controls/AppButton.qml
         qml/controls/AppCard.qml
         qml/controls/AppSegmented.qml
