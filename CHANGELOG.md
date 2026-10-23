@@ -9,6 +9,10 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
   computer). The *Reconocer texto* button in the dock (or Ctrl+T, or right click) darkens what is not text and leaves each line,
   and the lines of a paragraph together, as they are, with the corners of the theme. Drag to select, double click for a line, triple
   click for a paragraph, Ctrl+A for everything, Ctrl+C or right click to copy. It reads the languages installed in Windows.
+- **The same on Linux, with Tesseract** (Apache-2.0), in the AppImage and the Flatpak. English and Spanish come with the program; Settings >
+  *Reconocimiento de texto* lists 30 more that are downloaded when asked (1-4 MB each, to your data folder) and can be removed, and
+  which languages are read is chosen there. The Flatpak gets network access only for that download.
+- The *Reconocer texto* icon is now three lines inside the corners.
 
 ## [0.3.5] — Stay in the tray and start with Windows
 
@@ -258,6 +262,10 @@ Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https:/
   El botón *Reconocer texto* del dock (o Ctrl+T, o clic derecho) oscurece lo que no es texto y deja cada línea, y las líneas de un
   párrafo juntas, tal cual, con las esquinas del tema. Arrastra para seleccionar, doble clic para una línea, triple clic para un
   párrafo, Ctrl+A para todo, Ctrl+C o clic derecho para copiar. Lee los idiomas que tengas instalados en Windows.
+- **Lo mismo en Linux, con Tesseract** (Apache-2.0), en el AppImage y en el Flatpak. El inglés y el español vienen con el programa; Ajustes >
+  *Reconocimiento de texto* ofrece 30 más que se descargan cuando los pides (1-4 MB cada uno, a tu carpeta de datos) y se pueden quitar, y
+  ahí mismo eliges qué idiomas se leen. El Flatpak recibe acceso a la red solo para esa descarga.
+- El icono de *Reconocer texto* ahora son tres líneas dentro de las esquinas.
 
 ## [0.3.5] — Quedarse en la bandeja e iniciar con Windows
 
