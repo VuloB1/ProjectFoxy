@@ -336,6 +336,8 @@ Item {
                 model: animStudio
                 boundsBehavior: Flickable.StopAtBounds
                 ScrollBar.horizontal: AppScrollBar {}
+                // the wheel moves the strip sideways (it runs horizontally, so it has nothing to scroll up and down)
+                AppWheelScroll { view: list; horizontal: true; step: 260 }
                 header: Item {
                     width: 96
                     height: list.height
