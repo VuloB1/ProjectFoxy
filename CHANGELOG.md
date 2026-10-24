@@ -3,6 +3,10 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.8] — Wheel on the frame strip
+
+- **GIF studio:** the mouse wheel scrolls the strip of frames sideways (it runs horizontally, so the wheel had nothing to move).
+
 ## [0.3.7] — Comic reader, collage and GIF studio
 
 - **Reader:** a book (.cbz, .zip, .pdf or a folder) can be dropped on the reader to open it, and the page you are on shows at the top
@@ -271,6 +275,10 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.8] — Rueda en la tira de fotogramas
+
+- **Estudio de GIF:** la rueda del ratón desplaza a los lados la tira de fotogramas (es horizontal, y la rueda no tenía nada que mover).
 
 ## [0.3.7] — Lector, collage y estudio de GIF
 
