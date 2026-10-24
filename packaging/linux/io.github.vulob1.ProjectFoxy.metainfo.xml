@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.8" date="2026-10-24">
+      <description>
+        <p>GIF studio: the mouse wheel scrolls the strip of frames sideways.</p>
+      </description>
+    </release>
     <release version="0.3.7" date="2026-10-23">
       <description>
         <p>Comic reader, collage maker and GIF studio: drop files on them, page indicator, smoother collage, menus with icons.</p>
