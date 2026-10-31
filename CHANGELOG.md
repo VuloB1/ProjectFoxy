@@ -3,7 +3,7 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
-## [Unreleased]
+## [0.3.9] — Crop and lighter GIFs, start with Windows fixed
 
 - **Fixed: "Start with Windows" did nothing.** The program wrote nothing to Windows' list of programs that start with it (two slips in the
   code that writes the entry), so it never started by itself. It does now, with or without the window (*Start minimized in the tray*).
@@ -290,7 +290,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Sin publicar]
+## [0.3.9] — Recorte y GIF más ligeros, iniciar con Windows corregido
 
 - **Corregido: «Iniciar con Windows» no hacía nada.** El programa no escribía nada en la lista de programas que arrancan con Windows (dos
   descuidos en el código que escribe la entrada), así que nunca arrancaba solo. Ahora sí, con o sin ventana (*Iniciar minimizado en la
