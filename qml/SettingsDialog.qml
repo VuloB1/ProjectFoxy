@@ -563,6 +563,16 @@ AppDialog {
                         }
                         Divider { visible: trayIcon.available }
                         SettingRow {
+                            visible: trayIcon.available
+                            label: qsTr("Abrir las imágenes con Project Foxy")
+                            hint: qsTr("Windows decide con qué programa se abre cada tipo de archivo, y el icono del archivo es el de ese programa. Elige Project Foxy en cada formato para que se abran con él y muestren su icono.")
+                            AppButton {
+                                text: qsTr("Elegir en Windows…")
+                                onClicked: Qt.openUrlExternally("ms-settings:defaultapps?registeredAppUser=Project%20Foxy")
+                            }
+                        }
+                        Divider { visible: trayIcon.available }
+                        SettingRow {
                             label: qsTr("Sincronizar con la pantalla (V-Sync)")
                             hint: qsTr("Evita cortes en la imagen. Si la ventana se traba al cambiarle el tamaño (pasa con algunas tarjetas AMD), prueba a apagarla. Se aplica la próxima vez que abras el programa.")
                             AppSwitch {

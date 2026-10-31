@@ -1062,3 +1062,17 @@ Páginas %1-%2 de %3	Pages %1-%2 of %3	Páginas %1-%2 de %3	%1-%2 / %3 페이지
 Suelta el cómic para abrirlo	Drop the comic to open it	Solte o quadrinho para abri-lo	만화를 놓으면 열립니다	松开以打开漫画	ここにドロップして漫画を開く
 Suelta las fotos para añadirlas al collage	Drop the photos to add them to the collage	Solte as fotos para adicioná-las à colagem	사진을 놓으면 콜라주에 추가됩니다	松开以将照片添加到拼贴	ここにドロップして写真をコラージュに追加
 Suelta las imágenes o el vídeo para añadirlos	Drop the pictures or the video to add them	Solte as imagens ou o vídeo para adicioná-los	이미지나 동영상을 놓으면 추가됩니다	松开以添加图片或视频	ここにドロップして画像や動画を追加
+1 de cada 2	1 of every 2	1 de cada 2	2개 중 1개	每 2 帧取 1 帧	2枚に1枚
+1 de cada 3	1 of every 3	1 de cada 3	3개 중 1개	每 3 帧取 1 帧	3枚に1枚
+1 de cada 4	1 of every 4	1 de cada 4	4개 중 1개	每 4 帧取 1 帧	4枚に1枚
+1 de cada 6	1 of every 6	1 de cada 6	6개 중 1개	每 6 帧取 1 帧	6枚に1枚
+Abrir las imágenes con Project Foxy	Open pictures with Project Foxy	Abrir as imagens com o Project Foxy	Project Foxy로 이미지 열기	用 Project Foxy 打开图片	画像を Project Foxy で開く
+Corta la misma parte de todas las imágenes. Las proporciones de la animación siguen al recorte.	Cuts the same part out of every picture. The proportions of the animation follow the crop.	Corta a mesma parte de todas as imagens. As proporções da animação seguem o recorte.	모든 이미지에서 같은 부분을 잘라냅니다. 애니메이션 비율이 자르기를 따릅니다.	从所有图片中裁剪相同的部分。动画的比例随裁剪而变。	すべての画像から同じ部分を切り抜きます。アニメーションの縦横比は切り抜きに従います。
+Elegir el recorte	Choose the crop	Escolher o recorte	자르기 선택	选择裁剪	切り抜きを選ぶ
+Elegir en Windows…	Choose in Windows…	Escolher no Windows…	Windows에서 선택…	在 Windows 中选择…	Windows で選ぶ…
+Fotogramas que se usan	Frames that are used	Quadros usados	사용할 프레임	使用的帧	使用するフレーム
+Quitar el recorte	Remove the crop	Remover o recorte	자르기 제거	移除裁剪	切り抜きを解除
+Recorte activo: %1 × %2 %	Crop on: %1 × %2 %	Recorte ativo: %1 × %2 %	자르기 적용됨: %1 × %2 %	已裁剪：%1 × %2 %	切り抜き中: %1 × %2 %
+Se saltan los fotogramas intermedios y su tiempo se suma al que se queda: el GIF pesa menos y dura lo mismo.	The frames in between are skipped and their time is added to the one that stays: the GIF weighs less and lasts the same.	Os quadros intermediários são pulados e o tempo deles soma-se ao que fica: o GIF pesa menos e dura o mesmo.	중간 프레임을 건너뛰고 그 시간은 남는 프레임에 더해집니다. GIF 용량은 줄고 길이는 그대로입니다.	跳过中间的帧，其时间并入保留的帧：GIF 更小，时长不变。	間のフレームを飛ばし、その時間は残るフレームに加算されます。GIF は軽くなり、長さは変わりません。
+Sin recorte	No crop	Sem recorte	자르기 없음	无裁剪	切り抜きなし
+Windows decide con qué programa se abre cada tipo de archivo, y el icono del archivo es el de ese programa. Elige Project Foxy en cada formato para que se abran con él y muestren su icono.	Windows decides which program opens each type of file, and the file's icon is that program's. Choose Project Foxy for each format so they open with it and show its icon.	O Windows decide com qual programa cada tipo de arquivo abre, e o ícone do arquivo é o desse programa. Escolha o Project Foxy em cada formato para que abram com ele e mostrem o ícone dele.	Windows는 파일 형식마다 열 프로그램을 정하며, 파일 아이콘도 그 프로그램의 것입니다. 형식마다 Project Foxy를 선택하면 그것으로 열리고 아이콘도 표시됩니다.	Windows 会决定每种文件用哪个程序打开，文件图标也是该程序的。为每种格式选择 Project Foxy，即可用它打开并显示它的图标。	Windows はファイルの種類ごとに開くプログラムを決め、ファイルのアイコンもそのプログラムのものになります。各形式で Project Foxy を選ぶと、それで開かれ、アイコンも表示されます。

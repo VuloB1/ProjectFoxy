@@ -51,6 +51,26 @@ Item {
     readonly property var formatSuffixes: ["gif", "png", "webp"]
 
     function frameUrl(i) { return "image://animprev/" + i + "?r=" + animStudio.revision; }
+
+    // Choosing the crop: the first picture as it is, with the frame over it, in place of the preview
+    property bool cropping: false
+    property int cropAspect: 0
+    readonly property var cropAspects: [0, 1, 16 / 9, 4 / 3, 3 / 4, 9 / 16, -1]
+    readonly property bool cropped: opts.cropW < 0.999 || opts.cropH < 0.999
+    function startCrop() {
+        const size = animStudio.firstSize();
+        cropBox.srcWidth = Math.max(1, size.width);
+        cropBox.srcHeight = Math.max(1, size.height);
+        cropBox.aspect = 0;
+        cropAspect = 0;
+        cropBox.cx = opts.cropX; cropBox.cy = opts.cropY; cropBox.cw = opts.cropW; cropBox.ch = opts.cropH;
+        playing = false;
+        cropping = true;
+    }
+    function applyCrop() {
+        animStudio.setCrop(cropBox.cx, cropBox.cy, cropBox.cw, cropBox.ch);
+        cropping = false;
+    }
     function seconds(ms) { return (ms / 1000).toFixed(ms < 10000 ? 1 : 0) + " s"; }
     function sizeText(bytes) {
         if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + " MB";
@@ -94,7 +114,7 @@ Item {
                                  : (error !== "" ? error : qsTr("No se pudo guardar."));
         }
     }
-    onCountChanged: if (currentIndex >= count) currentIndex = count - 1
+    onCountChanged: { if (currentIndex >= count) currentIndex = count - 1; if (count === 0) cropping = false; }
     Connections {
         target: animStudio
         function onRowsInserted() { root.currentIndex = Math.min(root.currentIndex < 0 ? 0 : root.currentIndex, animStudio.rowCount() - 1); }
@@ -157,7 +177,7 @@ Item {
                 anchors.centerIn: parent
                 width: stage.boxW
                 height: stage.boxH
-                visible: root.count > 0
+                visible: root.count > 0 && !root.cropping
 
                 Canvas {
                     anchors.fill: parent
@@ -191,6 +211,30 @@ Item {
                     asynchronous: true
                     cache: true
                     visible: false
+                }
+            }
+
+            // choosing the crop
+            Item {
+                anchors.fill: parent
+                visible: root.cropping && root.count > 0
+                Rectangle { anchors.fill: parent; color: "#101014"; radius: themeManager.radiusSmall }
+                Image {
+                    id: cropPicture
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    source: root.cropping ? "image://animsrc/" + animStudio.firstEntryId() + "?r=" + animStudio.revision : ""
+                    cache: false
+                    fillMode: Image.PreserveAspectFit
+                    sourceSize: Qt.size(1600, 1600)
+                    smooth: true
+                }
+                VideoCropBox {
+                    id: cropBox
+                    objectName: "gifCrop"
+                    anchors.fill: cropPicture
+                    area: Qt.rect((cropPicture.width - cropPicture.paintedWidth) / 2, (cropPicture.height - cropPicture.paintedHeight) / 2,
+                                  cropPicture.paintedWidth, cropPicture.paintedHeight)
                 }
             }
 
@@ -754,6 +798,54 @@ Item {
                     }
                 }
 
+                // ---- the crop, the same for every picture
+                AdjustSection {
+                    width: parent.width
+                    title: qsTr("Recorte")
+                    icon: "crop"
+                    hint: qsTr("Corta la misma parte de todas las imágenes. Las proporciones de la animación siguen al recorte.")
+                    Label {
+                        visible: !root.cropping
+                        text: root.cropped ? qsTr("Recorte activo: %1 × %2 %").arg(Math.round(root.opts.cropW * 100)).arg(Math.round(root.opts.cropH * 100))
+                                           : qsTr("Sin recorte")
+                        color: themeManager.textSecondary
+                    }
+                    Row {
+                        visible: !root.cropping
+                        spacing: 8
+                        AppButton { objectName: "gifCropStart"; text: qsTr("Elegir el recorte"); enabled: root.count > 0; onClicked: root.startCrop() }
+                        AppButton { text: qsTr("Quitar el recorte"); visible: root.cropped; onClicked: animStudio.setCrop(0, 0, 1, 1) }
+                    }
+                    Column {
+                        visible: root.cropping
+                        width: parent.width
+                        spacing: 8
+                        AppChoiceChips {
+                            model: [{ text: qsTr("Todo") }, { text: "1:1" }, { text: "16:9" }, { text: "4:3" }, { text: "3:4" }, { text: "9:16" }, { text: qsTr("Libre") }]
+                            currentIndex: root.cropAspect
+                            onActivated: function (i) {
+                                root.cropAspect = i;
+                                const a = root.cropAspects[i];
+                                if (i === 0) { cropBox.reset(); cropBox.aspect = 0; }
+                                else if (a < 0) { cropBox.aspect = 0; if (cropBox.whole) { cropBox.cx = 0.1; cropBox.cy = 0.1; cropBox.cw = 0.8; cropBox.ch = 0.8; } }
+                                else cropBox.applyAspect(a);
+                            }
+                        }
+                        Label {
+                            width: parent.width
+                            text: qsTr("Arrastra el marco; las esquinas lo hacen más grande o más pequeño.")
+                            color: themeManager.textSecondary
+                            font.pixelSize: 11
+                            wrapMode: Text.WordWrap
+                        }
+                        Row {
+                            spacing: 8
+                            AppButton { objectName: "gifCropApply"; text: qsTr("Aplicar"); primary: true; onClicked: root.applyCrop() }
+                            AppButton { text: qsTr("Cancelar"); onClicked: root.cropping = false }
+                        }
+                    }
+                }
+
                 // ---- size, fit, background
                 AdjustSection {
                     width: parent.width
@@ -832,6 +924,21 @@ Item {
                         OptSlider { key: "transitionMs"; label: qsTr("Duración de la transición"); from: 100; to: 2000; step: 50; suffix: " ms" }
                         OptSlider { key: "transitionSteps"; label: qsTr("Fotogramas por transición"); from: 2; to: 16; step: 1 }
                         OptCheck { key: "transitionOnLoop"; text: qsTr("También de la última a la primera") }
+                    }
+                    Label { text: qsTr("Fotogramas que se usan"); color: themeManager.textSecondary }
+                    AppChoiceChips {
+                        readonly property var values: [1, 2, 3, 4, 6]
+                        model: [qsTr("Todos"), qsTr("1 de cada 2"), qsTr("1 de cada 3"), qsTr("1 de cada 4"), qsTr("1 de cada 6")]
+                        currentIndex: Math.max(0, values.indexOf(root.opts.skip))
+                        onActivated: function (i) { animStudio.setOption("skip", values[i]); }
+                    }
+                    Label {
+                        width: parent.width
+                        visible: root.opts.skip > 1
+                        text: qsTr("Se saltan los fotogramas intermedios y su tiempo se suma al que se queda: el GIF pesa menos y dura lo mismo.")
+                        color: themeManager.textSecondary
+                        font.pixelSize: 11
+                        wrapMode: Text.WordWrap
                     }
                     OptCheck { key: "reverse"; text: qsTr("Invertir el orden") }
                     OptCheck { key: "pingPong"; text: qsTr("Ida y vuelta") }

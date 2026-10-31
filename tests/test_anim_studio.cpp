@@ -115,6 +115,50 @@ private slots:
         QCOMPARE(s.options().value("width").toInt(), 300);
     }
 
+    void skippingFramesKeepsTheTime()
+    {
+        PaneImageStore store;
+        AnimStudio s(&store);
+        s.addPaths({makePng("a.png", Qt::red), makePng("b.png", Qt::green), makePng("c.png", Qt::blue), makePng("d.png", Qt::yellow),
+                    makePng("e.png", Qt::cyan)});
+        QCOMPARE(s.planCount(), 5);
+        QCOMPARE(s.totalMs(), 500);
+        s.setOption("skip", 2); // pictures 1, 3 and 5 stay; each takes the time of those it stands for
+        QCOMPARE(s.planCount(), 3);
+        QCOMPARE(s.totalMs(), 500);
+        QCOMPARE(s.planDelay(0), 200);
+        QCOMPARE(s.planDelay(2), 100); // the last one has no picture after it to take
+        QCOMPARE(s.planIndexOf(0), 0);
+        QCOMPARE(s.planIndexOf(1), -1); // left out
+        QCOMPARE(s.planIndexOf(2), 1);
+        QVERIFY(!s.previewFrame(2).isNull());
+        s.setOption("skip", 99); // limited
+        QCOMPARE(s.options().value("skip").toInt(), 8);
+        s.setOption("skip", 1);
+        QCOMPARE(s.planCount(), 5);
+    }
+
+    void theCropChangesTheProportionsAndTheFrames()
+    {
+        PaneImageStore store;
+        AnimStudio s(&store);
+        s.addPaths({makePng("a.png", Qt::red, 200, 100), makePng("b.png", Qt::blue, 200, 100)});
+        QCOMPARE(s.firstSize(), QSize(200, 100));
+        QCOMPARE(s.options().value("width").toInt(), 640);
+        QCOMPARE(s.options().value("height").toInt(), 320);
+        s.setCrop(0.25, 0.0, 0.5, 1.0); // 100 x 100: square
+        QCOMPARE(s.options().value("width").toInt(), 640);
+        QCOMPARE(s.options().value("height").toInt(), 640);
+        const QImage frame = s.previewFrame(0);
+        QVERIFY(!frame.isNull());
+        QCOMPARE(frame.width(), frame.height());
+        s.setCrop(-1, -1, 7, 7); // kept inside the picture
+        QCOMPARE(s.options().value("cropW").toDouble(), 1.0);
+        QCOMPARE(s.options().value("cropX").toDouble(), 0.0);
+        s.clear(); // a new animation starts whole
+        QCOMPARE(s.options().value("cropW").toDouble(), 1.0);
+    }
+
     void editingTheList()
     {
         PaneImageStore store;

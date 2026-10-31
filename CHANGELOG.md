@@ -3,6 +3,20 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.9] — Crop and lighter GIFs, start with Windows fixed
+
+- **Fixed: "Start with Windows" did nothing.** The program wrote nothing to Windows' list of programs that start with it (two slips in the
+  code that writes the entry), so it never started by itself. It does now, with or without the window (*Start minimized in the tray*).
+  If you turned it on before, turn it off and on again.
+- **GIF studio, crop:** *Recorte* chooses the part of the pictures that is kept (the same one for all of them, with the usual proportions
+  or free); the animation takes its proportions from it. As in the video page.
+- **GIF studio, lighter animations:** *Fotogramas que se usan* keeps one picture of every 2, 3, 4 or 6; the time of the ones left out is
+  added to the one that stays, so the animation lasts the same and weighs less.
+- **Colours:** the eyedropper copies the colour as digits only (`0B27E3`), without the `#`. The readout in the bar still shows it with `#`.
+- **Pictures and their icons:** Windows shows, for each file, the icon of the program that opens it, and Foxy can only be offered, not
+  imposed (that is why `.webp` shows the fox and `.jpg` shows another program's). Settings > Windows > *Abrir las imágenes con Project Foxy*
+  takes you to the page of Windows where you choose it for each format.
+
 ## [0.3.8] — Wheel on the frame strip
 
 - **GIF studio:** the mouse wheel scrolls the strip of frames sideways (it runs horizontally, so the wheel had nothing to move).
@@ -275,6 +289,20 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.9] — Recorte y GIF más ligeros, iniciar con Windows corregido
+
+- **Corregido: «Iniciar con Windows» no hacía nada.** El programa no escribía nada en la lista de programas que arrancan con Windows (dos
+  descuidos en el código que escribe la entrada), así que nunca arrancaba solo. Ahora sí, con o sin ventana (*Iniciar minimizado en la
+  bandeja*). Si lo activaste antes, apágalo y vuelve a encenderlo.
+- **Estudio de GIF, recorte:** *Recorte* elige la parte de las imágenes que se queda (la misma para todas, con las proporciones de siempre
+  o libre); la animación toma sus proporciones de él. Como en la página de vídeo.
+- **Estudio de GIF, animaciones más ligeras:** *Fotogramas que se usan* deja una imagen de cada 2, 3, 4 o 6; el tiempo de las que se saltan
+  se suma a la que queda, así la animación dura lo mismo y pesa menos.
+- **Colores:** el cuentagotas copia el color solo con los dígitos (`0B27E3`), sin el `#`. La lectura de la barra lo sigue mostrando con `#`.
+- **Imágenes y sus iconos:** Windows muestra, en cada archivo, el icono del programa que lo abre, y Foxy solo puede ofrecerse, no
+  imponerse (por eso `.webp` sale con el zorro y `.jpg` con el de otro programa). Ajustes > Ventanas > *Abrir las imágenes con Project Foxy*
+  te lleva a la página de Windows donde lo eliges para cada formato.
 
 ## [0.3.8] — Rueda en la tira de fotogramas
 

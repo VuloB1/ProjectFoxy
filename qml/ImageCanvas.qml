@@ -1206,7 +1206,7 @@ Rectangle {
 
     // The colour readout (the window's bottom bar shows `pixelInfo` and `pixelCell` while the mouse is over the
     // picture) and the eyedropper: holding Alt turns the cursor into an eyedropper, and a click copies the colour
-    // as #RRGGBB.
+    // as RRGGBB (no "#").
     property bool altDown: false
     readonly property bool pickerOn: altDown && !cropActive && !editMode
     property string copiedHex: ""
@@ -1233,7 +1233,7 @@ Rectangle {
         if (info.valid !== true)
             return;
         const text = colorPicker.hex(info.r, info.g, info.b, info.a);
-        colorPicker.copyText(text);
+        colorPicker.copyText(text.substring(1)); // the six (or eight) digits, without the "#"
         copiedHex = text;
         copiedTimer.restart();
     }

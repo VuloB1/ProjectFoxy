@@ -50,8 +50,26 @@ QVariantMap defaultOptions()
     m.insert("webpLossless", false);
     m.insert("webpQuality", 80);
     m.insert("defaultHold", 100); // (a video or an animation brings its own)
+    m.insert("skip", 1);          // one picture of every `skip`
+    m.insert("cropX", 0.0);
+    m.insert("cropY", 0.0);
+    m.insert("cropW", 1.0);
+    m.insert("cropH", 1.0);
     return m;
 }
+
+// `source` cut to the crop (fractions of the picture).
+QImage cropped(const QImage &source, const QRectF &crop)
+{
+    if (source.isNull() || (crop.x() <= 0.0 && crop.y() <= 0.0 && crop.width() >= 0.999 && crop.height() >= 0.999))
+        return source;
+    const QRect r(qRound(crop.x() * source.width()), qRound(crop.y() * source.height()), std::max(1, qRound(crop.width() * source.width())),
+                  std::max(1, qRound(crop.height() * source.height())));
+    return source.copy(r.intersected(source.rect()));
+}
+
+// How much bigger a picture has to be read for what is left of it after the crop to be as sharp.
+double cropLoadFactor(const QRectF &crop) { return 1.0 / std::clamp(std::min(crop.width(), crop.height()), 0.05, 1.0); }
 
 QString entryName(const QString &path) { return QFileInfo(path).fileName(); }
 
@@ -84,9 +102,9 @@ private:
             if (c.first == index)
                 return c.second;
         const Settings &s = m_snap->settings;
-        const int side = std::max(s.size.width(), s.size.height()) * (s.fit == Fit::Cover ? 3 : 2);
-        const QImage source = AnimStudio::loadEntry(m_store, m_snap->entries[size_t(index)], side);
-        QImage out = renderFrame(source, s, m_snap->entries[size_t(index)].style);
+        const int side = std::min(8192, int(std::max(s.size.width(), s.size.height()) * (s.fit == Fit::Cover ? 3 : 2) * cropLoadFactor(m_snap->crop)));
+        const QImage source = cropped(AnimStudio::loadEntry(m_store, m_snap->used[size_t(index)], side), m_snap->crop);
+        QImage out = renderFrame(source, s, m_snap->used[size_t(index)].style);
         m_cache.push_back({index, out});
         if (m_cache.size() > 3)
             m_cache.erase(m_cache.begin());
@@ -174,8 +192,19 @@ AnimStudio::Snapshot AnimStudio::makeSnapshot() const
     s.webp.quality = o.value("webpQuality").toInt();
     s.webp.loops = loops;
     s.format = o.value("format").toInt();
+    s.skip = std::clamp(o.value("skip").toInt(), 1, 8);
+    s.crop = QRectF(o.value("cropX").toDouble(), o.value("cropY").toDouble(), o.value("cropW").toDouble(), o.value("cropH").toDouble());
+    // the pictures used: one of every `skip`, holding the time of the ones that are left out
+    for (size_t i = 0; i < m_entries.size(); i += size_t(s.skip)) {
+        Entry e = m_entries[i];
+        int total = 0;
+        for (size_t j = i; j < std::min(m_entries.size(), i + size_t(s.skip)); ++j)
+            total += m_entries[j].holdMs;
+        e.holdMs = total;
+        s.used.push_back(std::move(e));
+    }
     std::vector<int> holds;
-    for (const Entry &e : m_entries)
+    for (const Entry &e : s.used)
         holds.push_back(e.holdMs);
     s.plan = buildPlan(holds, st);
     s.revision = m_revision;
@@ -225,8 +254,11 @@ int AnimStudio::planDelay(int planIndex) const
 int AnimStudio::planIndexOf(int entryIndex) const
 {
     const auto snap = snapshot();
+    if (entryIndex % snap->skip != 0) // left out
+        return -1;
+    const int used = entryIndex / snap->skip;
     for (size_t i = 0; i < snap->plan.size(); ++i)
-        if (snap->plan[i].a == entryIndex && snap->plan[i].isStill())
+        if (snap->plan[i].a == used && snap->plan[i].isStill())
             return int(i);
     return -1;
 }
@@ -288,8 +320,10 @@ int AnimStudio::addPaths(const QStringList &paths)
             m_store->image(first.path, 64); // decodes it, which makes its real size known
             s = m_store->sourceSize(first.path);
         }
-        if (s.isValid() && s.height() > 0)
-            m_aspect = double(s.width()) / s.height();
+        if (s.isValid() && s.height() > 0) {
+            m_firstSize = s;
+            refreshAspect();
+        }
         if (m_sizeIsAutomatic)
             applyFirstSize(640);
     }
@@ -318,8 +352,10 @@ int AnimStudio::addFrames(const QList<QImage> &frames, int holdMs, const QString
     endInsertRows();
     if (wasEmpty) {
         const QSize s = m_entries.front().memory.size();
-        if (s.isValid() && s.height() > 0)
-            m_aspect = double(s.width()) / s.height();
+        if (s.isValid() && s.height() > 0) {
+            m_firstSize = s;
+            refreshAspect();
+        }
         applyFirstSize(std::max(s.width(), s.height())); // the size chosen for the video
         m_sizeIsAutomatic = false;
     }
@@ -391,6 +427,10 @@ void AnimStudio::clear()
     m_entries.clear();
     endResetModel();
     m_sizeIsAutomatic = true;
+    m_options.insert("cropX", 0.0); // a new animation starts whole
+    m_options.insert("cropY", 0.0);
+    m_options.insert("cropW", 1.0);
+    m_options.insert("cropH", 1.0);
     changed();
 }
 
@@ -572,6 +612,7 @@ void AnimStudio::setOption(const QString &key, const QVariant &value)
     else if (key == "gifColors") clampInt(2, 256);
     else if (key == "webpQuality") clampInt(0, 100);
     else if (key == "defaultHold") clampInt(20, 300);
+    else if (key == "skip") clampInt(1, 8);
     else if (key == "gifCompression") clampInt(0, 100);
     else if (key == "background") v = int(value.toUInt() & 0xFFFFFF);
     else if (key == "speed") v = std::clamp(value.toDouble(), 0.1, 10.0);
@@ -593,6 +634,32 @@ void AnimStudio::setOption(const QString &key, const QVariant &value)
     } else if (m_options.value("lockAspect").toBool() && key == "height") {
         m_options.insert("width", std::clamp(int(std::lround(m_options.value("height").toInt() * m_aspect)), 16, 4096));
     }
+    changed();
+}
+
+void AnimStudio::refreshAspect()
+{
+    const QRectF c(m_options.value("cropX").toDouble(), m_options.value("cropY").toDouble(), m_options.value("cropW").toDouble(),
+                   m_options.value("cropH").toDouble());
+    if (m_firstSize.isValid() && c.width() > 0 && c.height() > 0)
+        m_aspect = (c.width() * m_firstSize.width()) / (c.height() * m_firstSize.height());
+}
+
+void AnimStudio::setCrop(qreal x, qreal y, qreal w, qreal h)
+{
+    w = std::clamp(w, 0.05, 1.0);
+    h = std::clamp(h, 0.05, 1.0);
+    x = std::clamp(x, 0.0, 1.0 - w);
+    y = std::clamp(y, 0.0, 1.0 - h);
+    m_options.insert("cropX", x);
+    m_options.insert("cropY", y);
+    m_options.insert("cropW", w);
+    m_options.insert("cropH", h);
+    refreshAspect();
+    if (m_sizeIsAutomatic)
+        applyFirstSize(std::max(m_options.value("width").toInt(), m_options.value("height").toInt()));
+    else if (m_options.value("lockAspect").toBool()) // the proportions follow the crop, the width stays
+        m_options.insert("height", std::clamp(int(std::lround(m_options.value("width").toInt() / m_aspect)), 16, 4096));
     changed();
 }
 
@@ -638,17 +705,18 @@ QImage AnimStudio::previewFrame(int planIndex) const
     ps.size = QSize(std::max(8, int(std::lround(ps.size.width() * k))), std::max(8, int(std::lround(ps.size.height() * k))));
 
     auto fitted = [&](int entryIndex) -> QImage {
-        const Entry &e = snap->entries[size_t(entryIndex)];
-        const QString key = QStringLiteral("%1|%2x%3|%4|%5|%6|%7").arg(e.id).arg(ps.size.width()).arg(ps.size.height()).arg(int(ps.fit))
-                                .arg(ps.background.rgba(), 0, 16).arg(ps.transparentBackground).arg(e.style.signature());
+        const Entry &e = snap->used[size_t(entryIndex)];
+        const QString key = QStringLiteral("%1|%2x%3|%4|%5|%6|%7|%8,%9,%10,%11").arg(e.id).arg(ps.size.width()).arg(ps.size.height()).arg(int(ps.fit))
+                                .arg(ps.background.rgba(), 0, 16).arg(ps.transparentBackground).arg(e.style.signature())
+                                .arg(snap->crop.x()).arg(snap->crop.y()).arg(snap->crop.width()).arg(snap->crop.height());
         {
             QMutexLocker lock(&m_previewMutex);
             const auto it = m_previewFitted.constFind(key);
             if (it != m_previewFitted.constEnd())
                 return it.value();
         }
-        const int side = std::max(ps.size.width(), ps.size.height()) * 2;
-        const QImage out = renderFrame(loadEntry(m_store, e, side), ps, e.style);
+        const int side = std::min(8192, int(std::max(ps.size.width(), ps.size.height()) * 2 * cropLoadFactor(snap->crop)));
+        const QImage out = renderFrame(cropped(loadEntry(m_store, e, side), snap->crop), ps, e.style);
         QMutexLocker lock(&m_previewMutex);
         m_previewFitted.insert(key, out);
         m_previewOrder.append(key);

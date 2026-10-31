@@ -102,10 +102,16 @@ public:
 
     // One option: width, height, lockAspect, fit, background (0xRRGGBB), transparent, transition,
     // transitionMs, transitionSteps, transitionOnLoop, reverse, pingPong, speed, loops, format (0 GIF, 1 APNG,
-    // 2 WebP), gifColors, gifDither, gifLocal, webpLossless, webpQuality, defaultHold.
+    // 2 WebP), gifColors, gifDither, gifLocal, webpLossless, webpQuality, defaultHold, skip (use one picture of every `skip`).
     Q_INVOKABLE void setOption(const QString &key, const QVariant &value);
     // The size of the first picture, as the starting size (and, when the aspect is locked, the proportions).
     Q_INVOKABLE void sizeFromFirst(int longSide);
+    // The crop of the whole animation: the part of every picture that is kept, as fractions of the picture (x, y, w, h).
+    // The proportions of the animation follow it. (1, 1) of width and height = no crop.
+    Q_INVOKABLE void setCrop(qreal x, qreal y, qreal w, qreal h);
+    // The first picture, as it is (for choosing the crop on it): its entry id (-1 when there is none) and its size.
+    Q_INVOKABLE int firstEntryId() const { return m_entries.empty() ? -1 : m_entries.front().id; }
+    Q_INVOKABLE QSize firstSize() const { return m_firstSize; }
 
     // The playback: how long frame `planIndex` of the finished animation stays.
     Q_INVOKABLE int planDelay(int planIndex) const;
@@ -135,6 +141,11 @@ private:
     // Everything the background parts need, frozen: replaced (not edited) on every change.
     struct Snapshot {
         std::vector<Entry> entries;
+        // The pictures the animation is made of: all of them, or one of every `skip` (each takes the time of those it
+        // stands for, so the animation lasts the same).
+        std::vector<Entry> used;
+        int skip = 1;
+        QRectF crop = QRectF(0, 0, 1, 1);
         core::anim::Settings settings;
         std::vector<core::anim::PlanStep> plan;
         core::anim::GifOptions gif;
@@ -159,7 +170,9 @@ private:
     int m_nextId = 1;
     QVariantMap m_options;
     bool m_sizeIsAutomatic = true;
-    double m_aspect = 4.0 / 3.0; // width / height of the first picture
+    double m_aspect = 4.0 / 3.0; // width / height of the first picture, cut to the crop
+    QSize m_firstSize;           // the first picture, as it is
+    void refreshAspect();
     int m_revision = 0;
 
     mutable QMutex m_mutex; // guards m_snapshot
