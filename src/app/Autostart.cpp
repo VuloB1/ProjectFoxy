@@ -1,14 +1,16 @@
 #include "Autostart.h"
 
-#ifdef Q_OS_WIN
 #include <QCoreApplication>
 #include <QDir>
+#include <QString>
+
+#ifdef Q_OS_WIN
 #include <windows.h>
 
 void Autostart::apply(bool enabled, bool hidden)
 {
     HKEY key;
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\Microsoft\Windows\CurrentVersion\Run", 0, KEY_SET_VALUE, &key) != ERROR_SUCCESS)
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_SET_VALUE, &key) != ERROR_SUCCESS)
         return;
     if (enabled) {
         QString command = QLatin1Char('"') + QDir::toNativeSeparators(QCoreApplication::applicationFilePath()) + QLatin1Char('"');
