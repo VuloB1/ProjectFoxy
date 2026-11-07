@@ -1,4 +1,4 @@
-# Flatpak manifest of Project Foxy. Build and install it with packaging/linux/flatpak/build-flatpak.sh.
+# Flatpak manifest of Foxy Viewer. Build and install it with packaging/linux/flatpak/build-flatpak.sh.
 #
 # The KDE runtime brings Qt 6, Mesa (OpenGL), libheif, libaom, libwebp, libtiff, libjpeg, libpng and lcms2, kept up to date
 # by the runtime. What it does not have is built here from source, each pinned by hash: libvips, LibRaw, exiv2 and inih.

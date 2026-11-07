@@ -9,7 +9,7 @@ ApplicationWindow {
     minimumWidth: 480
     minimumHeight: 320
     visible: true
-    title: "Project Foxy"
+    title: "Foxy Viewer"
     // The native frame is off: TitleBar.qml is the title bar and the edge handles below resize it.
     flags: Qt.Window | Qt.FramelessWindowHint
     color: themeManager.background
@@ -70,7 +70,7 @@ ApplicationWindow {
         function onQuitRequested() { root.quitFromTray() }
     }
     Binding { target: trayIcon; property: "visible"; value: appSettings.keepInTray || !root.visible }
-    Binding { target: trayIcon; property: "openText"; value: qsTr("Abrir Project Foxy") }
+    Binding { target: trayIcon; property: "openText"; value: qsTr("Abrir Foxy Viewer") }
     Binding { target: trayIcon; property: "quitText"; value: qsTr("Salir") }
 
     // "Guardar": over the original file (after asking, unless switched off), or - for
@@ -195,7 +195,7 @@ ApplicationWindow {
         delegate: MouseArea {
             required property var modelData
             readonly property bool corner: (modelData.e & (Qt.LeftEdge | Qt.RightEdge)) && (modelData.e & (Qt.TopEdge | Qt.BottomEdge))
-            enabled: root.visibility !== Window.Maximized
+            visible: root.visibility !== Window.Maximized
             z: 20
             cursorShape: modelData.c
             width: (modelData.e & Qt.LeftEdge) || (modelData.e & Qt.RightEdge) ? 6 : root.width - 12

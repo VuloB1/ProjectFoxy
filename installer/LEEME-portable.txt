@@ -1,4 +1,4 @@
-Project Foxy - version de prueba (portable)
+Foxy Viewer - version de prueba (portable)
 ==========================================
 
 COMO USARLO
@@ -23,6 +23,6 @@ hiciste, con que archivo y, si puedes, una captura. OJO: el editor guarda sobre 
 solo si lo pides con Guardar; usa copias de tus fotos importantes para probar.
 
 LICENCIAS
-Project Foxy usa Qt, libvips, LibRaw, libheif, exiv2 y otras librerias. Los avisos y licencias
+Foxy Viewer usa Qt, libvips, LibRaw, libheif, exiv2 y otras librerias. Los avisos y licencias
 estan en la carpeta "licenses". exiv2 es GPL: quien reciba esta copia tiene derecho al codigo
 fuente del programa; pidemelo y te lo paso.

@@ -3,11 +3,11 @@
   <id>io.github.vulob1.ProjectFoxy</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <name>Project Foxy</name>
+  <name>Foxy Viewer</name>
   <summary>Fast image viewer and editor with GIF maker, collage and compare</summary>
   <description>
     <p>
-      Project Foxy opens JPEG, PNG, WebP, TIFF, BMP, GIF, ICO, HEIC/HEIF, AVIF and camera RAW files quickly, with a thumbnail
+      Foxy Viewer opens JPEG, PNG, WebP, TIFF, BMP, GIF, ICO, HEIC/HEIF, AVIF and camera RAW files quickly, with a thumbnail
       bar, smooth GPU zoom and a before/after comparison.
     </p>
     <p>

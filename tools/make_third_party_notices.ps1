@@ -38,10 +38,10 @@ $ports = [ordered]@{
     'zlib'          = 'zlib - compression'
 }
 $sb = New-Object System.Text.StringBuilder
-[void]$sb.AppendLine('Project Foxy - third-party software notices')
+[void]$sb.AppendLine('Foxy Viewer - third-party software notices')
 [void]$sb.AppendLine('==========================================')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('Project Foxy uses the open-source components listed below. Each keeps its own licence;')
+[void]$sb.AppendLine('Foxy Viewer uses the open-source components listed below. Each keeps its own licence;')
 [void]$sb.AppendLine('the licence/copyright text of every one follows, exactly as vcpkg installed it.')
 [void]$sb.AppendLine('The Qt framework (LGPLv3) is used as dynamic libraries; its licence texts and source')
 [void]$sb.AppendLine('offer are available from https://www.qt.io/licensing/ and must accompany any distribution.')
@@ -69,7 +69,7 @@ The camera and lens profiles used by the "Lente" tool come from the Lensfun proj
 (https://lensfun.github.io/), (c) the Lensfun contributors, and are distributed
 unmodified under the Creative Commons Attribution-ShareAlike 3.0 licence
 (https://creativecommons.org/licenses/by-sa/3.0/legalcode). The Lensfun library itself
-is NOT used: Project Foxy reads the XML files with its own code. Redistributing or
+is NOT used: Foxy Viewer reads the XML files with its own code. Redistributing or
 changing the profile files keeps them under CC BY-SA 3.0; that licence covers the data
 files, not the rest of the program.
 '@

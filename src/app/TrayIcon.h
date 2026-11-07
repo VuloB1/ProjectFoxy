@@ -40,5 +40,5 @@ private:
     bool m_visible = false;
     QString m_openText = QStringLiteral("Open");
     QString m_quitText = QStringLiteral("Quit");
-    QString m_tip = QStringLiteral("Project Foxy");
+    QString m_tip = QStringLiteral("Foxy Viewer");
 };

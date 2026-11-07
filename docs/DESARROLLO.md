@@ -1,4 +1,4 @@
-# Project Foxy — Documento de desarrollo
+# Foxy Viewer — Documento de desarrollo
 
 > Documento pensado para pasárselo a un revisor externo (por ejemplo ChatGPT) y
 > pedirle opinión sobre el desarrollo: qué mejorar, qué riesgos hay y qué falta
@@ -1271,9 +1271,9 @@ reinstale lo afectado en el siguiente `cmake --build`.
 
 **Barra de miniaturas configurable.** `ThumbnailStrip.qml` pasó de `ListView` a `GridView`: `appSettings.stripColumns` (1–4) × `stripThumbSize` (48–200 px, tope: la mitad de la ventana). Arrastrando el borde derecho con el mouse cambia el tamaño en vivo (`liveCell`, sin animación) y al soltar se guarda en `stripThumbSize`. `appSettings.stripMode`: `manual` (la pestaña abre/cierra), `open` y `closed` (sin pestaña) y `auto` (cerrada al editar y con la ventana de menos de 900 px; la pestaña puede invertir la decisión hasta que cambie la situación). Las miniaturas se piden a 160 px, o a 256 si el tamaño pasa de 110. Se configura en Configuración > Apariencia > «Barra de miniaturas». +1 prueba en `test_app_settings`.
 
-**Nombre e icono: «Project Foxy».** Título de la ventana en `Main.qml`; icono en `resources/icons/icon.png` (ventana, `main.cpp`) y `icon.ico` (el `.exe`, vía `resources/app.rc`). `applicationName`/`organizationName` siguen siendo `ImageViewer` a propósito: de ellos cuelgan las carpetas de configuración y caché, y cambiarlos perdería los ajustes de quien ya lo usa. El ejecutable, el target de CMake y el proyecto aún se llaman `ImageViewer`.
+**Nombre e icono: «Foxy Viewer».** Título de la ventana en `Main.qml`; icono en `resources/icons/icon.png` (ventana, `main.cpp`) y `icon.ico` (el `.exe`, vía `resources/app.rc`). `applicationName`/`organizationName` siguen siendo `ImageViewer` a propósito: de ellos cuelgan las carpetas de configuración y caché, y cambiarlos perdería los ajustes de quien ya lo usa. El ejecutable, el target de CMake y el proyecto aún se llaman `ImageViewer`.
 
-**Cambio de nombre.** El programa se llamaba «ImageViewer» y ahora es **Project Foxy**: ejecutable `ProjectFoxy.exe`, ventana, documentos, licencias y carpeta de configuración (`%LOCALAPPDATA%\ProjectFoxy`; la primera vez se copia el `settings.ini` de la carpeta antigua `ImageViewer`, la caché de miniaturas se regenera). El target de CMake, el módulo QML (`ImageViewerApp`) y las rutas de compilación conservan el nombre antiguo a propósito. (Donde este documento dice «ImageViewer» entre comillas de código es ese nombre interno.)
+**Cambio de nombre.** El programa se llamaba «ImageViewer» y ahora es **Foxy Viewer**: ejecutable `ProjectFoxy.exe`, ventana, documentos, licencias y carpeta de configuración (`%LOCALAPPDATA%\ProjectFoxy`; la primera vez se copia el `settings.ini` de la carpeta antigua `ImageViewer`, la caché de miniaturas se regenera). El target de CMake, el módulo QML (`ImageViewerApp`) y las rutas de compilación conservan el nombre antiguo a propósito. (Donde este documento dice «ImageViewer» entre comillas de código es ese nombre interno.)
 
 **Rendimiento de los efectos (lag con otros programas).** Los efectos pesados (Giratorio, Zoom, Movimiento, Semitono, Quitar ruido) saturaban todos los núcleos a prioridad normal y dejaban sin CPU al resto del equipo (un vídeo de YouTube se congelaba mientras se arrastraba un slider). Ahora el pool de filas (`ParallelRows.h`) deja dos núcleos libres (uno en equipos pequeños) y sus hilos corren con prioridad `Lowest`. Además se aceleraron los bucles: muestreo bilineal en `float` (`accumulate`), giro por recurrencia con tabla de seno/coseno en Giratorio, un punto por celda calculado una sola vez en Semitono y red de ordenación de 19 comparaciones para la mediana 3×3. Resultado en 24 MP: Quitar ruido 2,7× más rápido, Semitono 3,7× (salidas idénticas bit a bit), Giratorio y Zoom ~2×. `bench_effects` (en `tests/`, no es una prueba) mide tiempo real y de CPU de cada efecto: `bench_effects [ladoLargo] [id...]`, con `BENCH_IMG`/`BENCH_SAVE` opcionales.
 
@@ -1290,7 +1290,7 @@ Todo lo necesario para publicar en GitHub está en el repositorio:
   directo opcional y, opcionalmente, **registra el programa como abridor de imágenes** (`ProjectFoxy.Image` con su
   ícono, «Abrir con» para cada extensión que lee y `Capabilities` + `RegisteredApplications` para que aparezca en
   *Aplicaciones predeterminadas*). Windows no deja que un programa se ponga solo como predeterminado: el último paso lo
-  hace la persona; cuando elige Project Foxy para un tipo, el Explorador muestra su ícono sobre esos archivos. El
+  hace la persona; cuando elige Foxy Viewer para un tipo, el Explorador muestra su ícono sobre esos archivos. El
   desinstalador borra todo lo que el instalador registró.
 - `.github/workflows/ci.yml` (compila y prueba en cada *push*/PR) y `release.yml` (al subir una etiqueta `vX.Y.Z`:
   compila, arma instalador y zip y publica la *release*). **No se pudieron probar localmente**; el CI y `release.yml` ya
@@ -1326,7 +1326,7 @@ Seis idiomas: español (el original), inglés, portugués (Brasil), coreano, chi
 
 ## 16. Linux (8‑oct‑2026, versión 0.2.0)
 
-Project Foxy corre en Linux como **AppImage** y **Flatpak**. Todo vive en `packaging/linux/` y en `.github/workflows/`.
+Foxy Viewer corre en Linux como **AppImage** y **Flatpak**. Todo vive en `packaging/linux/` y en `.github/workflows/`.
 
 - **AppImage** (`build-appimage.sh`): linuxdeploy + plugin de Qt fijados por hash, compilado en Ubuntu 22.04; exige
   glibc ≥ 2.35 (libstdc++ de GCC 12). Los plugins de Wayland se copian a mano. `smoke-appimage.sh` lo arranca en el CI.
@@ -1410,7 +1410,7 @@ largo** (y la imagen real tiene más de 5120), `ImageProvider` sirve una copia r
 
 ## 19. Una sola ventana (11‑oct‑2026)
 
-Abrir una imagen mientras Project Foxy ya está abierto (doble clic en el Explorador, «Abrir con») ya no arranca otro
+Abrir una imagen mientras Foxy Viewer ya está abierto (doble clic en el Explorador, «Abrir con») ya no arranca otro
 proceso: se la pasa al que corre y le trae la ventana al frente.
 
 - **`SingleInstance`** (`src/app/SingleInstance.{h,cpp}`). La primera instancia escucha en un `QLocalServer` **del usuario**
@@ -1478,7 +1478,7 @@ teclado sintéticos, con la plataforma `offscreen` de Qt y su renderizador por s
   `tools/Test-ResizeStrips.ps1` lo mide); `QT_D3D_NO_FLIP=1` no sirve: sale blanca. **Congelamientos al redimensionar
   (12‑oct‑2026):** en una Radeon RX 6750 XT con Direct3D 11 la interfaz se congela de 100 ms a 2 s al agrandar la ventana
   con el mouse; no pasa en la GTX 1050 Ti del mismo equipo, ni con Direct3D 12, Vulkan u OpenGL, y una ventana Qt Quick
-  mínima también lo sufre (menos), así que no es de Project Foxy. Las pilas muestreadas dejan al hilo de dibujo esperando
+  mínima también lo sufre (menos), así que no es de Foxy Viewer. Las pilas muestreadas dejan al hilo de dibujo esperando
   dentro de `dxgi.dll` / `amdxx64.dll` (el `Present`). **Desactivar el V-Sync lo arregla** (`QSG_NO_VSYNC=1`: `Present(0,
   ALLOW_TEARING)`; la CPU en reposo no sube). Por eso existe el ajuste «Sincronizar con la pantalla (V-Sync)»
   (`AppSettings::verticalSync`, `window/verticalSync`, activado por defecto): `main.cpp` pone `QSG_NO_VSYNC=1` antes de

@@ -30,7 +30,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Project Foxy version / Versión de Project Foxy
+      label: Foxy Viewer version / Versión de Foxy Viewer
       description: In "Information" (the ⓘ icon of the top bar) or in the installer's name. / En «Información» (el ícono ⓘ de la barra superior) o en el nombre del instalador.
       placeholder: "0.3.9"
     validations:

@@ -8,7 +8,7 @@
 class QLocalServer;
 class QLocalSocket;
 
-// One window for the program: opening a picture while Project Foxy is already running (double click in the file
+// One window for the program: opening a picture while Foxy Viewer is already running (double click in the file
 // manager, "Open with") hands the file to the running one and brings its window forward, instead of starting a
 // second process.
 //

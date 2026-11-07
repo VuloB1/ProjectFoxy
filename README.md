@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/assets/banner.png" alt="Project Foxy" width="100%">
+<img src="docs/assets/banner.png" alt="Foxy Viewer" width="100%">
 
-# Project Foxy
+# Foxy Viewer
 
 **A modern, lightweight and fast image viewer for Windows and Linux, with a full photo editor built in.**
 
@@ -72,7 +72,7 @@ Go to the [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases/latest) 
 
 | | |
 |---|---|
-| **`ProjectFoxy-Setup-x.y.z.exe`** | The installer. It needs no administrator rights (it installs for your user), creates the shortcut and, if you want, adds Project Foxy to "Open with" and to Windows' *Default apps*. |
+| **`ProjectFoxy-Setup-x.y.z.exe`** | The installer. It needs no administrator rights (it installs for your user), creates the shortcut and, if you want, adds Foxy Viewer to "Open with" and to Windows' *Default apps*. |
 | **`ProjectFoxy-portable-x.y.z.zip`** | Portable version: unzip the **whole** folder and open `ProjectFoxy.exe`. It keeps its settings next to the program and does not touch the registry (except the sign-in entry, if you turn on *Start with Windows*). |
 
 Requirements: 64-bit Windows 10 or 11. Windows may warn "Windows protected your PC" because the program is not signed
@@ -274,7 +274,7 @@ Bugs and ideas are welcome: open an *issue* (there are templates) or read [`CONT
 
 <div align="center">
 
-<img src="docs/assets/banner-es.png" alt="Project Foxy" width="100%">
+<img src="docs/assets/banner-es.png" alt="Foxy Viewer" width="100%">
 
 # 🇪🇸 Español
 
@@ -337,7 +337,7 @@ Ve a la página de [**Releases**](https://github.com/VuloB1/ProjectFoxy/releases
 
 | | |
 |---|---|
-| **`ProjectFoxy-Setup-x.y.z.exe`** | El instalador. No pide permisos de administrador (se instala para tu usuario), crea el acceso directo y, si quieres, deja a Project Foxy en «Abrir con» y en *Aplicaciones predeterminadas* de Windows. |
+| **`ProjectFoxy-Setup-x.y.z.exe`** | El instalador. No pide permisos de administrador (se instala para tu usuario), crea el acceso directo y, si quieres, deja a Foxy Viewer en «Abrir con» y en *Aplicaciones predeterminadas* de Windows. |
 | **`ProjectFoxy-portable-x.y.z.zip`** | Versión portable: descomprime **toda** la carpeta y abre `ProjectFoxy.exe`. Guarda su configuración al lado del programa y no toca el registro (salvo la entrada de inicio, si activas *Iniciar con Windows*). |
 
 Requisitos: Windows 10 u 11 de 64 bits. Windows puede avisar con «Windows protegió su PC» porque el programa aún

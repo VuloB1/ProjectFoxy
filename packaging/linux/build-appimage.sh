@@ -102,8 +102,8 @@ linuxdeploy-x86_64.AppImage \
     --plugin qt \
     --output appimage
 
-# The output name comes from the desktop file's Name ("Project_Foxy-...").
-produced="$(ls -t Project_Foxy-*"$ARCH".AppImage 2>/dev/null | head -n1 || true)"
+# The output name comes from the desktop file's Name ("Foxy_Viewer-...").
+produced="$(ls -t Foxy_Viewer-*"$ARCH".AppImage 2>/dev/null | head -n1 || true)"
 final="ProjectFoxy-$VERSION-$ARCH.AppImage"
 [ -n "$produced" ] && mv -f "$produced" "$final"
 echo "built: $OUT_DIR/$final"

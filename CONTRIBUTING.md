@@ -1,4 +1,4 @@
-# Contributing to Project Foxy
+# Contributing to Foxy Viewer
 
 *(Español más abajo / Spanish below.)*
 

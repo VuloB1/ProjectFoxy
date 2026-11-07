@@ -9,7 +9,7 @@ Q_DECLARE_METATYPE(SingleInstance::Result)
 
 namespace {
 
-// A name nobody else is using, so tests (and a real Project Foxy that may be running) never meet.
+// A name nobody else is using, so tests (and a real Foxy Viewer that may be running) never meet.
 QString uniqueName()
 {
     const QString token = QUuid::createUuid().toString(QUuid::Id128).left(12);

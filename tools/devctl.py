@@ -1,4 +1,4 @@
-"""Talk to a Project Foxy built with -DPROJECTFOXY_DEV_SERVER=ON and started with PROJECTFOXY_DEV_PORT set.
+"""Talk to a Foxy Viewer built with -DPROJECTFOXY_DEV_SERVER=ON and started with PROJECTFOXY_DEV_PORT set.
 
     python tools/devctl.py [--port 47800] items
     python tools/devctl.py get maximizeButton width

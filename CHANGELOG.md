@@ -3,6 +3,11 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [Unreleased]
+
+- **New name: Foxy Viewer.** The program, installer, shortcuts, tray and pages now say *Foxy Viewer*. Upgrading removes the old *Project Foxy* shortcuts. Files, settings and the repository keep the `ProjectFoxy` identifiers.
+- **Fixed:** with the window maximized, the resize cursor no longer shows at the edges.
+
 ## [0.3.9] — Crop and lighter GIFs, start with Windows fixed
 
 - **Fixed: "Start with Windows" did nothing.** The program wrote nothing to Windows' list of programs that start with it (two slips in the
@@ -289,6 +294,11 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [Sin publicar]
+
+- **Nuevo nombre: Foxy Viewer.** El programa, el instalador, los accesos directos, la bandeja y las páginas ahora dicen *Foxy Viewer*. Al actualizar se quitan los accesos *Project Foxy* antiguos. Los archivos, los ajustes y el repositorio conservan los identificadores `ProjectFoxy`.
+- **Corregido:** con la ventana maximizada ya no aparece el cursor de redimensionar en los bordes.
 
 ## [0.3.9] — Recorte y GIF más ligeros, iniciar con Windows corregido
 

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Builds Project Foxy and produces what gets published: the installer and the portable .zip.
+    Builds Foxy Viewer and produces what gets published: the installer and the portable .zip.
 
 .DESCRIPTION
     1. configures and builds the preset (and runs the tests, unless -SkipTests);
@@ -48,7 +48,7 @@ $rcDotted = "$($rcVersion[1].Value).$($rcVersion[2].Value).$($rcVersion[3].Value
 if ($vcpkgVersion -ne $Version -or $rcDotted -ne $Version) {
     throw "Version mismatch: release $Version, vcpkg.json $vcpkgVersion, resources/app.rc $rcDotted."
 }
-Write-Host "Project Foxy $Version" -ForegroundColor Cyan
+Write-Host "Foxy Viewer $Version" -ForegroundColor Cyan
 
 # ---- the compiler's environment
 if (-not (Get-Command cl.exe -ErrorAction SilentlyContinue)) {
