@@ -1,4 +1,4 @@
-"""Translation catalogue of Project Foxy.
+"""Translation catalogue of Foxy Viewer.
 
 The program is written in Spanish: the Spanish text IS the key. QML uses qsTr("..."), C++ uses tr("...") /
 core::tr("...") and the effect tables (names, sliders, presets...) are translated where they cross into the

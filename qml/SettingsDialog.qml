@@ -541,7 +541,7 @@ AppDialog {
                         SettingRow {
                             visible: trayIcon.available
                             label: qsTr("Iniciar con Windows")
-                            hint: qsTr("Abre Project Foxy al iniciar sesión.")
+                            hint: qsTr("Abre Foxy Viewer al iniciar sesión.")
                             AppSwitch {
                                 checked: appSettings.startWithWindows
                                 onToggled: appSettings.startWithWindows = checked
@@ -564,11 +564,11 @@ AppDialog {
                         Divider { visible: trayIcon.available }
                         SettingRow {
                             visible: trayIcon.available
-                            label: qsTr("Abrir las imágenes con Project Foxy")
-                            hint: qsTr("Windows decide con qué programa se abre cada tipo de archivo, y el icono del archivo es el de ese programa. Elige Project Foxy en cada formato para que se abran con él y muestren su icono.")
+                            label: qsTr("Abrir las imágenes con Foxy Viewer")
+                            hint: qsTr("Windows decide con qué programa se abre cada tipo de archivo, y el icono del archivo es el de ese programa. Elige Foxy Viewer en cada formato para que se abran con él y muestren su icono.")
                             AppButton {
                                 text: qsTr("Elegir en Windows…")
-                                onClicked: Qt.openUrlExternally("ms-settings:defaultapps?registeredAppUser=Project%20Foxy")
+                                onClicked: Qt.openUrlExternally("ms-settings:defaultapps?registeredAppUser=Foxy%20Viewer")
                             }
                         }
                         Divider { visible: trayIcon.available }

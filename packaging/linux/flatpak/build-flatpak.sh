@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the Flatpak of Project Foxy and a single-file bundle (ProjectFoxy-<version>.flatpak) that can be installed with
+# Builds the Flatpak of Foxy Viewer and a single-file bundle (ProjectFoxy-<version>.flatpak) that can be installed with
 #   flatpak install --user ProjectFoxy-<version>.flatpak
 #
 # Needs flatpak and flatpak-builder, and the Flathub remote (the KDE runtime and SDK 6.10 come from it):

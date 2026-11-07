@@ -498,7 +498,7 @@ Item {
             Label {
                 color: themeManager.textSecondary
                 font.pixelSize: 11
-                text: qsTr("Project Foxy %1").arg(Qt.application.version)
+                text: qsTr("Foxy Viewer %1").arg(Qt.application.version)
             }
 
             Rectangle {

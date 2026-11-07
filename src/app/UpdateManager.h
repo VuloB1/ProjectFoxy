@@ -11,7 +11,7 @@
 class AppSettings;
 class QNetworkReply;
 
-// Looks on GitHub for a newer published version of Project Foxy and, on Windows when the program was installed with
+// Looks on GitHub for a newer published version of Foxy Viewer and, on Windows when the program was installed with
 // its installer, downloads that installer, checks it against the release's SHA256SUMS.txt and runs it.
 //
 // States (`state`): "idle" (nothing to say), "checking", "upToDate" (only after a manual check), "available" (a newer

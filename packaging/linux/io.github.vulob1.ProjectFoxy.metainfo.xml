@@ -3,11 +3,11 @@
   <id>io.github.vulob1.ProjectFoxy</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
-  <name>Project Foxy</name>
+  <name>Foxy Viewer</name>
   <summary>Fast image viewer and editor with GIF maker, collage and compare</summary>
   <description>
     <p>
-      Project Foxy opens JPEG, PNG, WebP, TIFF, BMP, GIF, ICO, HEIC/HEIF, AVIF and camera RAW files quickly, with a thumbnail
+      Foxy Viewer opens JPEG, PNG, WebP, TIFF, BMP, GIF, ICO, HEIC/HEIF, AVIF and camera RAW files quickly, with a thumbnail
       bar, smooth GPU zoom and a before/after comparison.
     </p>
     <p>
@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.10" date="2026-11-07">
+      <description>
+        <p>The program is now called Foxy Viewer. No resize cursor at the edges when the window is maximized.</p>
+      </description>
+    </release>
     <release version="0.3.9" date="2026-10-31">
       <description>
         <p>GIF studio: crop and skipping frames. The colour picker copies the digits without the #. Fixes "Start with Windows".</p>

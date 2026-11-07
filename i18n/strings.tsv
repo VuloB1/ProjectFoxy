@@ -835,7 +835,7 @@ Imagen %1 de %2	Image %1 of %2	Imagem %1 de %2	이미지 %1 / %2	图像 %1/%2	�
 Información	Information	Informações	정보	信息	情報
 Más herramientas	More tools	Mais ferramentas	도구 더 보기	更多工具	その他のツール
 Podrás recuperarlo desde la Papelera si cambias de idea.	You can recover it from the Recycle Bin if you change your mind.	Você poderá recuperá-lo da Lixeira se mudar de ideia.	마음이 바뀌면 휴지통에서 복구할 수 있습니다.	如果改变主意，可以从回收站中恢复。	気が変わった場合はごみ箱から復元できます。
-Project Foxy %1					
+Foxy Viewer %1					
 Renombrar por lote…	Batch rename…	Renomear em lote…	일괄 이름 바꾸기…	批量重命名…	一括名前変更…
 Sin datos EXIF	No EXIF data	Sem dados EXIF	EXIF 데이터 없음	无 EXIF 数据	EXIF データなし
 Sin imagen	No image	Sem imagem	이미지 없음	无图像	画像なし
@@ -881,7 +881,7 @@ Creado con	Built with	Criado com	제작 도구	构建于	使用技術
 Desarrollado con la ayuda de Claude, de Anthropic	Developed with the help of Claude, by Anthropic	Desenvolvido com a ajuda do Claude, da Anthropic	Anthropic의 Claude의 도움으로 개발됨	在 Anthropic 的 Claude 帮助下开发	Anthropic の Claude の協力で開発
 Creador y autor	Creator and author	Criador e autor	제작자	创作者与作者	作者
 Sitio web	Website	Site	웹사이트	网站	ウェブサイト
-Si Project Foxy te gusta, puedes apoyar su desarrollo.	If you like Project Foxy, you can support its development.	Se você gosta do Project Foxy, pode apoiar o desenvolvimento.	Project Foxy가 마음에 드신다면 개발을 후원해 주세요.	如果您喜欢 Project Foxy，可以支持它的开发。	Project Foxy を気に入っていただけたら、開発を応援してください。
+Si Foxy Viewer te gusta, puedes apoyar su desarrollo.	If you like Foxy Viewer, you can support its development.	Se você gosta do Foxy Viewer, pode apoiar o desenvolvimento.	Foxy Viewer가 마음에 드신다면 개발을 후원해 주세요.	如果您喜欢 Foxy Viewer，可以支持它的开发。	Foxy Viewer を気に入っていただけたら、開発を応援してください。
 Invítame a un café en Ko-fi	Buy me a coffee on Ko-fi	Me pague um café no Ko-fi	Ko-fi에서 커피 한 잔 사주기	在 Ko-fi 请我喝杯咖啡	Ko-fi でコーヒーをおごる
 Agradecimientos	Acknowledgements	Agradecimentos	감사의 말	致谢	謝辞
 Legal	Legal	Legal	법적 고지	法律信息	法的情報
@@ -1032,12 +1032,12 @@ Quitar efecto y texto	Remove effect and text	Remover efeito e texto	효과와 �
 Tramado (degradados más suaves, pesa más)	Dithering (smoother gradients, heavier)	Pontilhado (gradientes mais suaves, pesa mais)	디더링 (그라데이션이 부드러워지지만 용량 증가)	抖动（渐变更平滑，文件更大）	ディザリング (グラデーションが滑らかになるが重くなる)
 Vale para todos los fotogramas. Cuanto menos dura cada uno, más fluido se ve (los visores muestran los de menos de 20 ms como más lentos).	Applies to all frames. The shorter each one lasts, the smoother it looks (viewers show those under 20 ms as slower).	Vale para todos os quadros. Quanto menos dura cada um, mais fluido fica (os visualizadores mostram os de menos de 20 ms como mais lentos).	모든 프레임에 적용됩니다. 각 프레임이 짧을수록 부드럽게 보입니다 (뷰어는 20ms 미만을 더 느리게 표시합니다).	适用于所有帧。每帧越短越流畅（查看器会把低于 20 毫秒的帧显示得更慢）。	すべてのフレームに適用されます。1枚が短いほど滑らかに見えます (20ms未満は多くのビューアーで遅く表示されます)。
 Escribe el texto de la animación	Write the text of the animation	Escreva o texto da animação	애니메이션의 텍스트 입력	输入动画的文字	アニメーションのテキストを入力
-Abrir Project Foxy	Open Project Foxy	Abrir o Project Foxy	Project Foxy 열기	打开 Project Foxy	Project Foxy を開く
+Abrir Foxy Viewer	Open Foxy Viewer	Abrir o Foxy Viewer	Foxy Viewer 열기	打开 Foxy Viewer	Foxy Viewer を開く
 Seguir abierto en la bandeja	Stay open in the tray	Continuar aberto na bandeja	트레이에서 계속 실행	保留在托盘中	トレイに常駐する
 Al cerrar la ventana el programa se queda cargado junto al reloj, sin ventana, y se abre al instante. Ocupa algo de memoria mientras tanto. Para salir del todo, usa «Salir» en el menú de su icono.	When you close the window the program stays loaded next to the clock, without a window, and opens instantly. It uses some memory meanwhile. To quit completely, use "Quit" in its icon's menu.	Ao fechar a janela, o programa continua carregado junto ao relógio, sem janela, e abre na hora. Usa alguma memória enquanto isso. Para sair de vez, use «Sair» no menu do ícone.	창을 닫아도 프로그램이 시계 옆에 로드된 채 남아 즉시 열립니다. 그동안 메모리를 조금 사용합니다. 완전히 종료하려면 아이콘 메뉴에서 «종료»를 사용하세요.	关闭窗口后，程序会无窗口地留在时钟旁，可立即打开，期间会占用一些内存。要完全退出，请使用其图标菜单中的“退出”。	ウィンドウを閉じてもプログラムは時計の横に読み込まれたまま残り、すぐに開きます。その間メモリを少し使用します。完全に終了するには、アイコンのメニューの「終了」を使ってください。
 Salir	Quit	Sair	종료	退出	終了
 Iniciar con Windows	Start with Windows	Iniciar com o Windows	Windows와 함께 시작	随 Windows 启动	Windows と同時に起動
-Abre Project Foxy al iniciar sesión.	Opens Project Foxy when you sign in.	Abre o Project Foxy ao iniciar a sessão.	로그인할 때 Project Foxy를 엽니다.	登录时打开 Project Foxy。	サインイン時に Project Foxy を開きます。
+Abre Foxy Viewer al iniciar sesión.	Opens Foxy Viewer when you sign in.	Abre o Foxy Viewer ao iniciar a sessão.	로그인할 때 Foxy Viewer를 엽니다.	登录时打开 Foxy Viewer。	サインイン時に Foxy Viewer を開きます。
 Iniciar minimizado en la bandeja	Start minimized in the tray	Iniciar minimizado na bandeja	트레이에 최소화하여 시작	启动时最小化到托盘	トレイに最小化して起動
 Arranca sin ventana, solo con el icono junto al reloj, y se abre al instante cuando lo necesites. Si está apagado, al iniciar sesión se abre la ventana. Necesita «Seguir abierto en la bandeja».	Starts without a window, only the icon next to the clock, and opens instantly when you need it. If it is off, the window opens when you sign in. It needs "Stay open in the tray".	Inicia sem janela, só com o ícone junto ao relógio, e abre na hora quando você precisar. Se estiver desligado, a janela abre ao iniciar a sessão. Precisa de «Continuar aberto na bandeja».	창 없이 시계 옆 아이콘만 두고 시작하며, 필요할 때 즉시 열립니다. 꺼져 있으면 로그인할 때 창이 열립니다. «트레이에서 계속 실행»이 필요합니다.	无窗口启动，只在时钟旁显示图标，需要时立即打开。关闭时，登录后会打开窗口。需要启用“保留在托盘中”。	ウィンドウなしで起動し、時計の横にアイコンだけを置いて、必要なときにすぐ開きます。オフの場合はサインイン時にウィンドウが開きます。「トレイに常駐する」が必要です。
 Reconocer texto	Recognize text	Reconhecer texto	텍스트 인식	识别文字	テキストを認識
@@ -1066,7 +1066,7 @@ Suelta las imágenes o el vídeo para añadirlos	Drop the pictures or the video 
 1 de cada 3	1 of every 3	1 de cada 3	3개 중 1개	每 3 帧取 1 帧	3枚に1枚
 1 de cada 4	1 of every 4	1 de cada 4	4개 중 1개	每 4 帧取 1 帧	4枚に1枚
 1 de cada 6	1 of every 6	1 de cada 6	6개 중 1개	每 6 帧取 1 帧	6枚に1枚
-Abrir las imágenes con Project Foxy	Open pictures with Project Foxy	Abrir as imagens com o Project Foxy	Project Foxy로 이미지 열기	用 Project Foxy 打开图片	画像を Project Foxy で開く
+Abrir las imágenes con Foxy Viewer	Open pictures with Foxy Viewer	Abrir as imagens com o Foxy Viewer	Foxy Viewer로 이미지 열기	用 Foxy Viewer 打开图片	画像を Foxy Viewer で開く
 Corta la misma parte de todas las imágenes. Las proporciones de la animación siguen al recorte.	Cuts the same part out of every picture. The proportions of the animation follow the crop.	Corta a mesma parte de todas as imagens. As proporções da animação seguem o recorte.	모든 이미지에서 같은 부분을 잘라냅니다. 애니메이션 비율이 자르기를 따릅니다.	从所有图片中裁剪相同的部分。动画的比例随裁剪而变。	すべての画像から同じ部分を切り抜きます。アニメーションの縦横比は切り抜きに従います。
 Elegir el recorte	Choose the crop	Escolher o recorte	자르기 선택	选择裁剪	切り抜きを選ぶ
 Elegir en Windows…	Choose in Windows…	Escolher no Windows…	Windows에서 선택…	在 Windows 中选择…	Windows で選ぶ…
@@ -1075,4 +1075,4 @@ Quitar el recorte	Remove the crop	Remover o recorte	자르기 제거	移除裁�
 Recorte activo: %1 × %2 %	Crop on: %1 × %2 %	Recorte ativo: %1 × %2 %	자르기 적용됨: %1 × %2 %	已裁剪：%1 × %2 %	切り抜き中: %1 × %2 %
 Se saltan los fotogramas intermedios y su tiempo se suma al que se queda: el GIF pesa menos y dura lo mismo.	The frames in between are skipped and their time is added to the one that stays: the GIF weighs less and lasts the same.	Os quadros intermediários são pulados e o tempo deles soma-se ao que fica: o GIF pesa menos e dura o mesmo.	중간 프레임을 건너뛰고 그 시간은 남는 프레임에 더해집니다. GIF 용량은 줄고 길이는 그대로입니다.	跳过中间的帧，其时间并入保留的帧：GIF 更小，时长不变。	間のフレームを飛ばし、その時間は残るフレームに加算されます。GIF は軽くなり、長さは変わりません。
 Sin recorte	No crop	Sem recorte	자르기 없음	无裁剪	切り抜きなし
-Windows decide con qué programa se abre cada tipo de archivo, y el icono del archivo es el de ese programa. Elige Project Foxy en cada formato para que se abran con él y muestren su icono.	Windows decides which program opens each type of file, and the file's icon is that program's. Choose Project Foxy for each format so they open with it and show its icon.	O Windows decide com qual programa cada tipo de arquivo abre, e o ícone do arquivo é o desse programa. Escolha o Project Foxy em cada formato para que abram com ele e mostrem o ícone dele.	Windows는 파일 형식마다 열 프로그램을 정하며, 파일 아이콘도 그 프로그램의 것입니다. 형식마다 Project Foxy를 선택하면 그것으로 열리고 아이콘도 표시됩니다.	Windows 会决定每种文件用哪个程序打开，文件图标也是该程序的。为每种格式选择 Project Foxy，即可用它打开并显示它的图标。	Windows はファイルの種類ごとに開くプログラムを決め、ファイルのアイコンもそのプログラムのものになります。各形式で Project Foxy を選ぶと、それで開かれ、アイコンも表示されます。
+Windows decide con qué programa se abre cada tipo de archivo, y el icono del archivo es el de ese programa. Elige Foxy Viewer en cada formato para que se abran con él y muestren su icono.	Windows decides which program opens each type of file, and the file's icon is that program's. Choose Foxy Viewer for each format so they open with it and show its icon.	O Windows decide com qual programa cada tipo de arquivo abre, e o ícone do arquivo é o desse programa. Escolha o Foxy Viewer em cada formato para que abram com ele e mostrem o ícone dele.	Windows는 파일 형식마다 열 프로그램을 정하며, 파일 아이콘도 그 프로그램의 것입니다. 형식마다 Foxy Viewer를 선택하면 그것으로 열리고 아이콘도 표시됩니다.	Windows 会决定每种文件用哪个程序打开，文件图标也是该程序的。为每种格式选择 Foxy Viewer，即可用它打开并显示它的图标。	Windows はファイルの種類ごとに開くプログラムを決め、ファイルのアイコンもそのプログラムのものになります。各形式で Foxy Viewer を選ぶと、それで開かれ、アイコンも表示されます。

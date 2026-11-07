@@ -2,7 +2,7 @@
 
     python tools/make_banner.py <logo.png> [out.png] [es]   (the texts are English; "es" draws the Spanish ones)
 
-The logo is the full Project Foxy logo (emblem + wordmark, transparent background). The banner is the emblem on a
+The logo is the full Foxy Viewer logo (emblem + wordmark, transparent background). The banner is the emblem on a
 light tile, the name and the tagline on a dark background with a warm glow, like the other banners of this author.
 Needs Pillow and numpy; the fonts are Windows' Segoe UI.
 """

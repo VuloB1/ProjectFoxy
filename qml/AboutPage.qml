@@ -132,7 +132,7 @@ Item {
                 }
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Project Foxy"
+                    text: "Foxy Viewer"
                     color: themeManager.textPrimary
                     font.bold: true
                     font.pixelSize: 22
@@ -304,7 +304,7 @@ Item {
                     Label {
                         width: parent.width
                         wrapMode: Text.WordWrap
-                        text: qsTr("Si Project Foxy te gusta, puedes apoyar su desarrollo.")
+                        text: qsTr("Si Foxy Viewer te gusta, puedes apoyar su desarrollo.")
                         color: themeManager.textSecondary
                         font.pixelSize: 12
                     }

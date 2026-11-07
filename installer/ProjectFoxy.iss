@@ -1,19 +1,19 @@
-﻿; Project Foxy - installer (Inno Setup 6).
+﻿; Foxy Viewer - installer (Inno Setup 6).
 ;
 ; Build it with tools\Build-Release.ps1 (which installs the program into dist\ProjectFoxy first), or by hand:
-;     ISCC.exe /DAppVersion=0.3.9 installer\ProjectFoxy.iss
+;     ISCC.exe /DAppVersion=0.3.10 installer\ProjectFoxy.iss
 ;
 ; What it does:
 ;   - installs the folder that `cmake --install` produces (the program, Qt, the libraries and the licences);
 ;   - per user by default (no administrator rights), or for all users if the person chooses so;
-;   - optionally registers Project Foxy as a program that opens images: it shows up in "Open with" and in
+;   - optionally registers Foxy Viewer as a program that opens images: it shows up in "Open with" and in
 ;     Windows' Settings > Default apps, and once it is the default for a type, Explorer shows its icon on those
 ;     files. Windows does not let a program make itself the default, so the last step is the person's.
 
 #ifndef AppVersion
-  #define AppVersion "0.3.9"
+  #define AppVersion "0.3.10"
 #endif
-#define AppName "Project Foxy"
+#define AppName "Foxy Viewer"
 #define AppExe "ProjectFoxy.exe"
 
 [Setup]
@@ -56,31 +56,31 @@ Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
 Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 [CustomMessages]
-english.TaskAssoc=Let Project Foxy open images (shows up in "Open with" and in Default apps)
+english.TaskAssoc=Let Foxy Viewer open images (shows up in "Open with" and in Default apps)
 english.TaskAssocGroup=Images:
-english.ImageType=Image (Project Foxy)
+english.ImageType=Image (Foxy Viewer)
 english.AppDescription=Image viewer and editor
-english.RunDefaultApps=Choose Project Foxy as the default app for images
-spanish.TaskAssoc=Permitir abrir imágenes con Project Foxy (aparece en «Abrir con» y en Aplicaciones predeterminadas)
+english.RunDefaultApps=Choose Foxy Viewer as the default app for images
+spanish.TaskAssoc=Permitir abrir imágenes con Foxy Viewer (aparece en «Abrir con» y en Aplicaciones predeterminadas)
 spanish.TaskAssocGroup=Imágenes:
-spanish.ImageType=Imagen (Project Foxy)
+spanish.ImageType=Imagen (Foxy Viewer)
 spanish.AppDescription=Visor y editor de imágenes
-spanish.RunDefaultApps=Elegir Project Foxy como programa predeterminado para las imágenes
-brazilianportuguese.TaskAssoc=Permitir abrir imagens com o Project Foxy (aparece em "Abrir com" e em Aplicativos padrão)
+spanish.RunDefaultApps=Elegir Foxy Viewer como programa predeterminado para las imágenes
+brazilianportuguese.TaskAssoc=Permitir abrir imagens com o Foxy Viewer (aparece em "Abrir com" e em Aplicativos padrão)
 brazilianportuguese.TaskAssocGroup=Imagens:
-brazilianportuguese.ImageType=Imagem (Project Foxy)
+brazilianportuguese.ImageType=Imagem (Foxy Viewer)
 brazilianportuguese.AppDescription=Visualizador e editor de imagens
-brazilianportuguese.RunDefaultApps=Escolher o Project Foxy como aplicativo padrão para imagens
-korean.TaskAssoc=Project Foxy로 이미지 열기 허용("연결 프로그램" 및 기본 앱에 표시됨)
+brazilianportuguese.RunDefaultApps=Escolher o Foxy Viewer como aplicativo padrão para imagens
+korean.TaskAssoc=Foxy Viewer로 이미지 열기 허용("연결 프로그램" 및 기본 앱에 표시됨)
 korean.TaskAssocGroup=이미지:
-korean.ImageType=이미지 (Project Foxy)
+korean.ImageType=이미지 (Foxy Viewer)
 korean.AppDescription=이미지 뷰어 및 편집기
-korean.RunDefaultApps=Project Foxy를 이미지의 기본 앱으로 선택
-japanese.TaskAssoc=Project Foxy で画像を開けるようにする（「プログラムから開く」と既定のアプリに表示されます）
+korean.RunDefaultApps=Foxy Viewer를 이미지의 기본 앱으로 선택
+japanese.TaskAssoc=Foxy Viewer で画像を開けるようにする（「プログラムから開く」と既定のアプリに表示されます）
 japanese.TaskAssocGroup=画像:
-japanese.ImageType=画像 (Project Foxy)
+japanese.ImageType=画像 (Foxy Viewer)
 japanese.AppDescription=画像ビューアーとエディター
-japanese.RunDefaultApps=Project Foxy を画像の既定のアプリに選ぶ
+japanese.RunDefaultApps=Foxy Viewer を画像の既定のアプリに選ぶ
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -93,12 +93,17 @@ Source: "..\dist\ProjectFoxy\*"; DestDir: "{app}"; Flags: ignoreversion recurses
 ; the picture of the last page, which is not the one of the first
 Source: "art\finish.bmp"; Flags: dontcopy
 
+[InstallDelete]
+; the name used before 0.3.10
+Type: files; Name: "{autoprograms}\Project Foxy.lnk"
+Type: files; Name: "{autodesktop}\Project Foxy.lnk"
+
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopicon
 
 [Registry]
-; the type "an image of Project Foxy": its icon and how to open it
+; the type "an image of Foxy Viewer": its icon and how to open it
 Root: HKA; Subkey: "Software\Classes\ProjectFoxy.Image"; ValueType: string; ValueName: ""; ValueData: "{cm:ImageType}"; Flags: uninsdeletekey; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\ProjectFoxy.Image\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExe},0"; Tasks: assoc
 Root: HKA; Subkey: "Software\Classes\ProjectFoxy.Image\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExe}"" ""%1"""; Tasks: assoc
@@ -155,6 +160,7 @@ Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueTy
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".pef"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\ProjectFoxy\Capabilities\FileAssociations"; ValueType: string; ValueName: ".raw"; ValueData: "ProjectFoxy.Image"; Tasks: assoc
 Root: HKA; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#AppName}"; ValueData: "Software\ProjectFoxy\Capabilities"; Flags: uninsdeletevalue; Tasks: assoc
+Root: HKA; Subkey: "Software\RegisteredApplications"; ValueName: "Project Foxy"; Flags: deletevalue
 
 [Run]
 Filename: "ms-settings:defaultapps"; Description: "{cm:RunDefaultApps}"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Installs Project Foxy into a scratch folder and proves that folder is self-contained.
+    Installs Foxy Viewer into a scratch folder and proves that folder is self-contained.
 
 .DESCRIPTION
     `cmake --install` is what produces the folder that gets shipped. This script checks it:

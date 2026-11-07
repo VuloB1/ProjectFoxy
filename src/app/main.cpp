@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
         background = background && settings.startsHidden();
     }
 
-    // One window: when Project Foxy is already running, hand it the file and leave. `--new-window` (or turning the
+    // One window: when Foxy Viewer is already running, hand it the file and leave. `--new-window` (or turning the
     // setting off) skips this. If the running one does not answer, this one runs on its own.
     SingleInstance single;
     if (!newWindow && AppSettings().singleInstance()) {

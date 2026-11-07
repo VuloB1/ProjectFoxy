@@ -48,7 +48,7 @@ def centered_text(img, text, cy, size, fill):
 def welcome():
     img = background(BASE_W, BASE_H, int(BASE_H * 0.36))
     put_logo(img, int(BASE_W * 0.82), int(BASE_H * 0.36))
-    centered_text(img, "Project Foxy", int(BASE_H * 0.62), 40, (255, 255, 255, 255))
+    centered_text(img, "Foxy Viewer", int(BASE_H * 0.62), 40, (255, 255, 255, 255))
     d = ImageDraw.Draw(img)
     y = int(BASE_H * 0.62) + 62
     d.line([(BASE_W * 0.38, y), (BASE_W * 0.62, y)], fill=(255, 122, 40, 255), width=3)
@@ -79,7 +79,7 @@ def finish():
         bd.ellipse([x - w, y - w, x + w, y + w], fill=(255, 255, 255, 255))
     badge = badge.resize((2 * r, 2 * r), Image.LANCZOS)
     img.alpha_composite(badge, (cx - r, cy - r))
-    centered_text(img, "Project Foxy", int(BASE_H * 0.62), 40, (255, 255, 255, 255))
+    centered_text(img, "Foxy Viewer", int(BASE_H * 0.62), 40, (255, 255, 255, 255))
     y = int(BASE_H * 0.62) + 62
     ImageDraw.Draw(img).line([(BASE_W * 0.38, y), (BASE_W * 0.62, y)], fill=(46, 184, 114, 255), width=3)
     return img.convert("RGB")
