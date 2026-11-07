@@ -3,7 +3,7 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
-## [Unreleased]
+## [0.3.10] — New name: Foxy Viewer
 
 - **New name: Foxy Viewer.** The program, installer, shortcuts, tray and pages now say *Foxy Viewer*. Upgrading removes the old *Project Foxy* shortcuts. Files, settings and the repository keep the `ProjectFoxy` identifiers.
 - **Fixed:** with the window maximized, the resize cursor no longer shows at the edges.
@@ -295,7 +295,7 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [Sin publicar]
+## [0.3.10] — Nuevo nombre: Foxy Viewer
 
 - **Nuevo nombre: Foxy Viewer.** El programa, el instalador, los accesos directos, la bandeja y las páginas ahora dicen *Foxy Viewer*. Al actualizar se quitan los accesos *Project Foxy* antiguos. Los archivos, los ajustes y el repositorio conservan los identificadores `ProjectFoxy`.
 - **Corregido:** con la ventana maximizada ya no aparece el cursor de redimensionar en los bordes.

@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.10" date="2026-11-07">
+      <description>
+        <p>The program is now called Foxy Viewer. No resize cursor at the edges when the window is maximized.</p>
+      </description>
+    </release>
     <release version="0.3.9" date="2026-10-31">
       <description>
         <p>GIF studio: crop and skipping frames. The colour picker copies the digits without the #. Fixes "Start with Windows".</p>
