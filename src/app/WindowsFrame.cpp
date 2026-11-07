@@ -233,12 +233,9 @@ void installWindowsFrame(QQuickWindow *window)
         const BOOL off = FALSE;
         DwmSetWindowAttribute(hwnd, 13 /* DWMWA_CLOAK */, &off, sizeof off);
     };
-    auto *once = new QMetaObject::Connection;
-    *once = QObject::connect(window, &QQuickWindow::frameSwapped, window, [reveal, once]() {
-        QObject::disconnect(*once);
-        delete once;
-        reveal();
-    });
+    // frameSwapped comes from the render thread, so this is a queued call: two frames can be queued before the first one
+    // runs. A single-shot connection (and an idempotent `reveal`) is safe for that; freeing a shared handle here was not.
+    QObject::connect(window, &QQuickWindow::frameSwapped, window, reveal, Qt::SingleShotConnection);
     QTimer::singleShot(2000, window, reveal); // never leave it hidden if no frame ever comes
     const MARGINS thin = {1, 1, 1, 1};
     if (!skip.contains("dwm"))
