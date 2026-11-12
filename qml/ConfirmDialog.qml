@@ -59,7 +59,7 @@ AppDialog {
                     text: root.heading
                     color: themeManager.textPrimary
                     font.weight: themeManager.strongWeight
-                    font.pixelSize: 17
+                    font.pixelSize: 16
                     wrapMode: Text.WordWrap
                 }
                 Label {

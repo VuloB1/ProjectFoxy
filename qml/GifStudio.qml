@@ -450,7 +450,7 @@ Item {
                             height: 18
                             radius: 9
                             color: themeManager.accent
-                            Label { anchors.centerIn: parent; text: "Fx"; color: themeManager.accentText; font.pixelSize: 10; font.weight: themeManager.strongWeight }
+                            Label { anchors.centerIn: parent; text: "Fx"; color: themeManager.accentText; font.pixelSize: 11; font.weight: themeManager.strongWeight }
                         }
                         Rectangle {
                             anchors.left: parent.left
@@ -516,7 +516,7 @@ Item {
                         elide: Text.ElideMiddle
                         text: cell.name
                         color: themeManager.textSecondary
-                        font.pixelSize: 10
+                        font.pixelSize: 11
                     }
                 }
             }

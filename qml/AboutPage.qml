@@ -135,7 +135,7 @@ Item {
                     text: "Foxy Viewer"
                     color: themeManager.textPrimary
                     font.weight: themeManager.strongWeight
-                    font.pixelSize: 22
+                    font.pixelSize: 24
                 }
                 Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -277,7 +277,7 @@ Item {
                         font.capitalization: themeManager.skin === "win98" ? Font.AllUppercase : Font.MixedCase
                         font.letterSpacing: themeManager.skin === "win98" ? 0.8 : 0.2
                     }
-                    Label { text: "Vulito"; color: themeManager.textPrimary; font.weight: themeManager.strongWeight; font.pixelSize: 17 }
+                    Label { text: "Vulito"; color: themeManager.textPrimary; font.weight: themeManager.strongWeight; font.pixelSize: 16 }
                 }
             }
             LinkButton { wide: true; label: qsTr("Sitio web") + " · vulito.carrd.co"; url: "https://vulito.carrd.co" }

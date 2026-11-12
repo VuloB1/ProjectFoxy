@@ -139,6 +139,7 @@ AppDialog {
                     model: root.pages
                     delegate: Rectangle {
                         id: item
+                        objectName: "settingsPage_" + modelData.id
                         required property int index
                         required property var modelData
                         readonly property bool current: root.page === index
