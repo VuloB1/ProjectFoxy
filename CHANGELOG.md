@@ -3,6 +3,13 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.12] — Interface polish
+
+- **Orange accent**, like the logo, in the Modern themes, with 7 colours to choose from in Settings > Appearance (Classic themes keep their own).
+- Section labels in sentence case and without letter spacing; heavy bold text is now semibold (Modern themes).
+- The empty screen is now a card with the Open icon and the Ctrl+O shortcut.
+- Stray font sizes moved onto the existing scale.
+
 ## [0.3.11] — Fix: closing on start when maximized
 
 - **Fixed:** the program closed right after opening when the window had been left maximized (a memory error while the first frame was drawn; present since 0.3.1 and more likely the larger the window).
@@ -298,6 +305,13 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.12] — Retoques de interfaz
+
+- **Acento naranja**, como el logo, en los temas Moderno, con 7 colores a elegir en Configuración > Apariencia (los temas Classic conservan el suyo).
+- Etiquetas de sección en minúsculas y sin separación de letras; las negritas pesadas pasan a seminegrita (temas Moderno).
+- La pantalla vacía es ahora una tarjeta con el icono de Abrir y el atajo Ctrl+O.
+- Tamaños de letra sueltos llevados a la escala existente.
 
 ## [0.3.11] — Corrección: se cerraba al abrir maximizado
 
