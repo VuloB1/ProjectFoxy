@@ -34,7 +34,7 @@ Item {
         Column {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 3
-            Label { text: root.title; color: themeManager.textPrimary; font.bold: true; font.pixelSize: 18 }
+            Label { text: root.title; color: themeManager.textPrimary; font.weight: themeManager.strongWeight; font.pixelSize: 18 }
             Label {
                 visible: root.hint.length > 0
                 text: root.hint

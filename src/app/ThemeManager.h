@@ -24,6 +24,8 @@ class ThemeManager : public QObject {
     // codebase already prefers plain string ids (presetId, requestId) over
     // enums for this kind of QML-facing branch selector.
     Q_PROPERTY(QString skin READ skin NOTIFY themeChanged)
+    // The weight for emphasised text: Bold in the classic skin, DemiBold in the modern ones (QFont::Weight values).
+    Q_PROPERTY(int strongWeight READ strongWeight NOTIFY themeChanged)
     // [{id, name}, ...] for the "Tema" menu - fixed for the process lifetime.
     Q_PROPERTY(QVariantList availableThemes READ availableThemes CONSTANT)
 
@@ -63,6 +65,7 @@ public:
 
     QString themeId() const { return current().id; }
     QString skin() const { return current().skin; }
+    int strongWeight() const { return current().skin == QLatin1String("win98") ? 700 : 600; }
     QVariantList availableThemes() const;
 
     QColor background() const { return current().background; }

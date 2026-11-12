@@ -58,7 +58,7 @@ AppDialog {
                     width: parent.width
                     text: root.heading
                     color: themeManager.textPrimary
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                     font.pixelSize: 17
                     wrapMode: Text.WordWrap
                 }

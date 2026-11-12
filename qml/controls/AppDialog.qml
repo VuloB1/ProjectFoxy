@@ -25,7 +25,7 @@ Dialog {
         visible: control.title.length > 0
         text: control.title
         color: themeManager.textPrimary
-        font.bold: true
+        font.weight: themeManager.strongWeight
         padding: 12
         background: Rectangle {
             color: themeManager.surfaceElevated

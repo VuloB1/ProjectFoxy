@@ -407,7 +407,7 @@ Item {
             spacing: 8
             Label {
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
                 text: qsTr("Nitidez de la vista")
             }
             Row {
@@ -456,7 +456,7 @@ Item {
             spacing: 6
             Label {
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
                 text: folderModel.count > 0
                       ? qsTr("Imagen %1 de %2").arg(folderModel.currentIndex + 1).arg(folderModel.count)
                       : qsTr("Sin imagen")

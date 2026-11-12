@@ -460,7 +460,7 @@ Item {
                 anchors.right: parent.right
                 text: parent.shown.toFixed(parent.decimals) + parent.suffix
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
             }
             AppSlider {
                 anchors.left: parent.left
@@ -549,7 +549,7 @@ Item {
                         spacing: 6
                         Label { anchors.verticalCenter: parent.verticalCenter; text: qsTr("Fotos"); color: themeManager.textSecondary; width: 60 }
                         AppToolButton { text: qsTr("Una menos"); iconName: "minus"; iconOnly: true; enabled: collageStudio.cellCount > 1; onClicked: collageStudio.setCellCount(collageStudio.cellCount - 1) }
-                        Label { anchors.verticalCenter: parent.verticalCenter; width: 26; horizontalAlignment: Text.AlignHCenter; text: collageStudio.cellCount; color: themeManager.textPrimary; font.bold: true }
+                        Label { anchors.verticalCenter: parent.verticalCenter; width: 26; horizontalAlignment: Text.AlignHCenter; text: collageStudio.cellCount; color: themeManager.textPrimary; font.weight: themeManager.strongWeight }
                         AppToolButton { text: qsTr("Una más"); iconName: "plus"; iconOnly: true; enabled: collageStudio.cellCount < 12; onClicked: collageStudio.setCellCount(collageStudio.cellCount + 1) }
                     }
                     Row {
@@ -708,7 +708,7 @@ Item {
                             width: parent.width
                             implicitHeight: 40
                             Label { text: qsTr("Zoom"); color: themeManager.textSecondary }
-                            Label { anchors.right: parent.right; text: root.selCell ? Math.round(root.selCell.zoom * 100) + "%" : ""; color: themeManager.textPrimary; font.bold: true }
+                            Label { anchors.right: parent.right; text: root.selCell ? Math.round(root.selCell.zoom * 100) + "%" : ""; color: themeManager.textPrimary; font.weight: themeManager.strongWeight }
                             AppSlider {
                                 anchors.left: parent.left
                                 anchors.right: parent.right
@@ -724,7 +724,7 @@ Item {
                             width: parent.width
                             implicitHeight: 40
                             Label { text: qsTr("Giro"); color: themeManager.textSecondary }
-                            Label { anchors.right: parent.right; text: root.selCell ? Math.round(root.selCell.rotation) + "°" : ""; color: themeManager.textPrimary; font.bold: true }
+                            Label { anchors.right: parent.right; text: root.selCell ? Math.round(root.selCell.rotation) + "°" : ""; color: themeManager.textPrimary; font.weight: themeManager.strongWeight }
                             AppSlider {
                                 anchors.left: parent.left
                                 anchors.right: parent.right

@@ -261,7 +261,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     text: panes.count
                     color: themeManager.textPrimary
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                 }
                 AppToolButton {
                     hPad: 10; iconSize: 22; text: qsTr("Una imagen más"); iconName: "plus"; iconOnly: true; enabled: panes.count < root.maxPanes; onClicked: root.setCount(panes.count + 1) }

@@ -77,7 +77,7 @@ MenuItem {
             visible: control.checked
             text: "✓"
             color: control.highlighted && control.win98 ? themeManager.accentText : themeManager.accent
-            font.bold: true
+            font.weight: themeManager.strongWeight
         }
     }
 }

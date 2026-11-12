@@ -88,7 +88,7 @@ AppDialog {
             y: 14
             text: card.heading
             color: themeManager.textSecondary
-            font.bold: true
+            font.weight: themeManager.strongWeight
             font.pixelSize: 11
             font.capitalization: themeManager.skin === "win98" ? Font.AllUppercase : Font.MixedCase
             font.letterSpacing: themeManager.skin === "win98" ? 0.8 : 0.2
@@ -122,7 +122,7 @@ AppDialog {
                 x: 20; y: 20
                 text: qsTr("Configuración")
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
                 font.pixelSize: 16
             }
 
@@ -172,7 +172,7 @@ AppDialog {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: item.modelData.name
                                 color: item.current && item.classic ? themeManager.accentText : themeManager.textPrimary
-                                font.bold: item.current
+                                font.weight: (item.current) ? themeManager.strongWeight : Font.Normal
                             }
                         }
                         HoverHandler { id: hover }
@@ -196,7 +196,7 @@ AppDialog {
                 y: 20
                 text: root.pages[root.page].name
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
                 font.pixelSize: 18
             }
             Label {
@@ -345,7 +345,7 @@ AppDialog {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: qsTr(card.modelData.name)
                                         color: themeManager.textPrimary
-                                        font.bold: card.selected
+                                        font.weight: (card.selected) ? themeManager.strongWeight : Font.Normal
                                     }
 
                                     HoverHandler { id: cardHover; cursorShape: Qt.PointingHandCursor }
@@ -422,7 +422,7 @@ AppDialog {
                             bottomPadding: 2
                             color: themeManager.textSecondary
                             font.pixelSize: 11
-                            font.bold: true
+                            font.weight: themeManager.strongWeight
                         }
                         // the extras: dimmed and untouchable while the mode is off
                         Column {

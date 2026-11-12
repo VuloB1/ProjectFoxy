@@ -236,7 +236,7 @@ Item {
         anchors.left: parent.left
         text: qsTr("%1 de %2 elegidos").arg(root.selectedCount).arg(root.rows.length)
         color: root.selectedCount > 0 ? themeManager.textPrimary : themeManager.textSecondary
-        font.bold: true
+        font.weight: themeManager.strongWeight
     }
     Label {
         anchors.bottom: parent.bottom

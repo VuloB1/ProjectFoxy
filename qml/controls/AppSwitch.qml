@@ -67,7 +67,7 @@ CheckBox {
                     text: "✓"
                     color: themeManager.textPrimary
                     font.pixelSize: 11
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                 }
             }
         }

@@ -143,7 +143,7 @@ Item {
                 id: straightenValueLabel
                 text: (straightenSlider.value > 0 ? "+" : "") + Math.round(straightenSlider.value) + "°"
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
             }
         }
         AppSlider {

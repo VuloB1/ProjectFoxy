@@ -61,7 +61,7 @@ Item {
             x: 18; y: 14
             text: parent.heading
             color: themeManager.textSecondary
-            font.bold: true
+            font.weight: themeManager.strongWeight
             font.pixelSize: 11
             font.capitalization: themeManager.skin === "win98" ? Font.AllUppercase : Font.MixedCase
             font.letterSpacing: themeManager.skin === "win98" ? 0.8 : 0.2
@@ -109,7 +109,7 @@ Item {
         width: 44; height: 44; radius: 22
         color: Qt.rgba(themeManager.accent.r, themeManager.accent.g, themeManager.accent.b, 0.2)
         border.color: themeManager.accent
-        Label { anchors.centerIn: parent; text: parent.letter; color: themeManager.accent; font.bold: true; font.pixelSize: 18 }
+        Label { anchors.centerIn: parent; text: parent.letter; color: themeManager.accent; font.weight: themeManager.strongWeight; font.pixelSize: 18 }
     }
 
     Column {
@@ -134,7 +134,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "Foxy Viewer"
                     color: themeManager.textPrimary
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                     font.pixelSize: 22
                 }
                 Rectangle {
@@ -164,7 +164,7 @@ Item {
                     topPadding: 6
                     text: qsTr("Creado con")
                     color: themeManager.textSecondary
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                     font.pixelSize: 11
                     font.capitalization: themeManager.skin === "win98" ? Font.AllUppercase : Font.MixedCase
                     font.letterSpacing: themeManager.skin === "win98" ? 0.8 : 0.2
@@ -272,12 +272,12 @@ Item {
                     Label {
                         text: qsTr("Creador y autor")
                         color: themeManager.textSecondary
-                        font.bold: true
+                        font.weight: themeManager.strongWeight
                         font.pixelSize: 11
                         font.capitalization: themeManager.skin === "win98" ? Font.AllUppercase : Font.MixedCase
                         font.letterSpacing: themeManager.skin === "win98" ? 0.8 : 0.2
                     }
-                    Label { text: "Vulito"; color: themeManager.textPrimary; font.bold: true; font.pixelSize: 17 }
+                    Label { text: "Vulito"; color: themeManager.textPrimary; font.weight: themeManager.strongWeight; font.pixelSize: 17 }
                 }
             }
             LinkButton { wide: true; label: qsTr("Sitio web") + " · vulito.carrd.co"; url: "https://vulito.carrd.co" }
@@ -343,7 +343,7 @@ Item {
                             width: parent.width - 32 - 10 - (person.modelData.url !== "" ? 22 : 0)
                             text: person.modelData.name
                             color: themeManager.textPrimary
-                            font.bold: true
+                            font.weight: themeManager.strongWeight
                             elide: Text.ElideRight
                         }
                         AppIcon {

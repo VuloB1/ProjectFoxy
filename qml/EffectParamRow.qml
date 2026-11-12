@@ -189,7 +189,7 @@ Item {
             anchors.top: parent.top
             text: root.isSeed ? Math.round(slider.value).toString() : root.formatted(slider.value)
             color: root.modified ? themeManager.accent : themeManager.textPrimary
-            font.bold: true
+            font.weight: themeManager.strongWeight
         }
         AppButton {
             id: diceButton

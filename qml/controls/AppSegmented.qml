@@ -40,7 +40,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: seg.modelData.text || ""
                     color: seg.picked ? themeManager.accent : themeManager.textPrimary
-                    font.bold: seg.picked
+                    font.weight: (seg.picked) ? themeManager.strongWeight : Font.Normal
                 }
                 AppIcon {
                     visible: !!seg.modelData.icon

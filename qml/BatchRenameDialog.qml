@@ -176,7 +176,7 @@ AppDialog {
                             anchors.verticalCenter: parent.verticalCenter
                             text: root.plan.names[index] || ""
                             color: themeManager.textPrimary
-                            font.bold: true
+                            font.weight: themeManager.strongWeight
                             elide: Text.ElideMiddle
                         }
                     }
@@ -211,7 +211,7 @@ AppDialog {
                 visible: root.failure.length > 0
                 text: root.failure
                 color: "#e5484d"
-                font.bold: true
+                font.weight: themeManager.strongWeight
                 wrapMode: Text.WordWrap
             }
             Row {

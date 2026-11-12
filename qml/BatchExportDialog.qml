@@ -156,7 +156,7 @@ AppDialog {
                 visible: !batchExporter.running && root.resultText.length > 0
                 text: root.resultText
                 color: root.resultBad ? "#e5484d" : themeManager.accent
-                font.bold: true
+                font.weight: themeManager.strongWeight
                 wrapMode: Text.WordWrap
             }
 

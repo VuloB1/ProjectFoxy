@@ -239,7 +239,7 @@ Item {
                     Row {
                         width: parent.width
                         Label { text: qsTr("Distancia focal"); color: themeManager.textSecondary; width: parent.width - focalValue.width }
-                        Label { id: focalValue; text: Math.round(focalSlider.value * 10) / 10 + " mm"; color: themeManager.textPrimary; font.bold: true }
+                        Label { id: focalValue; text: Math.round(focalSlider.value * 10) / 10 + " mm"; color: themeManager.textPrimary; font.weight: themeManager.strongWeight }
                     }
                     AppSlider {
                         id: focalSlider
@@ -253,7 +253,7 @@ Item {
                     Row {
                         width: parent.width
                         Label { text: qsTr("Apertura"); color: themeManager.textSecondary; width: parent.width - apertureValue.width }
-                        Label { id: apertureValue; text: "f/" + (Math.round(apertureSlider.value * 10) / 10); color: themeManager.textPrimary; font.bold: true }
+                        Label { id: apertureValue; text: "f/" + (Math.round(apertureSlider.value * 10) / 10); color: themeManager.textPrimary; font.weight: themeManager.strongWeight }
                     }
                     AppSlider {
                         id: apertureSlider
@@ -280,7 +280,7 @@ Item {
                     Row {
                         width: parent.width
                         Label { text: qsTr("Fuerza"); color: themeManager.textSecondary; width: parent.width - strengthValue.width }
-                        Label { id: strengthValue; text: Math.round(strengthSlider.value) + "%"; color: strengthSlider.value < 99.5 ? themeManager.accent : themeManager.textPrimary; font.bold: true }
+                        Label { id: strengthValue; text: Math.round(strengthSlider.value) + "%"; color: strengthSlider.value < 99.5 ? themeManager.accent : themeManager.textPrimary; font.weight: themeManager.strongWeight }
                     }
                     AppSlider {
                         id: strengthSlider
@@ -312,7 +312,7 @@ Item {
                     Row {
                         width: parent.width
                         Label { text: qsTr("Distorsión"); color: themeManager.textSecondary; width: parent.width - dValue.width }
-                        Label { id: dValue; text: (dSlider.value > 0 ? "+" : "") + Math.round(dSlider.value); color: dSlider.value !== 0 ? themeManager.accent : themeManager.textPrimary; font.bold: true }
+                        Label { id: dValue; text: (dSlider.value > 0 ? "+" : "") + Math.round(dSlider.value); color: dSlider.value !== 0 ? themeManager.accent : themeManager.textPrimary; font.weight: themeManager.strongWeight }
                     }
                     AppSlider {
                         id: dSlider
@@ -328,7 +328,7 @@ Item {
                     Row {
                         width: parent.width
                         Label { text: qsTr("Franjas de color"); color: themeManager.textSecondary; width: parent.width - fValue.width }
-                        Label { id: fValue; text: (fSlider.value > 0 ? "+" : "") + Math.round(fSlider.value); color: fSlider.value !== 0 ? themeManager.accent : themeManager.textPrimary; font.bold: true }
+                        Label { id: fValue; text: (fSlider.value > 0 ? "+" : "") + Math.round(fSlider.value); color: fSlider.value !== 0 ? themeManager.accent : themeManager.textPrimary; font.weight: themeManager.strongWeight }
                     }
                     AppSlider {
                         id: fSlider
@@ -343,7 +343,7 @@ Item {
                     Row {
                         width: parent.width
                         Label { text: qsTr("Esquinas"); color: themeManager.textSecondary; width: parent.width - vValue.width }
-                        Label { id: vValue; text: (vSlider.value > 0 ? "+" : "") + Math.round(vSlider.value); color: vSlider.value !== 0 ? themeManager.accent : themeManager.textPrimary; font.bold: true }
+                        Label { id: vValue; text: (vSlider.value > 0 ? "+" : "") + Math.round(vSlider.value); color: vSlider.value !== 0 ? themeManager.accent : themeManager.textPrimary; font.weight: themeManager.strongWeight }
                     }
                     AppSlider {
                         id: vSlider

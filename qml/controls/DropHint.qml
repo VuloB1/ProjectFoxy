@@ -26,7 +26,7 @@ Item {
         border.width: 2
     }
 
-    TextMetrics { id: metrics; text: root.text; font.pixelSize: 16; font.bold: true }
+    TextMetrics { id: metrics; text: root.text; font.pixelSize: 16; font.weight: themeManager.strongWeight }
 
     Rectangle {
         anchors.centerIn: parent
@@ -47,7 +47,7 @@ Item {
                 text: root.text
                 color: themeManager.textPrimary
                 font.pixelSize: 16
-                font.bold: true
+                font.weight: themeManager.strongWeight
             }
         }
     }
