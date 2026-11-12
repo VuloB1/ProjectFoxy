@@ -1,7 +1,7 @@
 ﻿; Foxy Viewer - installer (Inno Setup 6).
 ;
 ; Build it with tools\Build-Release.ps1 (which installs the program into dist\ProjectFoxy first), or by hand:
-;     ISCC.exe /DAppVersion=0.3.10 installer\ProjectFoxy.iss
+;     ISCC.exe /DAppVersion=0.3.11 installer\ProjectFoxy.iss
 ;
 ; What it does:
 ;   - installs the folder that `cmake --install` produces (the program, Qt, the libraries and the licences);
@@ -11,7 +11,7 @@
 ;     files. Windows does not let a program make itself the default, so the last step is the person's.
 
 #ifndef AppVersion
-  #define AppVersion "0.3.10"
+  #define AppVersion "0.3.11"
 #endif
 #define AppName "Foxy Viewer"
 #define AppExe "ProjectFoxy.exe"

@@ -3,6 +3,10 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.11] — Fix: closing on start when maximized
+
+- **Fixed:** the program closed right after opening when the window had been left maximized (a memory error while the first frame was drawn; present since 0.3.1 and more likely the larger the window).
+
 ## [0.3.10] — New name: Foxy Viewer
 
 - **New name: Foxy Viewer.** The program, installer, shortcuts, tray and pages now say *Foxy Viewer*. Upgrading removes the old *Project Foxy* shortcuts. Files, settings and the repository keep the `ProjectFoxy` identifiers.
@@ -294,6 +298,10 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.11] — Corrección: se cerraba al abrir maximizado
+
+- **Corregido:** el programa se cerraba nada más abrir cuando la ventana se había dejado maximizada (un error de memoria al dibujar el primer fotograma; existía desde la 0.3.1 y salía más cuanto mayor era la ventana).
 
 ## [0.3.10] — Nuevo nombre: Foxy Viewer
 
