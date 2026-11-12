@@ -6,6 +6,8 @@
 #include <QVariantList>
 #include <array>
 
+class AppSettings;
+
 // Owns every design token the UI reads: colors, corner radii, animation
 // timings/easing, and font family, one row per selectable theme ("Moderno
 // Claro/Oscuro", "Windows 98"). These live on this plain QObject (registered
@@ -26,8 +28,12 @@ class ThemeManager : public QObject {
     Q_PROPERTY(QString skin READ skin NOTIFY themeChanged)
     // The weight for emphasised text: Bold in the classic skin, DemiBold in the modern ones (QFont::Weight values).
     Q_PROPERTY(int strongWeight READ strongWeight NOTIFY themeChanged)
-    // [{id, name}, ...] for the "Tema" menu - fixed for the process lifetime.
-    Q_PROPERTY(QVariantList availableThemes READ availableThemes CONSTANT)
+    // [{id, name, ...palette}, ...] for the "Tema" menu (the accent follows the chosen one).
+    Q_PROPERTY(QVariantList availableThemes READ availableThemes NOTIFY themeChanged)
+    // The accent of the Moderno themes (a key of accentChoices; the Classic themes keep their navy).
+    Q_PROPERTY(QString accentId READ accentId NOTIFY themeChanged)
+    // [{id, color}, ...]: the swatches offered in Configuración > Apariencia (shown in the current theme).
+    Q_PROPERTY(QVariantList accentChoices READ accentChoices NOTIFY themeChanged)
 
     Q_PROPERTY(QColor background READ background NOTIFY themeChanged)
     Q_PROPERTY(QColor surface READ surface NOTIFY themeChanged)
@@ -61,7 +67,7 @@ class ThemeManager : public QObject {
     Q_PROPERTY(QString fontFamily READ fontFamily NOTIFY themeChanged)
 
 public:
-    explicit ThemeManager(QObject *parent = nullptr);
+    explicit ThemeManager(AppSettings *settings, QObject *parent = nullptr);
 
     QString themeId() const { return current().id; }
     QString skin() const { return current().skin; }
@@ -74,8 +80,10 @@ public:
     QColor textPrimary() const { return current().textPrimary; }
     QColor textSecondary() const { return current().textSecondary; }
     QColor border() const { return current().border; }
-    QColor accent() const { return current().accent; }
-    QColor accentText() const { return current().accentText; }
+    QColor accent() const { return accentOf(current()); }
+    QColor accentText() const;
+    QString accentId() const;
+    QVariantList accentChoices() const;
     QColor controlFace() const { return current().controlFace; }
     QColor fieldFace() const;
     QColor bevelLight() const { return current().bevelLight; }
@@ -92,6 +100,7 @@ public:
 
 public slots:
     void setTheme(const QString &id);
+    void setAccent(const QString &id);
 
 signals:
     // One umbrella signal for every property above, same pattern the old
@@ -122,6 +131,8 @@ private:
     // exists, since the first ThemeManager is constructed in main.cpp.
     static const std::array<ThemeSpec, 4> &themes();
     const ThemeSpec &current() const { return themes()[m_currentIndex]; }
+    QColor accentOf(const ThemeSpec &spec) const;
+    AppSettings *m_settings;
 
     int m_currentIndex = 1; // modern-dark, matching the previous m_darkMode default of true
 };

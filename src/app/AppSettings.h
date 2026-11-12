@@ -32,6 +32,8 @@ class AppSettings : public QObject {
     // Wheel zoom: in fixed steps (false) or glided smoothly towards the new size (true).
     // The language of the interface: "system" (follows Windows) or es / en / pt / ko / zh / ja.
     Q_PROPERTY(QString language READ language WRITE setLanguage NOTIFY languageChanged)
+    // The accent colour of the Moderno themes: a key of ThemeManager's palette ("orange" by default).
+    Q_PROPERTY(QString accentId READ accentId WRITE setAccentId NOTIFY accentIdChanged)
     Q_PROPERTY(bool smoothZoom READ smoothZoom WRITE setSmoothZoom NOTIFY smoothZoomChanged)
     // The comic reader's sharpening (the button at the bottom right of the window while reading): FidelityFX CAS
     // applied to what is on screen, 0..100 %, 0 = off. It changes how the page looks, never the file.
@@ -80,6 +82,8 @@ public:
 
     QString language() const { return m_language; }
     void setLanguage(const QString &value);
+    QString accentId() const { return m_accentId; }
+    void setAccentId(const QString &value);
 
     bool smoothZoom() const { return m_smoothZoom; }
     int viewSharpen() const { return m_viewSharpen; }
@@ -146,6 +150,7 @@ signals:
     void stripColumnsChanged();
     void stripModeChanged();
     void languageChanged();
+    void accentIdChanged();
     void smoothZoomChanged();
     void viewSharpenChanged();
     void pixelModeChanged();
@@ -178,6 +183,7 @@ private:
     int m_stripColumns = 1;
     QString m_stripMode = QStringLiteral("manual");
     QString m_language = QStringLiteral("system");
+    QString m_accentId = QStringLiteral("orange");
     bool m_smoothZoom = false;
     int m_viewSharpen = 0;
     bool m_pixelMode = false;

@@ -243,7 +243,7 @@ AppDialog {
                 Item {
                     id: pageColumn
                     width: scroller.width - 12
-                    implicitHeight: root.page === 0 ? appearance.implicitHeight + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + windowCard.implicitHeight + festiveCard.implicitHeight + 96
+                    implicitHeight: root.page === 0 ? appearance.implicitHeight + accentCard.offset + languageCard.implicitHeight + zoomCard.implicitHeight + pixelCard.implicitHeight + stripCard.implicitHeight + windowCard.implicitHeight + festiveCard.implicitHeight + 96
                                        : root.page === 1 ? saving.implicitHeight
                                        : root.page === 2 ? batch.implicitHeight
                                        : root.pages[root.page].id === "ocr" ? ocr.implicitHeight
@@ -263,6 +263,7 @@ AppDialog {
                                 model: themeManager.availableThemes
                                 delegate: Item {
                                     id: card
+                                    objectName: "themeCard_" + modelData.id
                                     required property var modelData
                                     readonly property bool selected: modelData.id === themeManager.themeId
                                     readonly property bool classic: modelData.skin === "win98"
@@ -356,12 +357,43 @@ AppDialog {
                         }
                     }
 
+                    // -- Apariencia: the accent colour of the Moderno themes -----------------------
+                    Card {
+                        id: accentCard
+                        readonly property real offset: visible ? height + 16 : 0
+                        width: parent.width
+                        visible: root.page === 0 && themeManager.skin !== "win98"
+                        y: appearance.height + 16
+                        heading: qsTr("Color de acento")
+                        Flow {
+                            width: parent.width
+                            spacing: 12
+                            bottomPadding: 6
+                            Repeater {
+                                model: themeManager.accentChoices
+                                delegate: Rectangle {
+                                    id: swatch
+                                    objectName: "accent_" + modelData.id
+                                    required property var modelData
+                                    readonly property bool selected: modelData.id === themeManager.accentId
+                                    width: 32; height: 32; radius: 16
+                                    color: modelData.color
+                                    border.width: selected ? 2 : 0
+                                    border.color: themeManager.textPrimary
+                                    AppIcon { visible: swatch.selected; anchors.centerIn: parent; name: "check"; size: 14; color: themeManager.accentText; strokeWidth: 2.4 }
+                                    HoverHandler { cursorShape: Qt.PointingHandCursor }
+                                    TapHandler { onTapped: themeManager.setAccent(swatch.modelData.id) }
+                                }
+                            }
+                        }
+                    }
+
                     // -- Apariencia, 2nd card: Idioma -------------------------------------------
                     Card {
                         id: languageCard
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + 16
+                        y: appearance.height + 16 + accentCard.offset
                         heading: qsTr("Idioma")
                         SettingRow {
                             label: qsTr("Idioma de la interfaz")
@@ -387,7 +419,7 @@ AppDialog {
                         id: zoomCard
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + languageCard.height + 32
+                        y: appearance.height + accentCard.offset + languageCard.height + 32
                         heading: qsTr("Zoom")
                         SettingRow {
                             label: qsTr("Tipo de zoom con la rueda")
@@ -405,7 +437,7 @@ AppDialog {
                         id: pixelCard
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + languageCard.height + zoomCard.height + 48
+                        y: appearance.height + accentCard.offset + languageCard.height + zoomCard.height + 48
                         heading: qsTr("Modo pixel")
                         SettingRow {
                             label: qsTr("Modo pixel")
@@ -475,7 +507,7 @@ AppDialog {
                         id: stripCard
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + languageCard.height + zoomCard.height + pixelCard.height + 64
+                        y: appearance.height + accentCard.offset + languageCard.height + zoomCard.height + pixelCard.height + 64
                         heading: qsTr("Barra de miniaturas")
                         SettingRow {
                             label: qsTr("Cuándo se muestra")
@@ -517,7 +549,7 @@ AppDialog {
                         objectName: "windowCard"
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + languageCard.height + zoomCard.height + pixelCard.height + stripCard.height + 80
+                        y: appearance.height + accentCard.offset + languageCard.height + zoomCard.height + pixelCard.height + stripCard.height + 80
                         heading: qsTr("Ventanas")
                         SettingRow {
                             label: qsTr("Una sola ventana")
@@ -588,7 +620,7 @@ AppDialog {
                         objectName: "festiveCard"
                         width: parent.width
                         visible: root.page === 0
-                        y: appearance.height + languageCard.height + zoomCard.height + pixelCard.height + stripCard.height + windowCard.height + 96
+                        y: appearance.height + accentCard.offset + languageCard.height + zoomCard.height + pixelCard.height + stripCard.height + windowCard.height + 96
                         heading: qsTr("Adornos festivos")
                         SettingRow {
                             label: qsTr("Adornos en fechas señaladas")

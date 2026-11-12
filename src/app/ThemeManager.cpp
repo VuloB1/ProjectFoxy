@@ -1,10 +1,82 @@
 #include "ThemeManager.h"
+#include "AppSettings.h"
 #include <QEasingCurve>
 #include <QVariantMap>
+#include <cmath>
 
-ThemeManager::ThemeManager(QObject *parent)
-    : QObject(parent)
+namespace {
+// The accent swatches: {id, colour on the light theme, colour on the dark one}. The first is the
+// default, the orange of the logo; the dark column is a little lighter so it still glows on charcoal.
+struct Accent { const char *id, *light, *dark; };
+constexpr Accent kAccents[] = {
+    { "orange", "#f06a0f", "#ff8126" },
+    { "blue",   "#3d8bfd", "#4cc2ff" },
+    { "teal",   "#0d9aa8", "#2dd4bf" },
+    { "green",  "#2f9e5b", "#4ade80" },
+    { "violet", "#7c5cf0", "#a78bfa" },
+    { "pink",   "#e0488a", "#f472b6" },
+    { "red",    "#d93a3f", "#ff6b6b" },
+};
+
+const Accent &accentFor(const QString &id)
 {
+    for (const Accent &a : kAccents)
+        if (id == QLatin1String(a.id))
+            return a;
+    return kAccents[0];
+}
+
+double luminance(const QColor &c)
+{
+    auto lin = [](double v) { return v <= 0.03928 ? v / 12.92 : std::pow((v + 0.055) / 1.055, 2.4); };
+    return 0.2126 * lin(c.redF()) + 0.7152 * lin(c.greenF()) + 0.0722 * lin(c.blueF());
+}
+}
+
+ThemeManager::ThemeManager(AppSettings *settings, QObject *parent)
+    : QObject(parent)
+    , m_settings(settings)
+{
+    connect(settings, &AppSettings::accentIdChanged, this, &ThemeManager::themeChanged);
+}
+
+QColor ThemeManager::accentOf(const ThemeSpec &spec) const
+{
+    if (spec.skin == QLatin1String("win98"))
+        return spec.accent;
+    const Accent &a = accentFor(m_settings->accentId());
+    return QColor(spec.id == QLatin1String("modern-dark") ? a.dark : a.light);
+}
+
+QColor ThemeManager::accentText() const
+{
+    if (current().skin == QLatin1String("win98"))
+        return current().accentText;
+    // Whichever of white / near-black reads better on the accent.
+    return luminance(accent()) > 0.18 ? QColor("#1a1a1a") : QColor("#ffffff");
+}
+
+QString ThemeManager::accentId() const
+{
+    return QString::fromLatin1(accentFor(m_settings->accentId()).id);
+}
+
+QVariantList ThemeManager::accentChoices() const
+{
+    const bool dark = current().id == QLatin1String("modern-dark");
+    QVariantList list;
+    for (const Accent &a : kAccents) {
+        QVariantMap m;
+        m[QStringLiteral("id")] = QString::fromLatin1(a.id);
+        m[QStringLiteral("color")] = QColor(dark ? a.dark : a.light);
+        list.append(m);
+    }
+    return list;
+}
+
+void ThemeManager::setAccent(const QString &id)
+{
+    m_settings->setAccentId(id);
 }
 
 const std::array<ThemeManager::ThemeSpec, 4> &ThemeManager::themes()
@@ -77,7 +149,7 @@ QVariantList ThemeManager::availableThemes() const
         entry[QStringLiteral("textPrimary")] = spec.textPrimary;
         entry[QStringLiteral("textSecondary")] = spec.textSecondary;
         entry[QStringLiteral("border")] = spec.border;
-        entry[QStringLiteral("accent")] = spec.accent;
+        entry[QStringLiteral("accent")] = accentOf(spec);
         list.append(entry);
     }
     return list;
