@@ -59,7 +59,7 @@ Item {
             anchors.verticalCenterOffset: 1
             text: root.title
             color: themeManager.textPrimary
-            font.pixelSize: 13
+            font.pixelSize: 12
             font.weight: Font.DemiBold
         }
         // the explanation, on hover

@@ -96,7 +96,7 @@ Item {
             Label {
                 text: Math.round(widthField.value) + " x " + Math.round(heightField.value)
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
             }
         }
 

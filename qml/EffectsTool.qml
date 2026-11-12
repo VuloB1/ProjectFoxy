@@ -151,7 +151,7 @@ Item {
                 Label {
                     text: effectFlick.picked ? effectFlick.picked.name : ""
                     color: themeManager.textPrimary
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                     width: parent.width - busyLabel.width
                 }
                 Label {
@@ -242,7 +242,7 @@ Item {
                     anchors.top: parent.top
                     text: Math.round(mixSlider.value * 100) + "%"
                     color: mixSlider.value < 0.9995 ? themeManager.accent : themeManager.textPrimary
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                 }
                 AppSlider {
                     id: mixSlider

@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.12" date="2026-11-12">
+      <description>
+        <p>Interface polish: orange accent with a choice of colours, sentence-case labels, lighter bold text, a clearer empty screen and a tidier type scale.</p>
+      </description>
+    </release>
     <release version="0.3.11" date="2026-11-12">
       <description>
         <p>Fixes the program closing when it opens with the window maximized.</p>

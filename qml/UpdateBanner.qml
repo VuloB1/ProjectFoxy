@@ -55,7 +55,7 @@ Rectangle {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     color: themeManager.textPrimary
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                     text: {
                         switch (root.state) {
                         case "downloading": return qsTr("Descargando la versión %1…").arg(updater.latestVersion)

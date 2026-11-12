@@ -31,7 +31,7 @@ CheckBox {
                     text: "✓"
                     color: themeManager.accentText
                     font.pixelSize: 11
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                 }
             }
         }
@@ -54,7 +54,7 @@ CheckBox {
                     text: "✓"
                     color: themeManager.textPrimary
                     font.pixelSize: 11
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                 }
             }
         }

@@ -50,7 +50,7 @@ Item {
                         id: modeLabel
                         text: histView.mode === "rgb" ? qsTr("RGB") : qsTr("Luminosidad")
                         color: themeManager.textPrimary
-                        font.bold: true
+                        font.weight: themeManager.strongWeight
                     }
                 }
                 HistogramView {

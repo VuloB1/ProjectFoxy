@@ -25,7 +25,7 @@ TabButton {
         id: labelMetrics
         font.family: control.font.family
         font.pixelSize: control.font.pixelSize
-        font.bold: true
+        font.weight: themeManager.strongWeight
         text: control.text
     }
 
@@ -82,7 +82,7 @@ TabButton {
             width: Math.min(labelMetrics.width + 4, control.availableWidth)
             text: control.text
             color: control.checked || control.hovered ? themeManager.textPrimary : themeManager.textSecondary
-            font.bold: control.checked
+            font.weight: (control.checked) ? themeManager.strongWeight : Font.Normal
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight

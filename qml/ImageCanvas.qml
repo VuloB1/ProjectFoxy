@@ -1421,12 +1421,35 @@ Rectangle {
         function onCurrentIndexChanged() { Qt.callLater(root.announceImageIndex); }
     }
 
-    Label {
+    // Nothing open: a card of its own (the empty canvas is the transparency checkerboard, which a bare line of text
+    // does not read over), with the icon of the Open button and its shortcut.
+    Rectangle {
         anchors.centerIn: parent
         visible: !appController.isLoading && appController.errorString.length === 0
                  && image.status !== Image.Ready
-        text: qsTr("Arrastra una imagen o usa Abrir")
-        color: themeManager.textSecondary
+        width: emptyColumn.width + 56
+        height: emptyColumn.height + 48
+        radius: themeManager.radiusMedium === 0 ? 0 : 12
+        color: themeManager.surface
+        border.color: themeManager.border
+        Column {
+            id: emptyColumn
+            anchors.centerIn: parent
+            spacing: 12
+            AppIcon { anchors.horizontalCenter: parent.horizontalCenter; name: "open"; size: 28; color: themeManager.textSecondary }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Arrastra una imagen o usa Abrir")
+                color: themeManager.textPrimary
+                font.pixelSize: 15
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: "Ctrl+O"
+                color: themeManager.textSecondary
+                font.pixelSize: 12
+            }
+        }
     }
 
     Item {

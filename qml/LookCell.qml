@@ -57,6 +57,6 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 11
         color: root.selected || hover.hovered ? themeManager.textPrimary : themeManager.textSecondary
-        font.bold: root.selected
+        font.weight: (root.selected) ? themeManager.strongWeight : Font.Normal
     }
 }

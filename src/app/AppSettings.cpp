@@ -27,6 +27,7 @@ AppSettings::AppSettings(QObject *parent)
     // every extra on; for everybody else the extras start off.
     const bool wasAllInOne = m_store.value(QStringLiteral("view/pixelArt"), false).toBool();
     m_language = m_store.value(QStringLiteral("ui/language"), QStringLiteral("system")).toString();
+    m_accentId = m_store.value(QStringLiteral("ui/accent"), m_accentId).toString();
     m_smoothZoom = m_store.value(QStringLiteral("view/smoothZoom"), false).toBool();
     m_viewSharpen = std::clamp(m_store.value(QStringLiteral("view/sharpen"), 0).toInt(), 0, 100);
     m_pixelMode = m_store.value(QStringLiteral("view/pixelMode"), wasAllInOne).toBool();
@@ -129,6 +130,15 @@ void AppSettings::setLanguage(const QString &value)
     m_language = value;
     m_store.setValue(QStringLiteral("ui/language"), value);
     emit languageChanged();
+}
+
+void AppSettings::setAccentId(const QString &value)
+{
+    if (m_accentId == value)
+        return;
+    m_accentId = value;
+    m_store.setValue(QStringLiteral("ui/accent"), value);
+    emit accentIdChanged();
 }
 
 void AppSettings::setSmoothZoom(bool value)

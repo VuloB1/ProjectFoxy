@@ -23,10 +23,10 @@ Rectangle {
         y: 14
         text: card.heading
         color: themeManager.textSecondary
-        font.bold: true
+        font.weight: themeManager.strongWeight
         font.pixelSize: 11
-        font.capitalization: Font.AllUppercase
-        font.letterSpacing: 0.8
+        font.capitalization: themeManager.skin === "win98" ? Font.AllUppercase : Font.MixedCase
+        font.letterSpacing: themeManager.skin === "win98" ? 0.8 : 0.2
     }
     Column {
         id: inner

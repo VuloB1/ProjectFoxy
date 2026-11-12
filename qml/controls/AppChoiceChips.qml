@@ -41,7 +41,7 @@ Flow {
                 elide: Text.ElideRight
                 text: chip.label
                 color: chip.picked ? themeManager.accent : themeManager.textPrimary
-                font.bold: chip.picked
+                font.weight: (chip.picked) ? themeManager.strongWeight : Font.Normal
             }
             HoverHandler { id: hover; cursorShape: Qt.PointingHandCursor }
             TapHandler { onTapped: root.activated(chip.index) }

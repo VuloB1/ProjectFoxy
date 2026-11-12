@@ -450,7 +450,7 @@ Item {
                             height: 18
                             radius: 9
                             color: themeManager.accent
-                            Label { anchors.centerIn: parent; text: "Fx"; color: themeManager.accentText; font.pixelSize: 10; font.bold: true }
+                            Label { anchors.centerIn: parent; text: "Fx"; color: themeManager.accentText; font.pixelSize: 11; font.weight: themeManager.strongWeight }
                         }
                         Rectangle {
                             anchors.left: parent.left
@@ -516,7 +516,7 @@ Item {
                         elide: Text.ElideMiddle
                         text: cell.name
                         color: themeManager.textSecondary
-                        font.pixelSize: 10
+                        font.pixelSize: 11
                     }
                 }
             }
@@ -560,7 +560,7 @@ Item {
                 anchors.right: parent.right
                 text: parent.shown.toFixed(parent.decimals) + parent.suffix
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
             }
             AppSlider {
                 anchors.left: parent.left
@@ -590,7 +590,7 @@ Item {
                 anchors.right: parent.right
                 text: parent.shown.toFixed(parent.decimals) + parent.suffix
                 color: themeManager.textPrimary
-                font.bold: true
+                font.weight: themeManager.strongWeight
             }
             AppSlider {
                 anchors.left: parent.left
@@ -644,7 +644,7 @@ Item {
                         width: parent.width
                         implicitHeight: 40
                         Label { text: qsTr("Cada fotograma"); color: themeManager.textSecondary }
-                        Label { anchors.right: parent.right; text: durationSection.hold + " ms"; color: themeManager.textPrimary; font.bold: true }
+                        Label { anchors.right: parent.right; text: durationSection.hold + " ms"; color: themeManager.textPrimary; font.weight: themeManager.strongWeight }
                         AppSlider {
                             anchors.left: parent.left
                             anchors.right: parent.right

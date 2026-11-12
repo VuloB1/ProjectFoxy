@@ -107,7 +107,7 @@ AppPanelBackground {
         Label {
             text: qsTr("Editar")
             color: themeManager.textPrimary
-            font.bold: true
+            font.weight: themeManager.strongWeight
             font.pixelSize: 15
             width: parent.width
             bottomPadding: 6
@@ -145,7 +145,7 @@ AppPanelBackground {
                     anchors.rightMargin: 8
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 2
-                    Label { width: parent.width; text: entry.modelData.name; color: themeManager.textPrimary; font.bold: true; elide: Text.ElideRight }
+                    Label { width: parent.width; text: entry.modelData.name; color: themeManager.textPrimary; font.weight: themeManager.strongWeight; elide: Text.ElideRight }
                     Label { width: parent.width; text: entry.modelData.hint; color: themeManager.textSecondary; font.pixelSize: 11; elide: Text.ElideRight }
                 }
                 AppIcon {
@@ -217,7 +217,7 @@ AppPanelBackground {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.toolInfo(root.shownTool).name
                     color: themeManager.textPrimary
-                    font.bold: true
+                    font.weight: themeManager.strongWeight
                     font.pixelSize: 15
                 }
             }

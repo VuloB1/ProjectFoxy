@@ -79,11 +79,11 @@ Objects setup(QQmlApplicationEngine &engine)
     auto *controller = new AppController(imageProvider, folderModel, &engine);
     engine.rootContext()->setContextProperty("appController", controller);
 
-    auto *themeManager = new ThemeManager(&engine);
-    engine.rootContext()->setContextProperty("themeManager", themeManager);
-
     auto *appSettings = new AppSettings(&engine);
     engine.rootContext()->setContextProperty("appSettings", appSettings);
+
+    auto *themeManager = new ThemeManager(appSettings, &engine);
+    engine.rootContext()->setContextProperty("themeManager", themeManager);
     auto *ocrLanguages = new OcrLanguages(appSettings, &engine);
     engine.rootContext()->setContextProperty("ocrLanguages", ocrLanguages);
     engine.rootContext()->setContextProperty("textRecognizer", new TextRecognizer(controller, ocrLanguages, &engine));

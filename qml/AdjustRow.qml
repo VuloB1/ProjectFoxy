@@ -53,7 +53,7 @@ Item {
         anchors.top: parent.top
         text: root.formatted(root.inverted ? -slider.value : slider.value)
         color: root.modified ? themeManager.accent : themeManager.textPrimary
-        font.bold: true
+        font.weight: themeManager.strongWeight
     }
     MouseArea {
         anchors.left: parent.left

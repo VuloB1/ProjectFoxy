@@ -118,7 +118,7 @@ Item {
             anchors.top: parent.top
             text: Math.round(amountSlider.value * 100)
             color: amountSlider.value < 0.9995 ? themeManager.accent : themeManager.textPrimary
-            font.bold: true
+            font.weight: themeManager.strongWeight
         }
         AppSlider {
             id: amountSlider
