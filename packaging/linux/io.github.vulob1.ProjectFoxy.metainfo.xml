@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.11" date="2026-11-12">
+      <description>
+        <p>Fixes the program closing when it opens with the window maximized.</p>
+      </description>
+    </release>
     <release version="0.3.10" date="2026-11-07">
       <description>
         <p>The program is now called Foxy Viewer. No resize cursor at the edges when the window is maximized.</p>
