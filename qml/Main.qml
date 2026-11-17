@@ -428,6 +428,20 @@ ApplicationWindow {
         onActivated: root.requestSave()
     }
 
+    // Deshacer / Rehacer (the status bar's buttons). Not while a text field has focus, so Ctrl+Z
+    // still undoes typing there. `sequences` because StandardKey.Redo is Ctrl+Y and Ctrl+Shift+Z.
+    readonly property bool textFieldFocused: !!(activeFocusItem && "cursorPosition" in activeFocusItem)
+    Shortcut {
+        sequences: [StandardKey.Undo]
+        enabled: root.editMode && !root.textFieldFocused && appController.canUndoEdit
+        onActivated: appController.undoEdit()
+    }
+    Shortcut {
+        sequences: [StandardKey.Redo]
+        enabled: root.editMode && !root.textFieldFocused && appController.canRedoEdit
+        onActivated: appController.redoEdit()
+    }
+
     // Drag & drop onto the window opens the file / navigates its folder.
     DropArea {
         anchors.fill: parent
