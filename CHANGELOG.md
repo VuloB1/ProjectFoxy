@@ -3,6 +3,11 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.13] — Undo shortcuts and Compare fix
+
+- **Ctrl+Z / Ctrl+Y** undo and redo while editing (they leave text fields alone).
+- **Compare** now draws the original in its own proportions; after a crop or a resize it is no longer squeezed.
+
 ## [0.3.12] — Interface polish
 
 - **Orange accent**, like the logo, in the Modern themes, with 7 colours to choose from in Settings > Appearance (Classic themes keep their own).
@@ -305,6 +310,11 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.13] — Atajos de deshacer y arreglo de Comparar
+
+- **Ctrl+Z / Ctrl+Y** deshacen y rehacen al editar (no interfieren con los campos de texto).
+- **Comparar** dibuja ahora el original con sus propias proporciones; tras un recorte o un cambio de tamaño ya no sale aplastado.
 
 ## [0.3.12] — Retoques de interfaz
 

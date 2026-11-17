@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.13" date="2026-11-17">
+      <description>
+        <p>Ctrl+Z and Ctrl+Y undo and redo while editing, and Compare shows the original in its own proportions after a crop.</p>
+      </description>
+    </release>
     <release version="0.3.12" date="2026-11-12">
       <description>
         <p>Interface polish: orange accent with a choice of colours, sentence-case labels, lighter bold text, a clearer empty screen and a tidier type scale.</p>
