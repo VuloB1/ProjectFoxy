@@ -10,7 +10,9 @@
 #include "AppSettings.h"
 #include "FolderModel.h"
 
+#include <QClipboard>
 #include <QFileInfo>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QQmlProperty>
@@ -393,6 +395,22 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(canvas->property("zoomPercent").toInt() > 100, 3000);
         QTest::keyClick(m_window, Qt::Key_0, Qt::ControlModifier);
         QTRY_COMPARE_WITH_TIMEOUT(canvas->property("zoomPercent").toInt(), 100, 3000); // a small picture fits at 100%
+    }
+
+    void rotateCopyAndDeleteKeys()
+    {
+        const QString a = file("viewkeys.png", picture(80, 40, Qt::yellow));
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("viewkeys.png"), 10000);
+        QQuickItem *canvas = item("imageCanvas");
+        QTest::keyClick(m_window, Qt::Key_R);
+        QTRY_COMPARE_WITH_TIMEOUT(canvas->property("targetRotation").toInt(), 90, 3000);
+        QGuiApplication::clipboard()->clear();
+        QTest::keyClick(m_window, Qt::Key_C, Qt::ControlModifier);
+        QTRY_COMPARE_WITH_TIMEOUT(QGuiApplication::clipboard()->image().size(), QSize(80, 40), 3000);
+        QTest::keyClick(m_window, Qt::Key_Delete); // only opens the confirmation: nothing is deleted yet
+        QTest::qWait(300);
+        QVERIFY(QFileInfo::exists(a));
     }
 
     // ------------------------------------------------------------------------------------------------ the unsaved question

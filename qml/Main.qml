@@ -450,6 +450,13 @@ ApplicationWindow {
     Shortcut { sequence: "Ctrl+0"; enabled: root.zoomKeysOn; onActivated: canvas.fitToWindow() }
     Shortcut { sequence: "Ctrl+1"; enabled: root.zoomKeysOn; onActivated: canvas.toggleActualSize() }
 
+    // R turns the view clockwise, Ctrl+C copies the picture (unless the text layer has a selection: it
+    // owns that Ctrl+C), Delete asks to delete the file (the same confirmation as the context menu).
+    readonly property bool viewKeysOn: root.zoomKeysOn && !root.toolLocked && appController.currentSource.length > 0
+    Shortcut { sequence: "R"; enabled: root.viewKeysOn && !root.editMode; onActivated: canvas.rotateClockwise() }
+    Shortcut { sequences: [StandardKey.Copy]; enabled: root.viewKeysOn && !canvas.textMode; onActivated: appController.copyToClipboard() }
+    Shortcut { sequence: "Delete"; enabled: root.viewKeysOn && !root.editMode; onActivated: toolbar.requestDelete() }
+
     // Drag & drop onto the window opens the file / navigates its folder.
     DropArea {
         anchors.fill: parent
