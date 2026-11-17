@@ -364,6 +364,23 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(effect->height() > effect->width(), 3000);
     }
 
+    void controlZAndControlYUndoAndRedoWhileEditing()
+    {
+        const QString a = file("keys.png", picture(80, 40, Qt::yellow));
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("keys.png"), 10000);
+        click("editButton");
+        click("tool-crop");
+        click("rotateRightButton");
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(40, 80), 10000);
+        click("applyToolButton");
+        QTRY_VERIFY_WITH_TIMEOUT(!m_app.controller->toolSessionActive(), 5000);
+        QTest::keyClick(m_window, Qt::Key_Z, Qt::ControlModifier);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(80, 40), 5000);
+        QTest::keyClick(m_window, Qt::Key_Y, Qt::ControlModifier);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(40, 80), 5000);
+    }
+
     // ------------------------------------------------------------------------------------------------ the unsaved question
 
     // Another picture while this one has unsaved edits: the question comes up. "Cancelar" stays; "Descartar" goes on.
