@@ -3,6 +3,11 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.14] — Keyboard shortcuts
+
+- **Ctrl +, Ctrl -, Ctrl+0, Ctrl+1**: zoom in, zoom out, fit to window, real size.
+- **R** rotates the view, **Ctrl+C** copies the picture and **Delete** asks to remove the file (with the usual confirmation).
+
 ## [0.3.13] — Undo shortcuts and Compare fix
 
 - **Ctrl+Z / Ctrl+Y** undo and redo while editing (they leave text fields alone).
@@ -310,6 +315,11 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.14] — Atajos de teclado
+
+- **Ctrl +, Ctrl -, Ctrl+0, Ctrl+1**: acercar, alejar, ajustar a la ventana y tamaño real.
+- **R** gira la vista, **Ctrl+C** copia la imagen y **Supr** pide eliminar el archivo (con la confirmación de siempre).
 
 ## [0.3.13] — Atajos de deshacer y arreglo de Comparar
 
