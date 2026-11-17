@@ -36,9 +36,9 @@ Rectangle {
     signal editModeRequested(bool on)
     // Before/after compare toggle (EditPanel's "Comparar" button, held down):
     // while true, the final visible stage shows the as-opened original
-    // instead of the live-edited GPU chain output. Not pixel-aligned with
-    // the edited view after a crop/resize (it's the full original image
-    // dimensions), which is fine for a rough before/after glance.
+    // instead of the live-edited GPU chain output. After a crop/resize the
+    // original has other proportions, so it is drawn with its own (fitted to the
+    // view, or to the picture's box when zoomed) - never stretched into the cropped one.
     property bool compareOriginal: false
     readonly property int zoomPercent: Math.round(image.scale * 100)
 
@@ -969,10 +969,18 @@ Rectangle {
 
         ShaderEffect {
             id: detailEffect
-            x: image.x
-            y: image.y
-            width: image.width
-            height: image.height
+            objectName: "detailEffect"
+            // While comparing: the original's own proportions, as big as fits (screen pixels /
+            // image.scale = item units), centred where the edited picture is.
+            readonly property real cmpAspect: originalImage.implicitHeight > 0 ? originalImage.implicitWidth / originalImage.implicitHeight : 0
+            readonly property bool cmpOn: root.compareOriginal && cmpAspect > 0
+            readonly property real cmpBoxW: root.fitMode ? flick.width : image.width * image.scale
+            readonly property real cmpBoxH: root.fitMode ? root.viewHeight : image.height * image.scale
+            readonly property real cmpScreenW: cmpAspect > 0 ? Math.min(cmpBoxW, cmpBoxH * cmpAspect) : 0
+            x: image.x + (image.width - width) / 2
+            y: image.y + (image.height - height) / 2
+            width: cmpOn ? cmpScreenW / image.scale : image.width
+            height: cmpOn ? cmpScreenW / cmpAspect / image.scale : image.height
             rotation: image.rotation
             scale: image.scale
             transformOrigin: image.transformOrigin
