@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.14" date="2026-11-17">
+      <description>
+        <p>Keyboard shortcuts: Ctrl +/-/0/1 for zoom, R to rotate, Ctrl+C to copy the picture and Delete to remove the file.</p>
+      </description>
+    </release>
     <release version="0.3.13" date="2026-11-17">
       <description>
         <p>Ctrl+Z and Ctrl+Y undo and redo while editing, and Compare shows the original in its own proportions after a crop.</p>
