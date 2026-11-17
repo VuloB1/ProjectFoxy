@@ -381,6 +381,20 @@ private slots:
         QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(40, 80), 5000);
     }
 
+    void zoomShortcutsChangeTheZoom()
+    {
+        const QString a = file("zoomkeys.png", picture(80, 40, Qt::yellow));
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("zoomkeys.png"), 10000);
+        QQuickItem *canvas = item("imageCanvas");
+        QTest::keyClick(m_window, Qt::Key_1, Qt::ControlModifier);
+        QTRY_COMPARE_WITH_TIMEOUT(canvas->property("zoomPercent").toInt(), 100, 3000);
+        QTest::keyClick(m_window, Qt::Key_Equal, Qt::ControlModifier);
+        QTRY_VERIFY_WITH_TIMEOUT(canvas->property("zoomPercent").toInt() > 100, 3000);
+        QTest::keyClick(m_window, Qt::Key_0, Qt::ControlModifier);
+        QTRY_COMPARE_WITH_TIMEOUT(canvas->property("zoomPercent").toInt(), 100, 3000); // a small picture fits at 100%
+    }
+
     // ------------------------------------------------------------------------------------------------ the unsaved question
 
     // Another picture while this one has unsaved edits: the question comes up. "Cancelar" stays; "Descartar" goes on.

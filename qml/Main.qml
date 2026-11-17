@@ -442,6 +442,14 @@ ApplicationWindow {
         onActivated: appController.redoEdit()
     }
 
+    // Zoom (the status bar's buttons): Ctrl +, Ctrl -, Ctrl+0 fits, Ctrl+1 shows the real size.
+    readonly property bool zoomKeysOn: !root.multiMode && root.studio === "" && !mangaReader.active && !root.textFieldFocused
+                                      && appController.currentImageSize.width > 0
+    Shortcut { sequences: [StandardKey.ZoomIn, "Ctrl+="]; enabled: root.zoomKeysOn; onActivated: canvas.zoomIn() }
+    Shortcut { sequences: [StandardKey.ZoomOut]; enabled: root.zoomKeysOn; onActivated: canvas.zoomOut() }
+    Shortcut { sequence: "Ctrl+0"; enabled: root.zoomKeysOn; onActivated: canvas.fitToWindow() }
+    Shortcut { sequence: "Ctrl+1"; enabled: root.zoomKeysOn; onActivated: canvas.toggleActualSize() }
+
     // Drag & drop onto the window opens the file / navigates its folder.
     DropArea {
         anchors.fill: parent
