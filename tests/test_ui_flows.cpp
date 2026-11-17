@@ -344,6 +344,26 @@ private slots:
         QVERIFY(!m_app.controller->isDirty());
     }
 
+    void compareShowsTheOriginalInItsOwnProportionsAfterACrop()
+    {
+        const QString a = file("cmp.png", picture(80, 40, Qt::yellow));
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("cmp.png"), 10000);
+        click("editButton");
+        click("tool-crop");
+        click("rotateRightButton");
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(40, 80), 10000);
+        click("applyToolButton");
+        QTRY_VERIFY_WITH_TIMEOUT(!m_app.controller->toolSessionActive(), 5000);
+        QQuickItem *effect = item("detailEffect");
+        QTRY_VERIFY_WITH_TIMEOUT(effect->height() > effect->width(), 3000); // the edited picture: 40 x 80
+        item("imageCanvas")->setProperty("compareOriginal", true);
+        QTRY_VERIFY_WITH_TIMEOUT(effect->width() > effect->height(), 3000); // the original: 80 x 40, not squeezed
+        QVERIFY(qAbs(effect->width() / effect->height() - 2.0) < 0.05);
+        item("imageCanvas")->setProperty("compareOriginal", false);
+        QTRY_VERIFY_WITH_TIMEOUT(effect->height() > effect->width(), 3000);
+    }
+
     // ------------------------------------------------------------------------------------------------ the unsaved question
 
     // Another picture while this one has unsaved edits: the question comes up. "Cancelar" stays; "Descartar" goes on.
