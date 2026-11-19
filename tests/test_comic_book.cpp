@@ -237,6 +237,22 @@ private slots:
         QVERIFY(!QDir(dir.filePath("cache")).exists());
     }
 
+    // A tiny entry that says it holds 1 GB is refused before anything is reserved for it.
+    void aZipBombIsRefused()
+    {
+        QTemporaryDir dir;
+        QByteArray bytes = makeZip({{"a.bin", QByteArray(5000, 'x'), true}});
+        const qsizetype central = bytes.indexOf("PK\x01\x02");
+        QVERIFY(central > 0);
+        const quint32 huge = 0x40000000; // 1 GB, little endian at offset 24 of the central record
+        for (int i = 0; i < 4; ++i)
+            bytes[central + 24 + i] = char((huge >> (8 * i)) & 0xFF);
+        core::ZipArchive zip;
+        QVERIFY(zip.open(writeFile(dir.filePath("bomb.zip"), bytes)));
+        QVERIFY(zip.read(0).isEmpty());
+        QVERIFY(!zip.error().isEmpty());
+    }
+
     void whatCannotBeReadIsReportedNotCrashed()
     {
         QTemporaryDir dir;

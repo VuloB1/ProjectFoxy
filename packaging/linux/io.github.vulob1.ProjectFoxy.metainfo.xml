@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.15" date="2026-11-19">
+      <description>
+        <p>Compare now shows the picture as it was before the last edit; safer ZIP reading and update installer check; copyright holder named.</p>
+      </description>
+    </release>
     <release version="0.3.14" date="2026-11-17">
       <description>
         <p>Keyboard shortcuts: Ctrl +/-/0/1 for zoom, R to rotate, Ctrl+C to copy the picture and Delete to remove the file.</p>
