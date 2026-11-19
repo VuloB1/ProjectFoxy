@@ -322,9 +322,17 @@ Item {
             iconName: "compare"
             visible: root.editMode
             enabled: appController.hasEdits
-            // Held down (not toggled) - shows the as-opened original for as
+            // Held down (not toggled) - shows the picture as it was before the last edit for as
             // long as the mouse is pressed, like most photo editors.
-            onPressedChanged: if (root.canvas) root.canvas.compareOriginal = pressed
+            onPressedChanged: {
+                if (!root.canvas)
+                    return;
+                if (pressed)
+                    appController.prepareCompare();
+                root.canvas.compareOriginal = pressed;
+                if (!pressed)
+                    appController.releaseCompare();
+            }
         }
         AppToolButton {
             hPad: 10
