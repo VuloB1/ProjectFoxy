@@ -260,7 +260,7 @@ python tools/i18n_tool.py build    # writes resources/i18n/<language>.json
 
 ## License
 
-**GPL-3.0-or-later**, copyright 2026 Vulito (see [`LICENSE`](LICENSE)); it is the one consistent with exiv2 (GPL). The
+**GPL-3.0-or-later**, copyright 2026 Enrique Ignacio Fuentes Nuñez (Vulito) (see [`LICENSE`](LICENSE)); it is the one consistent with exiv2 (GPL). The
 licenses of the other libraries are in [`docs/LICENCIAS.md`](docs/LICENCIAS.md) and in the `licenses` folder of every
 download. The lens profiles come from [Lensfun](https://lensfun.github.io/) (CC BY-SA 3.0).
 
@@ -544,7 +544,7 @@ python tools/i18n_tool.py build    # escribe resources/i18n/<idioma>.json
 
 ## Licencia
 
-**GPL-3.0-or-later**, copyright 2026 Vulito (ver [`LICENSE`](LICENSE)). Es la coherente con exiv2 (GPL). Las
+**GPL-3.0-or-later**, copyright 2026 Enrique Ignacio Fuentes Nuñez (Vulito) (ver [`LICENSE`](LICENSE)). Es la coherente con exiv2 (GPL). Las
 licencias de las demás librerías están en [`docs/LICENCIAS.md`](docs/LICENCIAS.md) y en la carpeta `licenses` de cada
 descarga. Los perfiles de lente son de [Lensfun](https://lensfun.github.io/) (CC BY-SA 3.0).
 
