@@ -246,7 +246,7 @@ void AppController::applyNewDocument(const core::ImageDocument &doc)
     m_liveCoalesceKey.clear();
 
     m_provider->setImage(doc.pixels, doc.displayProxy, core::kDisplayProxySide);
-    m_provider->setOriginalImage(doc.pixels);
+    m_provider->setOriginalImage(QImage());
     m_currentImageSize = doc.sourceSize;
     m_metadata = buildMetadataDisplay(doc.metadata);
     m_lensHints = QVariantMap{{QStringLiteral("make"), doc.metadata.cameraMake},
@@ -339,11 +339,31 @@ void AppController::showAnimationFrame(const QImage &frame)
     emit currentSourceChanged();
 }
 
-QString AppController::originalSource() const
+QString AppController::compareSource() const
 {
     if (m_originalImage.isNull())
         return {};
     return QStringLiteral("image://viewer/original?rev=%1").arg(m_originalRevision);
+}
+
+void AppController::prepareCompare()
+{
+    if (m_originalImage.isNull() || !m_editStack.canUndo())
+        return;
+    // Step back one entry, render, step forward again: the redo tail is untouched.
+    m_editStack.undo();
+    QImage before = m_editStack.bake(m_originalImage);
+    if (const core::edit::LiveOp *live = m_editStack.activeLiveState())
+        before = core::edit::renderLiveOverlay(before, live->lookId, live->lookAmount, live->adjust);
+    m_editStack.redo();
+    m_provider->setOriginalImage(before);
+    ++m_originalRevision;
+    emit compareSourceChanged();
+}
+
+void AppController::releaseCompare()
+{
+    m_provider->setOriginalImage(QImage());
 }
 
 QString AppController::currentFileName() const

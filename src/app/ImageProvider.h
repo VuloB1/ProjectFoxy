@@ -10,8 +10,8 @@
 // "image://viewer/current?rev=N" - bumping the revision in the query string
 // forces QML to re-request even though the provider id itself doesn't
 // change. Also separately serves "image://viewer/original?rev=N" - the
-// as-opened, never-edited image - for ImageCanvas.qml's before/after
-// compare toggle, "image://viewer/lut?rev=N" - the 256x1 tone lookup table
+// picture as it was before the last edit
+// (AppController::prepareCompare) - for ImageCanvas.qml's before/after compare toggle, "image://viewer/lut?rev=N" - the 256x1 tone lookup table
 // the Grade.frag shader reads for the Ajustes stage (see
 // core::edit::buildAdjustLut), "image://viewer/looklut?rev=N" - the same for
 // the active Filtros look - and "image://viewer/lookthumb/<lookId>?rev=N" -
