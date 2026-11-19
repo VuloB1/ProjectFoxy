@@ -359,11 +359,31 @@ private slots:
         QTRY_VERIFY_WITH_TIMEOUT(!m_app.controller->toolSessionActive(), 5000);
         QQuickItem *effect = item("detailEffect");
         QTRY_VERIFY_WITH_TIMEOUT(effect->height() > effect->width(), 3000); // the edited picture: 40 x 80
+        QMetaObject::invokeMethod(m_app.controller, "prepareCompare");
         item("imageCanvas")->setProperty("compareOriginal", true);
         QTRY_VERIFY_WITH_TIMEOUT(effect->width() > effect->height(), 3000); // the original: 80 x 40, not squeezed
         QVERIFY(qAbs(effect->width() / effect->height() - 2.0) < 0.05);
         item("imageCanvas")->setProperty("compareOriginal", false);
         QTRY_VERIFY_WITH_TIMEOUT(effect->height() > effect->width(), 3000);
+    }
+
+    // Comparar shows the picture as it was before the LAST edit, not the opened file.
+    void compareShowsTheStateBeforeTheLastEdit()
+    {
+        const QString a = file("cmp2.png", picture(80, 40, Qt::yellow));
+        m_app.controller->openPath(a);
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentFileName(), QStringLiteral("cmp2.png"), 10000);
+        m_app.controller->rotateEdit90(); // 40 x 80
+        m_app.controller->rotateEdit90(); // 80 x 40 again, but the step before was 40 x 80
+        QTRY_COMPARE_WITH_TIMEOUT(m_app.controller->currentImageSize(), QSize(80, 40), 5000);
+        QQuickItem *effect = item("detailEffect");
+        QMetaObject::invokeMethod(m_app.controller, "prepareCompare");
+        item("imageCanvas")->setProperty("compareOriginal", true);
+        QTRY_VERIFY_WITH_TIMEOUT(effect->height() > effect->width(), 3000);
+        item("imageCanvas")->setProperty("compareOriginal", false);
+        QMetaObject::invokeMethod(m_app.controller, "releaseCompare");
+        QCOMPARE(m_app.controller->currentImageSize(), QSize(80, 40));
+        QVERIFY(m_app.controller->canUndoEdit()); // the history is as it was
     }
 
     void controlZAndControlYUndoAndRedoWhileEditing()

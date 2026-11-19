@@ -34,11 +34,11 @@ Rectangle {
     // A tool is open in the edit panel (see Main.qml): no leaving edit mode, no deleting the file.
     property bool locked: false
     signal editModeRequested(bool on)
-    // Before/after compare toggle (EditPanel's "Comparar" button, held down):
-    // while true, the final visible stage shows the as-opened original
-    // instead of the live-edited GPU chain output. After a crop/resize the
-    // original has other proportions, so it is drawn with its own (fitted to the
-    // view, or to the picture's box when zoomed) - never stretched into the cropped one.
+    // Before/after compare toggle (the status bar's "Comparar" button, held down):
+    // while true, the final visible stage shows the picture as it was before the last
+    // edit (appController.compareSource) instead of the live-edited GPU chain output. After
+    // a crop/resize that picture has other proportions, so it is drawn with its own (fitted to
+    // the view, or to the picture's box when zoomed) - never stretched into the current one.
     property bool compareOriginal: false
     readonly property int zoomPercent: Math.round(image.scale * 100)
 
@@ -797,14 +797,14 @@ Rectangle {
             }
         }
 
-        // The as-opened, unedited image - only ever shown when compareOriginal
-        // is true (EditPanel's "Comparar" button held down), bypassing the
+        // The picture as it was before the last edit - only ever shown when compareOriginal
+        // is true (the status bar's "Comparar" button held down), bypassing the
         // whole filter/adjust/detail chain below entirely.
         Image {
             id: originalImage
             // Loaded only while "Comparar" is held: kept resident it would cost a
             // second full-size texture (about 200 MB for a 37 MP photo) for nothing.
-            source: root.compareOriginal ? appController.originalSource + (root.proxySide > 0 ? "&side=" + root.proxySide : "") : ""
+            source: root.compareOriginal ? appController.compareSource + (root.proxySide > 0 ? "&side=" + root.proxySide : "") : ""
             visible: false
             x: image.x
             y: image.y

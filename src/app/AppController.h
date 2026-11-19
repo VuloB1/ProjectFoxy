@@ -40,7 +40,8 @@ class AppController : public QObject {
     // compare toggle - unlike currentSource, this never changes across
     // crop/resize/rotate/flip/adjust/filter, only when a genuinely new
     // image is loaded.
-    Q_PROPERTY(QString originalSource READ originalSource NOTIFY currentSourceChanged)
+    // The picture the Comparar button shows while held: the state before the last edit (see prepareCompare()).
+    Q_PROPERTY(QString compareSource READ compareSource NOTIFY compareSourceChanged)
     Q_PROPERTY(QSize currentImageSize READ currentImageSize NOTIFY currentImageSizeChanged)
     // A "Guardar como..." dialog's suggested starting name/location: the
     // current file's own folder and base name (no extension), so the user
@@ -179,7 +180,11 @@ public:
     ~AppController() override;
 
     QString currentSource() const { return m_currentSource; }
-    QString originalSource() const;
+    QString compareSource() const;
+    // Renders the picture as it was before the newest history entry (what one Undo would show), for compareSource.
+    Q_INVOKABLE void prepareCompare();
+    Q_INVOKABLE void releaseCompare(); // frees it again
+
     QString currentFileName() const;
     QSize currentImageSize() const { return m_currentImageSize; }
     QUrl suggestedSaveUrl() const;
@@ -385,6 +390,7 @@ signals:
     // Image.onStatusChanged for exactly that reason.
     void structuralImageChanged();
     void currentSourceChanged();
+    void compareSourceChanged();
     void canSaveInPlaceChanged();
     void currentImageSizeChanged();
     void isLoadingChanged();
