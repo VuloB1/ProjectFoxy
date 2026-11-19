@@ -129,8 +129,13 @@ QByteArray ZipArchive::read(int index)
         m_error = core::tr("El archivo ZIP está protegido con contraseña.");
         return {};
     }
-    if ((e.method != 0 && e.method != 8) || e.size > (quint64(1) << 31)) {
+    if ((e.method != 0 && e.method != 8) || e.size > (quint64(1) << 29)) {
         m_error = core::tr("El ZIP usa una compresión que no se puede leer.");
+        return {};
+    }
+    // Deflate cannot expand more than about 1032 times: a bigger claim is a zip bomb that would only reserve memory.
+    if (e.method == 8 && e.size / 1032 > e.compressedSize) {
+        m_error = core::tr("El archivo ZIP está dañado.");
         return {};
     }
     m_file.seek(qint64(e.headerOffset));

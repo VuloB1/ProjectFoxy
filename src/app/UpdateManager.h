@@ -94,5 +94,6 @@ private:
     bool m_dismissed = false;
     bool m_manual = false;
     bool m_dryRun = false;
+    QString m_installerHash; // what the downloaded installer must still hash to when it is run
     QString m_downloadBase;
 };

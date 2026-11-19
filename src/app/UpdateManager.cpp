@@ -204,6 +204,7 @@ void UpdateManager::fetchInstaller(const QString &expectedHash)
             QFile::remove(file->fileName());
             return fail(QStringLiteral("corrupt"));
         }
+        m_installerHash = expectedHash;
         m_progress = 1.0;
         emit progressChanged();
         setState(QStringLiteral("ready"));
@@ -214,6 +215,11 @@ void UpdateManager::installAndRestart()
 {
     if (m_state != QLatin1String("ready"))
         return;
+    // The file sat in the temp folder since it was checked: look again right before running it.
+    if (core::sha256OfFile(installerPath()) != m_installerHash) {
+        QFile::remove(installerPath());
+        return fail(QStringLiteral("corrupt"));
+    }
     setState(QStringLiteral("installing"));
     if (m_dryRun)
         return;
