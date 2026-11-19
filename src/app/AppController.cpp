@@ -1197,9 +1197,11 @@ bool AppController::deleteCurrentFile()
     SHFILEOPSTRUCTW op{};
     op.wFunc = FO_DELETE;
     op.pFrom = wpath.c_str();
-    op.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+    // FOF_WANTNUKEWARNING partly overrides FOF_NOCONFIRMATION: Windows asks only when the file cannot go to the
+    // Recycle Bin (a USB stick, a network drive, a file bigger than the bin) and would be deleted for good.
+    op.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_WANTNUKEWARNING | FOF_NOERRORUI | FOF_SILENT;
     if (SHFileOperationW(&op) != 0 || op.fAnyOperationsAborted)
-        return false;
+        return false; // (also when the person said no to the permanent delete)
 #else
     // The desktop's trash (freedesktop.org Trash specification); never a permanent delete. A sandbox has a trash of
     // its own that nobody empties, so inside Flatpak the file goes to the real one through the Trash portal.
