@@ -3,6 +3,10 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.16] — Safer delete
+
+- On Windows, **Delete file** now asks before deleting for good when the file cannot go to the Recycle Bin (USB stick, network drive, very large file). Saying no deletes nothing.
+
 ## [0.3.15] — Compare with the previous step, safety fixes
 
 - **Compare** shows the picture as it was before the last edit (what one Undo would show), not the opened file.
@@ -322,6 +326,10 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.16] — Eliminar más seguro
+
+- En Windows, **Eliminar archivo** pregunta antes de borrar de forma permanente cuando el archivo no cabe en la Papelera (USB, unidad de red, archivo muy grande). Si dices que no, no se borra nada.
 
 ## [0.3.15] — Comparar con el paso anterior y arreglos de seguridad
 
