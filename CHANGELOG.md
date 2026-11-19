@@ -3,6 +3,13 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.15] — Compare with the previous step, safety fixes
+
+- **Compare** shows the picture as it was before the last edit (what one Undo would show), not the opened file.
+- A comic (ZIP/CBZ) that claims far more data than it holds is refused instead of reserving gigabytes of memory.
+- The update installer is checked again right before it runs.
+- The license now names the copyright holder.
+
 ## [0.3.14] — Keyboard shortcuts
 
 - **Ctrl +, Ctrl -, Ctrl+0, Ctrl+1**: zoom in, zoom out, fit to window, real size.
@@ -315,6 +322,13 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.15] — Comparar con el paso anterior y arreglos de seguridad
+
+- **Comparar** muestra la imagen como estaba antes de la última edición (lo que mostraría un Deshacer), no el archivo abierto.
+- Un cómic (ZIP/CBZ) que declara muchos más datos de los que tiene se rechaza en vez de reservar gigabytes de memoria.
+- El instalador de la actualización se vuelve a comprobar justo antes de ejecutarse.
+- La licencia nombra ahora al titular del copyright.
 
 ## [0.3.14] — Atajos de teclado
 
