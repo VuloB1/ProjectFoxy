@@ -3,6 +3,10 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.17] — Clearer Classic text
+
+- **Classic themes**: bold titles and button names no longer look crowded; the letters have a little more room. Modern themes are unchanged.
+
 ## [0.3.16] — Safer delete
 
 - On Windows, **Delete file** now asks before deleting for good when the file cannot go to the Recycle Bin (USB stick, network drive, very large file). Saying no deletes nothing.
@@ -326,6 +330,10 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.17] — Texto más claro en Classic
+
+- **Temas Classic**: los títulos en negrita y los nombres de los botones ya no se ven amontonados; las letras tienen un poco más de espacio. Los temas Moderno no cambian.
 
 ## [0.3.16] — Eliminar más seguro
 
