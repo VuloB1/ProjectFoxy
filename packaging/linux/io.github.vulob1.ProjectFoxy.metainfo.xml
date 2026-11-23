@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.17" date="2026-11-23">
+      <description>
+        <p>Classic themes: clearer letters in bold titles and buttons.</p>
+      </description>
+    </release>
     <release version="0.3.16" date="2026-11-19">
       <description>
         <p>Delete file now asks before a permanent delete when the file cannot go to the Recycle Bin.</p>
