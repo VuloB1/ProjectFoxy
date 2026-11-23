@@ -49,6 +49,11 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.3.18" date="2026-11-23">
+      <description>
+        <p>The delete question no longer mentions the Recycle Bin on drives that have none, and updating no longer leaves the program running as administrator.</p>
+      </description>
+    </release>
     <release version="0.3.17" date="2026-11-23">
       <description>
         <p>Classic themes: clearer letters in bold titles and buttons.</p>
