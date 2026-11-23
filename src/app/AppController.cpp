@@ -1169,6 +1169,16 @@ bool AppController::pasteFromClipboard()
     return false;
 }
 
+bool AppController::currentFileGoesToTrash() const
+{
+#ifdef _WIN32
+    const QString root = QDir::toNativeSeparators(QFileInfo(m_currentFilePath).absoluteDir().rootPath());
+    return GetDriveTypeW(root.toStdWString().c_str()) == DRIVE_FIXED;
+#else
+    return true;
+#endif
+}
+
 bool AppController::deleteCurrentFile()
 {
     if (m_currentFilePath.isEmpty())

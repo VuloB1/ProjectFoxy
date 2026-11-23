@@ -225,8 +225,9 @@ void UpdateManager::installAndRestart()
         return;
     // /SILENT: a small progress window, no questions. /CLOSEAPPLICATIONS: the installer closes what is still running.
     // /update=1: ProjectFoxy.iss starts the program again when it is done.
+    // /LOG: "Setup Log <date>.txt" in the temp folder, to see what happened if an update ever fails.
     const QStringList arguments{QStringLiteral("/SILENT"), QStringLiteral("/SUPPRESSMSGBOXES"),
-                                QStringLiteral("/CLOSEAPPLICATIONS"), QStringLiteral("/update=1")};
+                                QStringLiteral("/CLOSEAPPLICATIONS"), QStringLiteral("/LOG"), QStringLiteral("/update=1")};
     if (!QProcess::startDetached(installerPath(), arguments))
         return fail(QStringLiteral("launch"));
     QCoreApplication::quit();

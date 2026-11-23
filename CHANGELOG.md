@@ -3,6 +3,11 @@
 All versions of Project Foxy. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 *(Español más abajo / Spanish below.)*
 
+## [0.3.18] — Honest delete question, updates without administrator
+
+- **Delete file**: on a USB stick or network drive the question says the file will be deleted for good, instead of promising the Recycle Bin.
+- **Updating** no longer leaves Foxy Viewer running as administrator, which stopped the next update from closing it. The installer started by the program also writes a log in the temp folder.
+
 ## [0.3.17] — Clearer Classic text
 
 - **Classic themes**: bold titles and button names no longer look crowded; the letters have a little more room. Modern themes are unchanged.
@@ -330,6 +335,11 @@ All versions of Project Foxy. The format follows [Keep a Changelog](https://keep
 # Cambios (Español)
 
 Todas las versiones de Project Foxy. El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
+
+## [0.3.18] — Pregunta de eliminar sincera, actualizar sin administrador
+
+- **Eliminar archivo**: en un USB o una unidad de red la pregunta dice que el archivo se borrará para siempre, en vez de prometer la Papelera.
+- **Actualizar** ya no deja Foxy Viewer ejecutándose como administrador, que impedía que la siguiente actualización pudiera cerrarlo. El instalador que lanza el programa también escribe un registro en la carpeta temporal.
 
 ## [0.3.17] — Texto más claro en Classic
 

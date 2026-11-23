@@ -49,8 +49,12 @@ Item {
             symbol: "trash"
             danger: true
             heading: qsTr("¿Eliminar este archivo?")
-            message: qsTr("«%1» se enviará a la Papelera de reciclaje.").arg(appController.currentFileName)
-            detail: qsTr("Podrás recuperarlo desde la Papelera si cambias de idea.")
+            // read when the dialog is made, and again if the file changes (the name is part of the binding)
+            readonly property bool toTrash: appController.currentFileName.length >= 0 && appController.currentFileGoesToTrash()
+            message: toTrash ? qsTr("«%1» se enviará a la Papelera de reciclaje.").arg(appController.currentFileName)
+                             : qsTr("«%1» se eliminará de forma permanente.").arg(appController.currentFileName)
+            detail: toTrash ? qsTr("Podrás recuperarlo desde la Papelera si cambias de idea.")
+                            : qsTr("No podrás recuperarlo: esta unidad no tiene Papelera de reciclaje.")
             confirmText: qsTr("Eliminar")
             onConfirmed: appController.deleteCurrentFile()
         }

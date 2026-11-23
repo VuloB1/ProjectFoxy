@@ -1,7 +1,7 @@
 ﻿; Foxy Viewer - installer (Inno Setup 6).
 ;
 ; Build it with tools\Build-Release.ps1 (which installs the program into dist\ProjectFoxy first), or by hand:
-;     ISCC.exe /DAppVersion=0.3.17 installer\ProjectFoxy.iss
+;     ISCC.exe /DAppVersion=0.3.18 installer\ProjectFoxy.iss
 ;
 ; What it does:
 ;   - installs the folder that `cmake --install` produces (the program, Qt, the libraries and the licences);
@@ -11,7 +11,7 @@
 ;     files. Windows does not let a program make itself the default, so the last step is the person's.
 
 #ifndef AppVersion
-  #define AppVersion "0.3.17"
+  #define AppVersion "0.3.18"
 #endif
 #define AppName "Foxy Viewer"
 #define AppExe "ProjectFoxy.exe"
@@ -165,8 +165,9 @@ Root: HKA; Subkey: "Software\RegisteredApplications"; ValueName: "Project Foxy";
 [Run]
 Filename: "ms-settings:defaultapps"; Description: "{cm:RunDefaultApps}"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
-; the program updating itself runs this installer silently (/update=1): start it again
-Filename: "{app}\{#AppExe}"; Flags: nowait; Check: IsSelfUpdate
+; the program updating itself runs this installer silently (/update=1): start it again, as the person and not as the
+; administrator this installer may be running as (an elevated program cannot be closed by the next, normal update)
+Filename: "{app}\{#AppExe}"; Flags: nowait runasoriginaluser; Check: IsSelfUpdate
 
 [Code]
 function IsSelfUpdate: Boolean;
