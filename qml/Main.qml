@@ -14,6 +14,8 @@ ApplicationWindow {
     flags: Qt.Window | Qt.FramelessWindowHint
     color: themeManager.background
     font.family: themeManager.fontFamily
+    font.hintingPreference: themeManager.skin === "win98" ? Font.PreferNoHinting : Font.PreferDefaultHinting
+    font.letterSpacing: themeManager.skin === "win98" ? 0.4 : 0
 
     // Set once the user has answered the "unsaved changes" question for closing.
     property bool closeApproved: false

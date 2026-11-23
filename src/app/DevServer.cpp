@@ -10,6 +10,8 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QUrl>
+#include <QQmlContext>
+#include <QQmlEngine>
 #include <QQuickItem>
 #include <QQuickWindow>
 #include <QTcpServer>
@@ -137,6 +139,11 @@ QString DevServer::run(const QString &line)
         if (words[1] == QLatin1String("stop"))
             return framesReport();
     }
+    // theme <id>: switches the theme as the Apariencia page does (modern-light, modern-dark, win98, win98-dark)
+    if (command == QLatin1String("theme") && words.size() == 2) {
+        QObject *themes = qmlEngine(m_window)->rootContext()->contextProperty(QStringLiteral("themeManager")).value<QObject *>();
+        return themes && QMetaObject::invokeMethod(themes, "setTheme", Q_ARG(QString, words[1])) ? QStringLiteral("ok") : QStringLiteral("error: cannot set the theme");
+    }
     if (command == QLatin1String("grab") && words.size() == 2)
         return m_window->grabWindow().save(words[1]) ? QStringLiteral("ok") : QStringLiteral("error: cannot write the file");
 
@@ -249,7 +256,7 @@ QString DevServer::run(const QString &line)
                                           : QMetaObject::invokeMethod(item, function.constData());
         return ok ? QStringLiteral("ok") : QStringLiteral("error: cannot call %1").arg(words[2]);
     }
-    return QStringLiteral("error: unknown command (items | get <name> <property> | click <name> | call <name> <function> [arg] | grab <file.png> | frames start|stop)");
+    return QStringLiteral("error: unknown command (items | get <name> <property> | click <name> | call <name> <function> [arg] | theme <id> | grab <file.png> | frames start|stop)");
 }
 
 QString DevServer::framesReport()
