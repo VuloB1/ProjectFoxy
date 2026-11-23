@@ -165,8 +165,9 @@ Root: HKA; Subkey: "Software\RegisteredApplications"; ValueName: "Project Foxy";
 [Run]
 Filename: "ms-settings:defaultapps"; Description: "{cm:RunDefaultApps}"; Flags: postinstall shellexec skipifsilent unchecked; Tasks: assoc
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
-; the program updating itself runs this installer silently (/update=1): start it again
-Filename: "{app}\{#AppExe}"; Flags: nowait; Check: IsSelfUpdate
+; the program updating itself runs this installer silently (/update=1): start it again, as the person and not as the
+; administrator this installer may be running as (an elevated program cannot be closed by the next, normal update)
+Filename: "{app}\{#AppExe}"; Flags: nowait runasoriginaluser; Check: IsSelfUpdate
 
 [Code]
 function IsSelfUpdate: Boolean;

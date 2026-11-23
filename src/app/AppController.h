@@ -371,6 +371,9 @@ public slots:
     // Windows' own undo-delete still applies) and advances to the next
     // remaining file in the folder, if any.
     bool deleteCurrentFile();
+    // Whether deleting the current file can be undone from the Recycle Bin / trash. Windows has no bin on a USB stick
+    // or a network drive (a file bigger than the bin is deleted for good too: that case is only caught by Windows' own question).
+    bool currentFileGoesToTrash() const;
 
     // Bakes the current image out to a PNG and sets it as the desktop wallpaper (Windows: SPI_SETDESKWALLPAPER;
     // Linux: the desktop's own tool, else the Wallpaper portal). Does not block on Linux; the outcome comes as
